@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SKKS — โรงเรียนสวนสนขอนแก่น | Suanson Khon Kaen School</title>
-  <meta name="description" content="โรงเรียนสวนสนขอนแก่น (SKKS) เปิดสอนระดับเตรียมอนุบาลถึงมัธยมศึกษาปีที่ 3 หลักสูตร English Program (EP) และ Mini English Program (MEP) รับรองโดย University of Cambridge" />
-  <meta name="keywords" content="โรงเรียนสวนสนขอนแก่น, SKKS, Suanson Khon Kaen School, English Program, Mini English Program, EP, MEP, Cambridge, ขอนแก่น, อนุบาล, ประถม, มัธยม" />
+  <title>SKKS — Suanson Khon Kaen School</title>
+  <meta name="description" content="Suanson Khon Kaen School (SKKS) offers education from Pre-Kindergarten to Grade 9, with English Program (EP) and Mini English Program (MEP) certified by University of Cambridge." />
+  <meta name="keywords" content="SKKS, Suanson Khon Kaen School, English Program, Mini English Program, EP, MEP, Cambridge, Khon Kaen, kindergarten, primary, secondary, international school" />
   <meta name="author" content="Suanson Khon Kaen School" />
   
   <!-- Open Graph -->
-  <meta property="og:title" content="SKKS — โรงเรียนสวนสนขอนแก่น" />
-  <meta property="og:description" content="ปลูกฝังต้นกล้าสู่โลกแห่งความรู้ — หลักสูตร EP/MEP รับรองโดย Cambridge" />
+  <meta property="og:title" content="SKKS — Suanson Khon Kaen School" />
+  <meta property="og:description" content="Nurturing young minds toward a world of knowledge — EP/MEP curriculum certified by Cambridge" />
   <meta property="og:image" content="images/hero-bg.png" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://suansonkk.com" />
-  <meta property="og:locale" content="th_TH" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="th_TH" />
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="SKKS — โรงเรียนสวนสนขอนแก่น" />
-  <meta name="twitter:description" content="หลักสูตร EP/MEP รับรอง Cambridge — เปิดรับสมัครปีการศึกษา 2569" />
+  <meta name="twitter:title" content="SKKS — Suanson Khon Kaen School" />
+  <meta name="twitter:description" content="EP/MEP curriculum certified by Cambridge — Admissions Open for 2026" />
   <meta name="twitter:image" content="images/hero-bg.png" />
   
   <!-- Fonts -->
@@ -38,20 +39,23 @@
   {
     "@context": "https://schema.org",
     "@type": "School",
-    "name": "โรงเรียนสวนสนขอนแก่น",
-    "alternateName": "Suanson Khon Kaen School",
+    "name": "Suanson Khon Kaen School",
+    "alternateName": "โรงเรียนสวนสนขอนแก่น",
     "url": "https://suansonkk.com",
     "logo": "https://suansonkk.com/images/logo.png",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "ขอนแก่น",
-      "addressRegion": "ขอนแก่น",
+      "addressLocality": "Khon Kaen",
+      "addressRegion": "Khon Kaen",
       "addressCountry": "TH"
     },
     "telephone": "+66-43-XXX-XXXX",
     "email": "info@suansonkk.com"
   }
   </script>
+  
+  <!-- i18n script: load before content -->
+  <script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -61,13 +65,14 @@
       <div class="top-bar-left">
         <span>📞 043-XXX-XXXX</span>
         <span>✉ info@suansonkk.com</span>
-        <span class="hide-mobile">📍 ขอนแก่น</span>
+        <span class="hide-mobile" data-i18n="topbar.location">📍 Khon Kaen</span>
       </div>
       <div class="top-bar-right">
-        <a href="#" class="hide-mobile">📅 ปฏิทินการศึกษา</a>
-        <a href="pages/dashboard.html">🔒 เข้าระบบ</a>
+        <a href="#" class="hide-mobile" data-i18n="topbar.calendar">📅 Academic Calendar</a>
+        <a href="pages/dashboard.html" data-i18n="topbar.login">🔒 Sign In</a>
         <span class="lang-switch">
-          <a href="#" class="active">TH</a> | <a href="#">EN</a>
+          <a href="#" data-lang="en" class="active" onclick="event.preventDefault();i18n.set('en')">EN</a> | 
+          <a href="#" data-lang="th" onclick="event.preventDefault();i18n.set('th')">TH</a>
         </span>
       </div>
     </div>
@@ -85,30 +90,30 @@
       </a>
       
       <ul class="nav-menu" id="navMenu">
-        <li><a href="#home" class="active">หน้าแรก</a></li>
+        <li><a href="#home" class="active" data-i18n="nav.home">Home</a></li>
         <li class="has-dropdown">
-          <a href="#about">เกี่ยวกับเรา ▾</a>
+          <a href="#about" data-i18n="nav.about">About Us ▾</a>
           <ul class="dropdown">
-            <li><a href="#about">วิสัยทัศน์ / พันธกิจ</a></li>
-            <li><a href="#history">ประวัติโรงเรียน</a></li>
-            <li><a href="#staff">ครูและบุคลากร</a></li>
-            <li><a href="#facilities">อาคารสถานที่</a></li>
+            <li><a href="#about" data-i18n="nav.about.vision">Vision / Mission</a></li>
+            <li><a href="#history" data-i18n="nav.about.history">School History</a></li>
+            <li><a href="#staff" data-i18n="nav.about.staff">Faculty & Staff</a></li>
+            <li><a href="#facilities" data-i18n="nav.about.facilities">Facilities</a></li>
           </ul>
         </li>
         <li class="has-dropdown">
-          <a href="#programs">หลักสูตร ▾</a>
+          <a href="#programs" data-i18n="nav.programs">Programs ▾</a>
           <ul class="dropdown">
-            <li><a href="#programs">Pre-Kindergarten</a></li>
-            <li><a href="#programs">Kindergarten</a></li>
-            <li><a href="#programs">English Program (EP)</a></li>
-            <li><a href="#programs">Mini English Program (MEP)</a></li>
+            <li><a href="#programs" data-i18n="nav.programs.prek">Pre-Kindergarten</a></li>
+            <li><a href="#programs" data-i18n="nav.programs.k">Kindergarten</a></li>
+            <li><a href="#programs" data-i18n="nav.programs.ep">English Program (EP)</a></li>
+            <li><a href="#programs" data-i18n="nav.programs.mep">Mini English Program (MEP)</a></li>
           </ul>
         </li>
-        <li><a href="#achievements">ผลงาน</a></li>
-        <li><a href="#news">ข่าวสาร</a></li>
-        <li><a href="#tuition">ค่าเทอม</a></li>
-        <li><a href="#contact">ติดต่อ</a></li>
-        <li><a href="#admissions" class="nav-cta">สมัครเรียน</a></li>
+        <li><a href="#achievements" data-i18n="nav.achievements">Achievements</a></li>
+        <li><a href="#news" data-i18n="nav.news">News</a></li>
+        <li><a href="#tuition" data-i18n="nav.tuition">Tuition</a></li>
+        <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+        <li><a href="#admissions" class="nav-cta" data-i18n="nav.apply">Apply Now</a></li>
       </ul>
       
       <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
@@ -119,39 +124,38 @@
   <section class="hero" id="home">
     <div class="hero-container">
       <div class="hero-content">
-        <span class="hero-badge fade-in-up">🎉 เปิดรับสมัครปีการศึกษา 2569</span>
+        <span class="hero-badge fade-in-up" data-i18n="hero.badge">🎉 Admissions Open for Academic Year 2026</span>
         
         <h1 class="hero-title fade-in-up fade-delay-1">
-          ปลูกฝังต้นกล้า<br />
-          สู่<span class="accent">โลกแห่งความรู้</span>
+          <span data-i18n="hero.title.line1">Nurturing Young Minds</span><br />
+          <span data-i18n="hero.title.line2">Toward a</span> <span class="accent" data-i18n="hero.title.accent">World of Knowledge</span>
         </h1>
         
-        <p class="hero-subtitle fade-in-up fade-delay-2">
-          โรงเรียนสวนสนขอนแก่น (SKKS) เปิดสอนระดับเตรียมอนุบาลถึงมัธยมศึกษาปีที่ 3 
-          ด้วยหลักสูตร English Program และ Mini English Program ที่ได้รับการรับรองจาก University of Cambridge
+        <p class="hero-subtitle fade-in-up fade-delay-2" data-i18n="hero.subtitle">
+          Suanson Khon Kaen School (SKKS) offers education from Pre-Kindergarten to Grade 9, featuring English Program and Mini English Program certified by University of Cambridge.
         </p>
         
         <div class="hero-buttons fade-in-up fade-delay-3">
           <a href="#admissions" class="btn btn-primary">
-            สมัครเรียนเลย <span>→</span>
+            <span data-i18n="hero.btn.apply">Apply Now</span> <span>→</span>
           </a>
-          <a href="#programs" class="btn btn-secondary">
-            ดูหลักสูตร
+          <a href="#programs" class="btn btn-secondary" data-i18n="hero.btn.programs">
+            View Programs
           </a>
         </div>
         
         <div class="hero-stats fade-in-up fade-delay-4">
           <div class="stat-item">
             <div class="stat-number">15+</div>
-            <div class="stat-label">ปีแห่งความเชี่ยวชาญ</div>
+            <div class="stat-label" data-i18n="hero.stats.years">Years of Excellence</div>
           </div>
           <div class="stat-item">
             <div class="stat-number">500+</div>
-            <div class="stat-label">นักเรียนที่ไว้วางใจ</div>
+            <div class="stat-label" data-i18n="hero.stats.students">Trusted Students</div>
           </div>
           <div class="stat-item">
             <div class="stat-number">100</div>
-            <div class="stat-label">คะแนน O-NET เต็ม</div>
+            <div class="stat-label" data-i18n="hero.stats.onet">O-NET Perfect Score</div>
           </div>
         </div>
       </div>
@@ -162,16 +166,16 @@
         <div class="float-card float-card-1">
           <div class="float-icon green">🎓</div>
           <div class="float-text">
-            <strong>Cambridge</strong>
-            <span>Authorized Center</span>
+            <strong data-i18n="float.cambridge">Cambridge</strong>
+            <span data-i18n="float.cambridge.sub">Authorized Center</span>
           </div>
         </div>
         
         <div class="float-card float-card-2">
           <div class="float-icon blue">⭐</div>
           <div class="float-text">
-            <strong>O-NET 100</strong>
-            <span>คะแนนเต็มภาษาอังกฤษ</span>
+            <strong data-i18n="float.onet">O-NET 100</strong>
+            <span data-i18n="float.onet.sub">Perfect English Score</span>
           </div>
         </div>
       </div>
@@ -182,13 +186,13 @@
   <section class="trust-bar">
     <div class="container">
       <div class="trust-content">
-        <span class="trust-label">ได้รับการรับรองจาก</span>
+        <span class="trust-label" data-i18n="trust.label">Certified by</span>
         <div class="trust-logos">
-          <div class="trust-logo">🏛️ Cambridge</div>
-          <div class="trust-logo">📜 กระทรวงศึกษาธิการ</div>
-          <div class="trust-logo">🏆 สมศ.</div>
-          <div class="trust-logo">⭐ ISO 9001</div>
-          <div class="trust-logo">🌟 Microsoft Showcase</div>
+          <div class="trust-logo" data-i18n="trust.cambridge">🏛️ Cambridge</div>
+          <div class="trust-logo" data-i18n="trust.moe">📜 Ministry of Education</div>
+          <div class="trust-logo" data-i18n="trust.onesqa">🏆 ONESQA</div>
+          <div class="trust-logo" data-i18n="trust.iso">⭐ ISO 9001</div>
+          <div class="trust-logo" data-i18n="trust.microsoft">🌟 Microsoft Showcase</div>
         </div>
       </div>
     </div>
@@ -199,36 +203,41 @@
     <div class="container">
       <div class="about-grid">
         <div class="about-image">
-          <img src="images/hero-bg.png" alt="โรงเรียนสวนสนขอนแก่น" />
+          <img src="images/hero-bg.png" alt="SKKS Campus" />
           <div class="about-image-badge">
             <strong>15+</strong>
-            <span>ปีแห่งการพัฒนา</span>
+            <span data-i18n="about.badge">Years of Development</span>
           </div>
         </div>
         
         <div class="about-content">
-          <span class="section-tag">About SKKS</span>
-          <h2 class="section-title">โรงเรียนแห่งการเรียนรู้<br/>สู่อนาคตที่ยั่งยืน</h2>
-          <p class="about-lead">
-            "สวนสน" คือร่มเงาของต้นไม้ที่หยั่งรากลึก สื่อถึงความตั้งใจของเราในการบ่มเพาะนักเรียนให้เติบโตอย่างมั่นคง
-            ทั้งวิชาการ คุณธรรม และความเป็นพลเมืองโลก
+          <span class="section-tag" data-i18n="about.tag">About SKKS</span>
+          <h2 class="section-title" data-i18n="about.title">A School of Learning<br/>for a Sustainable Future</h2>
+          <p class="about-lead" data-i18n="about.lead">
+            "Suanson" represents the deeply rooted shade of pine trees, symbolizing our commitment to nurturing students with strong foundations.
           </p>
           
           <div class="vision-mission">
             <div class="vm-card">
               <div class="vm-icon">🌟</div>
-              <h4>วิสัยทัศน์</h4>
-              <p>เป็นโรงเรียนต้นแบบในภาคตะวันออกเฉียงเหนือ ที่ผลิตนักเรียนมีคุณภาพระดับสากล มีคุณธรรมและมีจิตสำนึกในความเป็นไทย</p>
+              <div>
+                <h4 data-i18n="about.vision.title">Vision</h4>
+                <p data-i18n="about.vision.text">To be a leading school in Northeastern Thailand that produces high-quality students with international standards.</p>
+              </div>
             </div>
             <div class="vm-card">
               <div class="vm-icon">🎯</div>
-              <h4>พันธกิจ</h4>
-              <p>จัดการศึกษาที่เน้นภาษาอังกฤษและทักษะแห่งศตวรรษที่ 21 พัฒนาคุณภาพครู และส่งเสริมการมีส่วนร่วมของผู้ปกครองและชุมชน</p>
+              <div>
+                <h4 data-i18n="about.mission.title">Mission</h4>
+                <p data-i18n="about.mission.text">Provide education emphasizing English and 21st-century skills.</p>
+              </div>
             </div>
             <div class="vm-card">
               <div class="vm-icon">💎</div>
-              <h4>ค่านิยม</h4>
-              <p>SKKS — Smart (ฉลาด), Kind (เมตตา), Knowledgeable (รอบรู้), Successful (ประสบความสำเร็จ)</p>
+              <div>
+                <h4 data-i18n="about.values.title">Values</h4>
+                <p data-i18n="about.values.text">SKKS — Smart, Kind, Knowledgeable, Successful</p>
+              </div>
             </div>
           </div>
         </div>
@@ -240,57 +249,57 @@
   <section class="section history-section" id="history">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Our Journey</span>
-        <h2 class="section-title">เส้นทางของ SKKS</h2>
-        <p class="section-subtitle">15 ปีแห่งการพัฒนาและความก้าวหน้า</p>
+        <span class="section-tag" data-i18n="timeline.tag">Our Journey</span>
+        <h2 class="section-title" data-i18n="timeline.title">SKKS's Journey</h2>
+        <p class="section-subtitle" data-i18n="timeline.subtitle">15 Years of Development and Progress</p>
       </div>
       
       <div class="timeline">
         <div class="timeline-item left">
           <div class="timeline-content">
-            <span class="timeline-year">2554</span>
-            <h4>ก่อตั้งโรงเรียน</h4>
-            <p>เริ่มต้นจากความฝันของผู้ก่อตั้ง เปิดโรงเรียนระดับอนุบาล มีนักเรียนรุ่นแรก 28 คน</p>
+            <span class="timeline-year">2011</span>
+            <h4 data-i18n="timeline.2011.title">School Founded</h4>
+            <p data-i18n="timeline.2011.text">Started from the founder's vision, opening as a kindergarten school with 28 students.</p>
           </div>
         </div>
         
         <div class="timeline-item right">
           <div class="timeline-content">
-            <span class="timeline-year">2557</span>
-            <h4>ขยายระดับประถม</h4>
-            <p>เปิดสอนระดับประถมศึกษาปีที่ 1 พร้อมนำหลักสูตร MEP เข้ามาใช้</p>
+            <span class="timeline-year">2014</span>
+            <h4 data-i18n="timeline.2014.title">Primary Level Expanded</h4>
+            <p data-i18n="timeline.2014.text">Opened Grade 1 with the introduction of MEP curriculum.</p>
           </div>
         </div>
         
         <div class="timeline-item left">
           <div class="timeline-content">
-            <span class="timeline-year">2561</span>
-            <h4>รับรอง Cambridge</h4>
-            <p>ได้รับการรับรองเป็น Cambridge Authorized Center และเปิดหลักสูตร EP เต็มรูปแบบ</p>
+            <span class="timeline-year">2018</span>
+            <h4 data-i18n="timeline.2018.title">Cambridge Certification</h4>
+            <p data-i18n="timeline.2018.text">Received certification as a Cambridge Authorized Center.</p>
           </div>
         </div>
         
         <div class="timeline-item right">
           <div class="timeline-content">
-            <span class="timeline-year">2564</span>
-            <h4>เปิดระดับมัธยมต้น</h4>
-            <p>เปิดสอนระดับมัธยมศึกษาตอนต้น (ม.1-ม.3) ทั้ง EP และ MEP</p>
+            <span class="timeline-year">2021</span>
+            <h4 data-i18n="timeline.2021.title">Junior High Opens</h4>
+            <p data-i18n="timeline.2021.text">Launched junior high school for both EP and MEP.</p>
           </div>
         </div>
         
         <div class="timeline-item left">
           <div class="timeline-content">
-            <span class="timeline-year">2568</span>
-            <h4>O-NET 100 คะแนน</h4>
-            <p>นักเรียนทำคะแนน O-NET เต็ม 100 คะแนน วิชาภาษาอังกฤษ ระดับ ป.6</p>
+            <span class="timeline-year">2025</span>
+            <h4 data-i18n="timeline.2025.title">O-NET 100 Score</h4>
+            <p data-i18n="timeline.2025.text">A student achieved a perfect 100 score on the English O-NET exam.</p>
           </div>
         </div>
         
         <div class="timeline-item right">
           <div class="timeline-content current">
-            <span class="timeline-year">2569</span>
-            <h4>ปัจจุบัน</h4>
-            <p>มีนักเรียนกว่า 524 คน ใน 25 ห้องเรียน ครบทุกระดับชั้น Pre-K ถึง ม.3</p>
+            <span class="timeline-year">2026</span>
+            <h4 data-i18n="timeline.2026.title">Present</h4>
+            <p data-i18n="timeline.2026.text">Over 524 students across 25 classrooms.</p>
           </div>
         </div>
       </div>
@@ -301,62 +310,62 @@
   <section class="section programs" id="programs">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Our Programs</span>
-        <h2 class="section-title">หลักสูตรของเรา</h2>
-        <p class="section-subtitle">
-          เรามุ่งเน้นการพัฒนาศักยภาพของผู้เรียนรอบด้าน ผ่านหลักสูตรที่ตอบโจทย์โลกสมัยใหม่
+        <span class="section-tag" data-i18n="programs.tag">Our Programs</span>
+        <h2 class="section-title" data-i18n="programs.title">Our Programs</h2>
+        <p class="section-subtitle" data-i18n="programs.subtitle">
+          We focus on holistic student development through programs designed for the modern world.
         </p>
       </div>
       
       <div class="programs-grid">
         <div class="program-card">
           <div class="program-icon">🎨</div>
-          <h3>Pre-Kindergarten</h3>
-          <p>ระดับเตรียมอนุบาล มุ่งเน้นพัฒนาการรอบด้านผ่านการเล่นและกิจกรรมสร้างสรรค์</p>
+          <h3 data-i18n="programs.prek.title">Pre-Kindergarten</h3>
+          <p data-i18n="programs.prek.text">Pre-K level focuses on holistic development through play and creative activities.</p>
           <ul class="program-features">
             <li>✓ Phonics & English Songs</li>
             <li>✓ Sensory Play</li>
             <li>✓ Fine Motor Skills</li>
           </ul>
-          <span class="program-grade">อายุ 2-3 ปี</span>
+          <span class="program-grade" data-i18n="programs.prek.age">Ages 2-3</span>
         </div>
         
         <div class="program-card">
           <div class="program-icon">🌟</div>
-          <h3>Kindergarten</h3>
-          <p>ระดับอนุบาล 1-3 ปูพื้นฐานทางวิชาการและทักษะชีวิต พร้อมเปิดโลกภาษาอังกฤษ</p>
+          <h3 data-i18n="programs.k.title">Kindergarten</h3>
+          <p data-i18n="programs.k.text">K1-K3 builds academic foundations and life skills, while introducing the English language.</p>
           <ul class="program-features">
             <li>✓ Cambridge Starters</li>
             <li>✓ STEM for Kids</li>
             <li>✓ Music & Movement</li>
           </ul>
-          <span class="program-grade">อายุ 3-6 ปี</span>
+          <span class="program-grade" data-i18n="programs.k.age">Ages 3-6</span>
         </div>
         
         <div class="program-card featured">
-          <div class="program-badge">แนะนำ</div>
+          <div class="program-badge" data-i18n="programs.featured">Featured</div>
           <div class="program-icon">📚</div>
-          <h3>English Program (EP)</h3>
-          <p>หลักสูตรที่เรียนเป็นภาษาอังกฤษเข้มข้น พร้อมครูเจ้าของภาษาและมาตรฐาน Cambridge</p>
+          <h3 data-i18n="programs.ep.title">English Program (EP)</h3>
+          <p data-i18n="programs.ep.text">Intensive English-medium curriculum with native speakers and Cambridge standards.</p>
           <ul class="program-features">
             <li>✓ Cambridge Curriculum</li>
             <li>✓ Native English Teachers</li>
             <li>✓ International Standards</li>
             <li>✓ Cambridge Exams (KET, PET, FCE)</li>
           </ul>
-          <span class="program-grade">ป.1 - ม.3</span>
+          <span class="program-grade" data-i18n="programs.ep.grade">Grades 1-9</span>
         </div>
         
         <div class="program-card">
           <div class="program-icon">🎯</div>
-          <h3>Mini English Program (MEP)</h3>
-          <p>หลักสูตรที่ผสมผสานภาษาอังกฤษและวิชาการไทยอย่างลงตัว เพื่อการเรียนรู้ที่สมดุล</p>
+          <h3 data-i18n="programs.mep.title">Mini English Program (MEP)</h3>
+          <p data-i18n="programs.mep.text">A balanced program blending English and Thai academics for a well-rounded learning experience.</p>
           <ul class="program-features">
-            <li>✓ ภาษาอังกฤษ 8-10 ชม./สัปดาห์</li>
-            <li>✓ วิชาการไทย</li>
+            <li>✓ 8-10 hrs English/week</li>
+            <li>✓ Thai Curriculum</li>
             <li>✓ Foreign Teachers</li>
           </ul>
-          <span class="program-grade">ป.1 - ม.3</span>
+          <span class="program-grade" data-i18n="programs.mep.grade">Grades 1-9</span>
         </div>
       </div>
     </div>
@@ -366,35 +375,35 @@
   <section class="section achievements" id="achievements">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Student Achievements</span>
-        <h2 class="section-title">ผลการสอบ O-NET ปี 2568</h2>
-        <p class="section-subtitle">
-          เราภูมิใจในความสำเร็จของลูกศิษย์ทุกคน ที่แสดงให้เห็นถึงคุณภาพของหลักสูตร SKKS
+        <span class="section-tag" data-i18n="achievements.tag">Student Achievements</span>
+        <h2 class="section-title" data-i18n="achievements.title">O-NET Results 2025</h2>
+        <p class="section-subtitle" data-i18n="achievements.subtitle">
+          We are proud of every student's success.
         </p>
       </div>
       
       <div class="achievements-stats">
         <div class="achievement-stat">
           <div class="number">100</div>
-          <div class="label">คะแนนเต็มภาษาอังกฤษ</div>
+          <div class="label" data-i18n="achievements.stat1">Perfect English Score</div>
         </div>
         <div class="achievement-stat">
           <div class="number">95%</div>
-          <div class="label">นักเรียนเหนือค่าเฉลี่ยประเทศ</div>
+          <div class="label" data-i18n="achievements.stat2">Above National Average</div>
         </div>
         <div class="achievement-stat">
           <div class="number">20+</div>
-          <div class="label">นักเรียนสอบปีนี้</div>
+          <div class="label" data-i18n="achievements.stat3">Students This Year</div>
         </div>
         <div class="achievement-stat">
           <div class="number">5</div>
-          <div class="label">วิชาที่ทำคะแนนเด่น</div>
+          <div class="label" data-i18n="achievements.stat4">Outstanding Subjects</div>
         </div>
       </div>
       
       <div class="students-slider-wrapper">
         <div class="slider-controls">
-          <h3 class="slider-title">นักเรียนที่ทำคะแนนยอดเยี่ยม</h3>
+          <h3 class="slider-title" data-i18n="achievements.slider.title">Outstanding Students</h3>
           <div class="slider-buttons">
             <button class="slider-btn" id="prevBtn" aria-label="Previous">‹</button>
             <button class="slider-btn" id="nextBtn" aria-label="Next">›</button>
@@ -402,7 +411,7 @@
         </div>
         
         <div class="students-slider" id="studentsSlider">
-          <!-- Students will be loaded by JS -->
+          <!-- Students loaded by JS -->
         </div>
       </div>
     </div>
@@ -412,61 +421,61 @@
   <section class="section features">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Why SKKS</span>
-        <h2 class="section-title">ทำไมต้อง SKKS</h2>
-        <p class="section-subtitle">
-          เราคือโรงเรียนที่ใส่ใจในรายละเอียดของการเรียนรู้ในทุกด้าน
+        <span class="section-tag" data-i18n="features.tag">Why SKKS</span>
+        <h2 class="section-title" data-i18n="features.title">Why Choose SKKS</h2>
+        <p class="section-subtitle" data-i18n="features.subtitle">
+          A school that cares about every detail of learning.
         </p>
       </div>
       
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon icon-1">👨‍🏫</div>
-          <h3>ครูเจ้าของภาษา</h3>
-          <p>ครูชาวต่างชาติที่มีคุณภาพและประสบการณ์การสอนเด็กในวัยต่างๆ พร้อมพัฒนาทักษะการสื่อสาร</p>
+          <h3 data-i18n="features.f1.title">Native Speakers</h3>
+          <p data-i18n="features.f1.text">Quality international teachers with experience.</p>
         </div>
         
         <div class="feature-card">
           <div class="feature-icon icon-2">🏛️</div>
-          <h3>มาตรฐาน Cambridge</h3>
-          <p>หลักสูตรได้รับการรับรองจาก University of Cambridge มาตรฐานเทียบเท่าโรงเรียนนานาชาติ</p>
+          <h3 data-i18n="features.f2.title">Cambridge Standards</h3>
+          <p data-i18n="features.f2.text">Curriculum certified by University of Cambridge.</p>
         </div>
         
         <div class="feature-card">
           <div class="feature-icon icon-3">🌳</div>
-          <h3>สิ่งแวดล้อมที่ปลอดภัย</h3>
-          <p>พื้นที่กว้างขวางกับสวนสนร่มรื่น ปลอดภัย และเอื้อต่อการเรียนรู้ของเด็กในทุกวัย</p>
+          <h3 data-i18n="features.f3.title">Safe Environment</h3>
+          <p data-i18n="features.f3.text">Spacious campus, safe and conducive to learning.</p>
         </div>
         
         <div class="feature-card">
           <div class="feature-icon icon-4">💡</div>
-          <h3>เทคโนโลยีสมัยใหม่</h3>
-          <p>ห้องเรียนที่พร้อมด้วยเทคโนโลยี Smart Board และอุปกรณ์การเรียนรู้แบบ Interactive</p>
+          <h3 data-i18n="features.f4.title">Modern Technology</h3>
+          <p data-i18n="features.f4.text">Smart Boards and interactive learning equipment.</p>
         </div>
         
         <div class="feature-card">
           <div class="feature-icon icon-5">🎭</div>
-          <h3>กิจกรรมรอบด้าน</h3>
-          <p>กีฬา ศิลปะ ดนตรี และกิจกรรมพัฒนาความเป็นผู้นำ เพื่อเด็กที่สมบูรณ์แบบทุกด้าน</p>
+          <h3 data-i18n="features.f5.title">Diverse Activities</h3>
+          <p data-i18n="features.f5.text">Sports, arts, music, and leadership development.</p>
         </div>
         
         <div class="feature-card">
           <div class="feature-icon icon-6">❤️</div>
-          <h3>ดูแลแบบครอบครัว</h3>
-          <p>ขนาดห้องเรียนที่เหมาะสม ทำให้ครูดูแลนักเรียนได้อย่างทั่วถึงเหมือนคนในครอบครัว</p>
+          <h3 data-i18n="features.f6.title">Family-Like Care</h3>
+          <p data-i18n="features.f6.text">Suitable class sizes for thorough teacher attention.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============== STAFF / TEACHERS ============== -->
+  <!-- ============== STAFF ============== -->
   <section class="section staff-section" id="staff">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Our Team</span>
-        <h2 class="section-title">ทีมครูและบุคลากร</h2>
-        <p class="section-subtitle">
-          ครูคุณภาพ คือหัวใจของการศึกษาที่ดี — เรามีครูไทยและต่างชาติที่ผ่านการคัดเลือกอย่างเข้มข้น
+        <span class="section-tag" data-i18n="staff.tag">Our Team</span>
+        <h2 class="section-title" data-i18n="staff.title">Faculty and Staff</h2>
+        <p class="section-subtitle" data-i18n="staff.subtitle">
+          Quality teachers are the heart of good education.
         </p>
       </div>
       
@@ -474,42 +483,42 @@
         <div class="staff-stat-card">
           <div class="staff-stat-icon">👨‍🏫</div>
           <div class="staff-stat-num">42</div>
-          <div class="staff-stat-label">ครูทั้งหมด</div>
+          <div class="staff-stat-label" data-i18n="staff.stat1">Total Teachers</div>
         </div>
         <div class="staff-stat-card">
           <div class="staff-stat-icon">🌎</div>
           <div class="staff-stat-num">12</div>
-          <div class="staff-stat-label">ครูเจ้าของภาษา</div>
+          <div class="staff-stat-label" data-i18n="staff.stat2">Native Speakers</div>
         </div>
         <div class="staff-stat-card">
           <div class="staff-stat-icon">🎓</div>
           <div class="staff-stat-num">85%</div>
-          <div class="staff-stat-label">ปริญญาโทขึ้นไป</div>
+          <div class="staff-stat-label" data-i18n="staff.stat3">Master's Degree+</div>
         </div>
         <div class="staff-stat-card">
           <div class="staff-stat-icon">⏱️</div>
           <div class="staff-stat-num">8.5</div>
-          <div class="staff-stat-label">ปีประสบการณ์เฉลี่ย</div>
+          <div class="staff-stat-label" data-i18n="staff.stat4">Avg. Years Experience</div>
         </div>
       </div>
       
       <div class="staff-grid">
         <div class="staff-card">
           <div class="staff-avatar">
-            <div class="staff-initial" style="background: linear-gradient(135deg, #5BB8E0, #7CB342)">ดร</div>
+            <div class="staff-initial" style="background: linear-gradient(135deg, #5BB8E0, #7CB342)">Dr</div>
           </div>
-          <h4>ดร. สมศักดิ์ พิทักษ์ไทย</h4>
-          <span class="staff-role">ผู้อำนวยการโรงเรียน</span>
-          <p>ปริญญาเอก การบริหารการศึกษา จุฬาฯ • 25 ปีในวงการการศึกษา</p>
+          <h4>Dr. Somsak Pithakthai</h4>
+          <span class="staff-role">School Director</span>
+          <p>Ph.D. Educational Administration, Chulalongkorn University • 25 years experience</p>
         </div>
         
         <div class="staff-card">
           <div class="staff-avatar">
-            <div class="staff-initial" style="background: linear-gradient(135deg, #EC4899, #7C3AED)">อ</div>
+            <div class="staff-initial" style="background: linear-gradient(135deg, #EC4899, #7C3AED)">N</div>
           </div>
-          <h4>อ. นันทนา ศรีสวัสดิ์</h4>
-          <span class="staff-role">รองผอ. ฝ่ายวิชาการ</span>
-          <p>ปริญญาโท การสอนภาษาอังกฤษ • 18 ปีประสบการณ์ • Cambridge Certified</p>
+          <h4>Nantana Srisawat</h4>
+          <span class="staff-role">Vice Director, Academics</span>
+          <p>M.Ed. English Teaching • 18 years experience • Cambridge Certified</p>
         </div>
         
         <div class="staff-card">
@@ -523,16 +532,16 @@
         
         <div class="staff-card">
           <div class="staff-avatar">
-            <div class="staff-initial" style="background: linear-gradient(135deg, #16A34A, #5BB8E0)">อ</div>
+            <div class="staff-initial" style="background: linear-gradient(135deg, #16A34A, #5BB8E0)">P</div>
           </div>
-          <h4>อ. ปราณี วงศ์ไทย</h4>
-          <span class="staff-role">หัวหน้าสายชั้นอนุบาล</span>
-          <p>ปริญญาโท การศึกษาปฐมวัย • 15 ปีประสบการณ์</p>
+          <h4>Pranee Wongthai</h4>
+          <span class="staff-role">Head of Kindergarten</span>
+          <p>M.Ed. Early Childhood Education • 15 years experience</p>
         </div>
       </div>
       
       <div class="staff-cta">
-        <a href="#contact" class="btn btn-secondary">ดูทีมครูทั้งหมด →</a>
+        <a href="#contact" class="btn btn-secondary" data-i18n="staff.cta">View All Faculty →</a>
       </div>
     </div>
   </section>
@@ -541,232 +550,232 @@
   <section class="section facilities-section" id="facilities">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Our Campus</span>
-        <h2 class="section-title">อาคารสถานที่</h2>
-        <p class="section-subtitle">
-          พื้นที่กว่า 15 ไร่ ออกแบบเพื่อการเรียนรู้และการเติบโตของนักเรียน
+        <span class="section-tag" data-i18n="facilities.tag">Our Campus</span>
+        <h2 class="section-title" data-i18n="facilities.title">Facilities</h2>
+        <p class="section-subtitle" data-i18n="facilities.subtitle">
+          15+ acres designed for student learning and growth.
         </p>
       </div>
       
       <div class="facilities-grid">
         <div class="facility-card">
           <div class="facility-icon">📚</div>
-          <h4>ห้องสมุด</h4>
-          <p>หนังสือกว่า 8,000 เล่ม ทั้งภาษาไทยและอังกฤษ มี Reading Corner สำหรับเด็กเล็ก</p>
+          <h4 data-i18n="facilities.f1.title">Library</h4>
+          <p data-i18n="facilities.f1.text">Over 8,000 books in Thai and English.</p>
         </div>
         
         <div class="facility-card">
           <div class="facility-icon">🔬</div>
-          <h4>ห้องวิทยาศาสตร์</h4>
-          <p>3 ห้องปฏิบัติการ พร้อมอุปกรณ์ครบครัน ปลอดภัยสำหรับการทดลอง</p>
+          <h4 data-i18n="facilities.f2.title">Science Lab</h4>
+          <p data-i18n="facilities.f2.text">3 laboratories fully equipped.</p>
         </div>
         
         <div class="facility-card">
           <div class="facility-icon">💻</div>
-          <h4>ห้องคอมพิวเตอร์</h4>
-          <p>คอมพิวเตอร์ 80 เครื่อง สำหรับเรียน Coding, Robotics และ Digital Skills</p>
+          <h4 data-i18n="facilities.f3.title">Computer Lab</h4>
+          <p data-i18n="facilities.f3.text">80 computers for Coding, Robotics, Digital Skills.</p>
         </div>
         
         <div class="facility-card">
           <div class="facility-icon">⚽</div>
-          <h4>สนามกีฬา</h4>
-          <p>สนามฟุตบอล สนามบาส สระว่ายน้ำ และห้องยิมเนเซียม</p>
+          <h4 data-i18n="facilities.f4.title">Sports Field</h4>
+          <p data-i18n="facilities.f4.text">Football, basketball, swimming pool, gym.</p>
         </div>
         
         <div class="facility-card">
           <div class="facility-icon">🎨</div>
-          <h4>ห้องศิลปะและดนตรี</h4>
-          <p>ห้องวาดรูป ห้องดนตรี ห้องเต้น พร้อมอุปกรณ์มาตรฐาน</p>
+          <h4 data-i18n="facilities.f5.title">Arts & Music</h4>
+          <p data-i18n="facilities.f5.text">Art, music, and dance studios.</p>
         </div>
         
         <div class="facility-card">
           <div class="facility-icon">🍱</div>
-          <h4>โรงอาหาร</h4>
-          <p>โรงอาหารสะอาด อาหารที่ผ่านมาตรฐาน อย. เพื่อสุขภาพของนักเรียน</p>
+          <h4 data-i18n="facilities.f6.title">Cafeteria</h4>
+          <p data-i18n="facilities.f6.text">Clean, FDA-certified meals.</p>
         </div>
         
         <div class="facility-card">
           <div class="facility-icon">🏥</div>
-          <h4>ห้องพยาบาล</h4>
-          <p>มีพยาบาลประจำตลอดเวลาเปิดเรียน พร้อมอุปกรณ์การปฐมพยาบาลครบ</p>
+          <h4 data-i18n="facilities.f7.title">Health Center</h4>
+          <p data-i18n="facilities.f7.text">Full-time nurse with first-aid equipment.</p>
         </div>
         
         <div class="facility-card">
           <div class="facility-icon">🚌</div>
-          <h4>รถรับ-ส่ง</h4>
-          <p>บริการรถรับ-ส่งครอบคลุมพื้นที่ในเขตเมืองขอนแก่น</p>
+          <h4 data-i18n="facilities.f8.title">School Bus</h4>
+          <p data-i18n="facilities.f8.text">Pick-up & drop-off in Khon Kaen city.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============== TUITION FEES ============== -->
+  <!-- ============== TUITION ============== -->
   <section class="section tuition-section" id="tuition">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Tuition Fees</span>
-        <h2 class="section-title">อัตราค่าเทอม</h2>
-        <p class="section-subtitle">
-          ค่าเทอมต่อภาคเรียน ปีการศึกษา 2569 (รวมค่าเรียน ค่าหนังสือ ค่ากิจกรรม)
+        <span class="section-tag" data-i18n="tuition.tag">Tuition Fees</span>
+        <h2 class="section-title" data-i18n="tuition.title">Tuition Fees</h2>
+        <p class="section-subtitle" data-i18n="tuition.subtitle">
+          Fees per semester, Academic Year 2026.
         </p>
       </div>
       
       <div class="tuition-grid">
         <div class="tuition-card">
           <div class="tuition-header">
-            <h3>Pre-K & Kindergarten</h3>
-            <span class="tuition-grade">เตรียมอนุบาล - อ.3</span>
+            <h3 data-i18n="tuition.prek.title">Pre-K & Kindergarten</h3>
+            <span class="tuition-grade" data-i18n="tuition.prek.grade">Pre-K - K3</span>
           </div>
           <div class="tuition-price">
             <span class="currency">฿</span>
             <span class="amount">35,000<span style="font-size:24px"> - 40,000</span></span>
-            <span class="period">/ ภาคเรียน</span>
+            <span class="period" data-i18n="tuition.period">/ semester</span>
           </div>
           <ul class="tuition-features">
-            <li>✓ ค่าเรียนทั้งหมด</li>
-            <li>✓ หนังสือเรียน</li>
-            <li>✓ อาหารกลางวัน + อาหารว่าง</li>
-            <li>✓ กิจกรรมเสริม</li>
-            <li>✓ ประกันอุบัติเหตุ</li>
+            <li>✓ Tuition</li>
+            <li>✓ Textbooks</li>
+            <li>✓ Lunch + Snacks</li>
+            <li>✓ Activities</li>
+            <li>✓ Accident Insurance</li>
           </ul>
-          <a href="#admissions" class="btn btn-secondary">สมัครเรียน</a>
+          <a href="#admissions" class="btn btn-secondary" data-i18n="tuition.btn">Apply Now</a>
         </div>
         
         <div class="tuition-card featured">
-          <div class="tuition-badge">แนะนำ</div>
+          <div class="tuition-badge" data-i18n="tuition.featured">Recommended</div>
           <div class="tuition-header">
-            <h3>English Program</h3>
-            <span class="tuition-grade">ป.1 - ม.3</span>
+            <h3 data-i18n="tuition.ep.title">English Program</h3>
+            <span class="tuition-grade" data-i18n="tuition.ep.grade">Grades 1-9</span>
           </div>
           <div class="tuition-price">
             <span class="currency">฿</span>
             <span class="amount">67,500<span style="font-size:24px"> - 82,500</span></span>
-            <span class="period">/ ภาคเรียน</span>
+            <span class="period" data-i18n="tuition.period">/ semester</span>
           </div>
           <ul class="tuition-features">
             <li>✓ Cambridge Curriculum</li>
             <li>✓ Native English Teachers</li>
-            <li>✓ ตำราภาษาอังกฤษ</li>
-            <li>✓ ค่าสอบ Cambridge (KET/PET)</li>
-            <li>✓ ทัศนศึกษานอกสถานที่</li>
+            <li>✓ English Textbooks</li>
+            <li>✓ Cambridge Exam Fees</li>
+            <li>✓ Field Trips</li>
             <li>✓ Summer Camp</li>
           </ul>
-          <a href="#admissions" class="btn btn-primary">สมัครเรียน</a>
+          <a href="#admissions" class="btn btn-primary" data-i18n="tuition.btn">Apply Now</a>
         </div>
         
         <div class="tuition-card">
           <div class="tuition-header">
-            <h3>Mini English Program</h3>
-            <span class="tuition-grade">ป.1 - ม.3</span>
+            <h3 data-i18n="tuition.mep.title">Mini English Program</h3>
+            <span class="tuition-grade" data-i18n="tuition.mep.grade">Grades 1-9</span>
           </div>
           <div class="tuition-price">
             <span class="currency">฿</span>
             <span class="amount">45,000<span style="font-size:24px"> - 55,000</span></span>
-            <span class="period">/ ภาคเรียน</span>
+            <span class="period" data-i18n="tuition.period">/ semester</span>
           </div>
           <ul class="tuition-features">
-            <li>✓ ค่าเรียนทั้งหมด</li>
-            <li>✓ หนังสือเรียน</li>
-            <li>✓ ภาษาอังกฤษ 8-10 ชม./สัปดาห์</li>
-            <li>✓ ครูต่างชาติบางวิชา</li>
-            <li>✓ ทัศนศึกษานอกสถานที่</li>
+            <li>✓ Tuition</li>
+            <li>✓ Textbooks</li>
+            <li>✓ 8-10 hrs English/week</li>
+            <li>✓ Foreign Teachers</li>
+            <li>✓ Field Trips</li>
           </ul>
-          <a href="#admissions" class="btn btn-secondary">สมัครเรียน</a>
+          <a href="#admissions" class="btn btn-secondary" data-i18n="tuition.btn">Apply Now</a>
         </div>
       </div>
       
       <div class="tuition-note">
-        <h4>💡 หมายเหตุ</h4>
+        <h4 data-i18n="tuition.note.title">💡 Notes</h4>
         <ul>
-          <li>ค่าเทอมข้างต้นเป็นยอดต่อ <strong>1 ภาคเรียน</strong> โดย 1 ปีการศึกษามี 2 ภาคเรียน</li>
-          <li>มีส่วนลด 5% สำหรับพี่น้องที่เรียนพร้อมกัน 2 คนขึ้นไป</li>
-          <li>มีส่วนลด 3% หากชำระเต็มจำนวนล่วงหน้าทั้งปีการศึกษา</li>
-          <li>มีทุนการศึกษาสำหรับนักเรียนที่มีผลการเรียนดีเด่น (โปรดสอบถามเพิ่มเติม)</li>
+          <li data-i18n="tuition.note.1">Above tuition is per <strong>1 semester</strong> (2 semesters per academic year).</li>
+          <li data-i18n="tuition.note.2">5% discount for siblings.</li>
+          <li data-i18n="tuition.note.3">3% discount for full-year payment.</li>
+          <li data-i18n="tuition.note.4">Scholarships available for academic excellence.</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- ============== NEWS & EVENTS ============== -->
+  <!-- ============== NEWS ============== -->
   <section class="section news-section" id="news">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">News & Events</span>
-        <h2 class="section-title">ข่าวสารและกิจกรรม</h2>
-        <p class="section-subtitle">
-          ติดตามข่าวสารและกิจกรรมล่าสุดของโรงเรียน
+        <span class="section-tag" data-i18n="news.tag">News & Events</span>
+        <h2 class="section-title" data-i18n="news.title">News & Events</h2>
+        <p class="section-subtitle" data-i18n="news.subtitle">
+          Stay updated with our latest news and activities.
         </p>
       </div>
       
       <div class="news-grid">
         <article class="news-card featured-news">
           <div class="news-image">
-            <img src="images/student-onet.png" alt="O-NET 100 คะแนน" />
-            <span class="news-tag">ความสำเร็จ</span>
+            <img src="images/student-onet.png" alt="O-NET 100" />
+            <span class="news-tag" data-i18n="news.tag.success">Achievement</span>
           </div>
           <div class="news-content">
-            <span class="news-date">📅 15 เมษายน 2569</span>
-            <h3>นักเรียน SKKS คว้าคะแนน O-NET เต็ม 100 ภาษาอังกฤษ</h3>
-            <p>ด.ญ. อัยยา ทองคำ ชั้น ป.6/EP สร้างประวัติศาสตร์ใหม่ให้ SKKS ด้วยการทำคะแนน O-NET วิชาภาษาอังกฤษเต็ม 100 คะแนน เป็นความภูมิใจของครู ผู้ปกครอง และเพื่อนๆ ทุกคน</p>
-            <a href="#" class="news-link">อ่านต่อ →</a>
+            <span class="news-date" data-i18n="news.featured.date">📅 April 15, 2026</span>
+            <h3 data-i18n="news.featured.title">SKKS Student Achieves Perfect 100 O-NET English Score</h3>
+            <p data-i18n="news.featured.text">A Grade 6 EP student made history by scoring perfect 100.</p>
+            <a href="#" class="news-link" data-i18n="news.readmore">Read More →</a>
           </div>
         </article>
         
         <article class="news-card">
           <div class="news-image" style="background: linear-gradient(135deg, #5BB8E0, #7CB342)">
             <span class="news-emoji">🎓</span>
-            <span class="news-tag">รับสมัคร</span>
+            <span class="news-tag" data-i18n="news.tag.admissions">Admissions</span>
           </div>
           <div class="news-content">
-            <span class="news-date">📅 1 พฤษภาคม 2569</span>
-            <h3>เปิดรับสมัครนักเรียนปีการศึกษา 2569</h3>
-            <p>เปิดรับสมัครนักเรียนใหม่ Pre-K ถึง ม.3 ทั้งหลักสูตร EP และ MEP ตั้งแต่บัดนี้เป็นต้นไป</p>
-            <a href="#admissions" class="news-link">สมัครเลย →</a>
+            <span class="news-date" data-i18n="news.2.date">📅 May 1, 2026</span>
+            <h3 data-i18n="news.2.title">Admissions Open for Academic Year 2026</h3>
+            <p data-i18n="news.2.text">Open enrollment for new students Pre-K to Grade 9.</p>
+            <a href="#admissions" class="news-link" data-i18n="news.applynow">Apply Now →</a>
           </div>
         </article>
         
         <article class="news-card">
           <div class="news-image" style="background: linear-gradient(135deg, #F59E0B, #EC4899)">
             <span class="news-emoji">🎭</span>
-            <span class="news-tag">กิจกรรม</span>
+            <span class="news-tag" data-i18n="news.tag.event">Events</span>
           </div>
           <div class="news-content">
-            <span class="news-date">📅 28 เมษายน 2569</span>
-            <h3>SKKS Open House 2569</h3>
-            <p>เชิญผู้ปกครองและนักเรียนเข้าร่วมงาน Open House พบปะครูและทดลองเรียน วันที่ 25 พ.ค. นี้</p>
-            <a href="#" class="news-link">ดูรายละเอียด →</a>
+            <span class="news-date" data-i18n="news.3.date">📅 April 28, 2026</span>
+            <h3 data-i18n="news.3.title">SKKS Open House 2026</h3>
+            <p data-i18n="news.3.text">Parents and students invited to attend Open House on May 25.</p>
+            <a href="#" class="news-link" data-i18n="news.details">View Details →</a>
           </div>
         </article>
         
         <article class="news-card">
           <div class="news-image" style="background: linear-gradient(135deg, #7C3AED, #2563EB)">
             <span class="news-emoji">🏆</span>
-            <span class="news-tag">การแข่งขัน</span>
+            <span class="news-tag" data-i18n="news.tag.competition">Competition</span>
           </div>
           <div class="news-content">
-            <span class="news-date">📅 20 เมษายน 2569</span>
-            <h3>นักเรียน SKKS ชนะเลิศการแข่งขัน Spelling Bee ระดับภาค</h3>
-            <p>นักเรียนชั้น ม.2 ตัวแทนของ SKKS ชนะเลิศการแข่งขัน Spelling Bee ระดับภาคตะวันออกเฉียงเหนือ</p>
-            <a href="#" class="news-link">อ่านต่อ →</a>
+            <span class="news-date" data-i18n="news.4.date">📅 April 20, 2026</span>
+            <h3 data-i18n="news.4.title">SKKS Wins Regional Spelling Bee</h3>
+            <p data-i18n="news.4.text">Grade 8 student wins Northeastern Regional Championship.</p>
+            <a href="#" class="news-link" data-i18n="news.readmore">Read More →</a>
           </div>
         </article>
         
         <article class="news-card">
           <div class="news-image" style="background: linear-gradient(135deg, #16A34A, #FCD34D)">
             <span class="news-emoji">🌳</span>
-            <span class="news-tag">CSR</span>
+            <span class="news-tag" data-i18n="news.tag.csr">CSR</span>
           </div>
           <div class="news-content">
-            <span class="news-date">📅 10 เมษายน 2569</span>
-            <h3>กิจกรรมปลูกต้นไม้เพื่อสิ่งแวดล้อม</h3>
-            <p>นักเรียนและครูร่วมกันปลูกต้นไม้กว่า 200 ต้น ปลูกฝังจิตสำนึกรักษ์สิ่งแวดล้อม</p>
-            <a href="#" class="news-link">อ่านต่อ →</a>
+            <span class="news-date" data-i18n="news.5.date">📅 April 10, 2026</span>
+            <h3 data-i18n="news.5.title">Tree Planting Activity</h3>
+            <p data-i18n="news.5.text">Planted over 200 trees, instilling environmental awareness.</p>
+            <a href="#" class="news-link" data-i18n="news.readmore">Read More →</a>
           </div>
         </article>
       </div>
       
       <div style="text-align:center;margin-top:40px">
-        <a href="#" class="btn btn-secondary">ดูข่าวสารทั้งหมด →</a>
+        <a href="#" class="btn btn-secondary" data-i18n="news.viewall">View All News →</a>
       </div>
     </div>
   </section>
@@ -775,44 +784,44 @@
   <section class="section testimonials">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Testimonials</span>
-        <h2 class="section-title">เสียงจากผู้ปกครอง</h2>
-        <p class="section-subtitle">ความประทับใจจากครอบครัว SKKS</p>
+        <span class="section-tag" data-i18n="testimonials.tag">Testimonials</span>
+        <h2 class="section-title" data-i18n="testimonials.title">Parent Voices</h2>
+        <p class="section-subtitle" data-i18n="testimonials.subtitle">Impressions from the SKKS family</p>
       </div>
       
       <div class="testimonials-grid">
         <div class="testimonial-card">
           <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-          <p class="testimonial-text">"ส่งลูกมาเรียน SKKS ตั้งแต่อนุบาล 1 ตอนนี้ลูกเรียน ป.4 EP แล้ว เห็นพัฒนาการของลูกชัดเจน พูดอังกฤษได้คล่อง คุณครูดูแลดีมาก"</p>
+          <p class="testimonial-text" data-i18n="testimonials.t1.text">"My child has been at SKKS since K1, now in Grade 4 EP. Excellent care."</p>
           <div class="testimonial-author">
-            <div class="author-avatar" style="background: linear-gradient(135deg, #EC4899, #7C3AED)">ค</div>
+            <div class="author-avatar" style="background: linear-gradient(135deg, #EC4899, #7C3AED)">W</div>
             <div>
-              <strong>คุณวรรณา ประสิทธิ์</strong>
-              <span>ผู้ปกครอง ป.4/EP</span>
+              <strong data-i18n="testimonials.t1.author">Wanna Prasit</strong>
+              <span data-i18n="testimonials.t1.role">Parent of Grade 4/EP</span>
             </div>
           </div>
         </div>
         
         <div class="testimonial-card">
           <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-          <p class="testimonial-text">"คุ้มค่ามาก ลูกได้ทั้งภาษาและคุณธรรม ครูเอาใจใส่นักเรียนเหมือนคนในครอบครัว แนะนำสำหรับผู้ปกครองที่หาที่เรียนคุณภาพ"</p>
+          <p class="testimonial-text" data-i18n="testimonials.t2.text">"Excellent value. My child gains both language and character."</p>
           <div class="testimonial-author">
-            <div class="author-avatar" style="background: linear-gradient(135deg, #5BB8E0, #2563EB)">ส</div>
+            <div class="author-avatar" style="background: linear-gradient(135deg, #5BB8E0, #2563EB)">S</div>
             <div>
-              <strong>คุณสมศักดิ์ มั่นคง</strong>
-              <span>ผู้ปกครอง ม.2/MEP</span>
+              <strong data-i18n="testimonials.t2.author">Somsak Munkong</strong>
+              <span data-i18n="testimonials.t2.role">Parent of Grade 8/MEP</span>
             </div>
           </div>
         </div>
         
         <div class="testimonial-card">
           <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-          <p class="testimonial-text">"โรงเรียนสะอาด ปลอดภัย และมีกิจกรรมเสริมเยอะมาก ลูกชอบมาเรียนทุกวัน ที่สำคัญผลการเรียนดีขึ้นมาก"</p>
+          <p class="testimonial-text" data-i18n="testimonials.t3.text">"Clean, safe school with many activities. My child loves coming every day."</p>
           <div class="testimonial-author">
-            <div class="author-avatar" style="background: linear-gradient(135deg, #16A34A, #7CB342)">ป</div>
+            <div class="author-avatar" style="background: linear-gradient(135deg, #16A34A, #7CB342)">P</div>
             <div>
-              <strong>คุณปิยะนุช วงศ์ไทย</strong>
-              <span>ผู้ปกครอง อ.3</span>
+              <strong data-i18n="testimonials.t3.author">Piyanuch Wongthai</strong>
+              <span data-i18n="testimonials.t3.role">Parent of K3</span>
             </div>
           </div>
         </div>
@@ -824,66 +833,66 @@
   <section class="section admissions" id="admissions">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Admissions Open</span>
-        <h2 class="section-title">รับสมัครนักเรียน</h2>
-        <p class="section-subtitle">
-          เริ่มต้นเส้นทางการศึกษาที่ SKKS ได้ง่ายๆ ผ่านระบบสมัครออนไลน์
+        <span class="section-tag" data-i18n="admissions.tag">Admissions Open</span>
+        <h2 class="section-title" data-i18n="admissions.title">Student Admissions</h2>
+        <p class="section-subtitle" data-i18n="admissions.subtitle">
+          Start your educational journey at SKKS through our online application.
         </p>
       </div>
       
       <div class="admission-grid">
         <div class="admission-info">
-          <h3>ขั้นตอนการสมัคร</h3>
-          <p>เพียง 4 ขั้นตอนง่ายๆ คุณก็จะได้เป็นส่วนหนึ่งของครอบครัว SKKS เรามีระบบที่สะดวกและรวดเร็วที่สุด</p>
+          <h3 data-i18n="admissions.steps.title">Application Steps</h3>
+          <p data-i18n="admissions.steps.intro">Just 4 simple steps to become part of the SKKS family.</p>
           
           <ul class="admission-steps">
             <li>
               <span class="step-number">1</span>
               <div class="step-content">
-                <strong>กรอกข้อมูลนักเรียน</strong>
-                <span>ข้อมูลพื้นฐานและประวัติการศึกษา</span>
+                <strong data-i18n="admissions.step1.title">Student Information</strong>
+                <span data-i18n="admissions.step1.text">Basic info and education history</span>
               </div>
             </li>
             <li>
               <span class="step-number">2</span>
               <div class="step-content">
-                <strong>ข้อมูลผู้ปกครอง</strong>
-                <span>ข้อมูลสำหรับการติดต่อและประสานงาน</span>
+                <strong data-i18n="admissions.step2.title">Parent Information</strong>
+                <span data-i18n="admissions.step2.text">Contact and coordination details</span>
               </div>
             </li>
             <li>
               <span class="step-number">3</span>
               <div class="step-content">
-                <strong>ชำระค่าธรรมเนียม</strong>
-                <span>ชำระเงินผ่านระบบออนไลน์ที่ปลอดภัย</span>
+                <strong data-i18n="admissions.step3.title">Pay Application Fee</strong>
+                <span data-i18n="admissions.step3.text">Secure online payment</span>
               </div>
             </li>
             <li>
               <span class="step-number">4</span>
               <div class="step-content">
-                <strong>นัดหมายสัมภาษณ์</strong>
-                <span>ทีมงานจะติดต่อกลับเพื่อนัดหมาย</span>
+                <strong data-i18n="admissions.step4.title">Schedule Interview</strong>
+                <span data-i18n="admissions.step4.text">Our team will contact you</span>
               </div>
             </li>
           </ul>
           
           <div class="admission-docs">
-            <h4>📋 เอกสารที่ใช้</h4>
+            <h4 data-i18n="admissions.docs.title">📋 Required Documents</h4>
             <ul>
-              <li>สำเนาทะเบียนบ้านนักเรียน</li>
-              <li>สำเนาสูติบัตร</li>
-              <li>สำเนาบัตรประชาชนผู้ปกครอง</li>
-              <li>รูปถ่ายขนาด 1 นิ้ว 2 รูป</li>
-              <li>ผลการเรียนล่าสุด (ถ้ามี)</li>
+              <li data-i18n="admissions.docs.1">Student's house registration copy</li>
+              <li data-i18n="admissions.docs.2">Birth certificate copy</li>
+              <li data-i18n="admissions.docs.3">Parent's ID card copy</li>
+              <li data-i18n="admissions.docs.4">2 photos (1 inch)</li>
+              <li data-i18n="admissions.docs.5">Latest academic records (if any)</li>
             </ul>
           </div>
         </div>
         
         <div class="admission-form">
-          <!-- STEP 1: Student Info -->
+          <!-- STEP 1 -->
           <div class="form-step" id="step1">
-            <h3 class="form-title">📝 แบบฟอร์มสมัครเรียน</h3>
-            <p class="form-subtitle">กรุณากรอกข้อมูลให้ครบถ้วน</p>
+            <h3 class="form-title" data-i18n="form.title">📝 Application Form</h3>
+            <p class="form-subtitle" data-i18n="form.subtitle">Please fill out all information completely.</p>
             
             <div class="form-progress">
               <div class="progress-step active"></div>
@@ -891,54 +900,54 @@
               <div class="progress-step"></div>
               <div class="progress-step"></div>
             </div>
-            <div class="form-step-label">ขั้นตอนที่ 1 จาก 4 — ข้อมูลนักเรียน</div>
+            <div class="form-step-label" data-i18n="form.step1.label">Step 1 of 4 — Student Information</div>
             
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">ชื่อจริง <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.firstname">First Name</span> <span class="required">*</span></label>
                 <input type="text" class="form-input" id="firstName" required />
               </div>
               <div class="form-group">
-                <label class="form-label">นามสกุล <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.lastname">Last Name</span> <span class="required">*</span></label>
                 <input type="text" class="form-input" id="lastName" required />
               </div>
             </div>
             
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">ชื่อเล่น</label>
+                <label class="form-label" data-i18n="form.nickname">Nickname</label>
                 <input type="text" class="form-input" id="nickName" />
               </div>
               <div class="form-group">
-                <label class="form-label">วันเกิด <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.birthdate">Date of Birth</span> <span class="required">*</span></label>
                 <input type="date" class="form-input" id="birthDate" required />
               </div>
             </div>
             
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">เพศ <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.gender">Gender</span> <span class="required">*</span></label>
                 <select class="form-select" id="gender" required>
-                  <option value="">เลือก</option>
-                  <option value="male">ชาย</option>
-                  <option value="female">หญิง</option>
+                  <option value="" data-i18n-option="form.gender.select">Select</option>
+                  <option value="male" data-i18n-option="form.gender.male">Male</option>
+                  <option value="female" data-i18n-option="form.gender.female">Female</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">สัญชาติ</label>
-                <input type="text" class="form-input" id="nationality" value="ไทย" />
+                <label class="form-label" data-i18n="form.nationality">Nationality</label>
+                <input type="text" class="form-input" id="nationality" value="Thai" />
               </div>
             </div>
             
             <div class="form-actions">
-              <button class="btn btn-primary" onclick="goToStep(2)">ถัดไป →</button>
+              <button class="btn btn-primary" onclick="goToStep(2)" data-i18n="form.next">Next →</button>
             </div>
           </div>
           
-          <!-- STEP 2: Program & Parent -->
+          <!-- STEP 2 -->
           <div class="form-step" id="step2" style="display:none">
-            <h3 class="form-title">👨‍👩‍👧 ข้อมูลผู้ปกครอง</h3>
-            <p class="form-subtitle">เลือกหลักสูตรและกรอกข้อมูลผู้ปกครอง</p>
+            <h3 class="form-title">👨‍👩‍👧 <span data-i18n="admissions.step2.title">Parent Information</span></h3>
+            <p class="form-subtitle">Select program and parent details</p>
             
             <div class="form-progress">
               <div class="progress-step completed"></div>
@@ -946,13 +955,13 @@
               <div class="progress-step"></div>
               <div class="progress-step"></div>
             </div>
-            <div class="form-step-label">ขั้นตอนที่ 2 จาก 4 — หลักสูตรและผู้ปกครอง</div>
+            <div class="form-step-label" data-i18n="form.step2.label">Step 2 of 4 — Program & Parent</div>
             
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">หลักสูตร <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.program">Program</span> <span class="required">*</span></label>
                 <select class="form-select" id="program" required>
-                  <option value="">เลือกหลักสูตร</option>
+                  <option value="" data-i18n-option="form.program.select">Select Program</option>
                   <option value="prek">Pre-Kindergarten</option>
                   <option value="k">Kindergarten</option>
                   <option value="ep">English Program (EP)</option>
@@ -960,62 +969,60 @@
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">ระดับชั้น <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.grade">Grade</span> <span class="required">*</span></label>
                 <select class="form-select" id="grade" required>
-                  <option value="">เลือกระดับชั้น</option>
-                  <option>เตรียมอนุบาล</option>
-                  <option>อนุบาล 1</option>
-                  <option>อนุบาล 2</option>
-                  <option>อนุบาล 3</option>
-                  <option>ป.1</option><option>ป.2</option><option>ป.3</option>
-                  <option>ป.4</option><option>ป.5</option><option>ป.6</option>
-                  <option>ม.1</option><option>ม.2</option><option>ม.3</option>
+                  <option value="" data-i18n-option="form.grade.select">Select Grade</option>
+                  <option>Pre-K</option>
+                  <option>K1</option><option>K2</option><option>K3</option>
+                  <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+                  <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+                  <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
                 </select>
               </div>
             </div>
             
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">ชื่อผู้ปกครอง <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.parent.name">Parent's Name</span> <span class="required">*</span></label>
                 <input type="text" class="form-input" id="parentName" required />
               </div>
               <div class="form-group">
-                <label class="form-label">ความสัมพันธ์ <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.parent.relation">Relationship</span> <span class="required">*</span></label>
                 <select class="form-select" id="relation" required>
-                  <option value="">เลือก</option>
-                  <option>บิดา</option>
-                  <option>มารดา</option>
-                  <option>ผู้ปกครอง</option>
+                  <option value="" data-i18n-option="form.relation.select">Select</option>
+                  <option data-i18n-option="form.relation.father">Father</option>
+                  <option data-i18n-option="form.relation.mother">Mother</option>
+                  <option data-i18n-option="form.relation.guardian">Guardian</option>
                 </select>
               </div>
             </div>
             
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">เบอร์โทรศัพท์ <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.phone">Phone</span> <span class="required">*</span></label>
                 <input type="tel" class="form-input" id="phone" required />
               </div>
               <div class="form-group">
-                <label class="form-label">อีเมล <span class="required">*</span></label>
+                <label class="form-label"><span data-i18n="form.email">Email</span> <span class="required">*</span></label>
                 <input type="email" class="form-input" id="email" required />
               </div>
             </div>
             
             <div class="form-group full">
-              <label class="form-label">ที่อยู่</label>
-              <textarea class="form-textarea" id="address" placeholder="ที่อยู่ปัจจุบัน"></textarea>
+              <label class="form-label" data-i18n="form.address">Address</label>
+              <textarea class="form-textarea" id="address" data-i18n-placeholder="form.address.placeholder" placeholder="Current address"></textarea>
             </div>
             
             <div class="form-actions">
-              <button class="btn btn-back" onclick="goToStep(1)">← ย้อนกลับ</button>
-              <button class="btn btn-primary" onclick="goToStep(3)">ถัดไป →</button>
+              <button class="btn btn-back" onclick="goToStep(1)" data-i18n="form.back">← Back</button>
+              <button class="btn btn-primary" onclick="goToStep(3)" data-i18n="form.next">Next →</button>
             </div>
           </div>
           
-          <!-- STEP 3: Payment -->
+          <!-- STEP 3 -->
           <div class="form-step" id="step3" style="display:none">
-            <h3 class="form-title">💳 ชำระค่าธรรมเนียมสมัคร</h3>
-            <p class="form-subtitle">ค่าธรรมเนียมการสมัครและประเมินผล</p>
+            <h3 class="form-title" data-i18n="form.payment.title">💳 Pay Application Fee</h3>
+            <p class="form-subtitle" data-i18n="form.payment.subtitle">Application and assessment fees</p>
             
             <div class="form-progress">
               <div class="progress-step completed"></div>
@@ -1023,54 +1030,54 @@
               <div class="progress-step active"></div>
               <div class="progress-step"></div>
             </div>
-            <div class="form-step-label">ขั้นตอนที่ 3 จาก 4 — ชำระเงิน</div>
+            <div class="form-step-label" data-i18n="form.step3.label">Step 3 of 4 — Payment</div>
             
             <div class="payment-summary">
               <div class="payment-row">
-                <span>ค่าใบสมัคร</span>
+                <span data-i18n="form.payment.app">Application Fee</span>
                 <span>500.00 ฿</span>
               </div>
               <div class="payment-row">
-                <span>ค่าประเมินผล</span>
+                <span data-i18n="form.payment.assessment">Assessment Fee</span>
                 <span>1,000.00 ฿</span>
               </div>
               <div class="payment-row">
-                <span>ค่าธรรมเนียมระบบ</span>
+                <span data-i18n="form.payment.system">System Fee</span>
                 <span>50.00 ฿</span>
               </div>
               <div class="payment-row total">
-                <span>รวมทั้งสิ้น</span>
+                <span data-i18n="form.payment.total">Total</span>
                 <span>1,550.00 ฿</span>
               </div>
             </div>
             
-            <label class="form-label" style="margin-bottom: 12px">เลือกวิธีการชำระเงิน <span class="required">*</span></label>
+            <label class="form-label" style="margin-bottom: 12px"><span data-i18n="form.payment.method">Select Payment Method</span> <span class="required">*</span></label>
             <div class="payment-methods">
               <div class="payment-method selected" data-method="qr" onclick="selectPayment(this)">
                 <div class="icon">📱</div>
-                <div class="name">PromptPay / QR</div>
+                <div class="name" data-i18n="form.payment.qr">PromptPay / QR</div>
               </div>
               <div class="payment-method" data-method="card" onclick="selectPayment(this)">
                 <div class="icon">💳</div>
-                <div class="name">บัตรเครดิต/เดบิต</div>
+                <div class="name" data-i18n="form.payment.card">Credit/Debit Card</div>
               </div>
               <div class="payment-method" data-method="bank" onclick="selectPayment(this)">
                 <div class="icon">🏦</div>
-                <div class="name">โอนผ่านธนาคาร</div>
+                <div class="name" data-i18n="form.payment.bank">Bank Transfer</div>
               </div>
               <div class="payment-method" data-method="wallet" onclick="selectPayment(this)">
                 <div class="icon">💰</div>
-                <div class="name">e-Wallet</div>
+                <div class="name" data-i18n="form.payment.wallet">e-Wallet</div>
               </div>
             </div>
             
             <div class="form-actions">
-              <button class="btn btn-back" onclick="goToStep(2)">← ย้อนกลับ</button>
-              <button class="btn btn-primary" onclick="goToStep(4)">ชำระเงิน →</button>
+              <button class="btn btn-back" onclick="goToStep(2)" data-i18n="form.back">← Back</button>
+              <button class="btn btn-primary" onclick="goToStep(4)" data-i18n="form.payment.pay">Pay Now →</button>
             </div>
           </div>
           
-          <!-- STEP 4: Success -->
+          <!-- STEP 4 -->
           <div class="form-step" id="step4" style="display:none">
             <div class="form-progress">
               <div class="progress-step completed"></div>
@@ -1081,13 +1088,13 @@
             
             <div class="success-screen">
               <div class="success-icon">✓</div>
-              <h3>สมัครเรียนสำเร็จ!</h3>
-              <p>ขอบคุณที่ไว้วางใจ SKKS เราได้รับข้อมูลของคุณเรียบร้อยแล้ว<br/>ทีมงานจะติดต่อกลับภายใน 24 ชั่วโมง</p>
+              <h3 data-i18n="form.success.title">Application Submitted!</h3>
+              <p data-i18n="form.success.text">Thank you for trusting SKKS. Our team will contact you within 24 hours.</p>
               
               <div class="ref-number" id="refNumber">SKKS-2569-000001</div>
               
               <div style="margin-top: 24px">
-                <button class="btn btn-primary" onclick="resetForm()">สมัครเพิ่ม</button>
+                <button class="btn btn-primary" onclick="resetForm()" data-i18n="form.success.btn">Submit Another</button>
               </div>
             </div>
           </div>
@@ -1100,62 +1107,62 @@
   <section class="section faq-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">FAQ</span>
-        <h2 class="section-title">คำถามที่พบบ่อย</h2>
-        <p class="section-subtitle">ข้อสงสัยจากผู้ปกครองที่เราตอบบ่อย</p>
+        <span class="section-tag" data-i18n="faq.tag">FAQ</span>
+        <h2 class="section-title" data-i18n="faq.title">Frequently Asked Questions</h2>
+        <p class="section-subtitle" data-i18n="faq.subtitle">Common questions from parents</p>
       </div>
       
       <div class="faq-list">
         <details class="faq-item" open>
-          <summary>นักเรียนต้องสอบเข้าหรือไม่?</summary>
-          <p>โรงเรียนใช้ระบบสัมภาษณ์และทดสอบความพร้อมของนักเรียน เพื่อจัดให้เข้าเรียนในระดับชั้นและหลักสูตรที่เหมาะสม ไม่ใช่การสอบคัดเลือก แต่เป็นการประเมินความพร้อม</p>
+          <summary data-i18n="faq.q1">Do students need to take an entrance exam?</summary>
+          <p data-i18n="faq.a1">The school uses interviews and readiness assessments.</p>
         </details>
         
         <details class="faq-item">
-          <summary>หลักสูตร EP กับ MEP ต่างกันอย่างไร?</summary>
-          <p>EP (English Program) เรียนเป็นภาษาอังกฤษ 70% สอนโดยครูเจ้าของภาษาในวิชาหลัก ส่วน MEP (Mini English Program) ผสมผสานวิชาการไทยและภาษาอังกฤษประมาณ 8-10 ชั่วโมงต่อสัปดาห์ เหมาะกับนักเรียนที่ต้องการเริ่มต้นภาษาอังกฤษอย่างค่อยเป็นค่อยไป</p>
+          <summary data-i18n="faq.q2">What's the difference between EP and MEP?</summary>
+          <p data-i18n="faq.a2">EP teaches 70% in English. MEP blends Thai academics with English.</p>
         </details>
         
         <details class="faq-item">
-          <summary>มีบริการรถรับ-ส่งหรือไม่?</summary>
-          <p>มีบริการรถรับ-ส่งครอบคลุมพื้นที่เขตเมืองขอนแก่น ค่าบริการขึ้นอยู่กับระยะทาง สามารถสอบถามรายละเอียดได้ที่ฝ่ายธุรการ</p>
+          <summary data-i18n="faq.q3">Is there school bus service?</summary>
+          <p data-i18n="faq.a3">Service covers Khon Kaen city area.</p>
         </details>
         
         <details class="faq-item">
-          <summary>มีทุนการศึกษาหรือไม่?</summary>
-          <p>โรงเรียนมีทุนการศึกษาสำหรับนักเรียนที่มีผลการเรียนดีเด่น ทุนกีฬา ทุนความสามารถพิเศษ และทุนสำหรับครอบครัวที่ขาดแคลน โปรดติดต่อฝ่ายรับสมัครเพื่อสอบถามรายละเอียด</p>
+          <summary data-i18n="faq.q4">Are scholarships available?</summary>
+          <p data-i18n="faq.a4">Yes — for academic excellence, sports, and special talents.</p>
         </details>
         
         <details class="faq-item">
-          <summary>โรงเรียนเปิด-ปิดเวลาไหน?</summary>
-          <p>โรงเรียนเปิดเรียนวันจันทร์ถึงวันศุกร์ เวลา 7:30 - 15:30 น. มีบริการรับเด็กหลังเลิกเรียน (After School) ถึง 17:00 น. โดยมีค่าบริการเพิ่มเติม</p>
+          <summary data-i18n="faq.q5">What are the school hours?</summary>
+          <p data-i18n="faq.a5">Mon-Fri 7:30 AM - 3:30 PM, with after-school care available.</p>
         </details>
         
         <details class="faq-item">
-          <summary>ต้องเตรียมเอกสารอะไรบ้างในการสมัคร?</summary>
-          <p>เอกสารที่ต้องเตรียม: 1) สำเนาทะเบียนบ้านนักเรียน 2) สำเนาสูติบัตร 3) สำเนาบัตรประชาชนผู้ปกครอง 4) รูปถ่ายขนาด 1 นิ้ว 2 รูป 5) ผลการเรียนล่าสุด (กรณีย้ายมาจากโรงเรียนอื่น)</p>
+          <summary data-i18n="faq.q6">What documents are needed?</summary>
+          <p data-i18n="faq.a6">House registration, birth certificate, ID copies, photos, academic records.</p>
         </details>
         
         <details class="faq-item">
-          <summary>มีกิจกรรมหลังเลิกเรียนหรือไม่?</summary>
-          <p>มีหลากหลาย เช่น ดนตรี กีฬา ศิลปะ Robotics, Coding, Cambridge English Camp, ว่ายน้ำ และอื่นๆ บางกิจกรรมรวมในค่าเทอม บางกิจกรรมเป็นค่าใช้จ่ายเพิ่มเติม</p>
+          <summary data-i18n="faq.q7">Are there extracurricular activities?</summary>
+          <p data-i18n="faq.a7">Yes — music, sports, arts, Robotics, Coding, swimming, and more.</p>
         </details>
         
         <details class="faq-item">
-          <summary>อาหารกลางวันมีคุณภาพอย่างไร?</summary>
-          <p>โรงอาหารผ่านมาตรฐาน อย. ใช้วัตถุดิบสด ปรุงทุกวัน มีหมุนเวียนเมนูและรองรับเด็กที่แพ้อาหารบางชนิด ผู้ปกครองสามารถดูเมนูล่วงหน้าผ่านแอปของโรงเรียน</p>
+          <summary data-i18n="faq.q8">How is the cafeteria food?</summary>
+          <p data-i18n="faq.a8">FDA-certified, fresh ingredients cooked daily.</p>
         </details>
       </div>
     </div>
   </section>
 
-  <!-- ============== CONTACT / MAP ============== -->
+  <!-- ============== CONTACT ============== -->
   <section class="section contact-section" id="contact">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Contact Us</span>
-        <h2 class="section-title">ติดต่อเรา</h2>
-        <p class="section-subtitle">มีคำถามเพิ่มเติม? ติดต่อเราได้ทุกช่องทาง</p>
+        <span class="section-tag" data-i18n="contact.tag">Contact Us</span>
+        <h2 class="section-title" data-i18n="contact.title">Contact Us</h2>
+        <p class="section-subtitle" data-i18n="contact.subtitle">Have questions? Reach us through any channel.</p>
       </div>
       
       <div class="contact-grid">
@@ -1163,37 +1170,37 @@
           <div class="contact-card">
             <div class="contact-icon">📍</div>
             <div>
-              <strong>ที่อยู่</strong>
-              <p>123/45 ถนนมิตรภาพ<br/>ตำบลในเมือง อำเภอเมือง<br/>จังหวัดขอนแก่น 40000</p>
+              <strong data-i18n="contact.address.title">Address</strong>
+              <p data-i18n="contact.address.text">123/45 Mittraphap Road<br/>Mueang District, Khon Kaen 40000</p>
             </div>
           </div>
           
           <div class="contact-card">
             <div class="contact-icon">📞</div>
             <div>
-              <strong>โทรศัพท์</strong>
-              <p>043-XXX-XXXX<br/>มือถือ 081-XXX-XXXX</p>
+              <strong data-i18n="contact.phone.title">Phone</strong>
+              <p data-i18n="contact.phone.text">043-XXX-XXXX<br/>Mobile 081-XXX-XXXX</p>
             </div>
           </div>
           
           <div class="contact-card">
             <div class="contact-icon">✉</div>
             <div>
-              <strong>อีเมล</strong>
-              <p>info@suansonkk.com<br/>admission@suansonkk.com</p>
+              <strong data-i18n="contact.email.title">Email</strong>
+              <p data-i18n="contact.email.text">info@suansonkk.com<br/>admission@suansonkk.com</p>
             </div>
           </div>
           
           <div class="contact-card">
             <div class="contact-icon">⏰</div>
             <div>
-              <strong>เวลาทำการ</strong>
-              <p>จันทร์-ศุกร์: 7:30 - 16:30<br/>เสาร์: 9:00 - 12:00<br/>(ปิดวันหยุดราชการ)</p>
+              <strong data-i18n="contact.hours.title">Office Hours</strong>
+              <p data-i18n="contact.hours.text">Mon-Fri: 7:30 - 16:30<br/>Sat: 9:00 - 12:00</p>
             </div>
           </div>
           
           <div class="contact-social">
-            <strong>โซเชียลมีเดีย</strong>
+            <strong data-i18n="contact.social">Social Media</strong>
             <div class="social-icons">
               <a href="#" aria-label="Facebook" class="social-fb">f</a>
               <a href="#" aria-label="Instagram" class="social-ig">📷</a>
@@ -1213,51 +1220,50 @@
             allowfullscreen="" 
             loading="lazy" 
             referrerpolicy="no-referrer-when-downgrade"
-            title="แผนที่โรงเรียน SKKS">
+            title="SKKS Map">
           </iframe>
         </div>
       </div>
       
-      <!-- Contact Form -->
       <div class="contact-form-card">
-        <h3>📨 ส่งข้อความถึงเรา</h3>
-        <p>กรอกฟอร์มด้านล่าง ทีมงานจะติดต่อกลับภายใน 24 ชั่วโมง</p>
+        <h3 data-i18n="contact.form.title">📨 Send Us a Message</h3>
+        <p data-i18n="contact.form.subtitle">Our team will respond within 24 hours.</p>
         
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">ชื่อ-นามสกุล <span class="required">*</span></label>
+            <label class="form-label"><span data-i18n="contact.form.name">Full Name</span> <span class="required">*</span></label>
             <input type="text" class="form-input" id="contactName" required />
           </div>
           <div class="form-group">
-            <label class="form-label">เบอร์โทร <span class="required">*</span></label>
+            <label class="form-label"><span data-i18n="contact.form.phone">Phone</span> <span class="required">*</span></label>
             <input type="tel" class="form-input" id="contactPhone" required />
           </div>
         </div>
         
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">อีเมล</label>
+            <label class="form-label" data-i18n="contact.form.email">Email</label>
             <input type="email" class="form-input" id="contactEmail" />
           </div>
           <div class="form-group">
-            <label class="form-label">เรื่องที่ต้องการสอบถาม</label>
+            <label class="form-label" data-i18n="contact.form.subject">Subject</label>
             <select class="form-select" id="contactSubject">
-              <option>รับสมัครเรียน</option>
-              <option>หลักสูตรและค่าเทอม</option>
-              <option>ทุนการศึกษา</option>
-              <option>ทัวร์โรงเรียน</option>
-              <option>อื่นๆ</option>
+              <option data-i18n-option="contact.form.subject.admission">Admissions</option>
+              <option data-i18n-option="contact.form.subject.programs">Programs & Tuition</option>
+              <option data-i18n-option="contact.form.subject.scholarship">Scholarships</option>
+              <option data-i18n-option="contact.form.subject.tour">School Tour</option>
+              <option data-i18n-option="contact.form.subject.other">Other</option>
             </select>
           </div>
         </div>
         
         <div class="form-group full">
-          <label class="form-label">ข้อความ <span class="required">*</span></label>
+          <label class="form-label"><span data-i18n="contact.form.message">Message</span> <span class="required">*</span></label>
           <textarea class="form-textarea" id="contactMessage" rows="4" required></textarea>
         </div>
         
         <div class="form-actions">
-          <button class="btn btn-primary" onclick="submitContact()">ส่งข้อความ →</button>
+          <button class="btn btn-primary" onclick="submitContact()" data-i18n="contact.form.send">Send Message →</button>
         </div>
       </div>
     </div>
@@ -1267,14 +1273,14 @@
   <section class="cta-section">
     <div class="container">
       <div class="cta-content">
-        <h2>พร้อมเริ่มต้นเส้นทางการศึกษาที่ SKKS?</h2>
-        <p>เปิดรับสมัครปีการศึกษา 2569 — ที่นั่งจำกัด</p>
+        <h2 data-i18n="cta.title">Ready to Begin Your Educational Journey at SKKS?</h2>
+        <p data-i18n="cta.subtitle">Admissions Open for Academic Year 2026 — Limited Seats</p>
         <div class="cta-buttons">
           <a href="#admissions" class="btn btn-primary btn-large">
-            สมัครเรียนเลย <span>→</span>
+            <span data-i18n="cta.apply">Apply Now</span> <span>→</span>
           </a>
-          <a href="tel:043XXXXXXX" class="btn btn-secondary btn-large">
-            📞 โทรสอบถาม
+          <a href="tel:043XXXXXXX" class="btn btn-secondary btn-large" data-i18n="cta.call">
+            📞 Call Us
           </a>
         </div>
       </div>
@@ -1293,7 +1299,7 @@
               <span>Suanson Khon Kaen School</span>
             </div>
           </div>
-          <p>โรงเรียนสวนสนขอนแก่น<br/>ปลูกฝังความรู้ ส่งเสริมศักยภาพ พัฒนาเยาวชนสู่อนาคต</p>
+          <p data-i18n="footer.tagline">Suanson Khon Kaen School<br/>Cultivating knowledge, fostering potential.</p>
           <div class="social-icons">
             <a href="#" aria-label="Facebook">f</a>
             <a href="#" aria-label="Instagram">📷</a>
@@ -1303,41 +1309,41 @@
         </div>
         
         <div>
-          <h4>เกี่ยวกับเรา</h4>
+          <h4 data-i18n="footer.about">About Us</h4>
           <ul>
-            <li><a href="#about">วิสัยทัศน์</a></li>
-            <li><a href="#history">ประวัติโรงเรียน</a></li>
-            <li><a href="#staff">ครูและบุคลากร</a></li>
-            <li><a href="#facilities">อาคารสถานที่</a></li>
+            <li><a href="#about" data-i18n="about.vision.title">Vision</a></li>
+            <li><a href="#history" data-i18n="nav.about.history">History</a></li>
+            <li><a href="#staff" data-i18n="nav.about.staff">Faculty</a></li>
+            <li><a href="#facilities" data-i18n="nav.about.facilities">Facilities</a></li>
           </ul>
         </div>
         
         <div>
-          <h4>หลักสูตร</h4>
+          <h4 data-i18n="footer.programs">Programs</h4>
           <ul>
             <li><a href="#programs">Pre-Kindergarten</a></li>
             <li><a href="#programs">Kindergarten</a></li>
             <li><a href="#programs">English Program</a></li>
             <li><a href="#programs">Mini English Program</a></li>
-            <li><a href="#tuition">ค่าเทอม</a></li>
+            <li><a href="#tuition" data-i18n="footer.tuition">Tuition</a></li>
           </ul>
         </div>
         
         <div>
-          <h4>ลิงก์ที่มีประโยชน์</h4>
+          <h4 data-i18n="footer.links">Useful Links</h4>
           <ul>
-            <li><a href="#admissions">รับสมัคร</a></li>
-            <li><a href="#news">ข่าวสาร/กิจกรรม</a></li>
-            <li><a href="#achievements">ผลงาน</a></li>
-            <li><a href="pages/dashboard.html">ผู้บริหาร</a></li>
-            <li><a href="#contact">ติดต่อเรา</a></li>
+            <li><a href="#admissions" data-i18n="footer.admissions">Admissions</a></li>
+            <li><a href="#news" data-i18n="footer.news">News & Events</a></li>
+            <li><a href="#achievements" data-i18n="footer.achievements">Achievements</a></li>
+            <li><a href="pages/dashboard.html" data-i18n="footer.admin">Admin</a></li>
+            <li><a href="#contact" data-i18n="footer.contact">Contact</a></li>
           </ul>
         </div>
         
         <div>
-          <h4>ติดต่อ</h4>
+          <h4 data-i18n="footer.contact">Contact</h4>
           <ul class="footer-contact">
-            <li>📍 123/45 ถ.มิตรภาพ<br/>อ.เมือง จ.ขอนแก่น 40000</li>
+            <li>📍 123/45 Mittraphap Road<br/>Khon Kaen 40000</li>
             <li>📞 043-XXX-XXXX</li>
             <li>✉ info@suansonkk.com</li>
             <li>🌐 suansonkk.com</li>
@@ -1346,11 +1352,11 @@
       </div>
       
       <div class="footer-bottom">
-        <p>© 2026 Suanson Khon Kaen School (SKKS) — All rights reserved.</p>
+        <p data-i18n="footer.copy">© 2026 Suanson Khon Kaen School (SKKS) — All rights reserved.</p>
         <div class="footer-bottom-links">
-          <a href="#">นโยบายความเป็นส่วนตัว</a> •
-          <a href="#">ข้อกำหนดการใช้งาน</a> •
-          <a href="#">Sitemap</a>
+          <a href="#" data-i18n="footer.privacy">Privacy Policy</a> •
+          <a href="#" data-i18n="footer.terms">Terms of Use</a> •
+          <a href="#" data-i18n="footer.sitemap">Sitemap</a>
         </div>
       </div>
     </div>

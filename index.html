@@ -863,8 +863,8 @@
             <li>
               <span class="step-number">3</span>
               <div class="step-content">
-                <strong data-i18n="admissions.step3.title">Pay Application Fee</strong>
-                <span data-i18n="admissions.step3.text">Secure online payment</span>
+                <strong data-i18n="admissions.step3.title">Review & Submit</strong>
+                <span data-i18n="admissions.step3.text">Review information and submit application</span>
               </div>
             </li>
             <li>
@@ -1021,8 +1021,8 @@
           
           <!-- STEP 3 -->
           <div class="form-step" id="step3" style="display:none">
-            <h3 class="form-title" data-i18n="form.payment.title">💳 Pay Application Fee</h3>
-            <p class="form-subtitle" data-i18n="form.payment.subtitle">Application and assessment fees</p>
+            <h3 class="form-title" data-i18n="form.payment.title">📋 Review & Confirm</h3>
+            <p class="form-subtitle" data-i18n="form.payment.subtitle">Please review your information before submitting</p>
             
             <div class="form-progress">
               <div class="progress-step completed"></div>
@@ -1030,50 +1030,40 @@
               <div class="progress-step active"></div>
               <div class="progress-step"></div>
             </div>
-            <div class="form-step-label" data-i18n="form.step3.label">Step 3 of 4 — Payment</div>
+            <div class="form-step-label" data-i18n="form.step3.label">Step 3 of 4 — Review</div>
             
-            <div class="payment-summary">
-              <div class="payment-row">
-                <span data-i18n="form.payment.app">Application Fee</span>
-                <span>500.00 ฿</span>
-              </div>
-              <div class="payment-row">
-                <span data-i18n="form.payment.assessment">Assessment Fee</span>
-                <span>1,000.00 ฿</span>
-              </div>
-              <div class="payment-row">
-                <span data-i18n="form.payment.system">System Fee</span>
-                <span>50.00 ฿</span>
-              </div>
-              <div class="payment-row total">
-                <span data-i18n="form.payment.total">Total</span>
-                <span>1,550.00 ฿</span>
-              </div>
+            <div style="background: linear-gradient(135deg, #F0F9FF, #F0FDF4); padding: 24px; border-radius: 16px; border-left: 4px solid #5BB8E0; margin-bottom: 24px">
+              <h4 style="font-family: 'Prompt', sans-serif; color: #1E3A5F; margin-bottom: 12px; font-size: 17px" data-i18n="form.review.title">📨 What happens next?</h4>
+              <ul style="list-style: none; padding: 0; margin: 0">
+                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
+                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
+                  <span data-i18n="form.review.step1">Our admissions team will review your application within 24 hours</span>
+                </li>
+                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
+                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
+                  <span data-i18n="form.review.step2">You will be contacted to schedule a school visit and interview</span>
+                </li>
+                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
+                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
+                  <span data-i18n="form.review.step3">Tuition and payment details will be discussed during the interview</span>
+                </li>
+                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
+                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
+                  <span data-i18n="form.review.step4">Payment will be processed only after admission is confirmed</span>
+                </li>
+              </ul>
             </div>
             
-            <label class="form-label" style="margin-bottom: 12px"><span data-i18n="form.payment.method">Select Payment Method</span> <span class="required">*</span></label>
-            <div class="payment-methods">
-              <div class="payment-method selected" data-method="qr" onclick="selectPayment(this)">
-                <div class="icon">📱</div>
-                <div class="name" data-i18n="form.payment.qr">PromptPay / QR</div>
-              </div>
-              <div class="payment-method" data-method="card" onclick="selectPayment(this)">
-                <div class="icon">💳</div>
-                <div class="name" data-i18n="form.payment.card">Credit/Debit Card</div>
-              </div>
-              <div class="payment-method" data-method="bank" onclick="selectPayment(this)">
-                <div class="icon">🏦</div>
-                <div class="name" data-i18n="form.payment.bank">Bank Transfer</div>
-              </div>
-              <div class="payment-method" data-method="wallet" onclick="selectPayment(this)">
-                <div class="icon">💰</div>
-                <div class="name" data-i18n="form.payment.wallet">e-Wallet</div>
-              </div>
+            <div style="background: #FEF3C7; padding: 16px 20px; border-radius: 12px; border: 1px solid #FDE68A; margin-bottom: 24px">
+              <p style="font-size: 14px; color: #92400E; margin: 0; line-height: 1.6">
+                <strong>📞 <span data-i18n="form.review.contact.title">Need to contact us?</span></strong><br/>
+                <span data-i18n="form.review.contact.text">Phone: 043-XXX-XXXX • Email: admission@suansonkk.com</span>
+              </p>
             </div>
             
             <div class="form-actions">
               <button class="btn btn-back" onclick="goToStep(2)" data-i18n="form.back">← Back</button>
-              <button class="btn btn-primary" onclick="goToStep(4)" data-i18n="form.payment.pay">Pay Now →</button>
+              <button class="btn btn-primary" onclick="goToStep(4)" data-i18n="form.review.submit">Submit Application →</button>
             </div>
           </div>
           

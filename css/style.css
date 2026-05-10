@@ -2584,3 +2584,198 @@ button {
 @media print {
   .top-bar, .navbar, .scroll-top { display: none; }
 }
+
+/* ===========================================
+   🌐 Language Switcher
+   =========================================== */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.1);
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 12px;
+}
+.lang-switch a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 2px 8px;
+  border-radius: 100px;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+.lang-switch a:hover { color: white; }
+.lang-switch a.active {
+  background: #7CB342;
+  color: white;
+}
+
+/* When Thai language is active, prefer Sarabun */
+html[lang="th"] body {
+  font-family: 'Sarabun', sans-serif;
+}
+html[lang="th"] .hero-title,
+html[lang="th"] .section-title,
+html[lang="th"] h1,
+html[lang="th"] h2,
+html[lang="th"] h3,
+html[lang="th"] h4,
+html[lang="th"] .form-title {
+  font-family: 'Prompt', sans-serif;
+}
+
+/* English uses Poppins for headings */
+html[lang="en"] .hero-title,
+html[lang="en"] .section-title,
+html[lang="en"] h1,
+html[lang="en"] h2,
+html[lang="en"] h3,
+html[lang="en"] h4 {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ===========================================
+   🔧 FIXES — UI Layout
+   =========================================== */
+
+/* Fix 1: Navbar should sit BELOW top-bar, not on top of it */
+.navbar {
+  position: sticky !important;
+  top: 0;
+}
+
+/* Move top bar OUT of fixed positioning so navbar stacks naturally */
+.top-bar {
+  position: relative;
+  z-index: 1001;
+}
+
+/* Body no longer needs offset since navbar is sticky */
+body {
+  padding-top: 0 !important;
+}
+
+/* Hero needs more top spacing on desktop since navbar is sticky now */
+.hero {
+  padding-top: 60px;
+}
+
+/* Fix 2: Float cards no longer clipped by hero image */
+.hero-image {
+  overflow: visible !important;
+  border-radius: 0;
+  box-shadow: none;
+  transform: none !important;
+}
+
+.hero-image:hover {
+  transform: none !important;
+}
+
+.hero-image img {
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(30, 58, 95, 0.18);
+}
+
+/* Float cards positioning — now properly outside the image */
+.float-card-1 {
+  top: 30px;
+  left: -20px;
+  z-index: 3;
+}
+
+.float-card-2 {
+  bottom: 40px;
+  right: -10px;
+  z-index: 3;
+}
+
+/* On smaller screens, position cards inside image area gracefully */
+@media (max-width: 1024px) {
+  .float-card-1 {
+    top: 20px;
+    left: 10px;
+  }
+  .float-card-2 {
+    bottom: 20px;
+    right: 10px;
+  }
+}
+
+/* Hide float cards on mobile (they take too much space) */
+@media (max-width: 768px) {
+  .float-card-1, .float-card-2 {
+    display: none !important;
+  }
+  
+  .hero {
+    padding-top: 40px;
+  }
+}
+
+/* Fix scroll-to-anchor offset (so links don't hide behind navbar) */
+section[id] {
+  scroll-margin-top: 80px;
+}
+
+/* ===========================================
+   🔧 FIXES round 2
+   =========================================== */
+
+/* Fix 3: Move "15+ Years of Development" badge OUT of image */
+.about-image-badge {
+  bottom: 20px !important;
+  left: auto !important;
+  right: -20px !important;
+  z-index: 2;
+}
+
+@media (max-width: 1024px) {
+  .about-image-badge {
+    right: 0 !important;
+    bottom: -10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-image-badge {
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    left: auto !important;
+    margin: -30px auto 0 auto !important;
+    display: inline-block;
+  }
+  .about-image {
+    text-align: center;
+  }
+}
+
+/* Fix 4: Hide tuition pricing on public site
+   (Pricing only visible after admission completion) */
+
+/* Hide the entire tuition section from front-end */
+.tuition-section {
+  display: none !important;
+}
+
+/* Hide tuition link in nav */
+a[href="#tuition"] {
+  display: none !important;
+}
+
+/* Hide tuition link in dropdown menus and footer */
+li:has(> a[href="#tuition"]) {
+  display: none !important;
+}
+
+/* Hide payment summary in admission form (pricing details) */
+.payment-summary {
+  display: none !important;
+}
+
+/* Replace with neutral text in admission step 3 */
+.form-step#step3 .form-subtitle::after {
+  content: '';
+}

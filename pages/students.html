@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>จัดการนักเรียน | SKKS Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+</head>
+<body>
+
+<div class="dashboard-layout">
+  
+  <!-- ========= SIDEBAR ========= -->
+  <aside class="sidebar no-print" id="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <div class="logo-text">
+          <strong>SKKS</strong>
+          <span>Admin Panel</span>
+        </div>
+      </a>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Main</div>
+        <ul>
+          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร <span class="badge">12</span></a></li>
+          <li><a href="#" class="active"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
+          <li><a href="#"><span class="icon">👨‍🏫</span> ครู / บุคลากร</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">การเงิน</div>
+        <ul>
+          <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
+          <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
+          <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">รายงาน</div>
+        <ul>
+          <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
+          <li><a href="#"><span class="icon">🏆</span> ผลสอบ O-NET</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">อื่นๆ</div>
+        <ul>
+          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+  
+  <main class="main-content">
+    
+    <!-- Toolbar -->
+    <div class="print-toolbar no-print">
+      <div class="print-toolbar-left">
+        <h3>👨‍🎓 จัดการนักเรียน</h3>
+        <span style="color:#6B7280;font-size:13px">ทั้งหมด <strong id="totalCount" style="color:#1E3A5F">524</strong> คน</span>
+      </div>
+      <div class="print-toolbar-actions">
+        <button class="toolbar-btn" onclick="exportCSV()">📥 Export CSV</button>
+        <button class="toolbar-btn" onclick="exportJSON()">💾 Export JSON</button>
+        <button class="toolbar-btn primary" onclick="window.print()">🖨️ พิมพ์ A4</button>
+      </div>
+    </div>
+    
+    <!-- Filter Bar -->
+    <div class="filter-bar no-print">
+      <label>หลักสูตร:</label>
+      <select id="filterProgram" onchange="renderClassrooms()">
+        <option value="">ทั้งหมด</option>
+        <option value="EP">English Program</option>
+        <option value="MEP">Mini English Program</option>
+      </select>
+      
+      <label>ระดับชั้น:</label>
+      <select id="filterGrade" onchange="renderClassrooms()">
+        <option value="">ทั้งหมด</option>
+        <option value="Pre-K">เตรียมอนุบาล</option>
+        <option value="K1">อนุบาล 1</option>
+        <option value="K2">อนุบาล 2</option>
+        <option value="K3">อนุบาล 3</option>
+        <option value="P1">ป.1</option>
+        <option value="P2">ป.2</option>
+        <option value="P3">ป.3</option>
+        <option value="P4">ป.4</option>
+        <option value="P5">ป.5</option>
+        <option value="P6">ป.6</option>
+        <option value="M1">ม.1</option>
+        <option value="M2">ม.2</option>
+        <option value="M3">ม.3</option>
+      </select>
+      
+      <label>ค้นหา:</label>
+      <input type="text" id="searchInput" placeholder="ชื่อนักเรียน..." oninput="renderClassrooms()" style="min-width:220px" />
+      
+      <span style="margin-left:auto;font-size:13px;color:#6B7280">
+        แสดง: <strong id="visibleCount" style="color:#1E3A5F">0</strong> ห้องเรียน
+      </span>
+    </div>
+    
+    <!-- Content -->
+    <div class="dashboard-content" style="padding-top:20px">
+      
+      <!-- Class Summary Cards (HTML) -->
+      <div class="stats-grid no-print">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-icon blue">🏫</div>
+          </div>
+          <div class="stat-card-value" id="classCount">0</div>
+          <div class="stat-card-label">ห้องเรียนทั้งหมด</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-icon green">👦</div>
+          </div>
+          <div class="stat-card-value" id="maleCount">0</div>
+          <div class="stat-card-label">นักเรียนชาย</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-icon pink">👧</div>
+          </div>
+          <div class="stat-card-value" id="femaleCount">0</div>
+          <div class="stat-card-label">นักเรียนหญิง</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-icon yellow">📊</div>
+          </div>
+          <div class="stat-card-value" id="avgPerClass">0</div>
+          <div class="stat-card-label">เฉลี่ย/ห้อง</div>
+        </div>
+      </div>
+      
+      <!-- Classrooms Container -->
+      <div id="classroomsContainer"></div>
+      
+    </div>
+  </main>
+</div>
+
+<script src="../js/students.js"></script>
+</body>
+</html>

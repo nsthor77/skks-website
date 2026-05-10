@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ใบสมัคร | SKKS Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+</head>
+<body>
+
+<div class="dashboard-layout">
+  
+  <aside class="sidebar no-print" id="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <div class="logo-text">
+          <strong>SKKS</strong>
+          <span>Admin Panel</span>
+        </div>
+      </a>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Main</div>
+        <ul>
+          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="#" class="active"><span class="icon">📝</span> ใบสมัคร</a></li>
+          <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">การเงิน</div>
+        <ul>
+          <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
+          <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
+          <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">รายงาน</div>
+        <ul>
+          <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <ul>
+          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+  
+  <main class="main-content">
+    
+    <!-- Toolbar -->
+    <div class="print-toolbar no-print">
+      <div class="print-toolbar-left">
+        <h3>📝 จัดการใบสมัคร</h3>
+        <span style="color:#6B7280;font-size:13px">ใบสมัครทั้งหมด <strong id="appCount" style="color:#1E3A5F">0</strong> รายการ</span>
+      </div>
+      <div class="print-toolbar-actions">
+        <button class="toolbar-btn" id="btnList" onclick="showList()">📋 รายการ</button>
+        <button class="toolbar-btn" id="btnDetail" onclick="showCurrentDetail()">📄 ใบสมัคร A4</button>
+        <button class="toolbar-btn" onclick="exportApps()">📥 Export CSV</button>
+        <button class="toolbar-btn primary" onclick="window.print()">🖨️ พิมพ์</button>
+      </div>
+    </div>
+    
+    <!-- List View -->
+    <div id="listView">
+      <div class="filter-bar no-print">
+        <label>สถานะ:</label>
+        <select id="filterAppStatus" onchange="renderList()">
+          <option value="">ทั้งหมด</option>
+          <option value="pending">รอพิจารณา</option>
+          <option value="interview">นัดสัมภาษณ์</option>
+          <option value="approved">อนุมัติ</option>
+          <option value="rejected">ไม่ผ่าน</option>
+        </select>
+        
+        <label>หลักสูตร:</label>
+        <select id="filterAppProgram" onchange="renderList()">
+          <option value="">ทั้งหมด</option>
+          <option value="EP">EP</option>
+          <option value="MEP">MEP</option>
+        </select>
+        
+        <input type="text" id="searchApp" placeholder="🔍 ค้นหาชื่อนักเรียน..." oninput="renderList()" style="margin-left:auto;min-width:240px" />
+      </div>
+      
+      <div class="dashboard-content">
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>รหัสใบสมัคร</th>
+                  <th>นักเรียน</th>
+                  <th>หลักสูตร</th>
+                  <th>ระดับชั้น</th>
+                  <th>วันที่สมัคร</th>
+                  <th>การชำระ</th>
+                  <th>สถานะ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="appsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Detail View (A4 Print) -->
+    <div id="detailView" style="display:none">
+      <div id="appDetailContainer"></div>
+    </div>
+    
+  </main>
+</div>
+
+<script src="../js/applications.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /pages/dashboard.html
+Disallow: /pages/applications.html
+Disallow: /pages/students.html
+Disallow: /pages/finance.html
+Disallow: /pages/reports.html
+
+Sitemap: https://suansonkk.com/sitemap.xml

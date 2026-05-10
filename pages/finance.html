@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>การเงิน | SKKS Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="dashboard-layout">
+  
+  <aside class="sidebar no-print" id="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <div class="logo-text">
+          <strong>SKKS</strong>
+          <span>Admin Panel</span>
+        </div>
+      </a>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Main</div>
+        <ul>
+          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร <span class="badge">12</span></a></li>
+          <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
+          <li><a href="#"><span class="icon">👨‍🏫</span> ครู / บุคลากร</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">การเงิน</div>
+        <ul>
+          <li><a href="#" class="active"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
+          <li><a href="#" onclick="switchTab('payments')"><span class="icon">💳</span> รายการชำระ</a></li>
+          <li><a href="#" onclick="switchTab('receipts')"><span class="icon">📋</span> ใบเสร็จ</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">รายงาน</div>
+        <ul>
+          <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">อื่นๆ</div>
+        <ul>
+          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+  
+  <main class="main-content">
+    
+    <!-- Toolbar -->
+    <div class="print-toolbar no-print">
+      <div class="print-toolbar-left">
+        <h3 id="pageTitle">💰 รายงานการเงิน</h3>
+      </div>
+      <div class="print-toolbar-actions">
+        <button class="toolbar-btn" onclick="switchTab('summary')">📊 สรุป</button>
+        <button class="toolbar-btn" onclick="switchTab('payments')">💳 รายการ</button>
+        <button class="toolbar-btn" onclick="switchTab('receipts')">📋 ใบเสร็จ</button>
+        <button class="toolbar-btn" onclick="exportFinanceCSV()">📥 Export CSV</button>
+        <button class="toolbar-btn primary" onclick="window.print()">🖨️ พิมพ์ A4</button>
+      </div>
+    </div>
+    
+    <!-- Filter Bar -->
+    <div class="filter-bar no-print">
+      <label>ภาคเรียน:</label>
+      <select id="filterTerm" onchange="renderFinance()">
+        <option value="1/2569">ภาคเรียนที่ 1/2569</option>
+        <option value="2/2569">ภาคเรียนที่ 2/2569</option>
+        <option value="3/2569">ภาคเรียนที่ 3/2569</option>
+      </select>
+      
+      <label>สถานะ:</label>
+      <select id="filterStatus" onchange="renderFinance()">
+        <option value="">ทั้งหมด</option>
+        <option value="paid">ชำระแล้ว</option>
+        <option value="pending">รอชำระ</option>
+        <option value="overdue">ค้างชำระ</option>
+      </select>
+      
+      <label>หลักสูตร:</label>
+      <select id="filterProgram" onchange="renderFinance()">
+        <option value="">ทั้งหมด</option>
+        <option value="EP">EP</option>
+        <option value="MEP">MEP</option>
+      </select>
+      
+      <input type="text" id="searchInput" placeholder="🔍 ค้นหานักเรียน..." oninput="renderFinance()" style="margin-left:auto;min-width:240px" />
+    </div>
+    
+    <!-- Content -->
+    <div class="dashboard-content" style="padding-top:20px">
+      
+      <!-- TAB: Summary (default) -->
+      <div id="tabSummary">
+        
+        <!-- Stats Cards -->
+        <div class="stats-grid no-print">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon green">💰</div>
+              <div class="stat-card-trend up">↑ 18.2%</div>
+            </div>
+            <div class="stat-card-value" id="totalIncome">0</div>
+            <div class="stat-card-label">รายรับรวม (บาท)</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon blue">✓</div>
+            </div>
+            <div class="stat-card-value" id="paidCount">0</div>
+            <div class="stat-card-label">ชำระเรียบร้อย</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon yellow">⏰</div>
+            </div>
+            <div class="stat-card-value" id="pendingCount">0</div>
+            <div class="stat-card-label">รอชำระ</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon pink">⚠</div>
+            </div>
+            <div class="stat-card-value" id="overdueCount">0</div>
+            <div class="stat-card-label">ค้างชำระ</div>
+          </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts-grid no-print">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title">รายรับรายเดือน (ภาคเรียน 1/2569)</h3>
+                <p class="chart-card-subtitle">เปรียบเทียบกับเป้าหมาย</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="incomeChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title">สถานะการชำระเงิน</h3>
+                <p class="chart-card-subtitle">รวม 524 รายการ</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <!-- A4 Summary Report -->
+        <div class="a4-page-landscape" id="summaryReport">
+          <!-- Auto-rendered -->
+        </div>
+        
+      </div>
+      
+      <!-- TAB: Payments -->
+      <div id="tabPayments" style="display:none">
+        <div class="a4-page-landscape" id="paymentsReport"></div>
+      </div>
+      
+      <!-- TAB: Receipts -->
+      <div id="tabReceipts" style="display:none">
+        <div style="text-align:center;padding:24px" class="no-print">
+          <p style="color:#6B7280;font-size:14px">คลิกที่นักเรียนในแถบ "รายการ" เพื่อดูใบเสร็จ — หรือดูตัวอย่างด้านล่าง</p>
+        </div>
+        <div id="receiptsContainer"></div>
+      </div>
+      
+    </div>
+  </main>
+</div>
+
+<script src="../js/finance.js"></script>
+</body>
+</html>

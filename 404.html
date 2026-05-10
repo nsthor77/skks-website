@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ไม่พบหน้าที่ค้นหา | SKKS</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700;800&family=Sarabun:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Sarabun', sans-serif;
+      background: linear-gradient(135deg, #5BB8E0, #7CB342);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      text-align: center;
+      max-width: 600px;
+    }
+    .error-code {
+      font-family: 'Prompt', sans-serif;
+      font-size: 180px;
+      font-weight: 800;
+      line-height: 1;
+      margin: 0;
+      text-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      letter-spacing: -8px;
+    }
+    h1 {
+      font-family: 'Prompt', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      margin: 16px 0;
+    }
+    p {
+      font-size: 17px;
+      opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: white;
+      color: #1E3A5F;
+      text-decoration: none;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 15px;
+      transition: all 0.2s;
+      margin: 0 6px 12px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+    .logo {
+      font-family: 'Prompt', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+    .emoji {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .error-code { font-size: 120px; letter-spacing: -4px; }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🌳 SKKS</div>
+    <div class="emoji">🔍</div>
+    <h1 class="error-code">404</h1>
+    <h1>ไม่พบหน้าที่ค้นหา</h1>
+    <p>ขออภัย หน้าเว็บที่คุณกำลังมองหาอาจถูกย้าย ถูกลบ หรือไม่เคยมีอยู่</p>
+    <a href="/" class="btn">🏠 กลับหน้าแรก</a>
+    <a href="/#contact" class="btn btn-secondary">💬 ติดต่อเรา</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,509 @@
+/* ===========================================
+   SKKS - Print Stylesheet (A4)
+   ใช้สำหรับพิมพ์เอกสารกระดาษ A4
+   =========================================== */
+
+/* ===== A4 Paper Setup ===== */
+.a4-page {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm 18mm;
+  margin: 20px auto;
+  background: white;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  font-family: 'Sarabun', sans-serif;
+  color: #1E3A5F;
+  position: relative;
+  page-break-after: always;
+}
+
+.a4-page-landscape {
+  width: 297mm;
+  min-height: 210mm;
+  padding: 12mm 15mm;
+  margin: 20px auto;
+  background: white;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  font-family: 'Sarabun', sans-serif;
+  color: #1E3A5F;
+  position: relative;
+  page-break-after: always;
+}
+
+/* ===== Document Header ===== */
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #5BB8E0;
+  padding-bottom: 10mm;
+  margin-bottom: 8mm;
+}
+
+.doc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.doc-header-left img {
+  height: 60px;
+  width: auto;
+}
+
+.doc-header-school h1 {
+  font-family: 'Prompt', sans-serif;
+  font-size: 18pt;
+  font-weight: 700;
+  color: #1E3A5F;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.doc-header-school p {
+  font-size: 10pt;
+  color: #6B7280;
+  margin: 2px 0 0;
+}
+
+.doc-header-right {
+  text-align: right;
+  font-size: 10pt;
+  color: #6B7280;
+}
+
+.doc-header-right strong {
+  display: block;
+  color: #1E3A5F;
+  font-size: 11pt;
+}
+
+/* ===== Document Title ===== */
+.doc-title {
+  text-align: center;
+  margin-bottom: 8mm;
+}
+
+.doc-title h2 {
+  font-family: 'Prompt', sans-serif;
+  font-size: 20pt;
+  font-weight: 800;
+  color: #1E3A5F;
+  margin: 0 0 4px;
+}
+
+.doc-title p {
+  font-size: 11pt;
+  color: #6B7280;
+}
+
+.doc-title .doc-subtitle {
+  display: inline-block;
+  background: linear-gradient(90deg, #5BB8E0, #7CB342);
+  color: white;
+  padding: 4px 16px;
+  border-radius: 100px;
+  font-size: 10pt;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* ===== Document Info Grid ===== */
+.doc-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 8mm;
+  background: #F9FAFB;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid #5BB8E0;
+}
+
+.doc-info-item label {
+  display: block;
+  font-size: 9pt;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.doc-info-item strong {
+  font-size: 11pt;
+  color: #1E3A5F;
+  font-weight: 600;
+}
+
+/* ===== Print Tables ===== */
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10pt;
+  margin-bottom: 6mm;
+}
+
+.print-table th {
+  background: #1E3A5F;
+  color: white;
+  text-align: left;
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 10pt;
+  border: 1px solid #1E3A5F;
+}
+
+.print-table th:first-child {
+  border-top-left-radius: 4px;
+}
+
+.print-table th:last-child {
+  border-top-right-radius: 4px;
+}
+
+.print-table td {
+  padding: 7px 10px;
+  border: 1px solid #E5E7EB;
+  font-size: 10pt;
+  color: #1E3A5F;
+}
+
+.print-table tr:nth-child(even) td {
+  background: #F9FAFB;
+}
+
+.print-table .text-center { text-align: center; }
+.print-table .text-right { text-align: right; }
+.print-table .text-bold { font-weight: 700; }
+
+.print-table tfoot td {
+  background: #E0F4FB;
+  font-weight: 700;
+  color: #1E3A5F;
+  font-size: 11pt;
+}
+
+/* ===== Summary Cards on Print ===== */
+.print-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 6mm;
+}
+
+.print-summary-card {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 10px 12px;
+  border-top: 3px solid #5BB8E0;
+}
+
+.print-summary-card.green { border-top-color: #7CB342; }
+.print-summary-card.yellow { border-top-color: #FCD34D; }
+.print-summary-card.pink { border-top-color: #EC4899; }
+
+.print-summary-card label {
+  font-size: 9pt;
+  color: #6B7280;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.print-summary-card .val {
+  font-family: 'Prompt', sans-serif;
+  font-size: 16pt;
+  font-weight: 800;
+  color: #1E3A5F;
+  line-height: 1;
+}
+
+.print-summary-card .sub {
+  font-size: 9pt;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+/* ===== Document Section ===== */
+.doc-section {
+  margin-bottom: 6mm;
+}
+
+.doc-section-title {
+  font-family: 'Prompt', sans-serif;
+  font-size: 12pt;
+  font-weight: 700;
+  color: #1E3A5F;
+  border-left: 4px solid #7CB342;
+  padding-left: 10px;
+  margin-bottom: 4mm;
+}
+
+/* ===== Document Footer ===== */
+.doc-footer {
+  position: absolute;
+  bottom: 12mm;
+  left: 18mm;
+  right: 18mm;
+  border-top: 1px solid #E5E7EB;
+  padding-top: 6px;
+  font-size: 9pt;
+  color: #6B7280;
+  display: flex;
+  justify-content: space-between;
+}
+
+.doc-signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30mm;
+  margin-top: 18mm;
+}
+
+.signature-box {
+  text-align: center;
+  font-size: 10pt;
+}
+
+.signature-line {
+  border-bottom: 1px solid #1E3A5F;
+  height: 18mm;
+  margin-bottom: 6px;
+}
+
+.signature-box strong {
+  display: block;
+  font-size: 11pt;
+}
+
+.signature-box span {
+  color: #6B7280;
+}
+
+/* ===== Action Bar (not printed) ===== */
+.print-toolbar {
+  position: sticky;
+  top: 0;
+  background: white;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.print-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.print-toolbar h3 {
+  font-family: 'Prompt', sans-serif;
+  font-size: 18px;
+  color: #1E3A5F;
+  margin: 0;
+}
+
+.print-toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbar-btn {
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid #E5E7EB;
+  background: white;
+  color: #1E3A5F;
+}
+
+.toolbar-btn:hover {
+  border-color: #5BB8E0;
+  color: #3A8FB7;
+  transform: translateY(-1px);
+}
+
+.toolbar-btn.primary {
+  background: linear-gradient(135deg, #7CB342, #5BB8E0);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(124, 179, 66, 0.35);
+}
+
+.toolbar-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 179, 66, 0.45);
+  color: white;
+}
+
+.toolbar-btn.danger {
+  background: white;
+  color: #DC2626;
+  border-color: #FEE2E2;
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 16px 24px;
+  background: white;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.filter-bar select,
+.filter-bar input {
+  padding: 8px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  color: #1E3A5F;
+}
+
+.filter-bar select:focus,
+.filter-bar input:focus {
+  outline: none;
+  border-color: #5BB8E0;
+  box-shadow: 0 0 0 3px rgba(91,184,224,0.1);
+}
+
+.filter-bar label {
+  font-size: 13px;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+/* ===========================================
+   PRINT MEDIA QUERY
+   เมื่อกดปริ้นจะซ่อน UI และแสดงเฉพาะกระดาษ
+   =========================================== */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  .a4-page,
+  .a4-page *,
+  .a4-page-landscape,
+  .a4-page-landscape * {
+    visibility: visible;
+  }
+  
+  .a4-page,
+  .a4-page-landscape {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+  
+  .print-toolbar,
+  .filter-bar,
+  .sidebar,
+  .dashboard-topbar,
+  .no-print {
+    display: none !important;
+  }
+  
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  
+  @page landscape {
+    size: A4 landscape;
+    margin: 0;
+  }
+  
+  .a4-page-landscape {
+    page: landscape;
+  }
+}
+
+/* ===== Receipt / Invoice Style ===== */
+.receipt {
+  max-width: 80mm;
+  margin: 20px auto;
+  background: white;
+  padding: 8mm;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 9pt;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  color: #1E3A5F;
+}
+
+.receipt-header {
+  text-align: center;
+  border-bottom: 1px dashed #6B7280;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.receipt-header img {
+  height: 40px;
+  margin: 0 auto 4px;
+}
+
+.receipt-header h3 {
+  font-family: 'Prompt', sans-serif;
+  font-size: 12pt;
+  margin: 0;
+}
+
+.receipt-header p {
+  font-size: 8pt;
+  color: #6B7280;
+  margin: 2px 0;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 9pt;
+}
+
+.receipt-row.total {
+  border-top: 1px dashed #6B7280;
+  margin-top: 8px;
+  padding-top: 8px;
+  font-weight: 700;
+  font-size: 11pt;
+}
+
+.receipt-divider {
+  text-align: center;
+  margin: 8px 0;
+  font-size: 8pt;
+  color: #6B7280;
+}
+
+/* Status badges for print */
+.print-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 9pt;
+  font-weight: 600;
+}
+
+.print-badge.success { background: #DCFCE7; color: #16A34A; }
+.print-badge.pending { background: #FEF3C7; color: #D97706; }
+.print-badge.danger { background: #FEE2E2; color: #DC2626; }
+.print-badge.info { background: #DBEAFE; color: #2563EB; }

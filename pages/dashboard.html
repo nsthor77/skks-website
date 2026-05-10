@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | SKKS Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    
+    <!-- ========= SIDEBAR ========= -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="logo">
+          <img src="../images/logo.png" alt="SKKS" />
+          <div class="logo-text">
+            <strong>SKKS</strong>
+            <span>Admin Panel</span>
+          </div>
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Main</div>
+          <ul>
+            <li><a href="#" class="active"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร <span class="badge">12</span></a></li>
+            <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
+            <li><a href="#"><span class="icon">👨‍🏫</span> ครู / บุคลากร</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">การเงิน</div>
+          <ul>
+            <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
+            <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
+            <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">รายงาน</div>
+          <ul>
+            <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
+            <li><a href="#"><span class="icon">🏆</span> ผลสอบ O-NET</a></li>
+            <li><a href="#"><span class="icon">📅</span> ตารางสอน</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">อื่นๆ</div>
+          <ul>
+            <li><a href="#"><span class="icon">📢</span> ประกาศ</a></li>
+            <li><a href="#"><span class="icon">⚙</span> ตั้งค่า</a></li>
+            <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- ========= MAIN ========= -->
+    <main class="main-content">
+      
+      <!-- Top bar -->
+      <div class="dashboard-topbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="ค้นหานักเรียน, ใบสมัคร, รายการ..." />
+        </div>
+        
+        <div class="topbar-actions">
+          <button class="topbar-icon-btn" aria-label="Notifications">
+            🔔
+            <span class="badge-dot"></span>
+          </button>
+          <button class="topbar-icon-btn" aria-label="Messages">💬</button>
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div class="user-info">
+              <strong>Admin SKKS</strong>
+              <span>ผู้บริหาร</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="dashboard-content">
+        
+        <!-- Header -->
+        <div class="dashboard-header">
+          <div>
+            <h1>👋 สวัสดี, ผู้บริหาร</h1>
+            <p>ภาพรวมโรงเรียน ณ วันที่ <span id="todayDate"></span></p>
+          </div>
+          
+          <div class="date-range">
+            <button>วันนี้</button>
+            <button>สัปดาห์</button>
+            <button class="active">เดือนนี้</button>
+            <button>ปี</button>
+          </div>
+        </div>
+        
+        <!-- Quick Action Shortcuts -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px">
+          <a href="applications.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
+            <div style="width:44px;height:44px;border-radius:10px;background:#E9D5FF;color:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:22px">📝</div>
+            <div>
+              <strong style="display:block;color:#1E3A5F;font-size:14px">ใบสมัคร</strong>
+              <span style="color:#6B7280;font-size:12px">28 ใบสมัคร</span>
+            </div>
+          </a>
+          
+          <a href="students.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
+            <div style="width:44px;height:44px;border-radius:10px;background:#DBEAFE;color:#2563EB;display:flex;align-items:center;justify-content:center;font-size:22px">👨‍🎓</div>
+            <div>
+              <strong style="display:block;color:#1E3A5F;font-size:14px">นักเรียน</strong>
+              <span style="color:#6B7280;font-size:12px">524 คน • 25 ห้อง</span>
+            </div>
+          </a>
+          
+          <a href="finance.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
+            <div style="width:44px;height:44px;border-radius:10px;background:#DCFCE7;color:#16A34A;display:flex;align-items:center;justify-content:center;font-size:22px">💰</div>
+            <div>
+              <strong style="display:block;color:#1E3A5F;font-size:14px">การเงิน</strong>
+              <span style="color:#6B7280;font-size:12px">2.4M บาท</span>
+            </div>
+          </a>
+          
+          <a href="reports.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
+            <div style="width:44px;height:44px;border-radius:10px;background:#FEF3C7;color:#D97706;display:flex;align-items:center;justify-content:center;font-size:22px">📄</div>
+            <div>
+              <strong style="display:block;color:#1E3A5F;font-size:14px">รายงาน A4</strong>
+              <span style="color:#6B7280;font-size:12px">พิมพ์เอกสารสำหรับผู้บริหาร</span>
+            </div>
+          </a>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon blue">👨‍🎓</div>
+              <div class="stat-card-trend up">↑ 12.5%</div>
+            </div>
+            <div class="stat-card-value">524</div>
+            <div class="stat-card-label">นักเรียนทั้งหมด</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon green">📝</div>
+              <div class="stat-card-trend up">↑ 8.3%</div>
+            </div>
+            <div class="stat-card-value">42</div>
+            <div class="stat-card-label">ใบสมัครใหม่ (เดือนนี้)</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon yellow">💰</div>
+              <div class="stat-card-trend up">↑ 18.2%</div>
+            </div>
+            <div class="stat-card-value">2.4M</div>
+            <div class="stat-card-label">รายได้รวม (บาท)</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-card-icon pink">🏆</div>
+              <div class="stat-card-trend up">↑ 5.1%</div>
+            </div>
+            <div class="stat-card-value">87.5</div>
+            <div class="stat-card-label">คะแนน O-NET เฉลี่ย</div>
+          </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title">ยอดสมัครและรายได้</h3>
+                <p class="chart-card-subtitle">เปรียบเทียบ 6 เดือนล่าสุด</p>
+              </div>
+              <div class="chart-tabs">
+                <button class="chart-tab active">ทั้งหมด</button>
+                <button class="chart-tab">EP</button>
+                <button class="chart-tab">MEP</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="enrollmentChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title">นักเรียนแยกตามหลักสูตร</h3>
+                <p class="chart-card-subtitle">ปีการศึกษา 2569</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="programChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <!-- More Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title">ผล O-NET ปี 2568 แยกตามวิชา</h3>
+                <p class="chart-card-subtitle">คะแนนเฉลี่ยของโรงเรียนเทียบกับประเทศ</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="onetChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title">การชำระเงิน</h3>
+                <p class="chart-card-subtitle">สถานะของการชำระเดือนนี้</p>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="paymentChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Applications Table -->
+        <div class="table-card" style="margin-top: 24px">
+          <div class="table-header">
+            <div>
+              <h3 class="chart-card-title">ใบสมัครล่าสุด</h3>
+              <p class="chart-card-subtitle">รายการ 5 ใบสมัครล่าสุดที่ส่งเข้ามา</p>
+            </div>
+            <button class="btn btn-primary" style="padding: 10px 20px; font-size: 14px">ดูทั้งหมด →</button>
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>นักเรียน</th>
+                  <th>หลักสูตร</th>
+                  <th>ระดับชั้น</th>
+                  <th>วันที่สมัคร</th>
+                  <th>สถานะ</th>
+                  <th>การชำระ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="applicationsTable">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Top Students -->
+        <div class="table-card" style="margin-top: 24px">
+          <div class="table-header">
+            <div>
+              <h3 class="chart-card-title">🏆 นักเรียนคะแนน O-NET สูงสุด</h3>
+              <p class="chart-card-subtitle">Top 10 ของปีการศึกษา 2568</p>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>อันดับ</th>
+                  <th>นักเรียน</th>
+                  <th>ระดับชั้น</th>
+                  <th>วิชา</th>
+                  <th>คะแนน</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="topStudentsTable">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+    
+  </div>
+  
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>

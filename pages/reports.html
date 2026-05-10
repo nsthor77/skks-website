@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายงาน A4 | SKKS Admin</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  
+  <style>
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .report-tile {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #E5E7EB;
+      transition: all 0.2s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .report-tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(30, 58, 95, 0.12);
+      border-color: #5BB8E0;
+    }
+    .report-tile::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #5BB8E0, #7CB342);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .report-tile:hover::before {
+      transform: scaleX(1);
+    }
+    .report-tile-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .report-tile h3 {
+      font-family: 'Prompt', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #1E3A5F;
+      margin-bottom: 8px;
+    }
+    .report-tile p {
+      font-size: 13px;
+      color: #6B7280;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .report-tile-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .report-tag {
+      background: #F3F4F6;
+      color: #6B7280;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .report-tile-action {
+      color: #5BB8E0;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-divider {
+      margin: 32px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-divider h2 {
+      font-family: 'Prompt', sans-serif;
+      font-size: 18px;
+      color: #1E3A5F;
+      font-weight: 700;
+    }
+    .section-divider .line {
+      flex: 1;
+      height: 1px;
+      background: #E5E7EB;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-layout">
+  
+  <aside class="sidebar no-print" id="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <div class="logo-text">
+          <strong>SKKS</strong>
+          <span>Admin Panel</span>
+        </div>
+      </a>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Main</div>
+        <ul>
+          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
+          <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร</a></li>
+          <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">การเงิน</div>
+        <ul>
+          <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
+          <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
+          <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">รายงาน</div>
+        <ul>
+          <li><a href="#" class="active"><span class="icon">📄</span> รายงาน A4</a></li>
+        </ul>
+      </div>
+      
+      <div class="sidebar-section">
+        <ul>
+          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+  
+  <main class="main-content">
+    
+    <div class="print-toolbar no-print">
+      <div class="print-toolbar-left">
+        <h3>📄 ศูนย์รวมรายงาน A4</h3>
+        <span style="color:#6B7280;font-size:13px">รายงานทั้งหมดสามารถพิมพ์เป็นกระดาษ A4 ส่งให้ผู้บริหารได้</span>
+      </div>
+    </div>
+    
+    <div class="dashboard-content">
+      
+      <!-- Section: ฝ่ายวิชาการ -->
+      <div class="section-divider">
+        <h2>📚 ฝ่ายวิชาการ</h2>
+        <div class="line"></div>
+      </div>
+      
+      <div class="reports-grid">
+        <a href="students.html" class="report-tile" style="text-decoration:none">
+          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">👨‍🎓</div>
+          <h3>รายชื่อนักเรียนแยกตามห้อง</h3>
+          <p>พิมพ์รายชื่อนักเรียนของแต่ละห้องเรียน พร้อมข้อมูลผู้ปกครองและสถานะการชำระ</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+            <span class="report-tag">25 ห้อง</span>
+            <span class="report-tag">524 คน</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </a>
+        
+        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา — สามารถดูตัวอย่างได้จากหน้านักเรียน')">
+          <div class="report-tile-icon" style="background:#DCFCE7;color:#16A34A">📊</div>
+          <h3>สรุปจำนวนนักเรียนแยกระดับชั้น</h3>
+          <p>ภาพรวมจำนวนนักเรียนแยกตามระดับชั้น เพศ และหลักสูตร พร้อมแผนภาพ</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+            <span class="report-tag">มีกราฟ</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </div>
+        
+        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
+          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">🏆</div>
+          <h3>ผลคะแนน O-NET ปี 2568</h3>
+          <p>คะแนน O-NET ของนักเรียน ป.6 และ ม.3 พร้อมเปรียบเทียบกับค่าเฉลี่ยประเทศ</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+            <span class="report-tag">มีกราฟ</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </div>
+        
+        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
+          <div class="report-tile-icon" style="background:#FCE7F3;color:#EC4899">📅</div>
+          <h3>ตารางสอน</h3>
+          <p>ตารางสอนแยกตามครู ห้องเรียน และวิชา พร้อมพิมพ์เป็นแผ่นแสดงในห้องครู</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </div>
+      </div>
+      
+      <!-- Section: การเงิน -->
+      <div class="section-divider">
+        <h2>💰 ฝ่ายการเงิน</h2>
+        <div class="line"></div>
+      </div>
+      
+      <div class="reports-grid">
+        <a href="finance.html" class="report-tile" style="text-decoration:none">
+          <div class="report-tile-icon" style="background:#DCFCE7;color:#16A34A">💰</div>
+          <h3>รายงานสรุปยอดเก็บค่าเทอม</h3>
+          <p>สรุปรายรับ รายการรอเก็บ และค้างชำระ แยกตามระดับชั้นและช่องทางการชำระเงิน</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 แนวนอน</span>
+            <span class="report-tag">มีกราฟ</span>
+            <span class="report-tag">สำหรับผู้บริหาร</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </a>
+        
+        <a href="finance.html" class="report-tile" style="text-decoration:none" onclick="setTimeout(()=>{document.querySelector('button[onclick*=payments]')?.click()},500)">
+          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">💳</div>
+          <h3>รายการชำระเงิน</h3>
+          <p>รายการชำระเงินทั้งหมด เรียงตามวันที่ พร้อมเลขใบเสร็จและช่องทางการชำระ</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 แนวนอน</span>
+            <span class="report-tag">CSV</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </a>
+        
+        <a href="finance.html" class="report-tile" style="text-decoration:none">
+          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">📋</div>
+          <h3>ใบเสร็จรับเงิน</h3>
+          <p>ใบเสร็จขนาดเล็ก (80mm) สำหรับพิมพ์จากเครื่องพิมพ์ใบเสร็จ หรือพิมพ์เป็น PDF ส่งผู้ปกครอง</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">80mm</span>
+            <span class="report-tag">PDF</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </a>
+        
+        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
+          <div class="report-tile-icon" style="background:#FEE2E2;color:#DC2626">⚠️</div>
+          <h3>รายชื่อนักเรียนค้างชำระ</h3>
+          <p>รายชื่อนักเรียนที่ยังไม่ชำระค่าเทอม พร้อมข้อมูลผู้ปกครองสำหรับการติดตาม</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+            <span class="report-tag">เร่งด่วน</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </div>
+      </div>
+      
+      <!-- Section: ฝ่ายรับสมัคร -->
+      <div class="section-divider">
+        <h2>📝 ฝ่ายรับสมัคร</h2>
+        <div class="line"></div>
+      </div>
+      
+      <div class="reports-grid">
+        <a href="applications.html" class="report-tile" style="text-decoration:none">
+          <div class="report-tile-icon" style="background:#E9D5FF;color:#7C3AED">📝</div>
+          <h3>ใบสมัครนักเรียนรายบุคคล</h3>
+          <p>ใบสมัครแบบเต็มของนักเรียนแต่ละคน พิมพ์ A4 พร้อมส่วนเซ็นรับรอง</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+            <span class="report-tag">รายบุคคล</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </a>
+        
+        <a href="applications.html" class="report-tile" style="text-decoration:none">
+          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">📑</div>
+          <h3>รายการใบสมัครทั้งหมด</h3>
+          <p>รายการใบสมัครทั้งหมดในปีการศึกษา 2569 พร้อมสถานะและผลการพิจารณา</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+            <span class="report-tag">CSV</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </a>
+        
+        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
+          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">📅</div>
+          <h3>ตารางนัดสัมภาษณ์</h3>
+          <p>ตารางนัดสัมภาษณ์ของผู้สมัคร เรียงตามวันที่และเวลานัด</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 พิมพ์ได้</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </div>
+      </div>
+      
+      <!-- Section: ผู้บริหาร -->
+      <div class="section-divider">
+        <h2>👔 รายงานผู้บริหาร</h2>
+        <div class="line"></div>
+      </div>
+      
+      <div class="reports-grid">
+        <a href="dashboard.html" class="report-tile" style="text-decoration:none">
+          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">📊</div>
+          <h3>Dashboard ภาพรวม</h3>
+          <p>ภาพรวมสถานการณ์โรงเรียนทั้งหมด — นักเรียน รายได้ ผลสอบ และใบสมัคร</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">Real-time</span>
+            <span class="report-tag">มีกราฟ</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </a>
+        
+        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
+          <div class="report-tile-icon" style="background:#DCFCE7;color:#16A34A">📈</div>
+          <h3>รายงานประจำเดือน</h3>
+          <p>รายงานสรุปผลการดำเนินงานประจำเดือน สำหรับนำเสนอผู้บริหาร</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 หลายแผ่น</span>
+            <span class="report-tag">มีกราฟ</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </div>
+        
+        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
+          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">📅</div>
+          <h3>รายงานประจำปี</h3>
+          <p>รายงานสรุปผลการดำเนินงานประจำปี เปรียบเทียบกับปีที่ผ่านมา</p>
+          <div class="report-tile-tags">
+            <span class="report-tag">A4 หลายแผ่น</span>
+            <span class="report-tag">รายปี</span>
+          </div>
+          <span class="report-tile-action">เปิดดู →</span>
+        </div>
+      </div>
+      
+      <div style="margin-top:48px;padding:24px;background:linear-gradient(135deg,#EFF6FF,#F0FDF4);border-radius:16px;border:1px dashed #5BB8E0">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="font-size:40px">💡</div>
+          <div>
+            <h3 style="font-family:'Prompt',sans-serif;color:#1E3A5F;margin-bottom:6px">วิธีใช้งานรายงาน A4</h3>
+            <p style="color:#6B7280;font-size:14px;line-height:1.7;margin:0">
+              1. คลิกเปิดรายงานที่ต้องการ &nbsp; 
+              2. ใช้ตัวกรองเพื่อเลือกข้อมูล &nbsp; 
+              3. คลิก <strong style="color:#1E3A5F">"🖨️ พิมพ์ A4"</strong> เพื่อเปิดหน้าต่างพิมพ์ &nbsp; 
+              4. เลือก "Save as PDF" เพื่อบันทึกเป็นไฟล์ PDF หรือพิมพ์โดยตรง
+            </p>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

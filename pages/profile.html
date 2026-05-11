@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — SKKS</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #F0F9FF 0%, #F0FDF4 100%);
+      min-height: 100vh;
+      font-family: 'Prompt', 'Sarabun', sans-serif;
+      margin: 0;
+    }
+    
+    .topbar {
+      background: white;
+      padding: 16px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .topbar-left img {
+      height: 40px;
+    }
+    
+    .topbar-left h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px;
+      color: #1E3A5F;
+      margin: 0;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5BB8E0, #7CB342);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    
+    .btn-logout {
+      padding: 8px 16px;
+      background: #FEE2E2;
+      color: #991B1B;
+      border: none;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    
+    .btn-logout:hover { background: #FECACA; }
+    
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-header h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 32px;
+      color: #1E3A5F;
+      margin: 0 0 8px 0;
+    }
+    
+    .page-header p {
+      color: #6B7280;
+      margin: 0;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.06);
+    }
+    
+    .card h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px;
+      color: #1E3A5F;
+      margin: 0 0 20px 0;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #F3F4F6;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .info-label {
+      font-size: 12px;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    
+    .info-value {
+      font-size: 15px;
+      color: #1E3A5F;
+      font-weight: 500;
+    }
+    
+    .role-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .role-badge.student { background: #DBEAFE; color: #1E40AF; }
+    .role-badge.parent { background: #FEF3C7; color: #92400E; }
+    .role-badge.staff { background: #DCFCE7; color: #166534; }
+    .role-badge.owner { background: #FCE7F3; color: #9F1239; }
+    .role-badge.developer { background: #E9D5FF; color: #6B21A8; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #9CA3AF;
+    }
+    
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6B7280;
+    }
+    
+    .lang-toggle {
+      background: #F3F4F6;
+      border-radius: 100px;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    
+    .lang-toggle a {
+      text-decoration: none;
+      color: #6B7280;
+      padding: 2px 6px;
+      font-weight: 600;
+    }
+    
+    .lang-toggle a.active {
+      color: #1E3A5F;
+    }
+    
+    table.payment-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .payment-table th {
+      text-align: left;
+      padding: 12px;
+      background: #F9FAFB;
+      font-size: 12px;
+      color: #6B7280;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    
+    .payment-table td {
+      padding: 12px;
+      border-top: 1px solid #F3F4F6;
+      font-size: 14px;
+    }
+    
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .status-pill.completed { background: #DCFCE7; color: #166534; }
+    .status-pill.pending { background: #FEF3C7; color: #92400E; }
+    .status-pill.cancelled { background: #FEE2E2; color: #991B1B; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <img src="../images/logo.png" alt="SKKS" />
+      <h1 data-i18n="profile.title">SKKS Portal</h1>
+    </div>
+    <div class="topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> | 
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
+      </div>
+      <div class="user-avatar" id="userAvatar">?</div>
+      <button class="btn-logout" onclick="auth.logout()" data-i18n="profile.logout">Sign Out</button>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="loading" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="profileContent" style="display:none;">
+      <div class="page-header">
+        <h2 data-i18n="profile.heading">My Profile</h2>
+        <p data-i18n="profile.subtitle">Welcome back to your SKKS portal</p>
+      </div>
+      
+      <!-- Personal Info -->
+      <div class="card">
+        <h3 data-i18n="profile.section.personal">👤 Personal Information</h3>
+        <div class="info-grid" id="personalInfo">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+      
+      <!-- Student Info -->
+      <div class="card" id="studentInfoCard">
+        <h3 data-i18n="profile.section.student">🎓 Student Information</h3>
+        <div class="info-grid" id="studentInfo">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+      
+      <!-- Payments -->
+      <div class="card">
+        <h3 data-i18n="profile.section.payments">💳 Payment History</h3>
+        <div id="paymentsList">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  
+  <script>
+    const t = {
+      en: {
+        'profile.title': 'SKKS Portal',
+        'profile.heading': 'My Profile',
+        'profile.subtitle': 'Welcome back to your SKKS portal',
+        'profile.logout': 'Sign Out',
+        'profile.section.personal': '👤 Personal Information',
+        'profile.section.student': '🎓 Student Information',
+        'profile.section.payments': '💳 Payment History',
+        'profile.label.name': 'Full Name',
+        'profile.label.email': 'Email',
+        'profile.label.phone': 'Phone',
+        'profile.label.role': 'Role',
+        'profile.label.student_number': 'Student Number',
+        'profile.label.program': 'Program',
+        'profile.label.grade': 'Grade',
+        'profile.label.classroom': 'Classroom',
+        'profile.label.status': 'Status',
+        'profile.label.enrollment': 'Enrollment Date',
+        'profile.empty.payments': 'No payment records yet',
+        'profile.empty.student': 'No student records linked yet'
+      },
+      th: {
+        'profile.title': 'พอร์ทัล SKKS',
+        'profile.heading': 'โปรไฟล์ของฉัน',
+        'profile.subtitle': 'ยินดีต้อนรับสู่พอร์ทัล SKKS',
+        'profile.logout': 'ออกจากระบบ',
+        'profile.section.personal': '👤 ข้อมูลส่วนตัว',
+        'profile.section.student': '🎓 ข้อมูลนักเรียน',
+        'profile.section.payments': '💳 ประวัติการชำระเงิน',
+        'profile.label.name': 'ชื่อ-นามสกุล',
+        'profile.label.email': 'อีเมล',
+        'profile.label.phone': 'เบอร์โทร',
+        'profile.label.role': 'สิทธิ์',
+        'profile.label.student_number': 'รหัสนักเรียน',
+        'profile.label.program': 'หลักสูตร',
+        'profile.label.grade': 'ระดับชั้น',
+        'profile.label.classroom': 'ห้องเรียน',
+        'profile.label.status': 'สถานะ',
+        'profile.label.enrollment': 'วันที่เข้าเรียน',
+        'profile.empty.payments': 'ยังไม่มีประวัติการชำระเงิน',
+        'profile.empty.student': 'ยังไม่มีข้อมูลนักเรียนที่เชื่อมไว้'
+      }
+    };
+    
+    function getLang() {
+      return localStorage.getItem('skks_lang') || 'en';
+    }
+    
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[lang][key]) el.textContent = t[lang][key];
+      });
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    
+    function getText(key) {
+      return t[getLang()][key] || key;
+    }
+    
+    setLang(getLang());
+    
+    // ============= LOAD PROFILE =============
+    async function loadProfile() {
+      // Require auth
+      const profile = await roleGuard.requireAuth();
+      if (!profile) return;
+      
+      const userProfile = await auth.getProfile();
+      if (!userProfile) return;
+      
+      // Show avatar
+      const initials = (userProfile.first_name?.[0] || '') + (userProfile.last_name?.[0] || '');
+      document.getElementById('userAvatar').textContent = initials.toUpperCase() || '?';
+      
+      // Personal Info
+      document.getElementById('personalInfo').innerHTML = `
+        <div class="info-item">
+          <span class="info-label">${getText('profile.label.name')}</span>
+          <span class="info-value">${userProfile.first_name} ${userProfile.last_name}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">${getText('profile.label.email')}</span>
+          <span class="info-value">${userProfile.email}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">${getText('profile.label.phone')}</span>
+          <span class="info-value">${userProfile.phone || '—'}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">${getText('profile.label.role')}</span>
+          <span><span class="role-badge ${userProfile.role}">${userProfile.role}</span></span>
+        </div>
+      `;
+      
+      // Student Info (if user is student)
+      if (userProfile.role === 'student') {
+        const { data: student } = await supabaseClient
+          .from('students')
+          .select('*')
+          .eq('profile_id', userProfile.id)
+          .single();
+        
+        if (student) {
+          document.getElementById('studentInfo').innerHTML = `
+            <div class="info-item">
+              <span class="info-label">${getText('profile.label.student_number')}</span>
+              <span class="info-value">${student.student_number}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">${getText('profile.label.program')}</span>
+              <span class="info-value">${student.program?.toUpperCase() || '—'}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">${getText('profile.label.grade')}</span>
+              <span class="info-value">${student.grade || '—'}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">${getText('profile.label.classroom')}</span>
+              <span class="info-value">${student.classroom || '—'}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">${getText('profile.label.status')}</span>
+              <span class="info-value">${student.status}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">${getText('profile.label.enrollment')}</span>
+              <span class="info-value">${student.enrollment_date || '—'}</span>
+            </div>
+          `;
+        } else {
+          document.getElementById('studentInfo').innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <div class="icon">📋</div>
+              <p>${getText('profile.empty.student')}</p>
+            </div>
+          `;
+        }
+      } else {
+        document.getElementById('studentInfoCard').style.display = 'none';
+      }
+      
+      // Payments
+      const { data: payments } = await supabaseClient
+        .from('payments')
+        .select('*, students(student_number, program)')
+        .order('paid_at', { ascending: false })
+        .limit(20);
+      
+      if (payments && payments.length > 0) {
+        document.getElementById('paymentsList').innerHTML = `
+          <table class="payment-table">
+            <thead>
+              <tr>
+                <th>Receipt #</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${payments.map(p => `
+                <tr>
+                  <td><strong>${p.receipt_number}</strong></td>
+                  <td>${new Date(p.paid_at).toLocaleDateString()}</td>
+                  <td>${p.payment_type}</td>
+                  <td>${p.description || '—'}</td>
+                  <td><strong>฿${parseFloat(p.amount).toLocaleString()}</strong></td>
+                  <td><span class="status-pill ${p.status}">${p.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        document.getElementById('paymentsList').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">💳</div>
+            <p>${getText('profile.empty.payments')}</p>
+          </div>
+        `;
+      }
+      
+      // Show content
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('profileContent').style.display = 'block';
+    }
+    
+    loadProfile();
+  </script>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payments — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <style>
+    /* Receipt print styles */
+    @media print {
+      body * { visibility: hidden; }
+      .receipt-print, .receipt-print * { visibility: visible; }
+      .receipt-print {
+        position: absolute; left: 0; top: 0; width: 100%;
+        padding: 40px; font-family: 'Sarabun', serif;
+      }
+      .no-print { display: none !important; }
+    }
+    .receipt-print { display: none; }
+    .receipt-print.printing {
+      display: block; position: fixed; inset: 0;
+      background: white; z-index: 9999; padding: 40px;
+      overflow: auto; font-family: 'Sarabun', serif;
+    }
+    .receipt-header { text-align: center; border-bottom: 2px solid #1E3A5F; padding-bottom: 20px; margin-bottom: 24px; }
+    .receipt-header img { height: 60px; }
+    .receipt-header h1 { margin: 10px 0 4px; color: #1E3A5F; font-family: 'Poppins'; }
+    .receipt-table { width: 100%; margin-top: 20px; }
+    .receipt-table td { padding: 8px 0; }
+    .receipt-table td:first-child { font-weight: 600; color: #6B7280; width: 35%; }
+    .receipt-total { font-size: 24px; font-weight: 700; color: #1E3A5F; padding: 16px; background: #F0FDF4; border-radius: 12px; margin-top: 20px; text-align: center; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="admin-topbar no-print">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html" class="active">💳 Payments</a>
+        <a href="finance.html" class="owner-only" style="display:none">💰 Finance</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
+      </div>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+  
+  <div class="admin-container no-print">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>💳 Payments</h2>
+          <p>Record payments and print receipts</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          ➕ Record Payment
+        </button>
+      </div>
+      
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));">
+        <div class="stat-card green">
+          <div class="label">Today's Revenue</div>
+          <div class="value" id="statToday">—</div>
+          <div class="sub">From completed payments</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">This Month</div>
+          <div class="value" id="statMonth">—</div>
+          <div class="sub">Total received</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">Total Payments</div>
+          <div class="value" id="statCount">—</div>
+          <div class="sub">All time</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="label">Pending</div>
+          <div class="value" id="statPending">—</div>
+          <div class="sub">Awaiting confirmation</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="🔍 Search by receipt #, student #..." oninput="filterPayments()" />
+          <select id="filterType" onchange="filterPayments()">
+            <option value="">All Types</option>
+            <option value="tuition">Tuition</option>
+            <option value="application_fee">Application Fee</option>
+            <option value="registration_fee">Registration Fee</option>
+            <option value="uniform">Uniform</option>
+            <option value="books">Books</option>
+            <option value="activity">Activity</option>
+            <option value="other">Other</option>
+          </select>
+          <select id="filterStatus" onchange="filterPayments()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Receipt #</th>
+                <th>Student</th>
+                <th>Type</th>
+                <th style="text-align:right;">Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="paymentsList">
+              <tr><td colspan="8"><div class="loading-state">Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="paymentCount" style="text-align:right; margin-top:12px; font-size:12px; color:#6B7280;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay no-print" id="paymentModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">➕ Record Payment</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      
+      <form id="paymentForm" onsubmit="savePayment(event)">
+        <input type="hidden" id="paymentId" />
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Receipt # <span class="req">*</span></label>
+            <input type="text" id="receiptNumber" required />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="paymentStatus">
+              <option value="completed">✅ Completed</option>
+              <option value="pending">⏳ Pending</option>
+              <option value="cancelled">❌ Cancelled</option>
+              <option value="refunded">↩️ Refunded</option>
+            </select>
+          </div>
+          
+          <div class="form-group full">
+            <label>Student <span class="req">*</span></label>
+            <select id="studentId" required>
+              <option value="">Select student...</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Payment Type <span class="req">*</span></label>
+            <select id="paymentType" required>
+              <option value="">Select...</option>
+              <option value="tuition">📚 Tuition</option>
+              <option value="application_fee">📝 Application Fee</option>
+              <option value="registration_fee">📋 Registration Fee</option>
+              <option value="uniform">👕 Uniform</option>
+              <option value="books">📖 Books</option>
+              <option value="activity">🎨 Activity</option>
+              <option value="other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Amount (THB) <span class="req">*</span></label>
+            <input type="number" id="amount" required min="0" step="0.01" placeholder="0.00" />
+          </div>
+          
+          <div class="form-group">
+            <label>Semester</label>
+            <input type="text" id="semester" placeholder="e.g., 1/2026" />
+          </div>
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select id="paymentMethod">
+              <option value="cash">💵 Cash</option>
+              <option value="bank_transfer">🏦 Bank Transfer</option>
+              <option value="qr_payment">📱 QR Payment</option>
+              <option value="credit_card">💳 Credit Card</option>
+              <option value="cheque">📋 Cheque</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Payment Date</label>
+            <input type="date" id="paidAt" />
+          </div>
+          <div class="form-group">
+            <label>Reference / Transaction ID</label>
+            <input type="text" id="referenceNumber" placeholder="Optional" />
+          </div>
+          
+          <div class="form-group full">
+            <label>Notes</label>
+            <textarea id="notes" rows="2" placeholder="Optional notes..."></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Receipt Print Template -->
+  <div class="receipt-print" id="receiptPrint">
+    <div class="receipt-header">
+      <img src="../images/logo.png" alt="SKKS" />
+      <h1>SUANSON KHON KAEN SCHOOL</h1>
+      <div style="color:#6B7280;">โรงเรียนสวนสนขอนแก่น</div>
+      <div style="margin-top:8px; font-size:13px; color:#6B7280;">ใบเสร็จรับเงิน / Receipt</div>
+    </div>
+    
+    <table class="receipt-table">
+      <tr><td>Receipt Number:</td><td id="rcptNumber">—</td></tr>
+      <tr><td>Date:</td><td id="rcptDate">—</td></tr>
+      <tr><td>Student:</td><td id="rcptStudent">—</td></tr>
+      <tr><td>Payment For:</td><td id="rcptType">—</td></tr>
+      <tr><td>Semester:</td><td id="rcptSemester">—</td></tr>
+      <tr><td>Payment Method:</td><td id="rcptMethod">—</td></tr>
+      <tr><td>Reference:</td><td id="rcptRef">—</td></tr>
+    </table>
+    
+    <div class="receipt-total" id="rcptAmount">฿0</div>
+    
+    <div style="margin-top:60px; display:flex; justify-content:space-between; gap:40px;">
+      <div style="text-align:center; flex:1;">
+        <div style="border-top:1px solid #1E3A5F; padding-top:8px; font-size:13px;">Received by</div>
+      </div>
+      <div style="text-align:center; flex:1;">
+        <div style="border-top:1px solid #1E3A5F; padding-top:8px; font-size:13px;">Authorized Signature</div>
+      </div>
+    </div>
+    
+    <div style="margin-top:40px; text-align:center; font-size:11px; color:#9CA3AF;">
+      Thank you for your payment • ขอบคุณค่ะ
+    </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    
+    let allPayments = [];
+    let allStudents = [];
+    let currentProfile = null;
+    
+    async function init() {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+      currentProfile = profile;
+      
+      if (['owner', 'developer'].includes(profile.role)) {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      await Promise.all([loadStudents(), loadPayments()]);
+    }
+    
+    async function loadStudents() {
+      const { data } = await supabaseClient
+        .from('students')
+        .select('id, student_number, grade, classroom')
+        .order('student_number');
+      
+      allStudents = data || [];
+      const select = document.getElementById('studentId');
+      select.innerHTML = '<option value="">Select student...</option>' + 
+        allStudents.map(s => `<option value="${s.id}">${s.student_number} • ${s.grade || ''} ${s.classroom || ''}</option>`).join('');
+    }
+    
+    async function loadPayments() {
+      const { data, error } = await supabaseClient
+        .from('payments')
+        .select('*, students(student_number, grade, classroom)')
+        .order('paid_at', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        return;
+      }
+      
+      allPayments = data || [];
+      updateStats();
+      renderPayments(allPayments);
+    }
+    
+    function updateStats() {
+      const today = new Date().toISOString().slice(0, 10);
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0,0,0,0);
+      
+      let todayTotal = 0, monthTotal = 0, pending = 0;
+      
+      allPayments.forEach(p => {
+        const paidDate = p.paid_at ? new Date(p.paid_at) : null;
+        if (p.status === 'completed' && paidDate) {
+          if (p.paid_at.startsWith(today)) todayTotal += parseFloat(p.amount || 0);
+          if (paidDate >= startOfMonth) monthTotal += parseFloat(p.amount || 0);
+        }
+        if (p.status === 'pending') pending++;
+      });
+      
+      document.getElementById('statToday').textContent = dataHelpers.formatMoney(todayTotal);
+      document.getElementById('statMonth').textContent = dataHelpers.formatMoney(monthTotal);
+      document.getElementById('statCount').textContent = allPayments.length;
+      document.getElementById('statPending').textContent = pending;
+    }
+    
+    function renderPayments(payments) {
+      const tbody = document.getElementById('paymentsList');
+      
+      if (!payments || payments.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">💳</div><h4>No payments yet</h4><p>Click "Record Payment" to add one</p></div></td></tr>`;
+        document.getElementById('paymentCount').textContent = '';
+        return;
+      }
+      
+      tbody.innerHTML = payments.map(p => `
+        <tr>
+          <td><strong>${p.receipt_number}</strong></td>
+          <td>${p.students?.student_number || '<em style="color:#9CA3AF;">—</em>'}</td>
+          <td><span style="font-size:11px; color:#5BB8E0; font-weight:600; text-transform:uppercase;">${p.payment_type}</span></td>
+          <td style="text-align:right; font-weight:700; color:#16A34A;">${dataHelpers.formatMoney(p.amount)}</td>
+          <td><span style="font-size:11px;">${p.payment_method || '—'}</span></td>
+          <td>${dataHelpers.statusBadge(p.status)}</td>
+          <td style="font-size:12px; color:#6B7280;">${dataHelpers.formatDate(p.paid_at)}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-secondary" onclick="printReceipt('${p.id}')" title="Print">🖨️</button>
+            <button class="btn btn-sm btn-secondary" onclick="editPayment('${p.id}')" title="Edit">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deletePayment('${p.id}', '${p.receipt_number}')" title="Delete">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('paymentCount').textContent = `${payments.length} payment(s)`;
+    }
+    
+    function filterPayments() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const type = document.getElementById('filterType').value;
+      const status = document.getElementById('filterStatus').value;
+      
+      const filtered = allPayments.filter(p => {
+        const studentNum = (p.students?.student_number || '').toLowerCase();
+        const matchSearch = !search || 
+          (p.receipt_number || '').toLowerCase().includes(search) ||
+          studentNum.includes(search) ||
+          (p.reference_number || '').toLowerCase().includes(search);
+        const matchType = !type || p.payment_type === type;
+        const matchStatus = !status || p.status === status;
+        return matchSearch && matchType && matchStatus;
+      });
+      
+      renderPayments(filtered);
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '➕ Record Payment';
+      document.getElementById('paymentId').value = '';
+      document.getElementById('paymentForm').reset();
+      document.getElementById('paymentStatus').value = 'completed';
+      document.getElementById('paymentMethod').value = 'cash';
+      
+      // Auto-generate receipt number
+      const now = new Date();
+      const date = now.toISOString().slice(0, 10).replace(/-/g, '');
+      const todayCount = allPayments.filter(p => p.paid_at && p.paid_at.startsWith(now.toISOString().slice(0, 10))).length;
+      const seq = String(todayCount + 1).padStart(4, '0');
+      document.getElementById('receiptNumber').value = `RC-${date}-${seq}`;
+      
+      // Default to today
+      document.getElementById('paidAt').value = now.toISOString().slice(0, 10);
+      
+      document.getElementById('paymentModal').classList.add('show');
+    }
+    
+    function editPayment(id) {
+      const p = allPayments.find(x => x.id === id);
+      if (!p) return;
+      
+      document.getElementById('modalTitle').textContent = '✏️ Edit Payment';
+      document.getElementById('paymentId').value = p.id;
+      document.getElementById('receiptNumber').value = p.receipt_number;
+      document.getElementById('paymentStatus').value = p.status;
+      document.getElementById('studentId').value = p.student_id || '';
+      document.getElementById('paymentType').value = p.payment_type;
+      document.getElementById('amount').value = p.amount;
+      document.getElementById('semester').value = p.semester || '';
+      document.getElementById('paymentMethod').value = p.payment_method || 'cash';
+      document.getElementById('paidAt').value = p.paid_at ? p.paid_at.slice(0, 10) : '';
+      document.getElementById('referenceNumber').value = p.reference_number || '';
+      document.getElementById('notes').value = p.notes || '';
+      
+      document.getElementById('paymentModal').classList.add('show');
+    }
+    
+    function closeModal() {
+      document.getElementById('paymentModal').classList.remove('show');
+    }
+    
+    async function savePayment(event) {
+      event.preventDefault();
+      const id = document.getElementById('paymentId').value;
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      const paymentData = {
+        receipt_number: document.getElementById('receiptNumber').value.trim(),
+        status: document.getElementById('paymentStatus').value,
+        student_id: document.getElementById('studentId').value,
+        payment_type: document.getElementById('paymentType').value,
+        amount: parseFloat(document.getElementById('amount').value),
+        semester: document.getElementById('semester').value.trim() || null,
+        payment_method: document.getElementById('paymentMethod').value,
+        paid_at: document.getElementById('paidAt').value ? new Date(document.getElementById('paidAt').value).toISOString() : new Date().toISOString(),
+        reference_number: document.getElementById('referenceNumber').value.trim() || null,
+        notes: document.getElementById('notes').value.trim() || null,
+        recorded_by: currentProfile.id
+      };
+      
+      let result;
+      if (id) {
+        result = await supabaseClient.from('payments').update(paymentData).eq('id', id);
+      } else {
+        result = await supabaseClient.from('payments').insert(paymentData);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '💾 Save Payment';
+      
+      if (result.error) {
+        dataHelpers.toast('❌ ' + result.error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(id ? '✅ Payment updated!' : '✅ Payment recorded!', 'success');
+      closeModal();
+      loadPayments();
+    }
+    
+    async function deletePayment(id, rcpt) {
+      const confirmed = await dataHelpers.confirm(
+        `Delete payment "${rcpt}"? This cannot be undone.`,
+        { title: '⚠️ Delete Payment', confirmText: 'Delete', danger: true }
+      );
+      if (!confirmed) return;
+      
+      const { error } = await supabaseClient.from('payments').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('✅ Payment deleted', 'success');
+      loadPayments();
+    }
+    
+    function printReceipt(id) {
+      const p = allPayments.find(x => x.id === id);
+      if (!p) return;
+      
+      document.getElementById('rcptNumber').textContent = p.receipt_number;
+      document.getElementById('rcptDate').textContent = dataHelpers.formatDateTime(p.paid_at);
+      document.getElementById('rcptStudent').textContent = p.students?.student_number ? 
+        `${p.students.student_number} (${p.students.grade || ''} ${p.students.classroom || ''})` : '—';
+      document.getElementById('rcptType').textContent = (p.payment_type || '—').replace('_', ' ').toUpperCase();
+      document.getElementById('rcptSemester').textContent = p.semester || '—';
+      document.getElementById('rcptMethod').textContent = (p.payment_method || '—').replace('_', ' ').toUpperCase();
+      document.getElementById('rcptRef').textContent = p.reference_number || '—';
+      document.getElementById('rcptAmount').textContent = dataHelpers.formatMoney(p.amount);
+      
+      const receipt = document.getElementById('receiptPrint');
+      receipt.classList.add('printing');
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => receipt.classList.remove('printing'), 500);
+      }, 100);
+    }
+    
+    setLang(getLang());
+    init();
+  </script>
+</body>
+</html>

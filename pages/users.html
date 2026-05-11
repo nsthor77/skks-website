@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="finance.html">💰 Finance</a>
+        <a href="users.html" class="active">👥 Users</a>
+        <a href="manage-invites.html">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
+      </div>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+  
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>👥 User Management</h2>
+          <p>Manage user roles and accounts — owner only</p>
+        </div>
+        <a href="manage-invites.html" class="btn btn-primary">
+          🎟️ Create Invite Code
+        </a>
+      </div>
+      
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="stat-card blue" onclick="filterByRole('student')" style="cursor:pointer;">
+          <div class="label">Students</div>
+          <div class="value" id="cntStudent">—</div>
+        </div>
+        <div class="stat-card amber" onclick="filterByRole('parent')" style="cursor:pointer;">
+          <div class="label">Parents</div>
+          <div class="value" id="cntParent">—</div>
+        </div>
+        <div class="stat-card green" onclick="filterByRole('staff')" style="cursor:pointer;">
+          <div class="label">Staff</div>
+          <div class="value" id="cntStaff">—</div>
+        </div>
+        <div class="stat-card pink" onclick="filterByRole('owner')" style="cursor:pointer;">
+          <div class="label">Owners</div>
+          <div class="value" id="cntOwner">—</div>
+        </div>
+        <div class="stat-card purple" onclick="filterByRole('developer')" style="cursor:pointer;">
+          <div class="label">Developers</div>
+          <div class="value" id="cntDev">—</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="🔍 Search by name, email, phone..." oninput="filterUsers()" />
+          <select id="filterRole" onchange="filterUsers()">
+            <option value="">All Roles</option>
+            <option value="student">Student</option>
+            <option value="parent">Parent</option>
+            <option value="staff">Staff</option>
+            <option value="owner">Owner</option>
+            <option value="developer">Developer</option>
+          </select>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Joined</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userList">
+              <tr><td colspan="6"><div class="loading-state">Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="userCount" style="text-align:right; margin-top:12px; font-size:12px; color:#6B7280;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Change Role Modal -->
+  <div class="modal-overlay" id="roleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>🔄 Change User Role</h3>
+        <button class="modal-close" onclick="closeRoleModal()">×</button>
+      </div>
+      
+      <div style="background:#FEF3C7; border-left:4px solid #F59E0B; padding:12px; border-radius:8px; margin-bottom:20px;">
+        <div style="font-weight:600; color:#92400E; margin-bottom:4px;">⚠️ Warning</div>
+        <div style="font-size:13px; color:#92400E;">Changing a user's role will affect their permissions immediately. The user must log out and log back in for changes to take full effect.</div>
+      </div>
+      
+      <div style="margin-bottom:16px;">
+        <strong>User:</strong> <span id="roleUserName">—</span><br>
+        <strong>Email:</strong> <span id="roleUserEmail">—</span><br>
+        <strong>Current role:</strong> <span id="roleCurrentRole">—</span>
+      </div>
+      
+      <form id="roleForm" onsubmit="saveRole(event)">
+        <input type="hidden" id="roleUserId" />
+        
+        <div class="form-group">
+          <label>New Role <span class="req">*</span></label>
+          <select id="newRole" required>
+            <option value="student">👨‍🎓 Student — basic access</option>
+            <option value="parent">👨‍👩‍👧 Parent — view own children</option>
+            <option value="staff">👨‍🏫 Staff — manage students/applications/payments</option>
+            <option value="owner">👑 Owner — full access including finance</option>
+            <option value="developer">🛠️ Developer — system access</option>
+          </select>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeRoleModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveRoleBtn">💾 Update Role</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    
+    let allUsers = [];
+    let currentProfile = null;
+    
+    async function init() {
+      const profile = await roleGuard.requireOwner();
+      if (!profile) return;
+      currentProfile = profile;
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      loadUsers();
+    }
+    
+    async function loadUsers() {
+      const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        return;
+      }
+      
+      allUsers = data || [];
+      updateStats();
+      renderUsers(allUsers);
+    }
+    
+    function updateStats() {
+      const counts = { student: 0, parent: 0, staff: 0, owner: 0, developer: 0 };
+      allUsers.forEach(u => { if (counts[u.role] !== undefined) counts[u.role]++; });
+      document.getElementById('cntStudent').textContent = counts.student;
+      document.getElementById('cntParent').textContent = counts.parent;
+      document.getElementById('cntStaff').textContent = counts.staff;
+      document.getElementById('cntOwner').textContent = counts.owner;
+      document.getElementById('cntDev').textContent = counts.developer;
+    }
+    
+    function renderUsers(users) {
+      const tbody = document.getElementById('userList');
+      
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">👥</div><h4>No users found</h4></div></td></tr>`;
+        document.getElementById('userCount').textContent = '';
+        return;
+      }
+      
+      tbody.innerHTML = users.map(u => {
+        const initials = ((u.first_name?.[0] || '') + (u.last_name?.[0] || '')).toUpperCase() || '?';
+        const isMe = u.id === currentProfile.id;
+        const canEdit = currentProfile.role === 'developer' || 
+                        (currentProfile.role === 'owner' && !['owner', 'developer'].includes(u.role));
+        
+        return `
+          <tr ${isMe ? 'style="background:#FEF3C7;"' : ''}>
+            <td>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #5BB8E0, #7CB342); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px;">${initials}</div>
+                <div>
+                  <strong>${u.first_name || ''} ${u.last_name || ''}</strong>
+                  ${isMe ? '<span style="font-size:10px; color:#92400E; margin-left:4px;">(you)</span>' : ''}
+                </div>
+              </div>
+            </td>
+            <td style="font-family:monospace; font-size:12px;">${u.email}</td>
+            <td style="font-family:monospace; font-size:12px;">${u.phone || '—'}</td>
+            <td>${dataHelpers.roleBadge(u.role)}</td>
+            <td style="font-size:12px; color:#6B7280;">${dataHelpers.formatDate(u.created_at)}</td>
+            <td class="actions-cell">
+              ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="openRoleModal('${u.id}')" title="Change role">🔄</button>` : ''}
+              ${canEdit && !isMe ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}', '${u.first_name} ${u.last_name}')" title="Delete">🗑️</button>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      document.getElementById('userCount').textContent = `${users.length} user(s)`;
+    }
+    
+    function filterByRole(role) {
+      document.getElementById('filterRole').value = role;
+      filterUsers();
+    }
+    
+    function filterUsers() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const role = document.getElementById('filterRole').value;
+      
+      const filtered = allUsers.filter(u => {
+        const fullName = `${u.first_name || ''} ${u.last_name || ''}`.toLowerCase();
+        const matchSearch = !search || 
+          fullName.includes(search) ||
+          (u.email || '').toLowerCase().includes(search) ||
+          (u.phone || '').includes(search);
+        const matchRole = !role || u.role === role;
+        return matchSearch && matchRole;
+      });
+      
+      renderUsers(filtered);
+    }
+    
+    function openRoleModal(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (!user) return;
+      
+      document.getElementById('roleUserId').value = user.id;
+      document.getElementById('roleUserName').textContent = `${user.first_name || ''} ${user.last_name || ''}`;
+      document.getElementById('roleUserEmail').textContent = user.email;
+      document.getElementById('roleCurrentRole').innerHTML = dataHelpers.roleBadge(user.role);
+      document.getElementById('newRole').value = user.role;
+      
+      document.getElementById('roleModal').classList.add('show');
+    }
+    
+    function closeRoleModal() {
+      document.getElementById('roleModal').classList.remove('show');
+    }
+    
+    async function saveRole(event) {
+      event.preventDefault();
+      const userId = document.getElementById('roleUserId').value;
+      const newRole = document.getElementById('newRole').value;
+      const btn = document.getElementById('saveRoleBtn');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Updating...';
+      
+      const { error } = await supabaseClient
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId);
+      
+      btn.disabled = false;
+      btn.textContent = '💾 Update Role';
+      
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast('✅ Role updated successfully!', 'success');
+      closeRoleModal();
+      loadUsers();
+    }
+    
+    async function deleteUser(id, name) {
+      const confirmed = await dataHelpers.confirm(
+        `Delete user "${name}"? This will also remove their account access. This cannot be undone.`,
+        { title: '⚠️ Delete User', confirmText: 'Delete', danger: true }
+      );
+      if (!confirmed) return;
+      
+      const { error } = await supabaseClient.from('profiles').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('✅ User deleted', 'success');
+      loadUsers();
+    }
+    
+    setLang(getLang());
+    init();
+  </script>
+</body>
+</html>

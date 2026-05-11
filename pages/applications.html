@@ -1,136 +1,467 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ใบสมัคร | SKKS Admin</title>
-  
+  <title>Applications — SKKS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <link rel="stylesheet" href="../css/dashboard.css" />
-  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
   <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-<div class="dashboard-layout">
-  
-  <aside class="sidebar no-print" id="sidebar">
-    <div class="sidebar-header">
-      <a href="../index.html" class="logo">
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
         <img src="../images/logo.png" alt="SKKS" />
-        <div class="logo-text">
-          <strong>SKKS</strong>
-          <span>Admin Panel</span>
-        </div>
+        <h1>SKKS Admin</h1>
       </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html" class="active">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="finance.html" class="owner-only" style="display:none">💰 Finance</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
     </div>
-    
-    <nav class="sidebar-nav">
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Main</div>
-        <ul>
-          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
-          <li><a href="#" class="active"><span class="icon">📝</span> ใบสมัคร</a></li>
-          <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
-        </ul>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">การเงิน</div>
-        <ul>
-          <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
-          <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
-          <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">รายงาน</div>
-        <ul>
-          <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <ul>
-          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
-        </ul>
-      </div>
-    </nav>
-  </aside>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
   
-  <main class="main-content">
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
     
-    <!-- Toolbar -->
-    <div class="print-toolbar no-print">
-      <div class="print-toolbar-left">
-        <h3>📝 จัดการใบสมัคร</h3>
-        <span style="color:#6B7280;font-size:13px">ใบสมัครทั้งหมด <strong id="appCount" style="color:#1E3A5F">0</strong> รายการ</span>
-      </div>
-      <div class="print-toolbar-actions">
-        <button class="toolbar-btn" id="btnList" onclick="showList()">📋 รายการ</button>
-        <button class="toolbar-btn" id="btnDetail" onclick="showCurrentDetail()">📄 ใบสมัคร A4</button>
-        <button class="toolbar-btn" onclick="exportApps()">📥 Export CSV</button>
-        <button class="toolbar-btn primary" onclick="window.print()">🖨️ พิมพ์</button>
-      </div>
-    </div>
-    
-    <!-- List View -->
-    <div id="listView">
-      <div class="filter-bar no-print">
-        <label>สถานะ:</label>
-        <select id="filterAppStatus" onchange="renderList()">
-          <option value="">ทั้งหมด</option>
-          <option value="pending">รอพิจารณา</option>
-          <option value="interview">นัดสัมภาษณ์</option>
-          <option value="approved">อนุมัติ</option>
-          <option value="rejected">ไม่ผ่าน</option>
-        </select>
-        
-        <label>หลักสูตร:</label>
-        <select id="filterAppProgram" onchange="renderList()">
-          <option value="">ทั้งหมด</option>
-          <option value="EP">EP</option>
-          <option value="MEP">MEP</option>
-        </select>
-        
-        <input type="text" id="searchApp" placeholder="🔍 ค้นหาชื่อนักเรียน..." oninput="renderList()" style="margin-left:auto;min-width:240px" />
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📝 Applications</h2>
+          <p>Manage admission applications and approvals</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          ➕ New Application
+        </button>
       </div>
       
-      <div class="dashboard-content">
-        <div class="table-card">
-          <div class="table-wrapper">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>รหัสใบสมัคร</th>
-                  <th>นักเรียน</th>
-                  <th>หลักสูตร</th>
-                  <th>ระดับชั้น</th>
-                  <th>วันที่สมัคร</th>
-                  <th>การชำระ</th>
-                  <th>สถานะ</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="appsTableBody"></tbody>
-            </table>
+      <!-- Status Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); margin-bottom:16px;">
+        <div class="stat-card amber" onclick="filterByStatus('pending')" style="cursor:pointer;">
+          <div class="label">Pending</div>
+          <div class="value" id="cntPending">—</div>
+        </div>
+        <div class="stat-card blue" onclick="filterByStatus('reviewing')" style="cursor:pointer;">
+          <div class="label">Reviewing</div>
+          <div class="value" id="cntReviewing">—</div>
+        </div>
+        <div class="stat-card green" onclick="filterByStatus('accepted')" style="cursor:pointer;">
+          <div class="label">Accepted</div>
+          <div class="value" id="cntAccepted">—</div>
+        </div>
+        <div class="stat-card purple" onclick="filterByStatus('enrolled')" style="cursor:pointer;">
+          <div class="label">Enrolled</div>
+          <div class="value" id="cntEnrolled">—</div>
+        </div>
+        <div class="stat-card pink" onclick="filterByStatus('rejected')" style="cursor:pointer;">
+          <div class="label">Rejected</div>
+          <div class="value" id="cntRejected">—</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="🔍 Search by name, application number, parent..." oninput="filterApplications()" />
+          <select id="filterStatus" onchange="filterApplications()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="reviewing">Reviewing</option>
+            <option value="interview_scheduled">Interview Scheduled</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+            <option value="enrolled">Enrolled</option>
+          </select>
+          <select id="filterProgram" onchange="filterApplications()">
+            <option value="">All Programs</option>
+            <option value="prek">Pre-K</option>
+            <option value="k">Kindergarten</option>
+            <option value="ep">EP</option>
+            <option value="mep">MEP</option>
+          </select>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>App #</th>
+                <th>Student</th>
+                <th>Program</th>
+                <th>Parent</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="appList">
+              <tr><td colspan="8"><div class="loading-state">Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="appCount" style="text-align:right; margin-top:12px; font-size:12px; color:#6B7280;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- View/Edit Modal -->
+  <div class="modal-overlay" id="appModal">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <h3 id="modalTitle">📋 Application Details</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      
+      <form id="appForm" onsubmit="saveApplication(event)">
+        <input type="hidden" id="appId" />
+        
+        <h4 style="margin:0 0 10px 0; color:#5BB8E0; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">👶 Student Information</h4>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Application # <span class="req">*</span></label>
+            <input type="text" id="appNumber" required />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="appStatus">
+              <option value="pending">⏳ Pending</option>
+              <option value="reviewing">🔍 Reviewing</option>
+              <option value="interview_scheduled">📅 Interview Scheduled</option>
+              <option value="accepted">✅ Accepted</option>
+              <option value="rejected">❌ Rejected</option>
+              <option value="enrolled">🎓 Enrolled</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" id="studentFirstName" required />
+          </div>
+          <div class="form-group">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" id="studentLastName" required />
+          </div>
+          
+          <div class="form-group">
+            <label>Nickname</label>
+            <input type="text" id="studentNickname" />
+          </div>
+          <div class="form-group">
+            <label>Birth Date</label>
+            <input type="date" id="studentBirthDate" />
+          </div>
+          
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="studentGender">
+              <option value="">—</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nationality</label>
+            <input type="text" id="studentNationality" value="Thai" />
+          </div>
+          
+          <div class="form-group">
+            <label>Program Choice <span class="req">*</span></label>
+            <select id="appProgram" required>
+              <option value="">Select...</option>
+              <option value="prek">Pre-K</option>
+              <option value="k">Kindergarten</option>
+              <option value="ep">EP (English Program)</option>
+              <option value="mep">MEP (Mini English Program)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Grade Level</label>
+            <input type="text" id="appGrade" placeholder="e.g., Grade 1, K1" />
           </div>
         </div>
-      </div>
+        
+        <h4 style="margin:20px 0 10px 0; color:#5BB8E0; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">👨‍👩‍👧 Parent / Guardian Information</h4>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Parent Name <span class="req">*</span></label>
+            <input type="text" id="parentName" required />
+          </div>
+          <div class="form-group">
+            <label>Relationship</label>
+            <select id="parentRelation">
+              <option value="">—</option>
+              <option value="father">Father</option>
+              <option value="mother">Mother</option>
+              <option value="guardian">Guardian</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Phone <span class="req">*</span></label>
+            <input type="tel" id="parentPhone" required placeholder="08X-XXX-XXXX" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="parentEmail" />
+          </div>
+          
+          <div class="form-group full">
+            <label>Address</label>
+            <textarea id="parentAddress" rows="2"></textarea>
+          </div>
+        </div>
+        
+        <h4 style="margin:20px 0 10px 0; color:#5BB8E0; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">📝 Notes</h4>
+        <div class="form-group full">
+          <textarea id="appNotes" rows="3" placeholder="Internal notes about this application..."></textarea>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Application</button>
+        </div>
+      </form>
     </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
     
-    <!-- Detail View (A4 Print) -->
-    <div id="detailView" style="display:none">
-      <div id="appDetailContainer"></div>
-    </div>
+    let allApps = [];
+    let currentProfile = null;
     
-  </main>
-</div>
-
-<script src="../js/applications.js"></script>
+    async function init() {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+      currentProfile = profile;
+      
+      if (['owner', 'developer'].includes(profile.role)) {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      loadApplications();
+    }
+    
+    async function loadApplications() {
+      const { data, error } = await supabaseClient
+        .from('applications')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        return;
+      }
+      
+      allApps = data || [];
+      updateStats();
+      renderApplications(allApps);
+    }
+    
+    function updateStats() {
+      const counts = { pending: 0, reviewing: 0, accepted: 0, enrolled: 0, rejected: 0 };
+      allApps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+      document.getElementById('cntPending').textContent = counts.pending;
+      document.getElementById('cntReviewing').textContent = counts.reviewing;
+      document.getElementById('cntAccepted').textContent = counts.accepted;
+      document.getElementById('cntEnrolled').textContent = counts.enrolled;
+      document.getElementById('cntRejected').textContent = counts.rejected;
+    }
+    
+    function renderApplications(apps) {
+      const tbody = document.getElementById('appList');
+      
+      if (!apps || apps.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">📭</div><h4>No applications</h4><p>Click "New Application" to add one</p></div></td></tr>`;
+        document.getElementById('appCount').textContent = '';
+        return;
+      }
+      
+      tbody.innerHTML = apps.map(a => `
+        <tr>
+          <td><strong>${a.application_number}</strong></td>
+          <td>${a.student_first_name} ${a.student_last_name}${a.student_nickname ? ` <em style="color:#9CA3AF;">(${a.student_nickname})</em>` : ''}</td>
+          <td><span style="text-transform:uppercase; font-size:11px; font-weight:600; color:#5BB8E0;">${a.program || '—'}</span></td>
+          <td>${a.parent_name}</td>
+          <td style="font-family:monospace; font-size:12px;">${a.parent_phone}</td>
+          <td>${dataHelpers.statusBadge(a.status)}</td>
+          <td style="font-size:12px; color:#6B7280;">${dataHelpers.formatDate(a.created_at)}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-secondary" onclick="viewApp('${a.id}')">👁️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteApp('${a.id}', '${a.application_number}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('appCount').textContent = `${apps.length} application(s)`;
+    }
+    
+    function filterByStatus(status) {
+      document.getElementById('filterStatus').value = status;
+      filterApplications();
+    }
+    
+    function filterApplications() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('filterStatus').value;
+      const program = document.getElementById('filterProgram').value;
+      
+      const filtered = allApps.filter(a => {
+        const fullName = `${a.student_first_name} ${a.student_last_name} ${a.parent_name}`.toLowerCase();
+        const matchSearch = !search || 
+          fullName.includes(search) ||
+          (a.application_number || '').toLowerCase().includes(search) ||
+          (a.parent_phone || '').includes(search);
+        const matchStatus = !status || a.status === status;
+        const matchProgram = !program || a.program === program;
+        return matchSearch && matchStatus && matchProgram;
+      });
+      
+      renderApplications(filtered);
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '➕ New Application';
+      document.getElementById('appId').value = '';
+      document.getElementById('appForm').reset();
+      document.getElementById('appStatus').value = 'pending';
+      document.getElementById('studentNationality').value = 'Thai';
+      
+      // Auto-generate application number
+      const yr = new Date().getFullYear();
+      const seq = String(allApps.length + 1).padStart(4, '0');
+      document.getElementById('appNumber').value = `APP-${yr}-${seq}`;
+      
+      document.getElementById('appModal').classList.add('show');
+    }
+    
+    function viewApp(id) {
+      const a = allApps.find(x => x.id === id);
+      if (!a) return;
+      
+      document.getElementById('modalTitle').textContent = '📋 Application Details';
+      document.getElementById('appId').value = a.id;
+      document.getElementById('appNumber').value = a.application_number;
+      document.getElementById('appStatus').value = a.status;
+      document.getElementById('studentFirstName').value = a.student_first_name;
+      document.getElementById('studentLastName').value = a.student_last_name;
+      document.getElementById('studentNickname').value = a.student_nickname || '';
+      document.getElementById('studentBirthDate').value = a.student_birth_date || '';
+      document.getElementById('studentGender').value = a.student_gender || '';
+      document.getElementById('studentNationality').value = a.student_nationality || 'Thai';
+      document.getElementById('appProgram').value = a.program || '';
+      document.getElementById('appGrade').value = a.grade || '';
+      document.getElementById('parentName').value = a.parent_name;
+      document.getElementById('parentRelation').value = a.parent_relation || '';
+      document.getElementById('parentPhone').value = a.parent_phone;
+      document.getElementById('parentEmail').value = a.parent_email || '';
+      document.getElementById('parentAddress').value = a.parent_address || '';
+      document.getElementById('appNotes').value = a.notes || '';
+      
+      document.getElementById('appModal').classList.add('show');
+    }
+    
+    function closeModal() {
+      document.getElementById('appModal').classList.remove('show');
+    }
+    
+    async function saveApplication(event) {
+      event.preventDefault();
+      const id = document.getElementById('appId').value;
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      const appData = {
+        application_number: document.getElementById('appNumber').value.trim(),
+        status: document.getElementById('appStatus').value,
+        student_first_name: document.getElementById('studentFirstName').value.trim(),
+        student_last_name: document.getElementById('studentLastName').value.trim(),
+        student_nickname: document.getElementById('studentNickname').value.trim() || null,
+        student_birth_date: document.getElementById('studentBirthDate').value || null,
+        student_gender: document.getElementById('studentGender').value || null,
+        student_nationality: document.getElementById('studentNationality').value.trim() || 'Thai',
+        program: document.getElementById('appProgram').value,
+        grade: document.getElementById('appGrade').value.trim() || null,
+        parent_name: document.getElementById('parentName').value.trim(),
+        parent_relation: document.getElementById('parentRelation').value || null,
+        parent_phone: document.getElementById('parentPhone').value.trim(),
+        parent_email: document.getElementById('parentEmail').value.trim() || null,
+        parent_address: document.getElementById('parentAddress').value.trim() || null,
+        notes: document.getElementById('appNotes').value.trim() || null,
+        reviewed_by: currentProfile.id,
+        reviewed_at: new Date().toISOString()
+      };
+      
+      let result;
+      if (id) {
+        result = await supabaseClient.from('applications').update(appData).eq('id', id);
+      } else {
+        result = await supabaseClient.from('applications').insert(appData);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '💾 Save Application';
+      
+      if (result.error) {
+        dataHelpers.toast('❌ ' + result.error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(id ? '✅ Application updated!' : '✅ Application created!', 'success');
+      closeModal();
+      loadApplications();
+    }
+    
+    async function deleteApp(id, number) {
+      const confirmed = await dataHelpers.confirm(
+        `Delete application "${number}"? This cannot be undone.`,
+        { title: '⚠️ Delete Application', confirmText: 'Delete', danger: true }
+      );
+      if (!confirmed) return;
+      
+      const { error } = await supabaseClient.from('applications').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('✅ Application deleted', 'success');
+      loadApplications();
+    }
+    
+    setLang(getLang());
+    init();
+  </script>
 </body>
 </html>

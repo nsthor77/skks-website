@@ -1,207 +1,529 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>การเงิน | SKKS Admin</title>
-  
+  <title>Finance — SKKS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <link rel="stylesheet" href="../css/dashboard.css" />
-  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
   <link rel="icon" type="image/png" href="../images/logo.png" />
-  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-
-<div class="dashboard-layout">
-  
-  <aside class="sidebar no-print" id="sidebar">
-    <div class="sidebar-header">
-      <a href="../index.html" class="logo">
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
         <img src="../images/logo.png" alt="SKKS" />
-        <div class="logo-text">
-          <strong>SKKS</strong>
-          <span>Admin Panel</span>
-        </div>
+        <h1>SKKS Admin</h1>
       </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="finance.html" class="active">💰 Finance</a>
+        <a href="users.html">👥 Users</a>
+        <a href="manage-invites.html">🎟️ Invites</a>
+      </nav>
     </div>
-    
-    <nav class="sidebar-nav">
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Main</div>
-        <ul>
-          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
-          <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร <span class="badge">12</span></a></li>
-          <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
-          <li><a href="#"><span class="icon">👨‍🏫</span> ครู / บุคลากร</a></li>
-        </ul>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">การเงิน</div>
-        <ul>
-          <li><a href="#" class="active"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
-          <li><a href="#" onclick="switchTab('payments')"><span class="icon">💳</span> รายการชำระ</a></li>
-          <li><a href="#" onclick="switchTab('receipts')"><span class="icon">📋</span> ใบเสร็จ</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">รายงาน</div>
-        <ul>
-          <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">อื่นๆ</div>
-        <ul>
-          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
-        </ul>
-      </div>
-    </nav>
-  </aside>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
   
-  <main class="main-content">
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
     
-    <!-- Toolbar -->
-    <div class="print-toolbar no-print">
-      <div class="print-toolbar-left">
-        <h3 id="pageTitle">💰 รายงานการเงิน</h3>
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>💰 Finance</h2>
+          <p>Track income and expenses — owner only</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          ➕ Add Transaction
+        </button>
       </div>
-      <div class="print-toolbar-actions">
-        <button class="toolbar-btn" onclick="switchTab('summary')">📊 สรุป</button>
-        <button class="toolbar-btn" onclick="switchTab('payments')">💳 รายการ</button>
-        <button class="toolbar-btn" onclick="switchTab('receipts')">📋 ใบเสร็จ</button>
-        <button class="toolbar-btn" onclick="exportFinanceCSV()">📥 Export CSV</button>
-        <button class="toolbar-btn primary" onclick="window.print()">🖨️ พิมพ์ A4</button>
+      
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="label">💵 Total Income</div>
+          <div class="value" id="statIncome">—</div>
+          <div class="sub">All time</div>
+        </div>
+        <div class="stat-card pink">
+          <div class="label">💸 Total Expense</div>
+          <div class="value" id="statExpense">—</div>
+          <div class="sub">All time</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">💹 Net Profit</div>
+          <div class="value" id="statProfit">—</div>
+          <div class="sub">Income - Expense</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="label">📅 This Month</div>
+          <div class="value" id="statThisMonth">—</div>
+          <div class="sub">Net</div>
+        </div>
+      </div>
+      
+      <!-- Chart + Filters -->
+      <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; margin-bottom:20px;">
+        <div class="card">
+          <div class="card-header">
+            <h3>📊 Income vs Expense (Last 6 Months)</h3>
+          </div>
+          <canvas id="financeChart" style="max-height:280px;"></canvas>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3>📂 By Category</h3>
+          </div>
+          <canvas id="categoryChart" style="max-height:280px;"></canvas>
+        </div>
+      </div>
+      
+      <!-- Transactions -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📋 Transactions</h3>
+        </div>
+        
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="🔍 Search description, reference..." oninput="filterTransactions()" />
+          <select id="filterType" onchange="filterTransactions()">
+            <option value="">All Types</option>
+            <option value="income">💵 Income</option>
+            <option value="expense">💸 Expense</option>
+          </select>
+          <select id="filterCategory" onchange="filterTransactions()">
+            <option value="">All Categories</option>
+            <option value="tuition">Tuition</option>
+            <option value="salary">Salary</option>
+            <option value="utilities">Utilities</option>
+            <option value="books">Books</option>
+            <option value="uniform">Uniform</option>
+            <option value="food">Food</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="equipment">Equipment</option>
+            <option value="marketing">Marketing</option>
+            <option value="other">Other</option>
+          </select>
+          <select id="filterMonth" onchange="filterTransactions()">
+            <option value="">All Months</option>
+          </select>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th style="text-align:right;">Amount</th>
+                <th>Reference</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="transList">
+              <tr><td colspan="7"><div class="loading-state">Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="transCount" style="text-align:right; margin-top:12px; font-size:12px; color:#6B7280;"></div>
       </div>
     </div>
-    
-    <!-- Filter Bar -->
-    <div class="filter-bar no-print">
-      <label>ภาคเรียน:</label>
-      <select id="filterTerm" onchange="renderFinance()">
-        <option value="1/2569">ภาคเรียนที่ 1/2569</option>
-        <option value="2/2569">ภาคเรียนที่ 2/2569</option>
-        <option value="3/2569">ภาคเรียนที่ 3/2569</option>
-      </select>
+  </div>
+  
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="transModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">➕ Add Transaction</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
       
-      <label>สถานะ:</label>
-      <select id="filterStatus" onchange="renderFinance()">
-        <option value="">ทั้งหมด</option>
-        <option value="paid">ชำระแล้ว</option>
-        <option value="pending">รอชำระ</option>
-        <option value="overdue">ค้างชำระ</option>
-      </select>
-      
-      <label>หลักสูตร:</label>
-      <select id="filterProgram" onchange="renderFinance()">
-        <option value="">ทั้งหมด</option>
-        <option value="EP">EP</option>
-        <option value="MEP">MEP</option>
-      </select>
-      
-      <input type="text" id="searchInput" placeholder="🔍 ค้นหานักเรียน..." oninput="renderFinance()" style="margin-left:auto;min-width:240px" />
+      <form id="transForm" onsubmit="saveTransaction(event)">
+        <input type="hidden" id="transId" />
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Type <span class="req">*</span></label>
+            <select id="transType" required>
+              <option value="income">💵 Income (รายรับ)</option>
+              <option value="expense">💸 Expense (รายจ่าย)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Category <span class="req">*</span></label>
+            <select id="transCategory" required>
+              <option value="">Select...</option>
+              <option value="tuition">📚 Tuition</option>
+              <option value="salary">💼 Salary</option>
+              <option value="utilities">⚡ Utilities</option>
+              <option value="books">📖 Books</option>
+              <option value="uniform">👕 Uniform</option>
+              <option value="food">🍱 Food</option>
+              <option value="maintenance">🔧 Maintenance</option>
+              <option value="equipment">🖥️ Equipment</option>
+              <option value="marketing">📢 Marketing</option>
+              <option value="other">📦 Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Amount (THB) <span class="req">*</span></label>
+            <input type="number" id="transAmount" required min="0" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label>Date <span class="req">*</span></label>
+            <input type="date" id="transDate" required />
+          </div>
+          
+          <div class="form-group full">
+            <label>Description <span class="req">*</span></label>
+            <input type="text" id="transDescription" required placeholder="e.g., ค่าเทอม 1/2026 - นักเรียน 50 คน" />
+          </div>
+          
+          <div class="form-group full">
+            <label>Reference Number</label>
+            <input type="text" id="transReference" placeholder="Optional - invoice/receipt number" />
+          </div>
+          
+          <div class="form-group full">
+            <label>Notes</label>
+            <textarea id="transNotes" rows="2"></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Transaction</button>
+        </div>
+      </form>
     </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
     
-    <!-- Content -->
-    <div class="dashboard-content" style="padding-top:20px">
+    let allTrans = [];
+    let currentProfile = null;
+    let chart1 = null, chart2 = null;
+    
+    async function init() {
+      const profile = await roleGuard.requireOwner();
+      if (!profile) return;
+      currentProfile = profile;
       
-      <!-- TAB: Summary (default) -->
-      <div id="tabSummary">
-        
-        <!-- Stats Cards -->
-        <div class="stats-grid no-print">
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon green">💰</div>
-              <div class="stat-card-trend up">↑ 18.2%</div>
-            </div>
-            <div class="stat-card-value" id="totalIncome">0</div>
-            <div class="stat-card-label">รายรับรวม (บาท)</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon blue">✓</div>
-            </div>
-            <div class="stat-card-value" id="paidCount">0</div>
-            <div class="stat-card-label">ชำระเรียบร้อย</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon yellow">⏰</div>
-            </div>
-            <div class="stat-card-value" id="pendingCount">0</div>
-            <div class="stat-card-label">รอชำระ</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon pink">⚠</div>
-            </div>
-            <div class="stat-card-value" id="overdueCount">0</div>
-            <div class="stat-card-label">ค้างชำระ</div>
-          </div>
-        </div>
-        
-        <!-- Charts -->
-        <div class="charts-grid no-print">
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div>
-                <h3 class="chart-card-title">รายรับรายเดือน (ภาคเรียน 1/2569)</h3>
-                <p class="chart-card-subtitle">เปรียบเทียบกับเป้าหมาย</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="incomeChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div>
-                <h3 class="chart-card-title">สถานะการชำระเงิน</h3>
-                <p class="chart-card-subtitle">รวม 524 รายการ</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="statusChart"></canvas>
-            </div>
-          </div>
-        </div>
-        
-        <!-- A4 Summary Report -->
-        <div class="a4-page-landscape" id="summaryReport">
-          <!-- Auto-rendered -->
-        </div>
-        
-      </div>
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
       
-      <!-- TAB: Payments -->
-      <div id="tabPayments" style="display:none">
-        <div class="a4-page-landscape" id="paymentsReport"></div>
-      </div>
+      loadTransactions();
+    }
+    
+    async function loadTransactions() {
+      const { data, error } = await supabaseClient
+        .from('finance_transactions')
+        .select('*')
+        .order('transaction_date', { ascending: false });
       
-      <!-- TAB: Receipts -->
-      <div id="tabReceipts" style="display:none">
-        <div style="text-align:center;padding:24px" class="no-print">
-          <p style="color:#6B7280;font-size:14px">คลิกที่นักเรียนในแถบ "รายการ" เพื่อดูใบเสร็จ — หรือดูตัวอย่างด้านล่าง</p>
-        </div>
-        <div id="receiptsContainer"></div>
-      </div>
+      if (error) {
+        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        return;
+      }
       
-    </div>
-  </main>
-</div>
-
-<script src="../js/finance.js"></script>
+      allTrans = data || [];
+      updateStats();
+      populateMonthFilter();
+      renderTransactions(allTrans);
+      renderCharts();
+    }
+    
+    function updateStats() {
+      let income = 0, expense = 0, thisMonthNet = 0;
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      
+      allTrans.forEach(t => {
+        const amt = parseFloat(t.amount || 0);
+        if (t.type === 'income') income += amt;
+        else expense += amt;
+        
+        if (new Date(t.transaction_date) >= startOfMonth) {
+          thisMonthNet += t.type === 'income' ? amt : -amt;
+        }
+      });
+      
+      document.getElementById('statIncome').textContent = dataHelpers.formatMoney(income);
+      document.getElementById('statExpense').textContent = dataHelpers.formatMoney(expense);
+      document.getElementById('statProfit').textContent = dataHelpers.formatMoney(income - expense);
+      document.getElementById('statThisMonth').textContent = dataHelpers.formatMoney(thisMonthNet);
+    }
+    
+    function populateMonthFilter() {
+      const months = new Set();
+      allTrans.forEach(t => {
+        if (t.transaction_date) {
+          const ym = t.transaction_date.slice(0, 7);
+          months.add(ym);
+        }
+      });
+      
+      const select = document.getElementById('filterMonth');
+      const current = select.value;
+      select.innerHTML = '<option value="">All Months</option>' + 
+        [...months].sort().reverse().map(m => `<option value="${m}">${m}</option>`).join('');
+      select.value = current;
+    }
+    
+    function renderTransactions(trans) {
+      const tbody = document.getElementById('transList');
+      
+      if (!trans || trans.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">💰</div><h4>No transactions yet</h4><p>Click "Add Transaction" to start tracking</p></div></td></tr>`;
+        document.getElementById('transCount').textContent = '';
+        return;
+      }
+      
+      tbody.innerHTML = trans.map(t => `
+        <tr>
+          <td style="font-size:12px;">${dataHelpers.formatDate(t.transaction_date)}</td>
+          <td>
+            ${t.type === 'income' 
+              ? '<span style="padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600; background:#DCFCE7; color:#166534;">💵 Income</span>'
+              : '<span style="padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600; background:#FEE2E2; color:#991B1B;">💸 Expense</span>'}
+          </td>
+          <td><span style="font-size:11px; color:#6B7280; text-transform:uppercase; font-weight:600;">${t.category}</span></td>
+          <td>${t.description}</td>
+          <td style="text-align:right; font-weight:700; color:${t.type === 'income' ? '#16A34A' : '#EF4444'};">
+            ${t.type === 'income' ? '+' : '-'}${dataHelpers.formatMoney(t.amount)}
+          </td>
+          <td style="font-size:11px; color:#9CA3AF;">${t.reference_number || '—'}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-secondary" onclick="editTransaction('${t.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteTransaction('${t.id}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('transCount').textContent = `${trans.length} transaction(s)`;
+    }
+    
+    function filterTransactions() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const type = document.getElementById('filterType').value;
+      const category = document.getElementById('filterCategory').value;
+      const month = document.getElementById('filterMonth').value;
+      
+      const filtered = allTrans.filter(t => {
+        const matchSearch = !search || 
+          (t.description || '').toLowerCase().includes(search) ||
+          (t.reference_number || '').toLowerCase().includes(search);
+        const matchType = !type || t.type === type;
+        const matchCategory = !category || t.category === category;
+        const matchMonth = !month || (t.transaction_date || '').startsWith(month);
+        return matchSearch && matchType && matchCategory && matchMonth;
+      });
+      
+      renderTransactions(filtered);
+    }
+    
+    function renderCharts() {
+      // Income vs Expense over 6 months
+      const months = [];
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({
+          ym: d.toISOString().slice(0, 7),
+          label: d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+          income: 0,
+          expense: 0
+        });
+      }
+      
+      allTrans.forEach(t => {
+        const ym = (t.transaction_date || '').slice(0, 7);
+        const m = months.find(x => x.ym === ym);
+        if (m) {
+          if (t.type === 'income') m.income += parseFloat(t.amount || 0);
+          else m.expense += parseFloat(t.amount || 0);
+        }
+      });
+      
+      if (chart1) chart1.destroy();
+      const ctx1 = document.getElementById('financeChart').getContext('2d');
+      chart1 = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: months.map(m => m.label),
+          datasets: [
+            {
+              label: 'Income',
+              data: months.map(m => m.income),
+              backgroundColor: '#7CB342',
+              borderRadius: 6
+            },
+            {
+              label: 'Expense',
+              data: months.map(m => m.expense),
+              backgroundColor: '#EF4444',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { font: { family: 'Prompt', size: 11 }}}},
+          scales: {
+            y: { ticks: { callback: v => '฿' + (v >= 1000 ? (v/1000) + 'K' : v) }}
+          }
+        }
+      });
+      
+      // Category breakdown (current month expenses)
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const categoryTotals = {};
+      allTrans.forEach(t => {
+        if (t.type === 'expense' && new Date(t.transaction_date) >= startOfMonth) {
+          categoryTotals[t.category] = (categoryTotals[t.category] || 0) + parseFloat(t.amount || 0);
+        }
+      });
+      
+      const catLabels = Object.keys(categoryTotals);
+      const catData = Object.values(categoryTotals);
+      
+      if (chart2) chart2.destroy();
+      const ctx2 = document.getElementById('categoryChart').getContext('2d');
+      chart2 = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: catLabels.length ? catLabels : ['No expenses yet'],
+          datasets: [{
+            data: catData.length ? catData : [1],
+            backgroundColor: ['#5BB8E0', '#7CB342', '#F59E0B', '#EF4444', '#9333EA', '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6B7280']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { font: { family: 'Prompt', size: 10 }, padding: 8 }}}
+        }
+      });
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '➕ Add Transaction';
+      document.getElementById('transId').value = '';
+      document.getElementById('transForm').reset();
+      document.getElementById('transType').value = 'income';
+      document.getElementById('transDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('transModal').classList.add('show');
+    }
+    
+    function editTransaction(id) {
+      const t = allTrans.find(x => x.id === id);
+      if (!t) return;
+      
+      document.getElementById('modalTitle').textContent = '✏️ Edit Transaction';
+      document.getElementById('transId').value = t.id;
+      document.getElementById('transType').value = t.type;
+      document.getElementById('transCategory').value = t.category;
+      document.getElementById('transAmount').value = t.amount;
+      document.getElementById('transDate').value = t.transaction_date;
+      document.getElementById('transDescription').value = t.description;
+      document.getElementById('transReference').value = t.reference_number || '';
+      document.getElementById('transNotes').value = t.notes || '';
+      
+      document.getElementById('transModal').classList.add('show');
+    }
+    
+    function closeModal() {
+      document.getElementById('transModal').classList.remove('show');
+    }
+    
+    async function saveTransaction(event) {
+      event.preventDefault();
+      const id = document.getElementById('transId').value;
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      const transData = {
+        type: document.getElementById('transType').value,
+        category: document.getElementById('transCategory').value,
+        amount: parseFloat(document.getElementById('transAmount').value),
+        transaction_date: document.getElementById('transDate').value,
+        description: document.getElementById('transDescription').value.trim(),
+        reference_number: document.getElementById('transReference').value.trim() || null,
+        notes: document.getElementById('transNotes').value.trim() || null,
+        recorded_by: currentProfile.id
+      };
+      
+      let result;
+      if (id) {
+        result = await supabaseClient.from('finance_transactions').update(transData).eq('id', id);
+      } else {
+        result = await supabaseClient.from('finance_transactions').insert(transData);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '💾 Save Transaction';
+      
+      if (result.error) {
+        dataHelpers.toast('❌ ' + result.error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(id ? '✅ Transaction updated!' : '✅ Transaction recorded!', 'success');
+      closeModal();
+      loadTransactions();
+    }
+    
+    async function deleteTransaction(id) {
+      const confirmed = await dataHelpers.confirm(
+        'Delete this transaction? This cannot be undone.',
+        { title: '⚠️ Delete Transaction', confirmText: 'Delete', danger: true }
+      );
+      if (!confirmed) return;
+      
+      const { error } = await supabaseClient.from('finance_transactions').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('✅ Transaction deleted', 'success');
+      loadTransactions();
+    }
+    
+    setLang(getLang());
+    init();
+  </script>
 </body>
 </html>

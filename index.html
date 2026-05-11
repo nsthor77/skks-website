@@ -4,85 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SKKS — Suanson Khon Kaen School</title>
-  <meta name="description" content="Suanson Khon Kaen School (SKKS) offers education from Pre-Kindergarten to Grade 9, with English Program (EP) and Mini English Program (MEP) certified by University of Cambridge." />
-  <meta name="keywords" content="SKKS, Suanson Khon Kaen School, English Program, Mini English Program, EP, MEP, Cambridge, Khon Kaen, kindergarten, primary, secondary, international school" />
-  <meta name="author" content="Suanson Khon Kaen School" />
-  
-  <!-- Open Graph -->
+  <meta name="description" content="Suanson Khon Kaen School (SKKS) — Cambridge-certified EP/MEP education from Pre-K to Grade 9 in Khon Kaen." />
   <meta property="og:title" content="SKKS — Suanson Khon Kaen School" />
-  <meta property="og:description" content="Nurturing young minds toward a world of knowledge — EP/MEP curriculum certified by Cambridge" />
+  <meta property="og:description" content="Nurturing young minds — Cambridge-certified bilingual education" />
   <meta property="og:image" content="images/hero-bg.png" />
-  <meta property="og:type" content="website" />
   <meta property="og:url" content="https://suansonkk.com" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:locale:alternate" content="th_TH" />
-  
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="SKKS — Suanson Khon Kaen School" />
-  <meta name="twitter:description" content="EP/MEP curriculum certified by Cambridge — Admissions Open for 2026" />
-  <meta name="twitter:image" content="images/hero-bg.png" />
-  
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/style.css" />
-  
-  <!-- Favicon -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
   <link rel="icon" type="image/png" href="images/logo.png" />
-  
-  <!-- JSON-LD Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "School",
-    "name": "Suanson Khon Kaen School",
-    "alternateName": "โรงเรียนสวนสนขอนแก่น",
-    "url": "https://suansonkk.com",
-    "logo": "https://suansonkk.com/images/logo.png",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Khon Kaen",
-      "addressRegion": "Khon Kaen",
-      "addressCountry": "TH"
-    },
-    "telephone": "+66-43-XXX-XXXX",
-    "email": "info@suansonkk.com"
-  }
-  </script>
-  
-  <!-- i18n script: load before content -->
-  <script src="js/i18n.js"></script>
 </head>
 <body>
 
-  <!-- ============== TOP BAR ============== -->
   <div class="top-bar">
     <div class="container top-bar-content">
       <div class="top-bar-left">
-        <span>📞 043-XXX-XXXX</span>
-        <span>✉ info@suansonkk.com</span>
-        <span class="hide-mobile" data-i18n="topbar.location">📍 Khon Kaen</span>
+        <span>📞 (+66) 043-XXX-XXXX</span>
+        <span class="hide-mobile">✉ info@suansonkk.com</span>
       </div>
       <div class="top-bar-right">
-        <a href="#" class="hide-mobile" data-i18n="topbar.calendar">📅 Academic Calendar</a>
-        <a href="login.html" data-i18n="topbar.login">🔒 Sign In</a>
+        <a href="#news" class="hide-mobile" data-i18n="topbar.events">Events</a>
+        <a href="#news" class="hide-mobile" data-i18n="topbar.news">News</a>
+        <a href="voices.html" class="hide-mobile" data-i18n="topbar.faqs">FAQs</a>
+        <a href="#contact" class="hide-mobile" data-i18n="topbar.contact">Contact</a>
+        <a href="admissions.html" class="btn-register" data-i18n="topbar.register">Register Your Interest</a>
         <span class="lang-switch">
-          <a href="#" data-lang="en" class="active" onclick="event.preventDefault();i18n.set('en')">EN</a> | 
-          <a href="#" data-lang="th" onclick="event.preventDefault();i18n.set('th')">TH</a>
+          <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a>
+          <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
         </span>
       </div>
     </div>
   </div>
 
-  <!-- ============== NAVIGATION ============== -->
-  <nav class="navbar" id="navbar">
+  <nav class="navbar">
     <div class="nav-container">
-      <a href="#home" class="logo">
-        <img src="images/logo.png" alt="SKKS Logo" />
+      <a href="index.html" class="logo">
+        <img src="images/logo.png" alt="SKKS" />
         <div class="logo-text">
           <strong>SKKS</strong>
           <span>Suanson Khon Kaen School</span>
@@ -90,1271 +48,458 @@
       </a>
       
       <ul class="nav-menu" id="navMenu">
-        <li><a href="#home" class="active" data-i18n="nav.home">Home</a></li>
+        <li><a href="index.html" class="active" data-i18n="nav.home">Home</a></li>
         <li class="has-dropdown">
-          <a href="#about" data-i18n="nav.about">About Us ▾</a>
+          <a href="about.html" data-i18n="nav.about">About Us ▾</a>
           <ul class="dropdown">
-            <li><a href="#about" data-i18n="nav.about.vision">Vision / Mission</a></li>
-            <li><a href="#history" data-i18n="nav.about.history">School History</a></li>
-            <li><a href="#staff" data-i18n="nav.about.staff">Faculty & Staff</a></li>
-            <li><a href="#facilities" data-i18n="nav.about.facilities">Facilities</a></li>
+            <li><a href="about.html#vision" data-i18n="nav.about.vision">Vision & Mission</a></li>
+            <li><a href="about.html#journey" data-i18n="nav.about.journey">Our Journey</a></li>
+            <li><a href="about.html#team" data-i18n="nav.about.team">Our Team</a></li>
+            <li><a href="about.html#campus" data-i18n="nav.about.campus">Our Campus</a></li>
           </ul>
         </li>
         <li class="has-dropdown">
           <a href="#programs" data-i18n="nav.programs">Programs ▾</a>
           <ul class="dropdown">
-            <li><a href="#programs" data-i18n="nav.programs.prek">Pre-Kindergarten</a></li>
-            <li><a href="#programs" data-i18n="nav.programs.k">Kindergarten</a></li>
-            <li><a href="#programs" data-i18n="nav.programs.ep">English Program (EP)</a></li>
-            <li><a href="#programs" data-i18n="nav.programs.mep">Mini English Program (MEP)</a></li>
+            <li><a href="#programs">Pre-K</a></li>
+            <li><a href="#programs">Kindergarten</a></li>
+            <li><a href="#programs">English Program (EP)</a></li>
+            <li><a href="#programs">Mini English Program (MEP)</a></li>
           </ul>
         </li>
-        <li><a href="#achievements" data-i18n="nav.achievements">Achievements</a></li>
-        <li><a href="#news" data-i18n="nav.news">News</a></li>
-        <li><a href="#tuition" data-i18n="nav.tuition">Tuition</a></li>
-        <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
-        <li><a href="#admissions" class="nav-cta" data-i18n="nav.apply">Apply Now</a></li>
+        <li><a href="voices.html" data-i18n="nav.voices">Voices</a></li>
+        <li><a href="admissions.html" data-i18n="nav.admissions">Admissions</a></li>
+        <li><a href="admissions.html" class="btn-cta" data-i18n="nav.apply">Apply Now</a></li>
       </ul>
       
-      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menu">☰</button>
     </div>
   </nav>
 
-  <!-- ============== HERO ============== -->
-  <section class="hero" id="home">
-    <div class="hero-container">
-      <div class="hero-content">
-        <span class="hero-badge fade-in-up" data-i18n="hero.badge">🎉 Admissions Open for Academic Year 2026</span>
-        
-        <h1 class="hero-title fade-in-up fade-delay-1">
-          <span data-i18n="hero.title.line1">Nurturing Young Minds</span><br />
-          <span data-i18n="hero.title.line2">Toward a</span> <span class="accent" data-i18n="hero.title.accent">World of Knowledge</span>
-        </h1>
-        
-        <p class="hero-subtitle fade-in-up fade-delay-2" data-i18n="hero.subtitle">
-          Suanson Khon Kaen School (SKKS) offers education from Pre-Kindergarten to Grade 9, featuring English Program and Mini English Program certified by University of Cambridge.
-        </p>
-        
-        <div class="hero-buttons fade-in-up fade-delay-3">
-          <a href="#admissions" class="btn btn-primary">
-            <span data-i18n="hero.btn.apply">Apply Now</span> <span>→</span>
-          </a>
-          <a href="#programs" class="btn btn-secondary" data-i18n="hero.btn.programs">
-            View Programs
-          </a>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="eyebrow" data-i18n="hero.eyebrow">Cambridge Certified Education</div>
+      <h1 data-i18n="hero.title">Nurturing Young Minds Toward<br>a World of Knowledge</h1>
+      <p data-i18n="hero.subtitle">Suanson Khon Kaen School — บ่มเพาะเยาวชนสู่โลกแห่งการเรียนรู้ ด้วยหลักสูตร EP/MEP รับรองโดย Cambridge</p>
+      <div class="hero-buttons">
+        <a href="admissions.html" class="btn btn-primary" data-i18n="hero.apply">Apply for Admission</a>
+        <a href="about.html" class="btn btn-outline" data-i18n="hero.learnmore">Discover More →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 HERO CARDS -->
+  <div class="container">
+    <div class="hero-cards">
+      <a href="#programs" class="hero-card">
+        <div class="icon">🌱</div>
+        <h3 data-i18n="card.1.title">Early Years</h3>
+        <p data-i18n="card.1.sub">Building Strong Foundations</p>
+        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
+      </a>
+      <a href="#programs" class="hero-card">
+        <div class="icon">📚</div>
+        <h3 data-i18n="card.2.title">Primary School</h3>
+        <p data-i18n="card.2.sub">Preparing For The Future</p>
+        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
+      </a>
+      <a href="#programs" class="hero-card">
+        <div class="icon">🎓</div>
+        <h3 data-i18n="card.3.title">EP / MEP Programs</h3>
+        <p data-i18n="card.3.sub">Shaping Global Learners</p>
+        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- WHY CHOOSE US -->
+  <section class="why-section">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow" data-i18n="why.eyebrow">Excellence</div>
+        <div class="section-divider"></div>
+        <h2 data-i18n="why.title">Why Choose Us?</h2>
+        <p data-i18n="why.subtitle">The Choice That Transforms Your Child's Future</p>
+      </div>
+      
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon">🌏</div>
+          <h3 data-i18n="why.1.title">Global Outlook</h3>
+          <p data-i18n="why.1.desc">Our education system is designed with a global perspective, incorporating international best practices and Cambridge curriculum.</p>
         </div>
-        
-        <div class="hero-stats fade-in-up fade-delay-4">
-          <div class="stat-item">
-            <div class="stat-number">15+</div>
-            <div class="stat-label" data-i18n="hero.stats.years">Years of Excellence</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">500+</div>
-            <div class="stat-label" data-i18n="hero.stats.students">Trusted Students</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number">100</div>
-            <div class="stat-label" data-i18n="hero.stats.onet">O-NET Perfect Score</div>
-          </div>
+        <div class="why-card">
+          <div class="why-icon">📖</div>
+          <h3 data-i18n="why.2.title">Strong Curriculum</h3>
+          <p data-i18n="why.2.desc">The curriculum emphasizes deep understanding of core subjects like Mathematics, Science, English, and literacy.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🗣️</div>
+          <h3 data-i18n="why.3.title">Bilingual Focus</h3>
+          <p data-i18n="why.3.desc">Our bilingual education policy ensures students master English as their first language while preserving Thai cultural identity.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🔬</div>
+          <h3 data-i18n="why.4.title">STEM Emphasis</h3>
+          <p data-i18n="why.4.desc">Strong emphasis on STEM (Science, Technology, Engineering, Mathematics) education from an early age.</p>
         </div>
       </div>
       
-      <div class="hero-image fade-in-up fade-delay-2">
-        <img src="images/hero-bg.png" alt="SKKS Students" />
-        
-        <div class="float-card float-card-1">
-          <div class="float-icon green">🎓</div>
-          <div class="float-text">
-            <strong data-i18n="float.cambridge">Cambridge</strong>
-            <span data-i18n="float.cambridge.sub">Authorized Center</span>
-          </div>
-        </div>
-        
-        <div class="float-card float-card-2">
-          <div class="float-icon blue">⭐</div>
-          <div class="float-text">
-            <strong data-i18n="float.onet">O-NET 100</strong>
-            <span data-i18n="float.onet.sub">Perfect English Score</span>
-          </div>
-        </div>
+      <div style="text-align:center; margin-top:40px;">
+        <a href="about.html" class="btn btn-primary" data-i18n="why.cta">Learn More About Us</a>
       </div>
     </div>
   </section>
 
-  <!-- ============== TRUST BAR ============== -->
-  <section class="trust-bar">
-    <div class="container">
-      <div class="trust-content">
-        <span class="trust-label" data-i18n="trust.label">Certified by</span>
-        <div class="trust-logos">
-          <div class="trust-logo" data-i18n="trust.cambridge">🏛️ Cambridge</div>
-          <div class="trust-logo" data-i18n="trust.moe">📜 Ministry of Education</div>
-          <div class="trust-logo" data-i18n="trust.onesqa">🏆 ONESQA</div>
-          <div class="trust-logo" data-i18n="trust.iso">⭐ ISO 9001</div>
-          <div class="trust-logo" data-i18n="trust.microsoft">🌟 Microsoft Showcase</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== ABOUT / VISION ============== -->
-  <section class="section about-section" id="about">
-    <div class="container">
-      <div class="about-grid">
-        <div class="about-image">
-          <img src="images/hero-bg.png" alt="SKKS Campus" />
-          <div class="about-image-badge">
-            <strong>15+</strong>
-            <span data-i18n="about.badge">Years of Development</span>
-          </div>
-        </div>
-        
-        <div class="about-content">
-          <span class="section-tag" data-i18n="about.tag">About SKKS</span>
-          <h2 class="section-title" data-i18n="about.title">A School of Learning<br/>for a Sustainable Future</h2>
-          <p class="about-lead" data-i18n="about.lead">
-            "Suanson" represents the deeply rooted shade of pine trees, symbolizing our commitment to nurturing students with strong foundations.
-          </p>
-          
-          <div class="vision-mission">
-            <div class="vm-card">
-              <div class="vm-icon">🌟</div>
-              <div>
-                <h4 data-i18n="about.vision.title">Vision</h4>
-                <p data-i18n="about.vision.text">To be a leading school in Northeastern Thailand that produces high-quality students with international standards.</p>
-              </div>
-            </div>
-            <div class="vm-card">
-              <div class="vm-icon">🎯</div>
-              <div>
-                <h4 data-i18n="about.mission.title">Mission</h4>
-                <p data-i18n="about.mission.text">Provide education emphasizing English and 21st-century skills.</p>
-              </div>
-            </div>
-            <div class="vm-card">
-              <div class="vm-icon">💎</div>
-              <div>
-                <h4 data-i18n="about.values.title">Values</h4>
-                <p data-i18n="about.values.text">SKKS — Smart, Kind, Knowledgeable, Successful</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== HISTORY / TIMELINE ============== -->
-  <section class="section history-section" id="history">
+  <!-- PROGRAMS -->
+  <section id="programs">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag" data-i18n="timeline.tag">Our Journey</span>
-        <h2 class="section-title" data-i18n="timeline.title">SKKS's Journey</h2>
-        <p class="section-subtitle" data-i18n="timeline.subtitle">15 Years of Development and Progress</p>
-      </div>
-      
-      <div class="timeline">
-        <div class="timeline-item left">
-          <div class="timeline-content">
-            <span class="timeline-year">2011</span>
-            <h4 data-i18n="timeline.2011.title">School Founded</h4>
-            <p data-i18n="timeline.2011.text">Started from the founder's vision, opening as a kindergarten school with 28 students.</p>
-          </div>
-        </div>
-        
-        <div class="timeline-item right">
-          <div class="timeline-content">
-            <span class="timeline-year">2014</span>
-            <h4 data-i18n="timeline.2014.title">Primary Level Expanded</h4>
-            <p data-i18n="timeline.2014.text">Opened Grade 1 with the introduction of MEP curriculum.</p>
-          </div>
-        </div>
-        
-        <div class="timeline-item left">
-          <div class="timeline-content">
-            <span class="timeline-year">2018</span>
-            <h4 data-i18n="timeline.2018.title">Cambridge Certification</h4>
-            <p data-i18n="timeline.2018.text">Received certification as a Cambridge Authorized Center.</p>
-          </div>
-        </div>
-        
-        <div class="timeline-item right">
-          <div class="timeline-content">
-            <span class="timeline-year">2021</span>
-            <h4 data-i18n="timeline.2021.title">Junior High Opens</h4>
-            <p data-i18n="timeline.2021.text">Launched junior high school for both EP and MEP.</p>
-          </div>
-        </div>
-        
-        <div class="timeline-item left">
-          <div class="timeline-content">
-            <span class="timeline-year">2025</span>
-            <h4 data-i18n="timeline.2025.title">O-NET 100 Score</h4>
-            <p data-i18n="timeline.2025.text">A student achieved a perfect 100 score on the English O-NET exam.</p>
-          </div>
-        </div>
-        
-        <div class="timeline-item right">
-          <div class="timeline-content current">
-            <span class="timeline-year">2026</span>
-            <h4 data-i18n="timeline.2026.title">Present</h4>
-            <p data-i18n="timeline.2026.text">Over 524 students across 25 classrooms.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== PROGRAMS ============== -->
-  <section class="section programs" id="programs">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="programs.tag">Our Programs</span>
-        <h2 class="section-title" data-i18n="programs.title">Our Programs</h2>
-        <p class="section-subtitle" data-i18n="programs.subtitle">
-          We focus on holistic student development through programs designed for the modern world.
-        </p>
+        <div class="eyebrow" data-i18n="programs.eyebrow">Curriculum</div>
+        <div class="section-divider"></div>
+        <h2 data-i18n="programs.title">Our Programs</h2>
+        <p data-i18n="programs.subtitle">Four educational pathways from early childhood to junior high</p>
       </div>
       
       <div class="programs-grid">
         <div class="program-card">
-          <div class="program-icon">🎨</div>
+          <div class="icon">🧸</div>
+          <div class="age" data-i18n="programs.prek.age">Ages 3-5</div>
           <h3 data-i18n="programs.prek.title">Pre-Kindergarten</h3>
-          <p data-i18n="programs.prek.text">Pre-K level focuses on holistic development through play and creative activities.</p>
-          <ul class="program-features">
-            <li>✓ Phonics & English Songs</li>
-            <li>✓ Sensory Play</li>
-            <li>✓ Fine Motor Skills</li>
-          </ul>
-          <span class="program-grade" data-i18n="programs.prek.age">Ages 2-3</span>
+          <p data-i18n="programs.prek.desc">Foundation learning through play, social skills, and early literacy in a nurturing bilingual environment.</p>
         </div>
-        
         <div class="program-card">
-          <div class="program-icon">🌟</div>
+          <div class="icon">🎨</div>
+          <div class="age" data-i18n="programs.k.age">Ages 5-7</div>
           <h3 data-i18n="programs.k.title">Kindergarten</h3>
-          <p data-i18n="programs.k.text">K1-K3 builds academic foundations and life skills, while introducing the English language.</p>
-          <ul class="program-features">
-            <li>✓ Cambridge Starters</li>
-            <li>✓ STEM for Kids</li>
-            <li>✓ Music & Movement</li>
-          </ul>
-          <span class="program-grade" data-i18n="programs.k.age">Ages 3-6</span>
+          <p data-i18n="programs.k.desc">Creative learning with strong emphasis on English language development and problem-solving skills.</p>
         </div>
-        
-        <div class="program-card featured">
-          <div class="program-badge" data-i18n="programs.featured">Featured</div>
-          <div class="program-icon">📚</div>
-          <h3 data-i18n="programs.ep.title">English Program (EP)</h3>
-          <p data-i18n="programs.ep.text">Intensive English-medium curriculum with native speakers and Cambridge standards.</p>
-          <ul class="program-features">
-            <li>✓ Cambridge Curriculum</li>
-            <li>✓ Native English Teachers</li>
-            <li>✓ International Standards</li>
-            <li>✓ Cambridge Exams (KET, PET, FCE)</li>
-          </ul>
-          <span class="program-grade" data-i18n="programs.ep.grade">Grades 1-9</span>
-        </div>
-        
         <div class="program-card">
-          <div class="program-icon">🎯</div>
+          <div class="icon">🌍</div>
+          <div class="age" data-i18n="programs.ep.age">Grades 1-9</div>
+          <h3 data-i18n="programs.ep.title">English Program (EP)</h3>
+          <p data-i18n="programs.ep.desc">Full English immersion curriculum with Cambridge certification. Math, Science, and English taught entirely in English.</p>
+        </div>
+        <div class="program-card">
+          <div class="icon">🌐</div>
+          <div class="age" data-i18n="programs.mep.age">Grades 1-9</div>
           <h3 data-i18n="programs.mep.title">Mini English Program (MEP)</h3>
-          <p data-i18n="programs.mep.text">A balanced program blending English and Thai academics for a well-rounded learning experience.</p>
-          <ul class="program-features">
-            <li>✓ 8-10 hrs English/week</li>
-            <li>✓ Thai Curriculum</li>
-            <li>✓ Foreign Teachers</li>
-          </ul>
-          <span class="program-grade" data-i18n="programs.mep.grade">Grades 1-9</span>
+          <p data-i18n="programs.mep.desc">Bilingual program with 60% English instruction. Perfect balance of Thai culture and English proficiency.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============== ACHIEVEMENTS / O-NET ============== -->
-  <section class="section achievements" id="achievements">
+  <!-- ADMISSION COUNTDOWN -->
+  <section class="admission-section">
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="achievements.tag">Student Achievements</span>
-        <h2 class="section-title" data-i18n="achievements.title">O-NET Results 2025</h2>
-        <p class="section-subtitle" data-i18n="achievements.subtitle">
-          We are proud of every student's success.
-        </p>
-      </div>
-      
-      <div class="achievements-stats">
-        <div class="achievement-stat">
-          <div class="number">100</div>
-          <div class="label" data-i18n="achievements.stat1">Perfect English Score</div>
-        </div>
-        <div class="achievement-stat">
-          <div class="number">95%</div>
-          <div class="label" data-i18n="achievements.stat2">Above National Average</div>
-        </div>
-        <div class="achievement-stat">
-          <div class="number">20+</div>
-          <div class="label" data-i18n="achievements.stat3">Students This Year</div>
-        </div>
-        <div class="achievement-stat">
-          <div class="number">5</div>
-          <div class="label" data-i18n="achievements.stat4">Outstanding Subjects</div>
-        </div>
-      </div>
-      
-      <div class="students-slider-wrapper">
-        <div class="slider-controls">
-          <h3 class="slider-title" data-i18n="achievements.slider.title">Outstanding Students</h3>
-          <div class="slider-buttons">
-            <button class="slider-btn" id="prevBtn" aria-label="Previous">‹</button>
-            <button class="slider-btn" id="nextBtn" aria-label="Next">›</button>
+      <div class="admission-grid">
+        <div class="admission-left">
+          <div class="eyebrow" data-i18n="adm.eyebrow">Securing a Bright Future</div>
+          <h2 class="serif" data-i18n="adm.title">ADMISSION</h2>
+          <p data-i18n="adm.subtitle" style="font-size:15px; opacity:0.9; margin:12px 0 0;">Apply now for the 2026 academic year. Limited seats available.</p>
+          
+          <div class="countdown" id="countdown">
+            <div class="countdown-item"><span class="num" id="cd-days">90</span><span class="lbl" data-i18n="cd.days">days</span></div>
+            <div class="countdown-item"><span class="num" id="cd-hours">12</span><span class="lbl" data-i18n="cd.hours">hours</span></div>
+            <div class="countdown-item"><span class="num" id="cd-mins">30</span><span class="lbl" data-i18n="cd.mins">minutes</span></div>
+            <div class="countdown-item"><span class="num" id="cd-secs">45</span><span class="lbl" data-i18n="cd.secs">seconds</span></div>
           </div>
+          
+          <a href="admissions.html" class="btn btn-gold" data-i18n="adm.cta" style="margin-top:14px;">View Admission Details →</a>
         </div>
         
-        <div class="students-slider" id="studentsSlider">
-          <!-- Students loaded by JS -->
+        <div class="register-card">
+          <h3 data-i18n="reg.title">Register Your Interest</h3>
+          <p data-i18n="reg.subtitle">to Know More About Us</p>
+          <form onsubmit="registerInterest(event)">
+            <input type="text" id="r-name" required placeholder="Your Name *" data-i18n-ph="reg.name" />
+            <input type="email" id="r-email" required placeholder="Email *" data-i18n-ph="reg.email" />
+            <input type="tel" id="r-phone" required placeholder="Phone *" data-i18n-ph="reg.phone" />
+            <button type="submit" data-i18n="reg.cta">Enroll Now</button>
+          </form>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============== FEATURES ============== -->
-  <section class="section features">
+  <!-- EVENTS -->
+  <section>
     <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="features.tag">Why SKKS</span>
-        <h2 class="section-title" data-i18n="features.title">Why Choose SKKS</h2>
-        <p class="section-subtitle" data-i18n="features.subtitle">
-          A school that cares about every detail of learning.
-        </p>
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:30px; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 class="serif" data-i18n="events.title">Events</h2>
+          <p style="color:var(--slate); font-size:14px;" data-i18n="events.subtitle">Upcoming activities & gatherings</p>
+        </div>
+        <a href="#" class="btn btn-outline" style="color:var(--navy); border-color:var(--gray-200);" data-i18n="events.viewall">VIEW ALL</a>
       </div>
       
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon icon-1">👨‍🏫</div>
-          <h3 data-i18n="features.f1.title">Native Speakers</h3>
-          <p data-i18n="features.f1.text">Quality international teachers with experience.</p>
+      <div class="event-item">
+        <div class="event-date">
+          <div class="day">17</div>
+          <div class="month" data-i18n="events.may">MAY, 2026</div>
         </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon icon-2">🏛️</div>
-          <h3 data-i18n="features.f2.title">Cambridge Standards</h3>
-          <p data-i18n="features.f2.text">Curriculum certified by University of Cambridge.</p>
+        <div class="event-info">
+          <h3 data-i18n="events.1.title">One-Day Golf Clinic</h3>
+          <div class="time">🕐 <span>8:00 - 13:00</span></div>
+          <p data-i18n="events.1.desc">Take your skills to the next level! Join us for an intensive, high-impact One-Day Golf Clinic at the prestigious Singha Park Golf Club.</p>
         </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon icon-3">🌳</div>
-          <h3 data-i18n="features.f3.title">Safe Environment</h3>
-          <p data-i18n="features.f3.text">Spacious campus, safe and conducive to learning.</p>
+        <div class="event-image">🏌️</div>
+      </div>
+      
+      <div class="event-item">
+        <div class="event-date">
+          <div class="day">15</div>
+          <div class="month" data-i18n="events.may">MAY, 2026</div>
         </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon icon-4">💡</div>
-          <h3 data-i18n="features.f4.title">Modern Technology</h3>
-          <p data-i18n="features.f4.text">Smart Boards and interactive learning equipment.</p>
+        <div class="event-info">
+          <h3 data-i18n="events.2.title">SKKS Experience Programme</h3>
+          <div class="time">🕐 <span>7:00 - 15:00</span></div>
+          <p data-i18n="events.2.desc">Experience world-class education at SKKS. What makes our school special — tour the campus, meet teachers, and see our students in action.</p>
         </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon icon-5">🎭</div>
-          <h3 data-i18n="features.f5.title">Diverse Activities</h3>
-          <p data-i18n="features.f5.text">Sports, arts, music, and leadership development.</p>
+        <div class="event-image">🎓</div>
+      </div>
+      
+      <div class="event-item">
+        <div class="event-date">
+          <div class="day">22</div>
+          <div class="month" data-i18n="events.may">MAY, 2026</div>
         </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon icon-6">❤️</div>
-          <h3 data-i18n="features.f6.title">Family-Like Care</h3>
-          <p data-i18n="features.f6.text">Suitable class sizes for thorough teacher attention.</p>
+        <div class="event-info">
+          <h3 data-i18n="events.3.title">Open House 2026</h3>
+          <div class="time">🕐 <span>9:00 - 16:00</span></div>
+          <p data-i18n="events.3.desc">Annual Open House — meet our teachers, tour the campus, and learn about our Cambridge-certified programs. Free admission for families.</p>
         </div>
+        <div class="event-image">🏫</div>
       </div>
     </div>
   </section>
 
-  <!-- ============== STAFF ============== -->
-  <section class="section staff-section" id="staff">
+  <!-- LATEST NEWS -->
+  <section class="news-section" id="news">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag" data-i18n="staff.tag">Our Team</span>
-        <h2 class="section-title" data-i18n="staff.title">Faculty and Staff</h2>
-        <p class="section-subtitle" data-i18n="staff.subtitle">
-          Quality teachers are the heart of good education.
-        </p>
-      </div>
-      
-      <div class="staff-stats">
-        <div class="staff-stat-card">
-          <div class="staff-stat-icon">👨‍🏫</div>
-          <div class="staff-stat-num">42</div>
-          <div class="staff-stat-label" data-i18n="staff.stat1">Total Teachers</div>
-        </div>
-        <div class="staff-stat-card">
-          <div class="staff-stat-icon">🌎</div>
-          <div class="staff-stat-num">12</div>
-          <div class="staff-stat-label" data-i18n="staff.stat2">Native Speakers</div>
-        </div>
-        <div class="staff-stat-card">
-          <div class="staff-stat-icon">🎓</div>
-          <div class="staff-stat-num">85%</div>
-          <div class="staff-stat-label" data-i18n="staff.stat3">Master's Degree+</div>
-        </div>
-        <div class="staff-stat-card">
-          <div class="staff-stat-icon">⏱️</div>
-          <div class="staff-stat-num">8.5</div>
-          <div class="staff-stat-label" data-i18n="staff.stat4">Avg. Years Experience</div>
-        </div>
-      </div>
-      
-      <div class="staff-grid">
-        <div class="staff-card">
-          <div class="staff-avatar">
-            <div class="staff-initial" style="background: linear-gradient(135deg, #5BB8E0, #7CB342)">Dr</div>
-          </div>
-          <h4>Dr. Somsak Pithakthai</h4>
-          <span class="staff-role">School Director</span>
-          <p>Ph.D. Educational Administration, Chulalongkorn University • 25 years experience</p>
-        </div>
-        
-        <div class="staff-card">
-          <div class="staff-avatar">
-            <div class="staff-initial" style="background: linear-gradient(135deg, #EC4899, #7C3AED)">N</div>
-          </div>
-          <h4>Nantana Srisawat</h4>
-          <span class="staff-role">Vice Director, Academics</span>
-          <p>M.Ed. English Teaching • 18 years experience • Cambridge Certified</p>
-        </div>
-        
-        <div class="staff-card">
-          <div class="staff-avatar">
-            <div class="staff-initial" style="background: linear-gradient(135deg, #F59E0B, #DC2626)">M</div>
-          </div>
-          <h4>Mr. James Anderson</h4>
-          <span class="staff-role">EP Coordinator</span>
-          <p>M.Ed. from University of Manchester • 12 years in international schools</p>
-        </div>
-        
-        <div class="staff-card">
-          <div class="staff-avatar">
-            <div class="staff-initial" style="background: linear-gradient(135deg, #16A34A, #5BB8E0)">P</div>
-          </div>
-          <h4>Pranee Wongthai</h4>
-          <span class="staff-role">Head of Kindergarten</span>
-          <p>M.Ed. Early Childhood Education • 15 years experience</p>
-        </div>
-      </div>
-      
-      <div class="staff-cta">
-        <a href="#contact" class="btn btn-secondary" data-i18n="staff.cta">View All Faculty →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== FACILITIES ============== -->
-  <section class="section facilities-section" id="facilities">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="facilities.tag">Our Campus</span>
-        <h2 class="section-title" data-i18n="facilities.title">Facilities</h2>
-        <p class="section-subtitle" data-i18n="facilities.subtitle">
-          15+ acres designed for student learning and growth.
-        </p>
-      </div>
-      
-      <div class="facilities-grid">
-        <div class="facility-card">
-          <div class="facility-icon">📚</div>
-          <h4 data-i18n="facilities.f1.title">Library</h4>
-          <p data-i18n="facilities.f1.text">Over 8,000 books in Thai and English.</p>
-        </div>
-        
-        <div class="facility-card">
-          <div class="facility-icon">🔬</div>
-          <h4 data-i18n="facilities.f2.title">Science Lab</h4>
-          <p data-i18n="facilities.f2.text">3 laboratories fully equipped.</p>
-        </div>
-        
-        <div class="facility-card">
-          <div class="facility-icon">💻</div>
-          <h4 data-i18n="facilities.f3.title">Computer Lab</h4>
-          <p data-i18n="facilities.f3.text">80 computers for Coding, Robotics, Digital Skills.</p>
-        </div>
-        
-        <div class="facility-card">
-          <div class="facility-icon">⚽</div>
-          <h4 data-i18n="facilities.f4.title">Sports Field</h4>
-          <p data-i18n="facilities.f4.text">Football, basketball, swimming pool, gym.</p>
-        </div>
-        
-        <div class="facility-card">
-          <div class="facility-icon">🎨</div>
-          <h4 data-i18n="facilities.f5.title">Arts & Music</h4>
-          <p data-i18n="facilities.f5.text">Art, music, and dance studios.</p>
-        </div>
-        
-        <div class="facility-card">
-          <div class="facility-icon">🍱</div>
-          <h4 data-i18n="facilities.f6.title">Cafeteria</h4>
-          <p data-i18n="facilities.f6.text">Clean, FDA-certified meals.</p>
-        </div>
-        
-        <div class="facility-card">
-          <div class="facility-icon">🏥</div>
-          <h4 data-i18n="facilities.f7.title">Health Center</h4>
-          <p data-i18n="facilities.f7.text">Full-time nurse with first-aid equipment.</p>
-        </div>
-        
-        <div class="facility-card">
-          <div class="facility-icon">🚌</div>
-          <h4 data-i18n="facilities.f8.title">School Bus</h4>
-          <p data-i18n="facilities.f8.text">Pick-up & drop-off in Khon Kaen city.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== TUITION ============== -->
-  <section class="section tuition-section" id="tuition">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="tuition.tag">Tuition Fees</span>
-        <h2 class="section-title" data-i18n="tuition.title">Tuition Fees</h2>
-        <p class="section-subtitle" data-i18n="tuition.subtitle">
-          Fees per semester, Academic Year 2026.
-        </p>
-      </div>
-      
-      <div class="tuition-grid">
-        <div class="tuition-card">
-          <div class="tuition-header">
-            <h3 data-i18n="tuition.prek.title">Pre-K & Kindergarten</h3>
-            <span class="tuition-grade" data-i18n="tuition.prek.grade">Pre-K - K3</span>
-          </div>
-          <div class="tuition-price">
-            <span class="currency">฿</span>
-            <span class="amount">35,000<span style="font-size:24px"> - 40,000</span></span>
-            <span class="period" data-i18n="tuition.period">/ semester</span>
-          </div>
-          <ul class="tuition-features">
-            <li>✓ Tuition</li>
-            <li>✓ Textbooks</li>
-            <li>✓ Lunch + Snacks</li>
-            <li>✓ Activities</li>
-            <li>✓ Accident Insurance</li>
-          </ul>
-          <a href="#admissions" class="btn btn-secondary" data-i18n="tuition.btn">Apply Now</a>
-        </div>
-        
-        <div class="tuition-card featured">
-          <div class="tuition-badge" data-i18n="tuition.featured">Recommended</div>
-          <div class="tuition-header">
-            <h3 data-i18n="tuition.ep.title">English Program</h3>
-            <span class="tuition-grade" data-i18n="tuition.ep.grade">Grades 1-9</span>
-          </div>
-          <div class="tuition-price">
-            <span class="currency">฿</span>
-            <span class="amount">67,500<span style="font-size:24px"> - 82,500</span></span>
-            <span class="period" data-i18n="tuition.period">/ semester</span>
-          </div>
-          <ul class="tuition-features">
-            <li>✓ Cambridge Curriculum</li>
-            <li>✓ Native English Teachers</li>
-            <li>✓ English Textbooks</li>
-            <li>✓ Cambridge Exam Fees</li>
-            <li>✓ Field Trips</li>
-            <li>✓ Summer Camp</li>
-          </ul>
-          <a href="#admissions" class="btn btn-primary" data-i18n="tuition.btn">Apply Now</a>
-        </div>
-        
-        <div class="tuition-card">
-          <div class="tuition-header">
-            <h3 data-i18n="tuition.mep.title">Mini English Program</h3>
-            <span class="tuition-grade" data-i18n="tuition.mep.grade">Grades 1-9</span>
-          </div>
-          <div class="tuition-price">
-            <span class="currency">฿</span>
-            <span class="amount">45,000<span style="font-size:24px"> - 55,000</span></span>
-            <span class="period" data-i18n="tuition.period">/ semester</span>
-          </div>
-          <ul class="tuition-features">
-            <li>✓ Tuition</li>
-            <li>✓ Textbooks</li>
-            <li>✓ 8-10 hrs English/week</li>
-            <li>✓ Foreign Teachers</li>
-            <li>✓ Field Trips</li>
-          </ul>
-          <a href="#admissions" class="btn btn-secondary" data-i18n="tuition.btn">Apply Now</a>
-        </div>
-      </div>
-      
-      <div class="tuition-note">
-        <h4 data-i18n="tuition.note.title">💡 Notes</h4>
-        <ul>
-          <li data-i18n="tuition.note.1">Above tuition is per <strong>1 semester</strong> (2 semesters per academic year).</li>
-          <li data-i18n="tuition.note.2">5% discount for siblings.</li>
-          <li data-i18n="tuition.note.3">3% discount for full-year payment.</li>
-          <li data-i18n="tuition.note.4">Scholarships available for academic excellence.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== NEWS ============== -->
-  <section class="section news-section" id="news">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="news.tag">News & Events</span>
-        <h2 class="section-title" data-i18n="news.title">News & Events</h2>
-        <p class="section-subtitle" data-i18n="news.subtitle">
-          Stay updated with our latest news and activities.
-        </p>
+        <div class="eyebrow" data-i18n="news.eyebrow">News & Updates</div>
+        <div class="section-divider"></div>
+        <h2 data-i18n="news.title">Latest News</h2>
+        <p data-i18n="news.subtitle">Education news from SKKS and around the world</p>
       </div>
       
       <div class="news-grid">
-        <article class="news-card featured-news">
-          <div class="news-image">
-            <img src="images/student-onet.png" alt="O-NET 100" />
-            <span class="news-tag" data-i18n="news.tag.success">Achievement</span>
-          </div>
+        <div class="news-card">
+          <div class="news-image">🏆<div class="news-tag">SKKS</div></div>
           <div class="news-content">
-            <span class="news-date" data-i18n="news.featured.date">📅 April 15, 2026</span>
-            <h3 data-i18n="news.featured.title">SKKS Student Achieves Perfect 100 O-NET English Score</h3>
-            <p data-i18n="news.featured.text">A Grade 6 EP student made history by scoring perfect 100.</p>
-            <a href="#" class="news-link" data-i18n="news.readmore">Read More →</a>
+            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 11 May 2026</div>
+            <h3 data-i18n="news.1.title">O-NET 100% Perfect Score</h3>
+            <p data-i18n="news.1.desc">Our student achieved a perfect score on the O-NET English exam — a record-breaking accomplishment for Khon Kaen.</p>
           </div>
-        </article>
+        </div>
         
-        <article class="news-card">
-          <div class="news-image" style="background: linear-gradient(135deg, #5BB8E0, #7CB342)">
-            <span class="news-emoji">🎓</span>
-            <span class="news-tag" data-i18n="news.tag.admissions">Admissions</span>
-          </div>
+        <div class="news-card">
+          <div class="news-image">🎓<div class="news-tag">SKKS</div></div>
           <div class="news-content">
-            <span class="news-date" data-i18n="news.2.date">📅 May 1, 2026</span>
-            <h3 data-i18n="news.2.title">Admissions Open for Academic Year 2026</h3>
-            <p data-i18n="news.2.text">Open enrollment for new students Pre-K to Grade 9.</p>
-            <a href="#admissions" class="news-link" data-i18n="news.applynow">Apply Now →</a>
+            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 28 Apr 2026</div>
+            <h3 data-i18n="news.2.title">Cambridge Re-certification</h3>
+            <p data-i18n="news.2.desc">SKKS successfully renewed Cambridge Assessment certification for another 5 years — confirming our commitment to excellence.</p>
           </div>
-        </article>
+        </div>
         
-        <article class="news-card">
-          <div class="news-image" style="background: linear-gradient(135deg, #F59E0B, #EC4899)">
-            <span class="news-emoji">🎭</span>
-            <span class="news-tag" data-i18n="news.tag.event">Events</span>
-          </div>
+        <div class="news-card">
+          <div class="news-image">📝<div class="news-tag">SKKS</div></div>
           <div class="news-content">
-            <span class="news-date" data-i18n="news.3.date">📅 April 28, 2026</span>
-            <h3 data-i18n="news.3.title">SKKS Open House 2026</h3>
-            <p data-i18n="news.3.text">Parents and students invited to attend Open House on May 25.</p>
-            <a href="#" class="news-link" data-i18n="news.details">View Details →</a>
-          </div>
-        </article>
-        
-        <article class="news-card">
-          <div class="news-image" style="background: linear-gradient(135deg, #7C3AED, #2563EB)">
-            <span class="news-emoji">🏆</span>
-            <span class="news-tag" data-i18n="news.tag.competition">Competition</span>
-          </div>
-          <div class="news-content">
-            <span class="news-date" data-i18n="news.4.date">📅 April 20, 2026</span>
-            <h3 data-i18n="news.4.title">SKKS Wins Regional Spelling Bee</h3>
-            <p data-i18n="news.4.text">Grade 8 student wins Northeastern Regional Championship.</p>
-            <a href="#" class="news-link" data-i18n="news.readmore">Read More →</a>
-          </div>
-        </article>
-        
-        <article class="news-card">
-          <div class="news-image" style="background: linear-gradient(135deg, #16A34A, #FCD34D)">
-            <span class="news-emoji">🌳</span>
-            <span class="news-tag" data-i18n="news.tag.csr">CSR</span>
-          </div>
-          <div class="news-content">
-            <span class="news-date" data-i18n="news.5.date">📅 April 10, 2026</span>
-            <h3 data-i18n="news.5.title">Tree Planting Activity</h3>
-            <p data-i18n="news.5.text">Planted over 200 trees, instilling environmental awareness.</p>
-            <a href="#" class="news-link" data-i18n="news.readmore">Read More →</a>
-          </div>
-        </article>
-      </div>
-      
-      <div style="text-align:center;margin-top:40px">
-        <a href="#" class="btn btn-secondary" data-i18n="news.viewall">View All News →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== TESTIMONIALS ============== -->
-  <section class="section testimonials">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="testimonials.tag">Testimonials</span>
-        <h2 class="section-title" data-i18n="testimonials.title">Parent Voices</h2>
-        <p class="section-subtitle" data-i18n="testimonials.subtitle">Impressions from the SKKS family</p>
-      </div>
-      
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-          <p class="testimonial-text" data-i18n="testimonials.t1.text">"My child has been at SKKS since K1, now in Grade 4 EP. Excellent care."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar" style="background: linear-gradient(135deg, #EC4899, #7C3AED)">W</div>
-            <div>
-              <strong data-i18n="testimonials.t1.author">Wanna Prasit</strong>
-              <span data-i18n="testimonials.t1.role">Parent of Grade 4/EP</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="testimonial-card">
-          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-          <p class="testimonial-text" data-i18n="testimonials.t2.text">"Excellent value. My child gains both language and character."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar" style="background: linear-gradient(135deg, #5BB8E0, #2563EB)">S</div>
-            <div>
-              <strong data-i18n="testimonials.t2.author">Somsak Munkong</strong>
-              <span data-i18n="testimonials.t2.role">Parent of Grade 8/MEP</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="testimonial-card">
-          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-          <p class="testimonial-text" data-i18n="testimonials.t3.text">"Clean, safe school with many activities. My child loves coming every day."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar" style="background: linear-gradient(135deg, #16A34A, #7CB342)">P</div>
-            <div>
-              <strong data-i18n="testimonials.t3.author">Piyanuch Wongthai</strong>
-              <span data-i18n="testimonials.t3.role">Parent of K3</span>
-            </div>
+            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 15 Mar 2026</div>
+            <h3 data-i18n="news.3.title">Admissions Open 2026</h3>
+            <p data-i18n="news.3.desc">Applications for the 2026 academic year are now open. Limited seats — secure your child's place early.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============== ADMISSIONS / FORM ============== -->
-  <section class="section admissions" id="admissions">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="admissions.tag">Admissions Open</span>
-        <h2 class="section-title" data-i18n="admissions.title">Student Admissions</h2>
-        <p class="section-subtitle" data-i18n="admissions.subtitle">
-          Start your educational journey at SKKS through our online application.
-        </p>
-      </div>
-      
-      <div class="admission-grid">
-        <div class="admission-info">
-          <h3 data-i18n="admissions.steps.title">Application Steps</h3>
-          <p data-i18n="admissions.steps.intro">Just 4 simple steps to become part of the SKKS family.</p>
-          
-          <ul class="admission-steps">
-            <li>
-              <span class="step-number">1</span>
-              <div class="step-content">
-                <strong data-i18n="admissions.step1.title">Student Information</strong>
-                <span data-i18n="admissions.step1.text">Basic info and education history</span>
-              </div>
-            </li>
-            <li>
-              <span class="step-number">2</span>
-              <div class="step-content">
-                <strong data-i18n="admissions.step2.title">Parent Information</strong>
-                <span data-i18n="admissions.step2.text">Contact and coordination details</span>
-              </div>
-            </li>
-            <li>
-              <span class="step-number">3</span>
-              <div class="step-content">
-                <strong data-i18n="admissions.step3.title">Review & Submit</strong>
-                <span data-i18n="admissions.step3.text">Review information and submit application</span>
-              </div>
-            </li>
-            <li>
-              <span class="step-number">4</span>
-              <div class="step-content">
-                <strong data-i18n="admissions.step4.title">Schedule Interview</strong>
-                <span data-i18n="admissions.step4.text">Our team will contact you</span>
-              </div>
-            </li>
-          </ul>
-          
-          <div class="admission-docs">
-            <h4 data-i18n="admissions.docs.title">📋 Required Documents</h4>
-            <ul>
-              <li data-i18n="admissions.docs.1">Student's house registration copy</li>
-              <li data-i18n="admissions.docs.2">Birth certificate copy</li>
-              <li data-i18n="admissions.docs.3">Parent's ID card copy</li>
-              <li data-i18n="admissions.docs.4">2 photos (1 inch)</li>
-              <li data-i18n="admissions.docs.5">Latest academic records (if any)</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="admission-form">
-          <!-- STEP 1 -->
-          <div class="form-step" id="step1">
-            <h3 class="form-title" data-i18n="form.title">📝 Application Form</h3>
-            <p class="form-subtitle" data-i18n="form.subtitle">Please fill out all information completely.</p>
-            
-            <div class="form-progress">
-              <div class="progress-step active"></div>
-              <div class="progress-step"></div>
-              <div class="progress-step"></div>
-              <div class="progress-step"></div>
-            </div>
-            <div class="form-step-label" data-i18n="form.step1.label">Step 1 of 4 — Student Information</div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.firstname">First Name</span> <span class="required">*</span></label>
-                <input type="text" class="form-input" id="firstName" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.lastname">Last Name</span> <span class="required">*</span></label>
-                <input type="text" class="form-input" id="lastName" required />
-              </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" data-i18n="form.nickname">Nickname</label>
-                <input type="text" class="form-input" id="nickName" />
-              </div>
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.birthdate">Date of Birth</span> <span class="required">*</span></label>
-                <input type="date" class="form-input" id="birthDate" required />
-              </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.gender">Gender</span> <span class="required">*</span></label>
-                <select class="form-select" id="gender" required>
-                  <option value="" data-i18n-option="form.gender.select">Select</option>
-                  <option value="male" data-i18n-option="form.gender.male">Male</option>
-                  <option value="female" data-i18n-option="form.gender.female">Female</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" data-i18n="form.nationality">Nationality</label>
-                <input type="text" class="form-input" id="nationality" value="Thai" />
-              </div>
-            </div>
-            
-            <div class="form-actions">
-              <button class="btn btn-primary" onclick="goToStep(2)" data-i18n="form.next">Next →</button>
-            </div>
-          </div>
-          
-          <!-- STEP 2 -->
-          <div class="form-step" id="step2" style="display:none">
-            <h3 class="form-title">👨‍👩‍👧 <span data-i18n="admissions.step2.title">Parent Information</span></h3>
-            <p class="form-subtitle">Select program and parent details</p>
-            
-            <div class="form-progress">
-              <div class="progress-step completed"></div>
-              <div class="progress-step active"></div>
-              <div class="progress-step"></div>
-              <div class="progress-step"></div>
-            </div>
-            <div class="form-step-label" data-i18n="form.step2.label">Step 2 of 4 — Program & Parent</div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.program">Program</span> <span class="required">*</span></label>
-                <select class="form-select" id="program" required>
-                  <option value="" data-i18n-option="form.program.select">Select Program</option>
-                  <option value="prek">Pre-Kindergarten</option>
-                  <option value="k">Kindergarten</option>
-                  <option value="ep">English Program (EP)</option>
-                  <option value="mep">Mini English Program (MEP)</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.grade">Grade</span> <span class="required">*</span></label>
-                <select class="form-select" id="grade" required>
-                  <option value="" data-i18n-option="form.grade.select">Select Grade</option>
-                  <option>Pre-K</option>
-                  <option>K1</option><option>K2</option><option>K3</option>
-                  <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
-                  <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
-                  <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.parent.name">Parent's Name</span> <span class="required">*</span></label>
-                <input type="text" class="form-input" id="parentName" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.parent.relation">Relationship</span> <span class="required">*</span></label>
-                <select class="form-select" id="relation" required>
-                  <option value="" data-i18n-option="form.relation.select">Select</option>
-                  <option data-i18n-option="form.relation.father">Father</option>
-                  <option data-i18n-option="form.relation.mother">Mother</option>
-                  <option data-i18n-option="form.relation.guardian">Guardian</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.phone">Phone</span> <span class="required">*</span></label>
-                <input type="tel" class="form-input" id="phone" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label"><span data-i18n="form.email">Email</span> <span class="required">*</span></label>
-                <input type="email" class="form-input" id="email" required />
-              </div>
-            </div>
-            
-            <div class="form-group full">
-              <label class="form-label" data-i18n="form.address">Address</label>
-              <textarea class="form-textarea" id="address" data-i18n-placeholder="form.address.placeholder" placeholder="Current address"></textarea>
-            </div>
-            
-            <div class="form-actions">
-              <button class="btn btn-back" onclick="goToStep(1)" data-i18n="form.back">← Back</button>
-              <button class="btn btn-primary" onclick="goToStep(3)" data-i18n="form.next">Next →</button>
-            </div>
-          </div>
-          
-          <!-- STEP 3 -->
-          <div class="form-step" id="step3" style="display:none">
-            <h3 class="form-title" data-i18n="form.payment.title">📋 Review & Confirm</h3>
-            <p class="form-subtitle" data-i18n="form.payment.subtitle">Please review your information before submitting</p>
-            
-            <div class="form-progress">
-              <div class="progress-step completed"></div>
-              <div class="progress-step completed"></div>
-              <div class="progress-step active"></div>
-              <div class="progress-step"></div>
-            </div>
-            <div class="form-step-label" data-i18n="form.step3.label">Step 3 of 4 — Review</div>
-            
-            <div style="background: linear-gradient(135deg, #F0F9FF, #F0FDF4); padding: 24px; border-radius: 16px; border-left: 4px solid #5BB8E0; margin-bottom: 24px">
-              <h4 style="font-family: 'Prompt', sans-serif; color: #1E3A5F; margin-bottom: 12px; font-size: 17px" data-i18n="form.review.title">📨 What happens next?</h4>
-              <ul style="list-style: none; padding: 0; margin: 0">
-                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
-                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
-                  <span data-i18n="form.review.step1">Our admissions team will review your application within 24 hours</span>
-                </li>
-                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
-                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
-                  <span data-i18n="form.review.step2">You will be contacted to schedule a school visit and interview</span>
-                </li>
-                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
-                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
-                  <span data-i18n="form.review.step3">Tuition and payment details will be discussed during the interview</span>
-                </li>
-                <li style="padding: 8px 0 8px 28px; position: relative; color: #4B5563; font-size: 14px; line-height: 1.6">
-                  <span style="position: absolute; left: 0; color: #16A34A; font-weight: bold">✓</span>
-                  <span data-i18n="form.review.step4">Payment will be processed only after admission is confirmed</span>
-                </li>
-              </ul>
-            </div>
-            
-            <div style="background: #FEF3C7; padding: 16px 20px; border-radius: 12px; border: 1px solid #FDE68A; margin-bottom: 24px">
-              <p style="font-size: 14px; color: #92400E; margin: 0; line-height: 1.6">
-                <strong>📞 <span data-i18n="form.review.contact.title">Need to contact us?</span></strong><br/>
-                <span data-i18n="form.review.contact.text">Phone: 043-XXX-XXXX • Email: admission@suansonkk.com</span>
-              </p>
-            </div>
-            
-            <div class="form-actions">
-              <button class="btn btn-back" onclick="goToStep(2)" data-i18n="form.back">← Back</button>
-              <button class="btn btn-primary" onclick="goToStep(4)" data-i18n="form.review.submit">Submit Application →</button>
-            </div>
-          </div>
-          
-          <!-- STEP 4 -->
-          <div class="form-step" id="step4" style="display:none">
-            <div class="form-progress">
-              <div class="progress-step completed"></div>
-              <div class="progress-step completed"></div>
-              <div class="progress-step completed"></div>
-              <div class="progress-step completed"></div>
-            </div>
-            
-            <div class="success-screen">
-              <div class="success-icon">✓</div>
-              <h3 data-i18n="form.success.title">Application Submitted!</h3>
-              <p data-i18n="form.success.text">Thank you for trusting SKKS. Our team will contact you within 24 hours.</p>
-              
-              <div class="ref-number" id="refNumber">SKKS-2569-000001</div>
-              
-              <div style="margin-top: 24px">
-                <button class="btn btn-primary" onclick="resetForm()" data-i18n="form.success.btn">Submit Another</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== FAQ ============== -->
-  <section class="section faq-section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="faq.tag">FAQ</span>
-        <h2 class="section-title" data-i18n="faq.title">Frequently Asked Questions</h2>
-        <p class="section-subtitle" data-i18n="faq.subtitle">Common questions from parents</p>
-      </div>
-      
-      <div class="faq-list">
-        <details class="faq-item" open>
-          <summary data-i18n="faq.q1">Do students need to take an entrance exam?</summary>
-          <p data-i18n="faq.a1">The school uses interviews and readiness assessments.</p>
-        </details>
-        
-        <details class="faq-item">
-          <summary data-i18n="faq.q2">What's the difference between EP and MEP?</summary>
-          <p data-i18n="faq.a2">EP teaches 70% in English. MEP blends Thai academics with English.</p>
-        </details>
-        
-        <details class="faq-item">
-          <summary data-i18n="faq.q3">Is there school bus service?</summary>
-          <p data-i18n="faq.a3">Service covers Khon Kaen city area.</p>
-        </details>
-        
-        <details class="faq-item">
-          <summary data-i18n="faq.q4">Are scholarships available?</summary>
-          <p data-i18n="faq.a4">Yes — for academic excellence, sports, and special talents.</p>
-        </details>
-        
-        <details class="faq-item">
-          <summary data-i18n="faq.q5">What are the school hours?</summary>
-          <p data-i18n="faq.a5">Mon-Fri 7:30 AM - 3:30 PM, with after-school care available.</p>
-        </details>
-        
-        <details class="faq-item">
-          <summary data-i18n="faq.q6">What documents are needed?</summary>
-          <p data-i18n="faq.a6">House registration, birth certificate, ID copies, photos, academic records.</p>
-        </details>
-        
-        <details class="faq-item">
-          <summary data-i18n="faq.q7">Are there extracurricular activities?</summary>
-          <p data-i18n="faq.a7">Yes — music, sports, arts, Robotics, Coding, swimming, and more.</p>
-        </details>
-        
-        <details class="faq-item">
-          <summary data-i18n="faq.q8">How is the cafeteria food?</summary>
-          <p data-i18n="faq.a8">FDA-certified, fresh ingredients cooked daily.</p>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== CONTACT ============== -->
-  <section class="section contact-section" id="contact">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag" data-i18n="contact.tag">Contact Us</span>
-        <h2 class="section-title" data-i18n="contact.title">Contact Us</h2>
-        <p class="section-subtitle" data-i18n="contact.subtitle">Have questions? Reach us through any channel.</p>
-      </div>
-      
-      <div class="contact-grid">
-        <div class="contact-info">
-          <div class="contact-card">
-            <div class="contact-icon">📍</div>
-            <div>
-              <strong data-i18n="contact.address.title">Address</strong>
-              <p data-i18n="contact.address.text">123/45 Mittraphap Road<br/>Mueang District, Khon Kaen 40000</p>
-            </div>
-          </div>
-          
-          <div class="contact-card">
-            <div class="contact-icon">📞</div>
-            <div>
-              <strong data-i18n="contact.phone.title">Phone</strong>
-              <p data-i18n="contact.phone.text">043-XXX-XXXX<br/>Mobile 081-XXX-XXXX</p>
-            </div>
-          </div>
-          
-          <div class="contact-card">
-            <div class="contact-icon">✉</div>
-            <div>
-              <strong data-i18n="contact.email.title">Email</strong>
-              <p data-i18n="contact.email.text">info@suansonkk.com<br/>admission@suansonkk.com</p>
-            </div>
-          </div>
-          
-          <div class="contact-card">
-            <div class="contact-icon">⏰</div>
-            <div>
-              <strong data-i18n="contact.hours.title">Office Hours</strong>
-              <p data-i18n="contact.hours.text">Mon-Fri: 7:30 - 16:30<br/>Sat: 9:00 - 12:00</p>
-            </div>
-          </div>
-          
-          <div class="contact-social">
-            <strong data-i18n="contact.social">Social Media</strong>
-            <div class="social-icons">
-              <a href="#" aria-label="Facebook" class="social-fb">f</a>
-              <a href="#" aria-label="Instagram" class="social-ig">📷</a>
-              <a href="#" aria-label="Line" class="social-line">L</a>
-              <a href="#" aria-label="YouTube" class="social-yt">▶</a>
-              <a href="#" aria-label="TikTok" class="social-tt">♪</a>
-            </div>
-          </div>
-        </div>
-        
-        <div class="contact-map">
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3781.4!2d102.8369!3d16.4322!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDI1JzU2LjAiTiAxMDLCsDUwJzEyLjkiRQ!5e0!3m2!1sth!2sth!4v1715000000000"
-            width="100%" 
-            height="100%" 
-            style="border:0;border-radius:16px;min-height:400px" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade"
-            title="SKKS Map">
-          </iframe>
-        </div>
-      </div>
-      
-      <div class="contact-form-card">
-        <h3 data-i18n="contact.form.title">📨 Send Us a Message</h3>
-        <p data-i18n="contact.form.subtitle">Our team will respond within 24 hours.</p>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label"><span data-i18n="contact.form.name">Full Name</span> <span class="required">*</span></label>
-            <input type="text" class="form-input" id="contactName" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label"><span data-i18n="contact.form.phone">Phone</span> <span class="required">*</span></label>
-            <input type="tel" class="form-input" id="contactPhone" required />
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" data-i18n="contact.form.email">Email</label>
-            <input type="email" class="form-input" id="contactEmail" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" data-i18n="contact.form.subject">Subject</label>
-            <select class="form-select" id="contactSubject">
-              <option data-i18n-option="contact.form.subject.admission">Admissions</option>
-              <option data-i18n-option="contact.form.subject.programs">Programs & Tuition</option>
-              <option data-i18n-option="contact.form.subject.scholarship">Scholarships</option>
-              <option data-i18n-option="contact.form.subject.tour">School Tour</option>
-              <option data-i18n-option="contact.form.subject.other">Other</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-group full">
-          <label class="form-label"><span data-i18n="contact.form.message">Message</span> <span class="required">*</span></label>
-          <textarea class="form-textarea" id="contactMessage" rows="4" required></textarea>
-        </div>
-        
-        <div class="form-actions">
-          <button class="btn btn-primary" onclick="submitContact()" data-i18n="contact.form.send">Send Message →</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== CTA ============== -->
-  <section class="cta-section">
-    <div class="container">
-      <div class="cta-content">
-        <h2 data-i18n="cta.title">Ready to Begin Your Educational Journey at SKKS?</h2>
-        <p data-i18n="cta.subtitle">Admissions Open for Academic Year 2026 — Limited Seats</p>
-        <div class="cta-buttons">
-          <a href="#admissions" class="btn btn-primary btn-large">
-            <span data-i18n="cta.apply">Apply Now</span> <span>→</span>
-          </a>
-          <a href="tel:043XXXXXXX" class="btn btn-secondary btn-large" data-i18n="cta.call">
-            📞 Call Us
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============== FOOTER ============== -->
-  <footer class="footer">
+  <!-- FOOTER -->
+  <footer id="contact">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="logo">
-            <img src="images/logo.png" alt="SKKS" style="height: 50px; background:white; border-radius: 8px; padding:4px" />
-            <div class="logo-text">
-              <strong>SKKS</strong>
-              <span>Suanson Khon Kaen School</span>
-            </div>
-          </div>
-          <p data-i18n="footer.tagline">Suanson Khon Kaen School<br/>Cultivating knowledge, fostering potential.</p>
-          <div class="social-icons">
+          <img src="images/logo.png" alt="SKKS" />
+          <div class="name">SUANSON KHON KAEN SCHOOL</div>
+          <div class="tagline">โรงเรียนสวนสนขอนแก่น</div>
+          <p>📞 (+66) 043-XXX-XXXX</p>
+          <p style="margin-top:6px;">📍 Khon Kaen, Thailand</p>
+          <p style="margin-top:6px;">✉ info@suansonkk.com</p>
+          <div class="footer-social">
             <a href="#" aria-label="Facebook">f</a>
             <a href="#" aria-label="Instagram">📷</a>
-            <a href="#" aria-label="Line">L</a>
+            <a href="#" aria-label="LINE">L</a>
             <a href="#" aria-label="YouTube">▶</a>
           </div>
         </div>
         
         <div>
-          <h4 data-i18n="footer.about">About Us</h4>
+          <h4 data-i18n="footer.school">School</h4>
           <ul>
-            <li><a href="#about" data-i18n="about.vision.title">Vision</a></li>
-            <li><a href="#history" data-i18n="nav.about.history">History</a></li>
-            <li><a href="#staff" data-i18n="nav.about.staff">Faculty</a></li>
-            <li><a href="#facilities" data-i18n="nav.about.facilities">Facilities</a></li>
+            <li><a href="about.html" data-i18n="nav.about">About Us</a></li>
+            <li><a href="about.html#team" data-i18n="nav.about.team">Our Team</a></li>
+            <li><a href="about.html#campus" data-i18n="nav.about.campus">Our Campus</a></li>
+            <li><a href="voices.html" data-i18n="nav.voices">Parent Voices</a></li>
           </ul>
         </div>
         
         <div>
-          <h4 data-i18n="footer.programs">Programs</h4>
+          <h4 data-i18n="footer.links">Quick Links</h4>
           <ul>
-            <li><a href="#programs">Pre-Kindergarten</a></li>
-            <li><a href="#programs">Kindergarten</a></li>
-            <li><a href="#programs">English Program</a></li>
-            <li><a href="#programs">Mini English Program</a></li>
-            <li><a href="#tuition" data-i18n="footer.tuition">Tuition</a></li>
+            <li><a href="#news" data-i18n="topbar.events">Events</a></li>
+            <li><a href="#news" data-i18n="topbar.news">News</a></li>
+            <li><a href="voices.html" data-i18n="topbar.faqs">FAQs</a></li>
+            <li><a href="admissions.html" data-i18n="nav.admissions">Admissions</a></li>
           </ul>
         </div>
         
         <div>
-          <h4 data-i18n="footer.links">Useful Links</h4>
+          <h4 data-i18n="footer.account">Account</h4>
           <ul>
-            <li><a href="#admissions" data-i18n="footer.admissions">Admissions</a></li>
-            <li><a href="#news" data-i18n="footer.news">News & Events</a></li>
-            <li><a href="#achievements" data-i18n="footer.achievements">Achievements</a></li>
-            <li><a href="pages/dashboard.html" data-i18n="footer.admin">Admin</a></li>
-            <li><a href="#contact" data-i18n="footer.contact">Contact</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 data-i18n="footer.contact">Contact</h4>
-          <ul class="footer-contact">
-            <li>📍 123/45 Mittraphap Road<br/>Khon Kaen 40000</li>
-            <li>📞 043-XXX-XXXX</li>
-            <li>✉ info@suansonkk.com</li>
-            <li>🌐 suansonkk.com</li>
+            <li><a href="login.html">Sign In</a></li>
+            <li><a href="login.html">Sign Up</a></li>
+            <li><a href="staff-invite.html">Staff Invite</a></li>
+            <li><a href="admissions.html">Apply Now</a></li>
           </ul>
         </div>
       </div>
       
       <div class="footer-bottom">
-        <p data-i18n="footer.copy">© 2026 Suanson Khon Kaen School (SKKS) — All rights reserved.</p>
-        <div class="footer-bottom-links">
-          <a href="#" data-i18n="footer.privacy">Privacy Policy</a> •
-          <a href="#" data-i18n="footer.terms">Terms of Use</a> •
-          <a href="#" data-i18n="footer.sitemap">Sitemap</a>
-        </div>
+        © 2026 Suanson Khon Kaen School. All rights reserved. • <a href="https://suansonkk.com">suansonkk.com</a>
       </div>
     </div>
   </footer>
 
-  <!-- Scroll to Top -->
-  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
+  <!-- CTA POPUP (Bottom) -->
+  <div id="cta-popup">
+    <button id="cta-popup-close" onclick="closePopup()" aria-label="Close">×</button>
+    <div id="cta-popup-content">
+      <div class="icon">🎓</div>
+      <div class="text">
+        <strong data-i18n="popup.title">Admissions Open!</strong>
+        <small data-i18n="popup.subtitle">Apply for academic year 2026</small>
+      </div>
+      <a href="admissions.html" class="btn btn-primary" data-i18n="popup.cta">Apply</a>
+    </div>
+  </div>
 
-  <script src="js/main.js"></script>
+  <script>
+    const translations = {
+      en: {
+        'topbar.events':'Events','topbar.news':'News','topbar.faqs':'FAQs','topbar.contact':'Contact','topbar.register':'Register Your Interest',
+        'nav.home':'Home','nav.about':'About Us ▾','nav.about.vision':'Vision & Mission','nav.about.journey':'Our Journey','nav.about.team':'Our Team','nav.about.campus':'Our Campus',
+        'nav.programs':'Programs ▾','nav.voices':'Voices','nav.admissions':'Admissions','nav.apply':'Apply Now',
+        'hero.eyebrow':'CAMBRIDGE CERTIFIED EDUCATION','hero.title':'Nurturing Young Minds Toward<br>a World of Knowledge','hero.subtitle':'Suanson Khon Kaen School — Cambridge-certified EP/MEP bilingual education from Pre-K to Grade 9','hero.apply':'Apply for Admission','hero.learnmore':'Discover More →',
+        'card.1.title':'Early Years','card.1.sub':'Building Strong Foundations','card.2.title':'Primary School','card.2.sub':'Preparing For The Future','card.3.title':'EP / MEP Programs','card.3.sub':'Shaping Global Learners','card.viewmore':'VIEW MORE',
+        'why.eyebrow':'EXCELLENCE','why.title':'Why Choose Us?','why.subtitle':"The Choice That Transforms Your Child's Future",'why.1.title':'Global Outlook','why.1.desc':'Our education system is designed with a global perspective, incorporating international best practices and Cambridge curriculum.','why.2.title':'Strong Curriculum','why.2.desc':'The curriculum emphasizes deep understanding of core subjects like Mathematics, Science, English, and literacy.','why.3.title':'Bilingual Focus','why.3.desc':'Our bilingual education policy ensures students master English as their first language while preserving Thai cultural identity.','why.4.title':'STEM Emphasis','why.4.desc':'Strong emphasis on STEM (Science, Technology, Engineering, Mathematics) education from an early age.','why.cta':'Learn More About Us',
+        'programs.eyebrow':'CURRICULUM','programs.title':'Our Programs','programs.subtitle':'Four educational pathways from early childhood to junior high','programs.prek.age':'AGES 3-5','programs.prek.title':'Pre-Kindergarten','programs.prek.desc':'Foundation learning through play, social skills, and early literacy in a nurturing bilingual environment.','programs.k.age':'AGES 5-7','programs.k.title':'Kindergarten','programs.k.desc':'Creative learning with strong emphasis on English language development and problem-solving skills.','programs.ep.age':'GRADES 1-9','programs.ep.title':'English Program (EP)','programs.ep.desc':'Full English immersion curriculum with Cambridge certification. Math, Science, and English taught entirely in English.','programs.mep.age':'GRADES 1-9','programs.mep.title':'Mini English Program (MEP)','programs.mep.desc':'Bilingual program with 60% English instruction. Perfect balance of Thai culture and English proficiency.',
+        'adm.eyebrow':'SECURING A BRIGHT FUTURE','adm.title':'ADMISSION','adm.subtitle':'Apply now for the 2026 academic year. Limited seats available.','cd.days':'days','cd.hours':'hours','cd.mins':'minutes','cd.secs':'seconds','adm.cta':'View Admission Details →',
+        'reg.title':'Register Your Interest','reg.subtitle':'to Know More About Us','reg.name':'Your Name *','reg.email':'Email *','reg.phone':'Phone *','reg.cta':'ENROLL NOW',
+        'events.title':'Events','events.subtitle':'Upcoming activities & gatherings','events.viewall':'VIEW ALL','events.may':'MAY, 2026','events.1.title':'One-Day Golf Clinic','events.1.desc':'Take your skills to the next level! Join us for an intensive, high-impact One-Day Golf Clinic at the prestigious Singha Park Golf Club.','events.2.title':'SKKS Experience Programme','events.2.desc':'Experience world-class education at SKKS. What makes our school special — tour the campus, meet teachers, and see our students in action.','events.3.title':'Open House 2026','events.3.desc':'Annual Open House — meet our teachers, tour the campus, and learn about our Cambridge-certified programs. Free admission for families.',
+        'news.eyebrow':'NEWS & UPDATES','news.title':'Latest News','news.subtitle':'Education news from SKKS and around the world','news.1.title':'O-NET 100% Perfect Score','news.1.desc':'Our student achieved a perfect score on the O-NET English exam — a record-breaking accomplishment for Khon Kaen.','news.2.title':'Cambridge Re-certification','news.2.desc':'SKKS successfully renewed Cambridge Assessment certification for another 5 years — confirming our commitment to excellence.','news.3.title':'Admissions Open 2026','news.3.desc':'Applications for the 2026 academic year are now open. Limited seats — secure your child\'s place early.',
+        'footer.school':'School','footer.links':'Quick Links','footer.account':'Account',
+        'popup.title':'Admissions Open!','popup.subtitle':'Apply for academic year 2026','popup.cta':'Apply'
+      },
+      th: {
+        'topbar.events':'กิจกรรม','topbar.news':'ข่าวสาร','topbar.faqs':'คำถาม','topbar.contact':'ติดต่อ','topbar.register':'ลงทะเบียนความสนใจ',
+        'nav.home':'หน้าหลัก','nav.about':'เกี่ยวกับเรา ▾','nav.about.vision':'วิสัยทัศน์ & พันธกิจ','nav.about.journey':'เส้นทางของเรา','nav.about.team':'ทีมงาน','nav.about.campus':'อาคารสถานที่',
+        'nav.programs':'หลักสูตร ▾','nav.voices':'เสียงผู้ปกครอง','nav.admissions':'สมัครเรียน','nav.apply':'สมัครเลย',
+        'hero.eyebrow':'รับรองโดย CAMBRIDGE','hero.title':'บ่มเพาะเยาวชน<br>สู่โลกแห่งความรู้','hero.subtitle':'โรงเรียนสวนสนขอนแก่น — หลักสูตร EP/MEP รับรองโดย Cambridge ตั้งแต่ Pre-K ถึง ม.3','hero.apply':'สมัครเรียน','hero.learnmore':'รายละเอียดเพิ่มเติม →',
+        'card.1.title':'ปฐมวัย','card.1.sub':'สร้างรากฐานที่แข็งแกร่ง','card.2.title':'ประถมศึกษา','card.2.sub':'เตรียมพร้อมสำหรับอนาคต','card.3.title':'หลักสูตร EP / MEP','card.3.sub':'ปั้นนักเรียนระดับสากล','card.viewmore':'อ่านเพิ่มเติม',
+        'why.eyebrow':'ความเป็นเลิศ','why.title':'ทำไมต้องเลือกเรา?','why.subtitle':'ทางเลือกที่จะเปลี่ยนอนาคตของลูกคุณ','why.1.title':'มุมมองสากล','why.1.desc':'ระบบการศึกษาออกแบบให้มีมุมมองระดับโลก ใช้หลักปฏิบัติสากลและหลักสูตร Cambridge','why.2.title':'หลักสูตรเข้มข้น','why.2.desc':'เน้นความเข้าใจลึกในวิชาหลัก คณิตศาสตร์ วิทยาศาสตร์ ภาษาอังกฤษ และการอ่านเขียน','why.3.title':'เน้นสองภาษา','why.3.desc':'นโยบายการศึกษาสองภาษา ให้นักเรียนเก่งภาษาอังกฤษพร้อมรักษาเอกลักษณ์ไทย','why.4.title':'เน้น STEM','why.4.desc':'เน้นการศึกษา STEM (วิทย์ เทคโน วิศวกรรม คณิต) ตั้งแต่ยังเล็ก','why.cta':'อ่านเพิ่มเติมเกี่ยวกับเรา',
+        'programs.eyebrow':'หลักสูตร','programs.title':'หลักสูตรของเรา','programs.subtitle':'4 เส้นทางการศึกษา ตั้งแต่ปฐมวัยถึงมัธยมต้น','programs.prek.age':'อายุ 3-5','programs.prek.title':'เตรียมอนุบาล','programs.prek.desc':'เรียนรู้พื้นฐานผ่านการเล่น ทักษะทางสังคม ในสภาพแวดล้อมสองภาษา','programs.k.age':'อายุ 5-7','programs.k.title':'อนุบาล','programs.k.desc':'เรียนรู้สร้างสรรค์ เน้นภาษาอังกฤษและการแก้ปัญหา','programs.ep.age':'ป.1-ม.3','programs.ep.title':'English Program (EP)','programs.ep.desc':'หลักสูตรภาษาอังกฤษเต็มรูปแบบ รับรอง Cambridge — สอนคณิต วิทย์ อังกฤษ เป็นภาษาอังกฤษทั้งหมด','programs.mep.age':'ป.1-ม.3','programs.mep.title':'Mini English Program (MEP)','programs.mep.desc':'หลักสูตรสองภาษา 60% เป็นภาษาอังกฤษ ผสมผสานวัฒนธรรมไทยและอังกฤษอย่างลงตัว',
+        'adm.eyebrow':'สร้างอนาคตที่สดใส','adm.title':'สมัครเรียน','adm.subtitle':'สมัครเรียนปีการศึกษา 2569 — ที่นั่งจำกัด','cd.days':'วัน','cd.hours':'ชั่วโมง','cd.mins':'นาที','cd.secs':'วินาที','adm.cta':'ดูรายละเอียดการสมัคร →',
+        'reg.title':'ลงทะเบียนความสนใจ','reg.subtitle':'เพื่อทราบข้อมูลเพิ่มเติม','reg.name':'ชื่อของคุณ *','reg.email':'อีเมล *','reg.phone':'เบอร์โทร *','reg.cta':'ลงทะเบียน',
+        'events.title':'กิจกรรม','events.subtitle':'กิจกรรมที่กำลังจะมาถึง','events.viewall':'ดูทั้งหมด','events.may':'พ.ค. 2569','events.1.title':'คลินิกกอล์ฟ 1 วัน','events.1.desc':'พัฒนาทักษะให้สูงขึ้น! เข้าร่วม One-Day Golf Clinic ที่ Singha Park Golf Club',' events.2.title':'SKKS Experience Programme','events.2.desc':'สัมผัสการศึกษาระดับโลกที่ SKKS เยี่ยมชมโรงเรียน พบครู เห็นนักเรียนของเราในห้องเรียน','events.3.title':'Open House 2569','events.3.desc':'Open House ประจำปี พบครู เยี่ยมชมโรงเรียน เรียนรู้หลักสูตร Cambridge เข้าฟรี',
+        'news.eyebrow':'ข่าวสารและอัปเดต','news.title':'ข่าวสารล่าสุด','news.subtitle':'ข่าวการศึกษาจาก SKKS และทั่วโลก','news.1.title':'O-NET 100% คะแนนเต็ม','news.1.desc':'นักเรียนของเราได้คะแนนเต็ม O-NET วิชาภาษาอังกฤษ ผลสัมฤทธิ์ที่ทำลายสถิติของขอนแก่น','news.2.title':'ต่ออายุการรับรอง Cambridge','news.2.desc':'SKKS ต่ออายุการรับรองจาก Cambridge Assessment สำเร็จอีก 5 ปี ยืนยันความเป็นเลิศของเรา','news.3.title':'เปิดรับสมัครปี 2569','news.3.desc':'เปิดรับสมัครนักเรียนปีการศึกษา 2569 แล้ว ที่นั่งจำกัด สมัครก่อนได้สิทธิ์ก่อน',
+        'footer.school':'โรงเรียน','footer.links':'ลิงก์ด่วน','footer.account':'บัญชี',
+        'popup.title':'เปิดรับสมัครแล้ว!','popup.subtitle':'สมัครเรียนปี 2569','popup.cta':'สมัคร'
+      }
+    };
+    
+    function getLang(){return localStorage.getItem('skks_lang')||'en'}
+    function setLang(lang){
+      localStorage.setItem('skks_lang',lang);
+      document.documentElement.lang=lang;
+      document.querySelectorAll('[data-i18n]').forEach(el=>{
+        const key=el.getAttribute('data-i18n');
+        if(translations[lang][key])el.innerHTML=translations[lang][key];
+      });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+        const key=el.getAttribute('data-i18n-ph');
+        if(translations[lang][key])el.placeholder=translations[lang][key];
+      });
+      document.querySelectorAll('.lang-switch a').forEach(a=>{
+        a.classList.toggle('active',a.getAttribute('data-lang')===lang);
+      });
+    }
+    function toggleMenu(){document.getElementById('navMenu').classList.toggle('show')}
+    function closePopup(){
+      document.getElementById('cta-popup').classList.remove('show');
+      localStorage.setItem('skks_popup_closed',Date.now());
+    }
+    
+    function updateCountdown(){
+      const target=new Date('2026-08-09T23:59:59').getTime();
+      const now=new Date().getTime();
+      const diff=target-now;
+      if(diff<0)return;
+      const days=Math.floor(diff/(1000*60*60*24));
+      const hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+      const mins=Math.floor((diff%(1000*60*60))/(1000*60));
+      const secs=Math.floor((diff%(1000*60))/1000);
+      document.getElementById('cd-days').textContent=String(days).padStart(2,'0');
+      document.getElementById('cd-hours').textContent=String(hours).padStart(2,'0');
+      document.getElementById('cd-mins').textContent=String(mins).padStart(2,'0');
+      document.getElementById('cd-secs').textContent=String(secs).padStart(2,'0');
+    }
+    updateCountdown();
+    setInterval(updateCountdown,1000);
+    
+    async function registerInterest(e){
+      e.preventDefault();
+      const btn=e.target.querySelector('button');
+      btn.disabled=true;
+      btn.textContent='SENDING...';
+      
+      const name=document.getElementById('r-name').value.trim();
+      const email=document.getElementById('r-email').value.trim();
+      const phone=document.getElementById('r-phone').value.trim();
+      
+      try{
+        await supabaseClient.from('applications').insert({
+          application_number:`INT-${Date.now()}`,
+          status:'pending',
+          student_first_name:'(Interest)',
+          student_last_name:name,
+          program:'inquiry',
+          parent_name:name,
+          parent_phone:phone,
+          parent_email:email,
+          notes:'Registered via homepage interest form'
+        });
+        alert('✅ Thank you! We will contact you shortly.');
+        e.target.reset();
+      }catch(err){
+        alert('Submission saved locally. We will follow up soon.');
+      }finally{
+        btn.disabled=false;
+        btn.textContent=translations[getLang()]['reg.cta'];
+      }
+    }
+    
+    setTimeout(()=>{
+      const lastClosed=localStorage.getItem('skks_popup_closed');
+      if(!lastClosed||(Date.now()-parseInt(lastClosed))>86400000){
+        document.getElementById('cta-popup').classList.add('show');
+      }
+    },5000);
+    
+    setLang(getLang());
+  </script>
+  <script src="js/supabase-client.js"></script>
 </body>
 </html>

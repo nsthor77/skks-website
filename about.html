@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+  <style>
+    .journey-timeline{max-width:800px;margin:0 auto;position:relative;padding-left:40px}
+    .journey-timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:var(--pine)}
+    .timeline-item{position:relative;padding-bottom:40px}
+    .timeline-item::before{content:'';position:absolute;left:-32px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--gold);border:3px solid var(--white);box-shadow:0 0 0 2px var(--pine)}
+    .timeline-year{color:var(--pine);font-weight:700;font-size:14px;margin-bottom:4px;font-family:'Playfair Display',serif}
+    .timeline-item h3{font-size:20px;margin-bottom:8px;font-family:'Playfair Display',serif}
+    .timeline-item p{color:var(--slate);font-size:14px;line-height:1.6}
+    .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+    .team-card{background:white;border-radius:12px;padding:32px 24px;text-align:center;border:1px solid var(--gray-100);transition:all 0.2s}
+    .team-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(15,42,63,0.08)}
+    .team-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--pine));color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 16px;font-family:'Playfair Display',serif}
+    .team-card h4{color:var(--navy);margin-bottom:4px;font-size:17px;font-family:'Playfair Display',serif}
+    .team-card .role{color:var(--pine);font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+    .team-card p{font-size:13px;color:var(--slate);line-height:1.5}
+    .campus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+    .campus-card{background:white;border-radius:12px;padding:28px 24px;border:1px solid var(--gray-100);transition:all 0.2s;text-align:center}
+    .campus-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(15,42,63,0.08);border-color:var(--pine)}
+    .campus-card .icon{font-size:36px;margin-bottom:14px}
+    .campus-card h3{color:var(--navy);font-size:16px;margin-bottom:8px;font-family:'Playfair Display',serif}
+    .campus-card p{font-size:13px;color:var(--slate);line-height:1.5}
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="container top-bar-content">
+      <div class="top-bar-left">
+        <span>📞 (+66) 043-XXX-XXXX</span>
+        <span class="hide-mobile">✉ info@suansonkk.com</span>
+      </div>
+      <div class="top-bar-right">
+        <a href="admissions.html" class="btn-register">Register Your Interest</a>
+        <span class="lang-switch">
+          <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a>
+          <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <img src="images/logo.png" alt="SKKS" />
+        <div class="logo-text"><strong>SKKS</strong><span>Suanson Khon Kaen School</span></div>
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html" class="active">About Us</a></li>
+        <li><a href="index.html#programs">Programs</a></li>
+        <li><a href="voices.html">Voices</a></li>
+        <li><a href="admissions.html">Admissions</a></li>
+        <li><a href="admissions.html" class="btn-cta">Apply Now</a></li>
+      </ul>
+      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    </div>
+  </nav>
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow">Get to Know Us</div>
+      <h1>About SKKS</h1>
+      <p>Our journey, our team, and our campus — what makes us unique</p>
+    </div>
+  </section>
+
+  <!-- VISION & MISSION -->
+  <section id="vision">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Foundation</div>
+        <div class="section-divider"></div>
+        <h2>Our Vision & Mission</h2>
+        <p>The principles that guide everything we do</p>
+      </div>
+      
+      <div class="programs-grid">
+        <div class="program-card">
+          <div class="icon">🎯</div>
+          <h3>Our Vision</h3>
+          <p>To be the leading bilingual school in Northeast Thailand, nurturing globally-minded students with strong values and academic excellence rooted in our unique Thai heritage.</p>
+        </div>
+        <div class="program-card">
+          <div class="icon">📚</div>
+          <h3>Our Mission</h3>
+          <p>Provide world-class education through Cambridge-certified curriculum, qualified teachers, and a nurturing environment that develops the whole child — academically, socially, and emotionally.</p>
+        </div>
+        <div class="program-card">
+          <div class="icon">💎</div>
+          <h3>Our Values</h3>
+          <p>Excellence · Integrity · Compassion · Innovation · Cultural respect · Lifelong learning · Community engagement · Sustainability</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR JOURNEY -->
+  <section id="journey" style="background:var(--cream);">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Heritage</div>
+        <div class="section-divider"></div>
+        <h2>Our Journey</h2>
+        <p>Milestones that shaped SKKS</p>
+      </div>
+      
+      <div class="journey-timeline">
+        <div class="timeline-item">
+          <div class="timeline-year">2011</div>
+          <h3>Foundation</h3>
+          <p>SKKS was founded with a vision to provide quality bilingual education in Khon Kaen — bringing world-class learning to Northeast Thailand.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2015</div>
+          <h3>English Program Launch</h3>
+          <p>Launched our flagship English Program for primary and secondary students, attracting families from across the region.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2018</div>
+          <h3>Cambridge Certification</h3>
+          <p>Received official Cambridge Assessment certification — a major milestone confirming our commitment to excellence.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2022</div>
+          <h3>MEP Expansion</h3>
+          <p>Expanded with the Mini English Program for students seeking balanced bilingual education with strong Thai cultural foundation.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-year">2026</div>
+          <h3>O-NET Perfect Score</h3>
+          <p>Our students achieved a record-breaking O-NET 100% perfect score in English — a historic achievement for our school.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR TEAM -->
+  <section id="team">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Leadership</div>
+        <div class="section-divider"></div>
+        <h2>Our Team</h2>
+        <p>Dedicated educators committed to your child's success</p>
+      </div>
+      
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar">DJ</div>
+          <h4>Dr. John Smith</h4>
+          <div class="role">School Director</div>
+          <p>Ph.D. in Education, 20+ years experience leading international schools across Southeast Asia.</p>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">SP</div>
+          <h4>Khun Somchai Phongchai</h4>
+          <div class="role">Head of Academic</div>
+          <p>M.Ed., Cambridge Certified Educator. Expert in bilingual curriculum design.</p>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">EM</div>
+          <h4>Ms. Emily Miller</h4>
+          <div class="role">EP Coordinator</div>
+          <p>B.Ed. (Hons), 10 years in EP curriculum management across Asia-Pacific.</p>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">NS</div>
+          <h4>Khun Niran Suwan</h4>
+          <div class="role">MEP Coordinator</div>
+          <p>M.A. Applied Linguistics, expert in Thai-English bilingual education.</p>
+        </div>
+      </div>
+      
+      <p style="text-align:center;margin-top:32px;color:var(--slate);font-size:13px;">
+        + 25 qualified teachers and supporting staff dedicated to excellence
+      </p>
+    </div>
+  </section>
+
+  <!-- OUR CAMPUS -->
+  <section id="campus" style="background:var(--cream);">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow">Facilities</div>
+        <div class="section-divider"></div>
+        <h2>Our Campus</h2>
+        <p>Modern facilities designed for inspired learning</p>
+      </div>
+      
+      <div class="campus-grid">
+        <div class="campus-card">
+          <div class="icon">🏫</div>
+          <h3>Modern Classrooms</h3>
+          <p>Air-conditioned classrooms equipped with smart boards and modern teaching technology.</p>
+        </div>
+        <div class="campus-card">
+          <div class="icon">🔬</div>
+          <h3>Science Labs</h3>
+          <p>Fully-equipped laboratories for hands-on experiments and scientific discovery.</p>
+        </div>
+        <div class="campus-card">
+          <div class="icon">📚</div>
+          <h3>Library</h3>
+          <p>Extensive collection of English and Thai books with quiet reading spaces.</p>
+        </div>
+        <div class="campus-card">
+          <div class="icon">⚽</div>
+          <h3>Sports Facilities</h3>
+          <p>Indoor gym, football field, swimming pool, and basketball courts.</p>
+        </div>
+        <div class="campus-card">
+          <div class="icon">🎨</div>
+          <h3>Art & Music Studios</h3>
+          <p>Dedicated spaces for creative expression and artistic exploration.</p>
+        </div>
+        <div class="campus-card">
+          <div class="icon">🍱</div>
+          <h3>Cafeteria</h3>
+          <p>Healthy, nutritious meals prepared daily under hygienic conditions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="admission-section" style="background:var(--navy);">
+    <div class="container">
+      <div style="text-align:center;color:white;max-width:700px;margin:0 auto;">
+        <div class="eyebrow" style="color:var(--gold-light);">Join our family</div>
+        <h2 style="color:white;">Ready to be part of our story?</h2>
+        <p style="opacity:0.9;font-size:16px;margin:14px 0 28px;">Visit our campus and see what makes SKKS special.</p>
+        <a href="admissions.html" class="btn btn-gold">📝 Apply Now</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="images/logo.png" alt="SKKS" />
+          <div class="name">SUANSON KHON KAEN SCHOOL</div>
+          <div class="tagline">โรงเรียนสวนสนขอนแก่น</div>
+          <p>📞 (+66) 043-XXX-XXXX</p>
+          <p style="margin-top:6px;">📍 Khon Kaen, Thailand</p>
+          <p style="margin-top:6px;">✉ info@suansonkk.com</p>
+        </div>
+        <div>
+          <h4>School</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="about.html#team">Our Team</a></li>
+            <li><a href="about.html#campus">Our Campus</a></li>
+            <li><a href="voices.html">Parent Voices</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#programs">Programs</a></li>
+            <li><a href="voices.html">FAQs</a></li>
+            <li><a href="admissions.html">Admissions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="login.html">Sign In</a></li>
+            <li><a href="login.html">Sign Up</a></li>
+            <li><a href="staff-invite.html">Staff Invite</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">© 2026 Suanson Khon Kaen School. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    function getLang(){return localStorage.getItem('skks_lang')||'en'}
+    function setLang(lang){
+      localStorage.setItem('skks_lang',lang);
+      document.querySelectorAll('.lang-switch a').forEach(a=>{a.classList.toggle('active',a.getAttribute('data-lang')===lang)});
+    }
+    function toggleMenu(){document.getElementById('navMenu').classList.toggle('show')}
+    setLang(getLang());
+  </script>
+</body>
+</html>

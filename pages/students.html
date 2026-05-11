@@ -1,166 +1,377 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>จัดการนักเรียน | SKKS Admin</title>
-  
+  <title>Students — SKKS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <link rel="stylesheet" href="../css/dashboard.css" />
-  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
   <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-<div class="dashboard-layout">
-  
-  <!-- ========= SIDEBAR ========= -->
-  <aside class="sidebar no-print" id="sidebar">
-    <div class="sidebar-header">
-      <a href="../index.html" class="logo">
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
         <img src="../images/logo.png" alt="SKKS" />
-        <div class="logo-text">
-          <strong>SKKS</strong>
-          <span>Admin Panel</span>
-        </div>
+        <h1>SKKS Admin</h1>
       </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html" class="active">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="finance.html" class="owner-only" style="display:none">💰 Finance</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
     </div>
-    
-    <nav class="sidebar-nav">
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Main</div>
-        <ul>
-          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
-          <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร <span class="badge">12</span></a></li>
-          <li><a href="#" class="active"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
-          <li><a href="#"><span class="icon">👨‍🏫</span> ครู / บุคลากร</a></li>
-        </ul>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">การเงิน</div>
-        <ul>
-          <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
-          <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
-          <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">รายงาน</div>
-        <ul>
-          <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
-          <li><a href="#"><span class="icon">🏆</span> ผลสอบ O-NET</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">อื่นๆ</div>
-        <ul>
-          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
-        </ul>
-      </div>
-    </nav>
-  </aside>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
   
-  <main class="main-content">
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
     
-    <!-- Toolbar -->
-    <div class="print-toolbar no-print">
-      <div class="print-toolbar-left">
-        <h3>👨‍🎓 จัดการนักเรียน</h3>
-        <span style="color:#6B7280;font-size:13px">ทั้งหมด <strong id="totalCount" style="color:#1E3A5F">524</strong> คน</span>
-      </div>
-      <div class="print-toolbar-actions">
-        <button class="toolbar-btn" onclick="exportCSV()">📥 Export CSV</button>
-        <button class="toolbar-btn" onclick="exportJSON()">💾 Export JSON</button>
-        <button class="toolbar-btn primary" onclick="window.print()">🖨️ พิมพ์ A4</button>
-      </div>
-    </div>
-    
-    <!-- Filter Bar -->
-    <div class="filter-bar no-print">
-      <label>หลักสูตร:</label>
-      <select id="filterProgram" onchange="renderClassrooms()">
-        <option value="">ทั้งหมด</option>
-        <option value="EP">English Program</option>
-        <option value="MEP">Mini English Program</option>
-      </select>
-      
-      <label>ระดับชั้น:</label>
-      <select id="filterGrade" onchange="renderClassrooms()">
-        <option value="">ทั้งหมด</option>
-        <option value="Pre-K">เตรียมอนุบาล</option>
-        <option value="K1">อนุบาล 1</option>
-        <option value="K2">อนุบาล 2</option>
-        <option value="K3">อนุบาล 3</option>
-        <option value="P1">ป.1</option>
-        <option value="P2">ป.2</option>
-        <option value="P3">ป.3</option>
-        <option value="P4">ป.4</option>
-        <option value="P5">ป.5</option>
-        <option value="P6">ป.6</option>
-        <option value="M1">ม.1</option>
-        <option value="M2">ม.2</option>
-        <option value="M3">ม.3</option>
-      </select>
-      
-      <label>ค้นหา:</label>
-      <input type="text" id="searchInput" placeholder="ชื่อนักเรียน..." oninput="renderClassrooms()" style="min-width:220px" />
-      
-      <span style="margin-left:auto;font-size:13px;color:#6B7280">
-        แสดง: <strong id="visibleCount" style="color:#1E3A5F">0</strong> ห้องเรียน
-      </span>
-    </div>
-    
-    <!-- Content -->
-    <div class="dashboard-content" style="padding-top:20px">
-      
-      <!-- Class Summary Cards (HTML) -->
-      <div class="stats-grid no-print">
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-card-icon blue">🏫</div>
-          </div>
-          <div class="stat-card-value" id="classCount">0</div>
-          <div class="stat-card-label">ห้องเรียนทั้งหมด</div>
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>🎓 Students</h2>
+          <p>Manage student records and information</p>
         </div>
-        
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-card-icon green">👦</div>
-          </div>
-          <div class="stat-card-value" id="maleCount">0</div>
-          <div class="stat-card-label">นักเรียนชาย</div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-card-icon pink">👧</div>
-          </div>
-          <div class="stat-card-value" id="femaleCount">0</div>
-          <div class="stat-card-label">นักเรียนหญิง</div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-card-icon yellow">📊</div>
-          </div>
-          <div class="stat-card-value" id="avgPerClass">0</div>
-          <div class="stat-card-label">เฉลี่ย/ห้อง</div>
-        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          ➕ Add Student
+        </button>
       </div>
       
-      <!-- Classrooms Container -->
-      <div id="classroomsContainer"></div>
-      
+      <div class="card">
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="🔍 Search by name, student number..." oninput="filterStudents()" />
+          <select id="filterProgram" onchange="filterStudents()">
+            <option value="">All Programs</option>
+            <option value="prek">Pre-K</option>
+            <option value="k">Kindergarten</option>
+            <option value="ep">EP (English Program)</option>
+            <option value="mep">MEP (Mini English Program)</option>
+          </select>
+          <select id="filterStatus" onchange="filterStudents()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="graduated">Graduated</option>
+            <option value="transferred">Transferred</option>
+          </select>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Student #</th>
+                <th>Name</th>
+                <th>Program</th>
+                <th>Grade</th>
+                <th>Classroom</th>
+                <th>Status</th>
+                <th>Enrollment</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentsList">
+              <tr><td colspan="8"><div class="loading-state">Loading students...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="studentCount" style="text-align:right; margin-top:12px; font-size:12px; color:#6B7280;"></div>
+      </div>
     </div>
-  </main>
-</div>
-
-<script src="../js/students.js"></script>
+  </div>
+  
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="studentModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">➕ Add Student</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      
+      <form id="studentForm" onsubmit="saveStudent(event)">
+        <input type="hidden" id="studentId" />
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Student Number <span class="req">*</span></label>
+            <input type="text" id="studentNumber" required placeholder="e.g., 26-EP-0001" />
+          </div>
+          
+          <div class="form-group">
+            <label>Status</label>
+            <select id="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="graduated">Graduated</option>
+              <option value="transferred">Transferred</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Program <span class="req">*</span></label>
+            <select id="program" required>
+              <option value="">Select...</option>
+              <option value="prek">Pre-K</option>
+              <option value="k">Kindergarten</option>
+              <option value="ep">EP (English Program)</option>
+              <option value="mep">MEP (Mini English Program)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Grade</label>
+            <input type="text" id="grade" placeholder="e.g., Grade 1, K1" />
+          </div>
+          
+          <div class="form-group">
+            <label>Classroom</label>
+            <input type="text" id="classroom" placeholder="e.g., EP/1A" />
+          </div>
+          
+          <div class="form-group">
+            <label>Enrollment Date</label>
+            <input type="date" id="enrollmentDate" />
+          </div>
+          
+          <div class="form-group">
+            <label>Birth Date</label>
+            <input type="date" id="birthDate" />
+          </div>
+          
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="gender">
+              <option value="">—</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Nationality</label>
+            <input type="text" id="nationality" value="Thai" />
+          </div>
+          
+          <div class="form-group full">
+            <label>Address</label>
+            <textarea id="address" rows="2" placeholder="Home address"></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    
+    let allStudents = [];
+    let currentProfile = null;
+    
+    async function init() {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+      currentProfile = profile;
+      
+      if (['owner', 'developer'].includes(profile.role)) {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      loadStudents();
+    }
+    
+    async function loadStudents() {
+      const { data, error } = await supabaseClient
+        .from('students')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        return;
+      }
+      
+      allStudents = data || [];
+      renderStudents(allStudents);
+    }
+    
+    function renderStudents(students) {
+      const tbody = document.getElementById('studentsList');
+      
+      if (!students || students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🎓</div><h4>No students yet</h4><p>Click "Add Student" to get started</p></div></td></tr>`;
+        document.getElementById('studentCount').textContent = '';
+        return;
+      }
+      
+      tbody.innerHTML = students.map(s => `
+        <tr>
+          <td><strong>${s.student_number || '—'}</strong></td>
+          <td>${s.profile_id ? '<em>(linked)</em>' : '<span style="color:#9CA3AF;">Not linked</span>'}</td>
+          <td><span style="text-transform:uppercase; font-size:11px; font-weight:600; color:#5BB8E0;">${s.program || '—'}</span></td>
+          <td>${s.grade || '—'}</td>
+          <td>${s.classroom || '—'}</td>
+          <td>${dataHelpers.statusBadge(s.status)}</td>
+          <td style="font-size:12px; color:#6B7280;">${dataHelpers.formatDate(s.enrollment_date)}</td>
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-secondary" onclick="editStudent('${s.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}', '${s.student_number}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('studentCount').textContent = `${students.length} student(s)`;
+    }
+    
+    function filterStudents() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const program = document.getElementById('filterProgram').value;
+      const status = document.getElementById('filterStatus').value;
+      
+      const filtered = allStudents.filter(s => {
+        const matchSearch = !search || 
+          (s.student_number || '').toLowerCase().includes(search) ||
+          (s.grade || '').toLowerCase().includes(search) ||
+          (s.classroom || '').toLowerCase().includes(search);
+        const matchProgram = !program || s.program === program;
+        const matchStatus = !status || s.status === status;
+        return matchSearch && matchProgram && matchStatus;
+      });
+      
+      renderStudents(filtered);
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '➕ Add Student';
+      document.getElementById('studentId').value = '';
+      document.getElementById('studentForm').reset();
+      document.getElementById('nationality').value = 'Thai';
+      document.getElementById('status').value = 'active';
+      
+      // Suggest student number
+      const yr = new Date().getFullYear().toString().slice(-2);
+      const seq = String(allStudents.length + 1).padStart(4, '0');
+      document.getElementById('studentNumber').value = `${yr}-EP-${seq}`;
+      
+      document.getElementById('studentModal').classList.add('show');
+    }
+    
+    function editStudent(id) {
+      const s = allStudents.find(x => x.id === id);
+      if (!s) return;
+      
+      document.getElementById('modalTitle').textContent = '✏️ Edit Student';
+      document.getElementById('studentId').value = s.id;
+      document.getElementById('studentNumber').value = s.student_number || '';
+      document.getElementById('program').value = s.program || '';
+      document.getElementById('grade').value = s.grade || '';
+      document.getElementById('classroom').value = s.classroom || '';
+      document.getElementById('status').value = s.status || 'active';
+      document.getElementById('enrollmentDate').value = s.enrollment_date || '';
+      document.getElementById('birthDate').value = s.birth_date || '';
+      document.getElementById('gender').value = s.gender || '';
+      document.getElementById('nationality').value = s.nationality || 'Thai';
+      document.getElementById('address').value = s.address || '';
+      
+      document.getElementById('studentModal').classList.add('show');
+    }
+    
+    function closeModal() {
+      document.getElementById('studentModal').classList.remove('show');
+    }
+    
+    async function saveStudent(event) {
+      event.preventDefault();
+      const id = document.getElementById('studentId').value;
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      const studentData = {
+        student_number: document.getElementById('studentNumber').value.trim(),
+        program: document.getElementById('program').value,
+        grade: document.getElementById('grade').value.trim() || null,
+        classroom: document.getElementById('classroom').value.trim() || null,
+        status: document.getElementById('status').value,
+        enrollment_date: document.getElementById('enrollmentDate').value || null,
+        birth_date: document.getElementById('birthDate').value || null,
+        gender: document.getElementById('gender').value || null,
+        nationality: document.getElementById('nationality').value.trim() || 'Thai',
+        address: document.getElementById('address').value.trim() || null
+      };
+      
+      let result;
+      if (id) {
+        result = await supabaseClient.from('students').update(studentData).eq('id', id);
+      } else {
+        result = await supabaseClient.from('students').insert(studentData);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '💾 Save Student';
+      
+      if (result.error) {
+        dataHelpers.toast('❌ ' + result.error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(id ? '✅ Student updated!' : '✅ Student added!', 'success');
+      closeModal();
+      loadStudents();
+    }
+    
+    async function deleteStudent(id, number) {
+      const confirmed = await dataHelpers.confirm(
+        `Are you sure you want to delete student "${number}"? This cannot be undone.`,
+        { title: '⚠️ Delete Student', confirmText: 'Delete', danger: true }
+      );
+      if (!confirmed) return;
+      
+      const { error } = await supabaseClient.from('students').delete().eq('id', id);
+      
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast('✅ Student deleted', 'success');
+      loadStudents();
+    }
+    
+    setLang(getLang());
+    init();
+  </script>
 </body>
 </html>

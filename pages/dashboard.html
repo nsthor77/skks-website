@@ -1,313 +1,329 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard | SKKS Admin</title>
-  
+  <title>Dashboard — SKKS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
   <link rel="icon" type="image/png" href="../images/logo.png" />
-  
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-  <div class="dashboard-layout">
-    
-    <!-- ========= SIDEBAR ========= -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <a href="../index.html" class="logo">
-          <img src="../images/logo.png" alt="SKKS" />
-          <div class="logo-text">
-            <strong>SKKS</strong>
-            <span>Admin Panel</span>
-          </div>
-        </a>
-      </div>
-      
-      <nav class="sidebar-nav">
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">Main</div>
-          <ul>
-            <li><a href="#" class="active"><span class="icon">📊</span> Dashboard</a></li>
-            <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร <span class="badge">12</span></a></li>
-            <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
-            <li><a href="#"><span class="icon">👨‍🏫</span> ครู / บุคลากร</a></li>
-          </ul>
-        </div>
-        
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">การเงิน</div>
-          <ul>
-            <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
-            <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
-            <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
-          </ul>
-        </div>
-        
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">รายงาน</div>
-          <ul>
-            <li><a href="reports.html"><span class="icon">📄</span> รายงาน A4</a></li>
-            <li><a href="#"><span class="icon">🏆</span> ผลสอบ O-NET</a></li>
-            <li><a href="#"><span class="icon">📅</span> ตารางสอน</a></li>
-          </ul>
-        </div>
-        
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">อื่นๆ</div>
-          <ul>
-            <li><a href="#"><span class="icon">📢</span> ประกาศ</a></li>
-            <li><a href="#"><span class="icon">⚙</span> ตั้งค่า</a></li>
-            <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
-          </ul>
-        </div>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html" class="active" data-i18n="nav.dashboard">📊 Dashboard</a>
+        <a href="students.html" data-i18n="nav.students">🎓 Students</a>
+        <a href="applications.html" data-i18n="nav.applications">📝 Applications</a>
+        <a href="payments.html" data-i18n="nav.payments">💳 Payments</a>
+        <a href="finance.html" class="owner-only" style="display:none" data-i18n="nav.finance">💰 Finance</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none" data-i18n="nav.invites">🎟️ Invites</a>
       </nav>
-    </aside>
-    
-    <!-- ========= MAIN ========= -->
-    <main class="main-content">
-      
-      <!-- Top bar -->
-      <div class="dashboard-topbar">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" placeholder="ค้นหานักเรียน, ใบสมัคร, รายการ..." />
-        </div>
-        
-        <div class="topbar-actions">
-          <button class="topbar-icon-btn" aria-label="Notifications">
-            🔔
-            <span class="badge-dot"></span>
-          </button>
-          <button class="topbar-icon-btn" aria-label="Messages">💬</button>
-          <div class="user-profile">
-            <div class="user-avatar">AD</div>
-            <div class="user-info">
-              <strong>Admin SKKS</strong>
-              <span>ผู้บริหาร</span>
-            </div>
-          </div>
-        </div>
+    </div>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      
-      <!-- Content -->
-      <div class="dashboard-content">
-        
-        <!-- Header -->
-        <div class="dashboard-header">
-          <div>
-            <h1>👋 สวัสดี, ผู้บริหาร</h1>
-            <p>ภาพรวมโรงเรียน ณ วันที่ <span id="todayDate"></span></p>
-          </div>
-          
-          <div class="date-range">
-            <button>วันนี้</button>
-            <button>สัปดาห์</button>
-            <button class="active">เดือนนี้</button>
-            <button>ปี</button>
-          </div>
-        </div>
-        
-        <!-- Quick Action Shortcuts -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px">
-          <a href="applications.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
-            <div style="width:44px;height:44px;border-radius:10px;background:#E9D5FF;color:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:22px">📝</div>
-            <div>
-              <strong style="display:block;color:#1E3A5F;font-size:14px">ใบสมัคร</strong>
-              <span style="color:#6B7280;font-size:12px">28 ใบสมัคร</span>
-            </div>
-          </a>
-          
-          <a href="students.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
-            <div style="width:44px;height:44px;border-radius:10px;background:#DBEAFE;color:#2563EB;display:flex;align-items:center;justify-content:center;font-size:22px">👨‍🎓</div>
-            <div>
-              <strong style="display:block;color:#1E3A5F;font-size:14px">นักเรียน</strong>
-              <span style="color:#6B7280;font-size:12px">524 คน • 25 ห้อง</span>
-            </div>
-          </a>
-          
-          <a href="finance.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
-            <div style="width:44px;height:44px;border-radius:10px;background:#DCFCE7;color:#16A34A;display:flex;align-items:center;justify-content:center;font-size:22px">💰</div>
-            <div>
-              <strong style="display:block;color:#1E3A5F;font-size:14px">การเงิน</strong>
-              <span style="color:#6B7280;font-size:12px">2.4M บาท</span>
-            </div>
-          </a>
-          
-          <a href="reports.html" style="text-decoration:none;background:white;padding:16px;border-radius:12px;border:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;transition:all 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(30,58,95,0.1)';this.style.borderColor='#5BB8E0'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='#E5E7EB'">
-            <div style="width:44px;height:44px;border-radius:10px;background:#FEF3C7;color:#D97706;display:flex;align-items:center;justify-content:center;font-size:22px">📄</div>
-            <div>
-              <strong style="display:block;color:#1E3A5F;font-size:14px">รายงาน A4</strong>
-              <span style="color:#6B7280;font-size:12px">พิมพ์เอกสารสำหรับผู้บริหาร</span>
-            </div>
-          </a>
-        </div>
-        
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon blue">👨‍🎓</div>
-              <div class="stat-card-trend up">↑ 12.5%</div>
-            </div>
-            <div class="stat-card-value">524</div>
-            <div class="stat-card-label">นักเรียนทั้งหมด</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon green">📝</div>
-              <div class="stat-card-trend up">↑ 8.3%</div>
-            </div>
-            <div class="stat-card-value">42</div>
-            <div class="stat-card-label">ใบสมัครใหม่ (เดือนนี้)</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon yellow">💰</div>
-              <div class="stat-card-trend up">↑ 18.2%</div>
-            </div>
-            <div class="stat-card-value">2.4M</div>
-            <div class="stat-card-label">รายได้รวม (บาท)</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-card-icon pink">🏆</div>
-              <div class="stat-card-trend up">↑ 5.1%</div>
-            </div>
-            <div class="stat-card-value">87.5</div>
-            <div class="stat-card-label">คะแนน O-NET เฉลี่ย</div>
-          </div>
-        </div>
-        
-        <!-- Charts -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div>
-                <h3 class="chart-card-title">ยอดสมัครและรายได้</h3>
-                <p class="chart-card-subtitle">เปรียบเทียบ 6 เดือนล่าสุด</p>
-              </div>
-              <div class="chart-tabs">
-                <button class="chart-tab active">ทั้งหมด</button>
-                <button class="chart-tab">EP</button>
-                <button class="chart-tab">MEP</button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="enrollmentChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div>
-                <h3 class="chart-card-title">นักเรียนแยกตามหลักสูตร</h3>
-                <p class="chart-card-subtitle">ปีการศึกษา 2569</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="programChart"></canvas>
-            </div>
-          </div>
-        </div>
-        
-        <!-- More Charts -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div>
-                <h3 class="chart-card-title">ผล O-NET ปี 2568 แยกตามวิชา</h3>
-                <p class="chart-card-subtitle">คะแนนเฉลี่ยของโรงเรียนเทียบกับประเทศ</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="onetChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div>
-                <h3 class="chart-card-title">การชำระเงิน</h3>
-                <p class="chart-card-subtitle">สถานะของการชำระเดือนนี้</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="paymentChart"></canvas>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Recent Applications Table -->
-        <div class="table-card" style="margin-top: 24px">
-          <div class="table-header">
-            <div>
-              <h3 class="chart-card-title">ใบสมัครล่าสุด</h3>
-              <p class="chart-card-subtitle">รายการ 5 ใบสมัครล่าสุดที่ส่งเข้ามา</p>
-            </div>
-            <button class="btn btn-primary" style="padding: 10px 20px; font-size: 14px">ดูทั้งหมด →</button>
-          </div>
-          <div class="table-wrapper">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>นักเรียน</th>
-                  <th>หลักสูตร</th>
-                  <th>ระดับชั้น</th>
-                  <th>วันที่สมัคร</th>
-                  <th>สถานะ</th>
-                  <th>การชำระ</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="applicationsTable">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <!-- Top Students -->
-        <div class="table-card" style="margin-top: 24px">
-          <div class="table-header">
-            <div>
-              <h3 class="chart-card-title">🏆 นักเรียนคะแนน O-NET สูงสุด</h3>
-              <p class="chart-card-subtitle">Top 10 ของปีการศึกษา 2568</p>
-            </div>
-          </div>
-          <div class="table-wrapper">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>อันดับ</th>
-                  <th>นักเรียน</th>
-                  <th>ระดับชั้น</th>
-                  <th>วิชา</th>
-                  <th>คะแนน</th>
-                  <th>สถานะ</th>
-                </tr>
-              </thead>
-              <tbody id="topStudentsTable">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
+      <div class="user-chip">
+        <span id="userName">Loading...</span>
+        <div class="avatar" id="userAvatar">?</div>
       </div>
-    </main>
-    
+      <button class="btn-logout" onclick="auth.logout()" data-i18n="topbar.logout">Sign Out</button>
+    </div>
   </div>
   
-  <script src="../js/dashboard.js"></script>
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading dashboard...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2 data-i18n="dashboard.title">Dashboard</h2>
+          <p id="welcomeMsg">Welcome back!</p>
+        </div>
+        <div>
+          <span class="user-chip">
+            <span data-i18n="dashboard.role">Your role:</span>
+            <span id="userRole" style="font-weight:700;">—</span>
+          </span>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="label" data-i18n="stat.students">Total Students</div>
+          <div class="value" id="statStudents">—</div>
+          <div class="sub" data-i18n="stat.students_sub">Active enrollments</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="label" data-i18n="stat.applications">Pending Applications</div>
+          <div class="value" id="statApplications">—</div>
+          <div class="sub" data-i18n="stat.applications_sub">Awaiting review</div>
+        </div>
+        <div class="stat-card green owner-only" style="display:none">
+          <div class="label" data-i18n="stat.revenue">This Month's Revenue</div>
+          <div class="value" id="statRevenue">—</div>
+          <div class="sub" data-i18n="stat.revenue_sub">Payments received</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label" data-i18n="stat.users">Total Users</div>
+          <div class="value" id="statUsers">—</div>
+          <div class="sub" data-i18n="stat.users_sub">All accounts</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3 data-i18n="dashboard.quickActions">⚡ Quick Actions</h3>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <a href="students.html" class="btn btn-secondary" style="justify-content:flex-start; padding:18px;">
+            <span style="font-size:24px;">🎓</span>
+            <div style="text-align:left; line-height:1.3;">
+              <div style="font-weight:700;" data-i18n="action.manage_students">Manage Students</div>
+              <div style="font-size:11px; opacity:0.7;" data-i18n="action.manage_students_sub">Add, edit, view</div>
+            </div>
+          </a>
+          <a href="applications.html" class="btn btn-secondary" style="justify-content:flex-start; padding:18px;">
+            <span style="font-size:24px;">📝</span>
+            <div style="text-align:left; line-height:1.3;">
+              <div style="font-weight:700;" data-i18n="action.review_apps">Review Applications</div>
+              <div style="font-size:11px; opacity:0.7;" data-i18n="action.review_apps_sub">Pending decisions</div>
+            </div>
+          </a>
+          <a href="payments.html" class="btn btn-secondary" style="justify-content:flex-start; padding:18px;">
+            <span style="font-size:24px;">💳</span>
+            <div style="text-align:left; line-height:1.3;">
+              <div style="font-weight:700;" data-i18n="action.record_payment">Record Payment</div>
+              <div style="font-size:11px; opacity:0.7;" data-i18n="action.record_payment_sub">New transaction</div>
+            </div>
+          </a>
+          <a href="manage-invites.html" class="btn btn-secondary owner-only" style="display:none; justify-content:flex-start; padding:18px;">
+            <span style="font-size:24px;">🎟️</span>
+            <div style="text-align:left; line-height:1.3;">
+              <div style="font-weight:700;" data-i18n="action.invites">Invite Codes</div>
+              <div style="font-size:11px; opacity:0.7;" data-i18n="action.invites_sub">Add staff</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:20px;">
+        <div class="card">
+          <div class="card-header">
+            <h3 data-i18n="dashboard.recent_apps">📋 Recent Applications</h3>
+            <a href="applications.html" class="btn btn-sm btn-secondary" data-i18n="action.view_all">View All →</a>
+          </div>
+          <div id="recentApps">
+            <div class="loading-state">Loading...</div>
+          </div>
+        </div>
+        
+        <div class="card owner-only" style="display:none">
+          <div class="card-header">
+            <h3 data-i18n="dashboard.recent_payments">💳 Recent Payments</h3>
+            <a href="payments.html" class="btn btn-sm btn-secondary" data-i18n="action.view_all">View All →</a>
+          </div>
+          <div id="recentPayments">
+            <div class="loading-state">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    const t = {
+      en: {
+        'topbar.logout': 'Sign Out',
+        'nav.dashboard': '📊 Dashboard',
+        'nav.students': '🎓 Students',
+        'nav.applications': '📝 Applications',
+        'nav.payments': '💳 Payments',
+        'nav.finance': '💰 Finance',
+        'nav.invites': '🎟️ Invites',
+        'dashboard.title': 'Dashboard',
+        'dashboard.role': 'Your role:',
+        'dashboard.quickActions': '⚡ Quick Actions',
+        'dashboard.recent_apps': '📋 Recent Applications',
+        'dashboard.recent_payments': '💳 Recent Payments',
+        'stat.students': 'Total Students',
+        'stat.students_sub': 'Active enrollments',
+        'stat.applications': 'Pending Applications',
+        'stat.applications_sub': 'Awaiting review',
+        'stat.revenue': "This Month's Revenue",
+        'stat.revenue_sub': 'Payments received',
+        'stat.users': 'Total Users',
+        'stat.users_sub': 'All accounts',
+        'action.manage_students': 'Manage Students',
+        'action.manage_students_sub': 'Add, edit, view',
+        'action.review_apps': 'Review Applications',
+        'action.review_apps_sub': 'Pending decisions',
+        'action.record_payment': 'Record Payment',
+        'action.record_payment_sub': 'New transaction',
+        'action.invites': 'Invite Codes',
+        'action.invites_sub': 'Add staff',
+        'action.view_all': 'View All →',
+        'empty.apps': 'No applications yet',
+        'empty.payments': 'No payments yet'
+      },
+      th: {
+        'topbar.logout': 'ออกจากระบบ',
+        'nav.dashboard': '📊 หน้าหลัก',
+        'nav.students': '🎓 นักเรียน',
+        'nav.applications': '📝 ใบสมัคร',
+        'nav.payments': '💳 การชำระเงิน',
+        'nav.finance': '💰 การเงิน',
+        'nav.invites': '🎟️ Invite Codes',
+        'dashboard.title': 'หน้าหลัก',
+        'dashboard.role': 'สิทธิ์:',
+        'dashboard.quickActions': '⚡ ทางลัด',
+        'dashboard.recent_apps': '📋 ใบสมัครล่าสุด',
+        'dashboard.recent_payments': '💳 การชำระเงินล่าสุด',
+        'stat.students': 'นักเรียนทั้งหมด',
+        'stat.students_sub': 'กำลังเรียน',
+        'stat.applications': 'ใบสมัครรอตรวจ',
+        'stat.applications_sub': 'รอการอนุมัติ',
+        'stat.revenue': 'รายรับเดือนนี้',
+        'stat.revenue_sub': 'ยอดเงินรับ',
+        'stat.users': 'ผู้ใช้ทั้งหมด',
+        'stat.users_sub': 'บัญชีในระบบ',
+        'action.manage_students': 'จัดการนักเรียน',
+        'action.manage_students_sub': 'เพิ่ม/แก้/ดู',
+        'action.review_apps': 'ตรวจใบสมัคร',
+        'action.review_apps_sub': 'รอตัดสินใจ',
+        'action.record_payment': 'บันทึกชำระเงิน',
+        'action.record_payment_sub': 'รายการใหม่',
+        'action.invites': 'Invite Codes',
+        'action.invites_sub': 'เพิ่มพนักงาน',
+        'action.view_all': 'ดูทั้งหมด →',
+        'empty.apps': 'ยังไม่มีใบสมัคร',
+        'empty.payments': 'ยังไม่มีการชำระเงิน'
+      }
+    };
+    
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[lang][key]) el.innerHTML = t[lang][key];
+      });
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    function getText(key) { return t[getLang()][key] || key; }
+    
+    let currentProfile = null;
+    
+    async function loadDashboard() {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+      currentProfile = profile;
+      
+      const initials = (profile.first_name?.[0] || '') + (profile.last_name?.[0] || '');
+      document.getElementById('userAvatar').textContent = initials.toUpperCase() || '?';
+      document.getElementById('userName').textContent = profile.first_name + ' ' + profile.last_name;
+      document.getElementById('userRole').textContent = dataHelpers.roleLabel(profile.role);
+      document.getElementById('welcomeMsg').textContent = 
+        getLang() === 'th' 
+          ? `ยินดีต้อนรับกลับมา ${profile.first_name}!`
+          : `Welcome back, ${profile.first_name}!`;
+      
+      if (['owner', 'developer'].includes(profile.role)) {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      loadStats();
+      loadRecentApplications();
+      
+      if (['owner', 'developer'].includes(profile.role)) {
+        loadRecentPayments();
+      }
+    }
+    
+    async function loadStats() {
+      const stats = await dataHelpers.getStats();
+      document.getElementById('statStudents').textContent = stats.students || 0;
+      document.getElementById('statApplications').textContent = stats.pendingApplications || 0;
+      document.getElementById('statRevenue').textContent = dataHelpers.formatMoney(stats.monthlyRevenue);
+      document.getElementById('statUsers').textContent = stats.users || 0;
+    }
+    
+    async function loadRecentApplications() {
+      const { data } = await supabaseClient
+        .from('applications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      const container = document.getElementById('recentApps');
+      if (!data || data.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>${getText('empty.apps')}</p></div>`;
+        return;
+      }
+      
+      container.innerHTML = `
+        <table class="data-table">
+          <tbody>
+            ${data.map(a => `
+              <tr>
+                <td><strong>${a.application_number}</strong><br><span style="font-size:11px; color:#6B7280;">${a.student_first_name} ${a.student_last_name}</span></td>
+                <td style="text-align:right;">${dataHelpers.statusBadge(a.status)}<br><span style="font-size:11px; color:#9CA3AF;">${dataHelpers.formatDate(a.created_at)}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    async function loadRecentPayments() {
+      const { data } = await supabaseClient
+        .from('payments')
+        .select('*, students(student_number)')
+        .order('paid_at', { ascending: false })
+        .limit(5);
+      
+      const container = document.getElementById('recentPayments');
+      if (!data || data.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="icon">💳</div><p>${getText('empty.payments')}</p></div>`;
+        return;
+      }
+      
+      container.innerHTML = `
+        <table class="data-table">
+          <tbody>
+            ${data.map(p => `
+              <tr>
+                <td><strong>${p.receipt_number}</strong><br><span style="font-size:11px; color:#6B7280;">${p.payment_type}</span></td>
+                <td style="text-align:right;"><strong>${dataHelpers.formatMoney(p.amount)}</strong><br><span style="font-size:11px; color:#9CA3AF;">${dataHelpers.formatDate(p.paid_at)}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    setLang(getLang());
+    loadDashboard();
+  </script>
 </body>
 </html>

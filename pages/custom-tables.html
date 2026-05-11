@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Tables — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <style>
+    .table-card {
+      padding: 18px; background: white; border-radius: 14px;
+      border: 2px solid #E5E7EB; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .table-card:hover { border-color: #5BB8E0; transform: translateY(-2px); }
+    .table-card.active { border-color: #5BB8E0; background: #F0F9FF; }
+    .table-card h4 { margin: 0 0 4px 0; font-size: 15px; color: #1E3A5F; }
+    .table-card p { margin: 0; font-size: 12px; color: #6B7280; }
+    .table-card .table-stats { margin-top: 8px; font-size: 11px; color: #5BB8E0; font-weight: 600; }
+    
+    .column-row {
+      display: grid; grid-template-columns: 2fr 1.5fr 1fr 60px;
+      gap: 8px; align-items: center; padding: 8px 0;
+      border-bottom: 1px solid #F3F4F6;
+    }
+    .column-row:last-child { border-bottom: none; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html">💰 Finance</a>
+        <a href="custom-tables.html" class="active">🗂️ Custom</a>
+        <a href="users.html">👥 Users</a>
+        <a href="manage-invites.html">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
+      </div>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+  
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>🗂️ Custom Tables</h2>
+          <p>Create your own data tables — teachers, equipment, vehicles, anything!</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateTableModal()">
+          ➕ New Table
+        </button>
+      </div>
+      
+      <!-- ALL CUSTOM TABLES -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📚 Your Tables</h3>
+        </div>
+        
+        <div id="tablesList" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+          <div class="loading-state">Loading...</div>
+        </div>
+      </div>
+      
+      <!-- SELECTED TABLE DATA -->
+      <div class="card" id="dataCard" style="display:none;">
+        <div class="card-header">
+          <h3>📋 <span id="selectedTableName">—</span></h3>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-sm btn-secondary" onclick="editTableStructure()">⚙️ Edit Structure</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteTable()">🗑️ Delete Table</button>
+            <button class="btn btn-primary" onclick="openCreateRowModal()">➕ Add Row</button>
+          </div>
+        </div>
+        
+        <p id="selectedTableDesc" style="color:#6B7280; font-size:13px; margin:0 0 16px 0;">—</p>
+        
+        <div class="table-wrapper">
+          <table class="data-table" id="rowsTable">
+            <thead id="rowsHead"></thead>
+            <tbody id="rowsBody"></tbody>
+          </table>
+        </div>
+        
+        <div id="rowCount" style="text-align:right; margin-top:12px; font-size:12px; color:#6B7280;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- CREATE/EDIT TABLE MODAL -->
+  <div class="modal-overlay" id="tableModal">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <h3 id="tableModalTitle">➕ New Table</h3>
+        <button class="modal-close" onclick="closeTableModal()">×</button>
+      </div>
+      
+      <form id="tableForm" onsubmit="saveTable(event)">
+        <input type="hidden" id="tableId" />
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Table Name <span class="req">*</span></label>
+            <input type="text" id="tableName" required placeholder="e.g., teachers, equipment" />
+          </div>
+          <div class="form-group">
+            <label>Icon</label>
+            <input type="text" id="tableIcon" placeholder="🧑‍🏫" maxlength="2" />
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <input type="text" id="tableDesc" placeholder="What is this table for?" />
+          </div>
+        </div>
+        
+        <h4 style="margin:20px 0 10px 0; color:#5BB8E0; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">📋 Columns</h4>
+        
+        <div id="columnsList">
+          <!-- Columns will be added dynamically -->
+        </div>
+        
+        <button type="button" class="btn btn-secondary btn-sm" onclick="addColumn()" style="margin-top:8px;">
+          ➕ Add Column
+        </button>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeTableModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveTableBtn">💾 Save Table</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- ADD/EDIT ROW MODAL -->
+  <div class="modal-overlay" id="rowModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="rowModalTitle">➕ Add Row</h3>
+        <button class="modal-close" onclick="closeRowModal()">×</button>
+      </div>
+      
+      <form id="rowForm" onsubmit="saveRow(event)">
+        <input type="hidden" id="rowId" />
+        
+        <div id="rowFormFields" class="form-grid"></div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeRowModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveRowBtn">💾 Save Row</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    
+    let allTables = [];
+    let selectedTable = null;
+    let selectedRows = [];
+    let currentProfile = null;
+    
+    async function init() {
+      const profile = await roleGuard.requireOwner();
+      if (!profile) return;
+      currentProfile = profile;
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      loadTables();
+    }
+    
+    async function loadTables() {
+      const { data, error } = await supabaseClient
+        .from('custom_tables')
+        .select('*, custom_table_rows(count)')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        return;
+      }
+      
+      allTables = data || [];
+      renderTables();
+    }
+    
+    function renderTables() {
+      const container = document.getElementById('tablesList');
+      
+      if (!allTables || allTables.length === 0) {
+        container.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="icon">🗂️</div><h4>No custom tables yet</h4><p>Click "New Table" to create your first one</p></div>`;
+        return;
+      }
+      
+      container.innerHTML = allTables.map(t => `
+        <div class="table-card ${selectedTable?.id === t.id ? 'active' : ''}" onclick="selectTable('${t.id}')">
+          <div style="font-size:24px;">${t.icon || '📋'}</div>
+          <h4>${t.name}</h4>
+          <p>${t.description || 'No description'}</p>
+          <div class="table-stats">${(t.columns || []).length} columns • ${t.custom_table_rows?.[0]?.count || 0} rows</div>
+        </div>
+      `).join('');
+    }
+    
+    async function selectTable(id) {
+      selectedTable = allTables.find(t => t.id === id);
+      if (!selectedTable) return;
+      
+      renderTables();
+      
+      document.getElementById('dataCard').style.display = 'block';
+      document.getElementById('selectedTableName').textContent = `${selectedTable.icon || '📋'} ${selectedTable.name}`;
+      document.getElementById('selectedTableDesc').textContent = selectedTable.description || '—';
+      
+      await loadRows();
+    }
+    
+    async function loadRows() {
+      const { data } = await supabaseClient
+        .from('custom_table_rows')
+        .select('*')
+        .eq('table_id', selectedTable.id)
+        .order('created_at', { ascending: false });
+      
+      selectedRows = data || [];
+      renderRows();
+    }
+    
+    function renderRows() {
+      const head = document.getElementById('rowsHead');
+      const body = document.getElementById('rowsBody');
+      const cols = selectedTable.columns || [];
+      
+      head.innerHTML = `<tr>${cols.map(c => `<th>${c.label}</th>`).join('')}<th style="text-align:right;">Actions</th></tr>`;
+      
+      if (selectedRows.length === 0) {
+        body.innerHTML = `<tr><td colspan="${cols.length + 1}"><div class="empty-state"><div class="icon">📋</div><p>No rows yet. Click "Add Row" to start.</p></div></td></tr>`;
+        document.getElementById('rowCount').textContent = '';
+        return;
+      }
+      
+      body.innerHTML = selectedRows.map(r => `
+        <tr>
+          ${cols.map(c => `<td>${formatCellValue(r.data?.[c.key], c.type)}</td>`).join('')}
+          <td class="actions-cell">
+            <button class="btn btn-sm btn-secondary" onclick="editRow('${r.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteRow('${r.id}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('rowCount').textContent = `${selectedRows.length} row(s)`;
+    }
+    
+    function formatCellValue(val, type) {
+      if (val === null || val === undefined || val === '') return '—';
+      if (type === 'number') return Number(val).toLocaleString();
+      if (type === 'date') return dataHelpers.formatDate(val);
+      if (type === 'boolean') return val ? '✅' : '❌';
+      return String(val);
+    }
+    
+    // ========== TABLE STRUCTURE MODAL ==========
+    function openCreateTableModal() {
+      document.getElementById('tableModalTitle').textContent = '➕ New Table';
+      document.getElementById('tableId').value = '';
+      document.getElementById('tableForm').reset();
+      document.getElementById('columnsList').innerHTML = '';
+      addColumn(); // start with one column
+      document.getElementById('tableModal').classList.add('show');
+    }
+    
+    function editTableStructure() {
+      if (!selectedTable) return;
+      
+      document.getElementById('tableModalTitle').textContent = '⚙️ Edit Table Structure';
+      document.getElementById('tableId').value = selectedTable.id;
+      document.getElementById('tableName').value = selectedTable.name;
+      document.getElementById('tableIcon').value = selectedTable.icon || '';
+      document.getElementById('tableDesc').value = selectedTable.description || '';
+      
+      document.getElementById('columnsList').innerHTML = '';
+      (selectedTable.columns || []).forEach(c => addColumn(c));
+      
+      document.getElementById('tableModal').classList.add('show');
+    }
+    
+    function closeTableModal() {
+      document.getElementById('tableModal').classList.remove('show');
+    }
+    
+    let colCounter = 0;
+    function addColumn(existing = null) {
+      colCounter++;
+      const div = document.createElement('div');
+      div.className = 'column-row';
+      div.dataset.colId = colCounter;
+      div.innerHTML = `
+        <input type="text" placeholder="Column label" value="${existing?.label || ''}" class="col-label" required style="padding:8px; border:1.5px solid #E5E7EB; border-radius:8px; font-size:13px;" />
+        <input type="text" placeholder="Key (no spaces)" value="${existing?.key || ''}" class="col-key" required pattern="[a-z_][a-z0-9_]*" style="padding:8px; border:1.5px solid #E5E7EB; border-radius:8px; font-size:13px; font-family:monospace;" />
+        <select class="col-type" style="padding:8px; border:1.5px solid #E5E7EB; border-radius:8px; font-size:13px;">
+          <option value="text" ${existing?.type === 'text' ? 'selected' : ''}>Text</option>
+          <option value="number" ${existing?.type === 'number' ? 'selected' : ''}>Number</option>
+          <option value="date" ${existing?.type === 'date' ? 'selected' : ''}>Date</option>
+          <option value="boolean" ${existing?.type === 'boolean' ? 'selected' : ''}>Yes/No</option>
+          <option value="textarea" ${existing?.type === 'textarea' ? 'selected' : ''}>Long Text</option>
+        </select>
+        <button type="button" onclick="this.parentElement.remove()" style="padding:6px 10px; background:#FEE2E2; color:#991B1B; border:none; border-radius:8px; cursor:pointer; font-size:14px;">×</button>
+      `;
+      document.getElementById('columnsList').appendChild(div);
+      
+      // Auto-generate key from label
+      const labelInput = div.querySelector('.col-label');
+      const keyInput = div.querySelector('.col-key');
+      labelInput.oninput = () => {
+        if (!keyInput.value || keyInput.dataset.auto === 'true') {
+          keyInput.value = labelInput.value.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_|_$/g, '');
+          keyInput.dataset.auto = 'true';
+        }
+      };
+      keyInput.oninput = () => { keyInput.dataset.auto = 'false'; };
+    }
+    
+    async function saveTable(event) {
+      event.preventDefault();
+      const id = document.getElementById('tableId').value;
+      const btn = document.getElementById('saveTableBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      // Gather columns
+      const cols = [];
+      document.querySelectorAll('#columnsList .column-row').forEach(row => {
+        const label = row.querySelector('.col-label').value.trim();
+        const key = row.querySelector('.col-key').value.trim();
+        const type = row.querySelector('.col-type').value;
+        if (label && key) cols.push({ label, key, type });
+      });
+      
+      if (cols.length === 0) {
+        dataHelpers.toast('At least one column is required', 'error');
+        btn.disabled = false;
+        btn.textContent = '💾 Save Table';
+        return;
+      }
+      
+      const tableData = {
+        name: document.getElementById('tableName').value.trim(),
+        icon: document.getElementById('tableIcon').value.trim() || null,
+        description: document.getElementById('tableDesc').value.trim() || null,
+        columns: cols,
+        owner_id: currentProfile.id
+      };
+      
+      let result;
+      if (id) {
+        result = await supabaseClient.from('custom_tables').update(tableData).eq('id', id);
+      } else {
+        result = await supabaseClient.from('custom_tables').insert(tableData);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '💾 Save Table';
+      
+      if (result.error) {
+        dataHelpers.toast('❌ ' + result.error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(id ? '✅ Table updated!' : '✅ Table created!', 'success');
+      closeTableModal();
+      
+      const savedId = id || result.data?.[0]?.id;
+      await loadTables();
+      if (savedId) {
+        const t = allTables.find(x => x.id === savedId);
+        if (t) selectTable(t.id);
+      }
+    }
+    
+    async function deleteTable() {
+      if (!selectedTable) return;
+      
+      const confirmed = await dataHelpers.confirm(
+        `Delete table "${selectedTable.name}" and all its rows? This cannot be undone.`,
+        { title: '⚠️ Delete Table', confirmText: 'Delete', danger: true }
+      );
+      if (!confirmed) return;
+      
+      const { error } = await supabaseClient.from('custom_tables').delete().eq('id', selectedTable.id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('✅ Table deleted', 'success');
+      selectedTable = null;
+      document.getElementById('dataCard').style.display = 'none';
+      loadTables();
+    }
+    
+    // ========== ROW MODAL ==========
+    function openCreateRowModal() {
+      if (!selectedTable) return;
+      
+      document.getElementById('rowModalTitle').textContent = '➕ Add Row';
+      document.getElementById('rowId').value = '';
+      renderRowFormFields({});
+      document.getElementById('rowModal').classList.add('show');
+    }
+    
+    function editRow(id) {
+      const row = selectedRows.find(r => r.id === id);
+      if (!row) return;
+      
+      document.getElementById('rowModalTitle').textContent = '✏️ Edit Row';
+      document.getElementById('rowId').value = row.id;
+      renderRowFormFields(row.data || {});
+      document.getElementById('rowModal').classList.add('show');
+    }
+    
+    function renderRowFormFields(data) {
+      const container = document.getElementById('rowFormFields');
+      const cols = selectedTable.columns || [];
+      
+      container.innerHTML = cols.map(c => {
+        const val = data[c.key] ?? '';
+        let input = '';
+        if (c.type === 'textarea') {
+          input = `<textarea name="${c.key}" rows="3">${val}</textarea>`;
+        } else if (c.type === 'boolean') {
+          input = `<select name="${c.key}">
+            <option value="">—</option>
+            <option value="true" ${val === true || val === 'true' ? 'selected' : ''}>Yes</option>
+            <option value="false" ${val === false || val === 'false' ? 'selected' : ''}>No</option>
+          </select>`;
+        } else if (c.type === 'date') {
+          input = `<input type="date" name="${c.key}" value="${val}" />`;
+        } else if (c.type === 'number') {
+          input = `<input type="number" step="any" name="${c.key}" value="${val}" />`;
+        } else {
+          input = `<input type="text" name="${c.key}" value="${val}" />`;
+        }
+        return `<div class="form-group ${c.type === 'textarea' ? 'full' : ''}">
+          <label>${c.label}</label>
+          ${input}
+        </div>`;
+      }).join('');
+    }
+    
+    function closeRowModal() {
+      document.getElementById('rowModal').classList.remove('show');
+    }
+    
+    async function saveRow(event) {
+      event.preventDefault();
+      const id = document.getElementById('rowId').value;
+      const btn = document.getElementById('saveRowBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      const rowData = {};
+      const cols = selectedTable.columns || [];
+      cols.forEach(c => {
+        const input = document.querySelector(`#rowFormFields [name="${c.key}"]`);
+        if (input) {
+          let val = input.value;
+          if (c.type === 'number') val = val ? parseFloat(val) : null;
+          else if (c.type === 'boolean') val = val === 'true' ? true : val === 'false' ? false : null;
+          else val = val || null;
+          rowData[c.key] = val;
+        }
+      });
+      
+      const payload = {
+        table_id: selectedTable.id,
+        data: rowData
+      };
+      
+      let result;
+      if (id) {
+        result = await supabaseClient.from('custom_table_rows').update({ data: rowData }).eq('id', id);
+      } else {
+        result = await supabaseClient.from('custom_table_rows').insert(payload);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '💾 Save Row';
+      
+      if (result.error) {
+        dataHelpers.toast('❌ ' + result.error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(id ? '✅ Row updated!' : '✅ Row added!', 'success');
+      closeRowModal();
+      loadRows();
+    }
+    
+    async function deleteRow(id) {
+      const confirmed = await dataHelpers.confirm(
+        'Delete this row? This cannot be undone.',
+        { title: '⚠️ Delete Row', confirmText: 'Delete', danger: true }
+      );
+      if (!confirmed) return;
+      
+      const { error } = await supabaseClient.from('custom_table_rows').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('✅ Row deleted', 'success');
+      loadRows();
+    }
+    
+    setLang(getLang());
+    init();
+  </script>
+</body>
+</html>

@@ -1,381 +1,610 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>รายงาน A4 | SKKS Admin</title>
-  
+  <title>Reports — SKKS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <link rel="stylesheet" href="../css/dashboard.css" />
-  <link rel="stylesheet" href="../css/print.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
   <link rel="icon" type="image/png" href="../images/logo.png" />
-  
   <style>
-    .reports-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+    .report-type-card {
+      padding: 24px; background: white; border-radius: 16px;
+      border: 2px solid #E5E7EB; cursor: pointer;
+      transition: all 0.15s; text-align: center;
     }
-    .report-tile {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      border: 1px solid #E5E7EB;
-      transition: all 0.2s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
+    .report-type-card:hover { border-color: #5BB8E0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(91,184,224,0.15); }
+    .report-type-card.active { border-color: #5BB8E0; background: #F0F9FF; }
+    .report-type-card .icon { font-size: 36px; margin-bottom: 8px; }
+    .report-type-card .title { font-weight: 700; color: #1E3A5F; font-size: 14px; margin-bottom: 4px; }
+    .report-type-card .desc { font-size: 11px; color: #6B7280; }
+    
+    /* PRINT STYLES */
+    @media print {
+      body * { visibility: hidden; }
+      .report-print, .report-print * { visibility: visible; }
+      .report-print {
+        position: absolute; left: 0; top: 0; width: 100%;
+        padding: 30px; font-family: 'Sarabun', serif; font-size: 11pt;
+      }
+      .report-print table { width: 100%; border-collapse: collapse; }
+      .report-print th, .report-print td { border: 1px solid #999; padding: 6px 8px; }
+      .report-print th { background: #F0F0F0; }
+      .no-print { display: none !important; }
+      @page { size: A4; margin: 1cm; }
     }
-    .report-tile:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(30, 58, 95, 0.12);
-      border-color: #5BB8E0;
+    
+    .report-print { display: none; }
+    .report-print.printing {
+      display: block; position: fixed; inset: 0;
+      background: white; z-index: 9999; padding: 30px;
+      overflow: auto; font-family: 'Sarabun', serif;
     }
-    .report-tile::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, #5BB8E0, #7CB342);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s;
+    .report-header {
+      text-align: center; border-bottom: 3px double #1E3A5F;
+      padding-bottom: 16px; margin-bottom: 24px;
     }
-    .report-tile:hover::before {
-      transform: scaleX(1);
+    .report-header img { height: 50px; }
+    .report-header h1 { margin: 8px 0 4px; font-family: 'Poppins'; color: #1E3A5F; font-size: 22pt; }
+    .report-header .subtitle { color: #6B7280; font-size: 12pt; }
+    .report-header .report-title { color: #1E3A5F; font-weight: 700; font-size: 16pt; margin-top: 12px; }
+    .report-meta { font-size: 10pt; color: #6B7280; margin: 8px 0; }
+    .report-table {
+      width: 100%; border-collapse: collapse; margin-top: 12px;
     }
-    .report-tile-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      margin-bottom: 16px;
+    .report-table th {
+      background: #1E3A5F; color: white; padding: 8px;
+      font-size: 10pt; text-align: left;
     }
-    .report-tile h3 {
-      font-family: 'Prompt', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      color: #1E3A5F;
-      margin-bottom: 8px;
+    .report-table td {
+      padding: 6px 8px; border-bottom: 1px solid #E5E7EB;
+      font-size: 10pt;
     }
-    .report-tile p {
-      font-size: 13px;
-      color: #6B7280;
-      line-height: 1.6;
-      margin-bottom: 16px;
+    .report-summary {
+      margin-top: 20px; padding: 12px;
+      background: #F0FDF4; border-radius: 8px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
     }
-    .report-tile-tags {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .report-tag {
-      background: #F3F4F6;
-      color: #6B7280;
-      padding: 3px 10px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .report-tile-action {
-      color: #5BB8E0;
-      font-weight: 600;
-      font-size: 13px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .section-divider {
-      margin: 32px 0 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .section-divider h2 {
-      font-family: 'Prompt', sans-serif;
-      font-size: 18px;
-      color: #1E3A5F;
-      font-weight: 700;
-    }
-    .section-divider .line {
-      flex: 1;
-      height: 1px;
-      background: #E5E7EB;
+    .summary-item { text-align: center; }
+    .summary-item .label { font-size: 9pt; color: #6B7280; }
+    .summary-item .value { font-size: 14pt; font-weight: 700; color: #1E3A5F; }
+    .report-footer {
+      margin-top: 40px; display: flex; justify-content: space-between; font-size: 10pt;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-<div class="dashboard-layout">
-  
-  <aside class="sidebar no-print" id="sidebar">
-    <div class="sidebar-header">
-      <a href="../index.html" class="logo">
+  <div class="admin-topbar no-print">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
         <img src="../images/logo.png" alt="SKKS" />
-        <div class="logo-text">
-          <strong>SKKS</strong>
-          <span>Admin Panel</span>
-        </div>
+        <h1>SKKS Admin</h1>
       </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="reports.html" class="active">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💰 Finance</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
     </div>
-    
-    <nav class="sidebar-nav">
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Main</div>
-        <ul>
-          <li><a href="dashboard.html"><span class="icon">📊</span> Dashboard</a></li>
-          <li><a href="applications.html"><span class="icon">📝</span> ใบสมัคร</a></li>
-          <li><a href="students.html"><span class="icon">👨‍🎓</span> นักเรียน</a></li>
-        </ul>
+    <div class="admin-topbar-right">
+      <div class="lang-toggle">
+        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
+        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">การเงิน</div>
-        <ul>
-          <li><a href="finance.html"><span class="icon">💰</span> ยอดเก็บค่าเทอม</a></li>
-          <li><a href="finance.html"><span class="icon">💳</span> รายการชำระ</a></li>
-          <li><a href="finance.html"><span class="icon">📋</span> ใบเสร็จ</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">รายงาน</div>
-        <ul>
-          <li><a href="#" class="active"><span class="icon">📄</span> รายงาน A4</a></li>
-        </ul>
-      </div>
-      
-      <div class="sidebar-section">
-        <ul>
-          <li><a href="../index.html"><span class="icon">🏠</span> กลับหน้าเว็บ</a></li>
-        </ul>
-      </div>
-    </nav>
-  </aside>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
   
-  <main class="main-content">
+  <div class="admin-container no-print">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
     
-    <div class="print-toolbar no-print">
-      <div class="print-toolbar-left">
-        <h3>📄 ศูนย์รวมรายงาน A4</h3>
-        <span style="color:#6B7280;font-size:13px">รายงานทั้งหมดสามารถพิมพ์เป็นกระดาษ A4 ส่งให้ผู้บริหารได้</span>
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📄 Reports</h2>
+          <p>Generate and print professional A4 reports</p>
+        </div>
+      </div>
+      
+      <!-- REPORT TYPE PICKER -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📚 Select Report Type</h3>
+        </div>
+        
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
+          <div class="report-type-card" data-report="students" onclick="selectReport('students')">
+            <div class="icon">🎓</div>
+            <div class="title">Student Roster</div>
+            <div class="desc">List of students by class</div>
+          </div>
+          
+          <div class="report-type-card" data-report="applications" onclick="selectReport('applications')">
+            <div class="icon">📝</div>
+            <div class="title">Applications</div>
+            <div class="desc">Summary of admission</div>
+          </div>
+          
+          <div class="report-type-card owner-only" data-report="finance" onclick="selectReport('finance')" style="display:none">
+            <div class="icon">💰</div>
+            <div class="title">Financial Report</div>
+            <div class="desc">Income & expense summary</div>
+          </div>
+          
+          <div class="report-type-card" data-report="payments" onclick="selectReport('payments')">
+            <div class="icon">💳</div>
+            <div class="title">Payments Report</div>
+            <div class="desc">Payment transactions</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- REPORT FILTERS -->
+      <div class="card" id="filtersCard" style="display:none;">
+        <div class="card-header">
+          <h3>⚙️ Report Options</h3>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+            <button class="btn btn-primary" onclick="printReport()">🖨️ Print A4</button>
+          </div>
+        </div>
+        
+        <div class="form-grid" id="filterOptions"></div>
+      </div>
+      
+      <!-- REPORT PREVIEW -->
+      <div class="card" id="previewCard" style="display:none;">
+        <div class="card-header">
+          <h3>👁️ Preview</h3>
+          <span id="recordCount" style="color:#6B7280; font-size:12px;"></span>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="data-table" id="previewTable">
+            <thead id="previewHead"></thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
-    
-    <div class="dashboard-content">
-      
-      <!-- Section: ฝ่ายวิชาการ -->
-      <div class="section-divider">
-        <h2>📚 ฝ่ายวิชาการ</h2>
-        <div class="line"></div>
-      </div>
-      
-      <div class="reports-grid">
-        <a href="students.html" class="report-tile" style="text-decoration:none">
-          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">👨‍🎓</div>
-          <h3>รายชื่อนักเรียนแยกตามห้อง</h3>
-          <p>พิมพ์รายชื่อนักเรียนของแต่ละห้องเรียน พร้อมข้อมูลผู้ปกครองและสถานะการชำระ</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-            <span class="report-tag">25 ห้อง</span>
-            <span class="report-tag">524 คน</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </a>
-        
-        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา — สามารถดูตัวอย่างได้จากหน้านักเรียน')">
-          <div class="report-tile-icon" style="background:#DCFCE7;color:#16A34A">📊</div>
-          <h3>สรุปจำนวนนักเรียนแยกระดับชั้น</h3>
-          <p>ภาพรวมจำนวนนักเรียนแยกตามระดับชั้น เพศ และหลักสูตร พร้อมแผนภาพ</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-            <span class="report-tag">มีกราฟ</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </div>
-        
-        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
-          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">🏆</div>
-          <h3>ผลคะแนน O-NET ปี 2568</h3>
-          <p>คะแนน O-NET ของนักเรียน ป.6 และ ม.3 พร้อมเปรียบเทียบกับค่าเฉลี่ยประเทศ</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-            <span class="report-tag">มีกราฟ</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </div>
-        
-        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
-          <div class="report-tile-icon" style="background:#FCE7F3;color:#EC4899">📅</div>
-          <h3>ตารางสอน</h3>
-          <p>ตารางสอนแยกตามครู ห้องเรียน และวิชา พร้อมพิมพ์เป็นแผ่นแสดงในห้องครู</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </div>
-      </div>
-      
-      <!-- Section: การเงิน -->
-      <div class="section-divider">
-        <h2>💰 ฝ่ายการเงิน</h2>
-        <div class="line"></div>
-      </div>
-      
-      <div class="reports-grid">
-        <a href="finance.html" class="report-tile" style="text-decoration:none">
-          <div class="report-tile-icon" style="background:#DCFCE7;color:#16A34A">💰</div>
-          <h3>รายงานสรุปยอดเก็บค่าเทอม</h3>
-          <p>สรุปรายรับ รายการรอเก็บ และค้างชำระ แยกตามระดับชั้นและช่องทางการชำระเงิน</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 แนวนอน</span>
-            <span class="report-tag">มีกราฟ</span>
-            <span class="report-tag">สำหรับผู้บริหาร</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </a>
-        
-        <a href="finance.html" class="report-tile" style="text-decoration:none" onclick="setTimeout(()=>{document.querySelector('button[onclick*=payments]')?.click()},500)">
-          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">💳</div>
-          <h3>รายการชำระเงิน</h3>
-          <p>รายการชำระเงินทั้งหมด เรียงตามวันที่ พร้อมเลขใบเสร็จและช่องทางการชำระ</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 แนวนอน</span>
-            <span class="report-tag">CSV</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </a>
-        
-        <a href="finance.html" class="report-tile" style="text-decoration:none">
-          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">📋</div>
-          <h3>ใบเสร็จรับเงิน</h3>
-          <p>ใบเสร็จขนาดเล็ก (80mm) สำหรับพิมพ์จากเครื่องพิมพ์ใบเสร็จ หรือพิมพ์เป็น PDF ส่งผู้ปกครอง</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">80mm</span>
-            <span class="report-tag">PDF</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </a>
-        
-        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
-          <div class="report-tile-icon" style="background:#FEE2E2;color:#DC2626">⚠️</div>
-          <h3>รายชื่อนักเรียนค้างชำระ</h3>
-          <p>รายชื่อนักเรียนที่ยังไม่ชำระค่าเทอม พร้อมข้อมูลผู้ปกครองสำหรับการติดตาม</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-            <span class="report-tag">เร่งด่วน</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </div>
-      </div>
-      
-      <!-- Section: ฝ่ายรับสมัคร -->
-      <div class="section-divider">
-        <h2>📝 ฝ่ายรับสมัคร</h2>
-        <div class="line"></div>
-      </div>
-      
-      <div class="reports-grid">
-        <a href="applications.html" class="report-tile" style="text-decoration:none">
-          <div class="report-tile-icon" style="background:#E9D5FF;color:#7C3AED">📝</div>
-          <h3>ใบสมัครนักเรียนรายบุคคล</h3>
-          <p>ใบสมัครแบบเต็มของนักเรียนแต่ละคน พิมพ์ A4 พร้อมส่วนเซ็นรับรอง</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-            <span class="report-tag">รายบุคคล</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </a>
-        
-        <a href="applications.html" class="report-tile" style="text-decoration:none">
-          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">📑</div>
-          <h3>รายการใบสมัครทั้งหมด</h3>
-          <p>รายการใบสมัครทั้งหมดในปีการศึกษา 2569 พร้อมสถานะและผลการพิจารณา</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-            <span class="report-tag">CSV</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </a>
-        
-        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
-          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">📅</div>
-          <h3>ตารางนัดสัมภาษณ์</h3>
-          <p>ตารางนัดสัมภาษณ์ของผู้สมัคร เรียงตามวันที่และเวลานัด</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 พิมพ์ได้</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </div>
-      </div>
-      
-      <!-- Section: ผู้บริหาร -->
-      <div class="section-divider">
-        <h2>👔 รายงานผู้บริหาร</h2>
-        <div class="line"></div>
-      </div>
-      
-      <div class="reports-grid">
-        <a href="dashboard.html" class="report-tile" style="text-decoration:none">
-          <div class="report-tile-icon" style="background:#DBEAFE;color:#2563EB">📊</div>
-          <h3>Dashboard ภาพรวม</h3>
-          <p>ภาพรวมสถานการณ์โรงเรียนทั้งหมด — นักเรียน รายได้ ผลสอบ และใบสมัคร</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">Real-time</span>
-            <span class="report-tag">มีกราฟ</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </a>
-        
-        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
-          <div class="report-tile-icon" style="background:#DCFCE7;color:#16A34A">📈</div>
-          <h3>รายงานประจำเดือน</h3>
-          <p>รายงานสรุปผลการดำเนินงานประจำเดือน สำหรับนำเสนอผู้บริหาร</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 หลายแผ่น</span>
-            <span class="report-tag">มีกราฟ</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </div>
-        
-        <div class="report-tile" onclick="alert('รายงานนี้กำลังพัฒนา')">
-          <div class="report-tile-icon" style="background:#FEF3C7;color:#D97706">📅</div>
-          <h3>รายงานประจำปี</h3>
-          <p>รายงานสรุปผลการดำเนินงานประจำปี เปรียบเทียบกับปีที่ผ่านมา</p>
-          <div class="report-tile-tags">
-            <span class="report-tag">A4 หลายแผ่น</span>
-            <span class="report-tag">รายปี</span>
-          </div>
-          <span class="report-tile-action">เปิดดู →</span>
-        </div>
-      </div>
-      
-      <div style="margin-top:48px;padding:24px;background:linear-gradient(135deg,#EFF6FF,#F0FDF4);border-radius:16px;border:1px dashed #5BB8E0">
-        <div style="display:flex;align-items:center;gap:16px">
-          <div style="font-size:40px">💡</div>
-          <div>
-            <h3 style="font-family:'Prompt',sans-serif;color:#1E3A5F;margin-bottom:6px">วิธีใช้งานรายงาน A4</h3>
-            <p style="color:#6B7280;font-size:14px;line-height:1.7;margin:0">
-              1. คลิกเปิดรายงานที่ต้องการ &nbsp; 
-              2. ใช้ตัวกรองเพื่อเลือกข้อมูล &nbsp; 
-              3. คลิก <strong style="color:#1E3A5F">"🖨️ พิมพ์ A4"</strong> เพื่อเปิดหน้าต่างพิมพ์ &nbsp; 
-              4. เลือก "Save as PDF" เพื่อบันทึกเป็นไฟล์ PDF หรือพิมพ์โดยตรง
-            </p>
-          </div>
-        </div>
-      </div>
-      
+  </div>
+  
+  <!-- A4 PRINT TEMPLATE -->
+  <div class="report-print" id="reportPrint">
+    <div class="report-header">
+      <img src="../images/logo.png" alt="SKKS" />
+      <h1>SUANSON KHON KAEN SCHOOL</h1>
+      <div class="subtitle">โรงเรียนสวนสนขอนแก่น</div>
+      <div class="report-title" id="printTitle">Report</div>
+      <div class="report-meta" id="printMeta">—</div>
     </div>
-  </main>
-</div>
-
+    
+    <div id="printContent"></div>
+    
+    <div class="report-footer">
+      <div>Generated: <span id="printDate"></span></div>
+      <div>By: <span id="printBy"></span></div>
+    </div>
+  </div>
+  
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  
+  <script>
+    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    function setLang(lang) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-toggle a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    
+    let currentProfile = null;
+    let currentReport = null;
+    let currentData = [];
+    
+    async function init() {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+      currentProfile = profile;
+      
+      if (['owner', 'developer'].includes(profile.role)) {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function selectReport(type) {
+      currentReport = type;
+      
+      document.querySelectorAll('.report-type-card').forEach(c => 
+        c.classList.toggle('active', c.dataset.report === type));
+      
+      document.getElementById('filtersCard').style.display = 'block';
+      document.getElementById('previewCard').style.display = 'block';
+      
+      renderFilters(type);
+      loadReportData();
+    }
+    
+    function renderFilters(type) {
+      const container = document.getElementById('filterOptions');
+      const today = new Date().toISOString().slice(0, 10);
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      const monthAgoStr = monthAgo.toISOString().slice(0, 10);
+      
+      let html = '';
+      
+      if (type === 'students') {
+        html = `
+          <div class="form-group">
+            <label>Program</label>
+            <select id="fProgram" onchange="loadReportData()">
+              <option value="">All</option>
+              <option value="prek">Pre-K</option>
+              <option value="k">Kindergarten</option>
+              <option value="ep">EP</option>
+              <option value="mep">MEP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Grade</label>
+            <input type="text" id="fGrade" placeholder="e.g., Grade 1" oninput="loadReportData()" />
+          </div>
+          <div class="form-group">
+            <label>Classroom</label>
+            <input type="text" id="fClassroom" placeholder="e.g., EP/1A" oninput="loadReportData()" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="fStatus" onchange="loadReportData()">
+              <option value="active" selected>Active Only</option>
+              <option value="">All</option>
+              <option value="graduated">Graduated</option>
+              <option value="transferred">Transferred</option>
+            </select>
+          </div>
+        `;
+      } else if (type === 'applications') {
+        html = `
+          <div class="form-group">
+            <label>Status</label>
+            <select id="fStatus" onchange="loadReportData()">
+              <option value="">All</option>
+              <option value="pending">Pending</option>
+              <option value="reviewing">Reviewing</option>
+              <option value="accepted">Accepted</option>
+              <option value="rejected">Rejected</option>
+              <option value="enrolled">Enrolled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Program</label>
+            <select id="fProgram" onchange="loadReportData()">
+              <option value="">All</option>
+              <option value="prek">Pre-K</option>
+              <option value="k">Kindergarten</option>
+              <option value="ep">EP</option>
+              <option value="mep">MEP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>From Date</label>
+            <input type="date" id="fDateFrom" value="${monthAgoStr}" onchange="loadReportData()" />
+          </div>
+          <div class="form-group">
+            <label>To Date</label>
+            <input type="date" id="fDateTo" value="${today}" onchange="loadReportData()" />
+          </div>
+        `;
+      } else if (type === 'finance') {
+        html = `
+          <div class="form-group">
+            <label>Type</label>
+            <select id="fType" onchange="loadReportData()">
+              <option value="">All</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="fCategory" onchange="loadReportData()">
+              <option value="">All</option>
+              <option value="tuition">Tuition</option>
+              <option value="salary">Salary</option>
+              <option value="utilities">Utilities</option>
+              <option value="books">Books</option>
+              <option value="uniform">Uniform</option>
+              <option value="food">Food</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="equipment">Equipment</option>
+              <option value="marketing">Marketing</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>From Date</label>
+            <input type="date" id="fDateFrom" value="${monthAgoStr}" onchange="loadReportData()" />
+          </div>
+          <div class="form-group">
+            <label>To Date</label>
+            <input type="date" id="fDateTo" value="${today}" onchange="loadReportData()" />
+          </div>
+        `;
+      } else if (type === 'payments') {
+        html = `
+          <div class="form-group">
+            <label>Status</label>
+            <select id="fStatus" onchange="loadReportData()">
+              <option value="completed" selected>Completed Only</option>
+              <option value="">All</option>
+              <option value="pending">Pending</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="refunded">Refunded</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Payment Type</label>
+            <select id="fType" onchange="loadReportData()">
+              <option value="">All</option>
+              <option value="tuition">Tuition</option>
+              <option value="application_fee">Application Fee</option>
+              <option value="registration_fee">Registration Fee</option>
+              <option value="uniform">Uniform</option>
+              <option value="books">Books</option>
+              <option value="activity">Activity</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>From Date</label>
+            <input type="date" id="fDateFrom" value="${monthAgoStr}" onchange="loadReportData()" />
+          </div>
+          <div class="form-group">
+            <label>To Date</label>
+            <input type="date" id="fDateTo" value="${today}" onchange="loadReportData()" />
+          </div>
+        `;
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    async function loadReportData() {
+      if (!currentReport) return;
+      
+      let data = [];
+      
+      if (currentReport === 'students') {
+        let q = supabaseClient.from('students').select('*').order('classroom').order('student_number');
+        const program = document.getElementById('fProgram')?.value;
+        const grade = document.getElementById('fGrade')?.value;
+        const classroom = document.getElementById('fClassroom')?.value;
+        const status = document.getElementById('fStatus')?.value;
+        if (program) q = q.eq('program', program);
+        if (grade) q = q.ilike('grade', `%${grade}%`);
+        if (classroom) q = q.ilike('classroom', `%${classroom}%`);
+        if (status) q = q.eq('status', status);
+        const { data: result } = await q;
+        data = result || [];
+      }
+      else if (currentReport === 'applications') {
+        let q = supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
+        const status = document.getElementById('fStatus')?.value;
+        const program = document.getElementById('fProgram')?.value;
+        const from = document.getElementById('fDateFrom')?.value;
+        const to = document.getElementById('fDateTo')?.value;
+        if (status) q = q.eq('status', status);
+        if (program) q = q.eq('program', program);
+        if (from) q = q.gte('created_at', from);
+        if (to) q = q.lte('created_at', to + 'T23:59:59');
+        const { data: result } = await q;
+        data = result || [];
+      }
+      else if (currentReport === 'finance') {
+        let q = supabaseClient.from('finance_transactions').select('*').order('transaction_date', { ascending: false });
+        const type = document.getElementById('fType')?.value;
+        const category = document.getElementById('fCategory')?.value;
+        const from = document.getElementById('fDateFrom')?.value;
+        const to = document.getElementById('fDateTo')?.value;
+        if (type) q = q.eq('type', type);
+        if (category) q = q.eq('category', category);
+        if (from) q = q.gte('transaction_date', from);
+        if (to) q = q.lte('transaction_date', to);
+        const { data: result } = await q;
+        data = result || [];
+      }
+      else if (currentReport === 'payments') {
+        let q = supabaseClient.from('payments').select('*, students(student_number, grade, classroom)').order('paid_at', { ascending: false });
+        const status = document.getElementById('fStatus')?.value;
+        const type = document.getElementById('fType')?.value;
+        const from = document.getElementById('fDateFrom')?.value;
+        const to = document.getElementById('fDateTo')?.value;
+        if (status) q = q.eq('status', status);
+        if (type) q = q.eq('payment_type', type);
+        if (from) q = q.gte('paid_at', from);
+        if (to) q = q.lte('paid_at', to + 'T23:59:59');
+        const { data: result } = await q;
+        data = result || [];
+      }
+      
+      currentData = data;
+      renderPreview(data);
+    }
+    
+    function renderPreview(data) {
+      const head = document.getElementById('previewHead');
+      const body = document.getElementById('previewBody');
+      const count = document.getElementById('recordCount');
+      
+      count.textContent = `${data.length} record(s)`;
+      
+      if (data.length === 0) {
+        head.innerHTML = '';
+        body.innerHTML = `<tr><td><div class="empty-state"><div class="icon">📭</div><p>No data found for selected filters</p></div></td></tr>`;
+        return;
+      }
+      
+      const config = getReportConfig(currentReport);
+      
+      head.innerHTML = `<tr>${config.columns.map(c => `<th>${c.label}</th>`).join('')}</tr>`;
+      body.innerHTML = data.map(row => 
+        `<tr>${config.columns.map(c => `<td>${c.render(row)}</td>`).join('')}</tr>`
+      ).join('');
+    }
+    
+    function getReportConfig(type) {
+      const configs = {
+        students: {
+          title: 'Student Roster',
+          columns: [
+            { label: 'Student #', render: r => r.student_number || '—' },
+            { label: 'Program', render: r => (r.program || '').toUpperCase() },
+            { label: 'Grade', render: r => r.grade || '—' },
+            { label: 'Classroom', render: r => r.classroom || '—' },
+            { label: 'Status', render: r => r.status || '—' },
+            { label: 'Enrolled', render: r => dataHelpers.formatDate(r.enrollment_date) }
+          ]
+        },
+        applications: {
+          title: 'Applications Report',
+          columns: [
+            { label: 'App #', render: r => r.application_number },
+            { label: 'Student', render: r => `${r.student_first_name} ${r.student_last_name}` },
+            { label: 'Program', render: r => (r.program || '').toUpperCase() },
+            { label: 'Parent', render: r => r.parent_name },
+            { label: 'Phone', render: r => r.parent_phone },
+            { label: 'Status', render: r => r.status },
+            { label: 'Submitted', render: r => dataHelpers.formatDate(r.created_at) }
+          ]
+        },
+        finance: {
+          title: 'Financial Report',
+          columns: [
+            { label: 'Date', render: r => dataHelpers.formatDate(r.transaction_date) },
+            { label: 'Type', render: r => r.type },
+            { label: 'Category', render: r => r.category },
+            { label: 'Description', render: r => r.description },
+            { label: 'Amount', render: r => (r.type === 'income' ? '+' : '-') + dataHelpers.formatMoney(r.amount) }
+          ]
+        },
+        payments: {
+          title: 'Payments Report',
+          columns: [
+            { label: 'Receipt #', render: r => r.receipt_number },
+            { label: 'Date', render: r => dataHelpers.formatDate(r.paid_at) },
+            { label: 'Student', render: r => r.students?.student_number || '—' },
+            { label: 'Type', render: r => r.payment_type },
+            { label: 'Method', render: r => r.payment_method || '—' },
+            { label: 'Amount', render: r => dataHelpers.formatMoney(r.amount) },
+            { label: 'Status', render: r => r.status }
+          ]
+        }
+      };
+      return configs[type];
+    }
+    
+    function printReport() {
+      if (!currentData.length) {
+        dataHelpers.toast('No data to print', 'warning');
+        return;
+      }
+      
+      const config = getReportConfig(currentReport);
+      document.getElementById('printTitle').textContent = config.title;
+      document.getElementById('printDate').textContent = new Date().toLocaleString();
+      document.getElementById('printBy').textContent = `${currentProfile.first_name} ${currentProfile.last_name}`;
+      
+      // Build meta info from filters
+      let meta = `Records: ${currentData.length}`;
+      const program = document.getElementById('fProgram')?.value;
+      const status = document.getElementById('fStatus')?.value;
+      const from = document.getElementById('fDateFrom')?.value;
+      const to = document.getElementById('fDateTo')?.value;
+      if (program) meta += ` • Program: ${program.toUpperCase()}`;
+      if (status) meta += ` • Status: ${status}`;
+      if (from && to) meta += ` • ${from} to ${to}`;
+      document.getElementById('printMeta').textContent = meta;
+      
+      // Build content
+      let contentHTML = `<table class="report-table"><thead><tr>${config.columns.map(c => `<th>${c.label}</th>`).join('')}</tr></thead><tbody>`;
+      contentHTML += currentData.map(row => 
+        `<tr>${config.columns.map(c => `<td>${c.render(row)}</td>`).join('')}</tr>`
+      ).join('');
+      contentHTML += '</tbody></table>';
+      
+      // Add summary for finance/payments
+      if (currentReport === 'finance') {
+        let income = 0, expense = 0;
+        currentData.forEach(t => {
+          const amt = parseFloat(t.amount || 0);
+          if (t.type === 'income') income += amt; else expense += amt;
+        });
+        contentHTML += `<div class="report-summary">
+          <div class="summary-item"><div class="label">Total Income</div><div class="value">${dataHelpers.formatMoney(income)}</div></div>
+          <div class="summary-item"><div class="label">Total Expense</div><div class="value">${dataHelpers.formatMoney(expense)}</div></div>
+          <div class="summary-item"><div class="label">Net</div><div class="value">${dataHelpers.formatMoney(income - expense)}</div></div>
+        </div>`;
+      } else if (currentReport === 'payments') {
+        const total = currentData.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+        contentHTML += `<div class="report-summary">
+          <div class="summary-item"><div class="label">Total Records</div><div class="value">${currentData.length}</div></div>
+          <div class="summary-item"><div class="label">Total Amount</div><div class="value">${dataHelpers.formatMoney(total)}</div></div>
+        </div>`;
+      }
+      
+      document.getElementById('printContent').innerHTML = contentHTML;
+      
+      const report = document.getElementById('reportPrint');
+      report.classList.add('printing');
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => report.classList.remove('printing'), 500);
+      }, 100);
+    }
+    
+    function exportCSV() {
+      if (!currentData.length) {
+        dataHelpers.toast('No data to export', 'warning');
+        return;
+      }
+      
+      const config = getReportConfig(currentReport);
+      const headers = config.columns.map(c => c.label);
+      const rows = currentData.map(r => config.columns.map(c => {
+        const val = c.render(r);
+        return `"${String(val).replace(/"/g, '""')}"`;
+      }));
+      
+      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentReport}-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      dataHelpers.toast('✅ CSV exported', 'success');
+    }
+    
+    setLang(getLang());
+    init();
+  </script>
 </body>
 </html>

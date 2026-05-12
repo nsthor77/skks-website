@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SKKS — Suanson Khon Kaen School</title>
-  <meta name="description" content="Suanson Khon Kaen School (SKKS) — Cambridge-certified EP/MEP education from Pre-K to Grade 9 in Khon Kaen." />
+  <meta name="description" content="Where pines grow tall. Suanson Khon Kaen School — Cambridge-certified bilingual education from Pre-K to Grade 9." />
   <meta property="og:title" content="SKKS — Suanson Khon Kaen School" />
-  <meta property="og:description" content="Nurturing young minds — Cambridge-certified bilingual education" />
+  <meta property="og:description" content="Where pines grow tall — Cambridge-certified bilingual education" />
   <meta property="og:image" content="images/hero-bg.png" />
   <meta property="og:url" content="https://suansonkk.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/main.css" />
   <link rel="icon" type="image/png" href="images/logo.png" />
 </head>
@@ -22,12 +22,9 @@
       <div class="top-bar-left">
         <span>📞 (+66) 043-XXX-XXXX</span>
         <span class="hide-mobile">✉ info@suansonkk.com</span>
+        <span class="hide-mobile">📍 ขอนแก่น, ไทย</span>
       </div>
       <div class="top-bar-right">
-        <a href="#news" class="hide-mobile" data-i18n="topbar.events">Events</a>
-        <a href="#news" class="hide-mobile" data-i18n="topbar.news">News</a>
-        <a href="voices.html" class="hide-mobile" data-i18n="topbar.faqs">FAQs</a>
-        <a href="#contact" class="hide-mobile" data-i18n="topbar.contact">Contact</a>
         <a href="admissions.html" class="btn-register" data-i18n="topbar.register">Register Your Interest</a>
         <span class="lang-switch">
           <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a>
@@ -43,7 +40,7 @@
         <img src="images/logo.png" alt="SKKS" />
         <div class="logo-text">
           <strong>SKKS</strong>
-          <span>Suanson Khon Kaen School</span>
+          <span>สวนสนขอนแก่น</span>
         </div>
       </a>
       
@@ -58,15 +55,7 @@
             <li><a href="about.html#campus" data-i18n="nav.about.campus">Our Campus</a></li>
           </ul>
         </li>
-        <li class="has-dropdown">
-          <a href="#programs" data-i18n="nav.programs">Programs ▾</a>
-          <ul class="dropdown">
-            <li><a href="#programs">Pre-K</a></li>
-            <li><a href="#programs">Kindergarten</a></li>
-            <li><a href="#programs">English Program (EP)</a></li>
-            <li><a href="#programs">Mini English Program (MEP)</a></li>
-          </ul>
-        </li>
+        <li><a href="#programs" data-i18n="nav.programs">Programs</a></li>
         <li><a href="voices.html" data-i18n="nav.voices">Voices</a></li>
         <li><a href="admissions.html" data-i18n="nav.admissions">Admissions</a></li>
         <li><a href="admissions.html" class="btn-cta" data-i18n="nav.apply">Apply Now</a></li>
@@ -76,129 +65,237 @@
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="eyebrow" data-i18n="hero.eyebrow">Cambridge Certified Education</div>
-      <h1 data-i18n="hero.title">Nurturing Young Minds Toward<br>a World of Knowledge</h1>
-      <p data-i18n="hero.subtitle">Suanson Khon Kaen School — บ่มเพาะเยาวชนสู่โลกแห่งการเรียนรู้ ด้วยหลักสูตร EP/MEP รับรองโดย Cambridge</p>
-      <div class="hero-buttons">
-        <a href="admissions.html" class="btn btn-primary" data-i18n="hero.apply">Apply for Admission</a>
-        <a href="about.html" class="btn btn-outline" data-i18n="hero.learnmore">Discover More →</a>
+  <!-- ==================================================
+       1. HERO SPLIT (asymmetric — เอกลักษณ์ SKKS)
+       ================================================== -->
+  <section class="hero-split">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-left">
+          <div class="pine-badge" data-i18n="hero.badge">Where Pines Grow Tall</div>
+          <h1>
+            <span data-i18n="hero.title1">Rooted in Excellence,</span><br>
+            <span class="accent" data-i18n="hero.title2">Reaching for the World.</span>
+          </h1>
+          <p class="lead" data-i18n="hero.lead">โรงเรียนสวนสนขอนแก่น — บ่มเพาะนักเรียนของเราให้เติบโตอย่างมั่นคงเหมือนต้นสน พร้อมก้าวสู่โลกกว้างด้วยหลักสูตร Cambridge EP/MEP</p>
+          
+          <div class="hero-actions">
+            <a href="admissions.html" class="btn btn-primary" data-i18n="hero.apply">Begin Your Journey →</a>
+            <a href="about.html" class="btn btn-ghost" data-i18n="hero.learnmore">Our Story</a>
+          </div>
+          
+          <div class="hero-trust">
+            <div class="hero-trust-item">
+              <div>
+                <div class="hero-trust-num">15+</div>
+                <div class="hero-trust-lbl" data-i18n="trust.years">Years</div>
+              </div>
+            </div>
+            <div class="hero-trust-item">
+              <div>
+                <div class="hero-trust-num">500+</div>
+                <div class="hero-trust-lbl" data-i18n="trust.students">Students</div>
+              </div>
+            </div>
+            <div class="hero-trust-item">
+              <div>
+                <div class="hero-trust-num">🏆</div>
+                <div class="hero-trust-lbl" data-i18n="trust.cambridge">Cambridge<br>Certified</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hero-right">
+          <div class="hero-circle">
+            <div class="hero-image"></div>
+            <div class="hero-badge-float top">
+              <div class="ic">🎓</div>
+              <div class="txt">
+                <strong>100%</strong>
+                <small data-i18n="float.onet">O-NET English</small>
+              </div>
+            </div>
+            <div class="hero-badge-float bottom">
+              <div class="ic">🌲</div>
+              <div class="txt">
+                <strong data-i18n="float.prek">Pre-K → ม.3</strong>
+                <small data-i18n="float.path">Growth Path</small>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 3 HERO CARDS -->
-  <div class="container">
-    <div class="hero-cards">
-      <a href="#programs" class="hero-card">
-        <div class="icon">🌱</div>
-        <h3 data-i18n="card.1.title">Early Years</h3>
-        <p data-i18n="card.1.sub">Building Strong Foundations</p>
-        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
-      </a>
-      <a href="#programs" class="hero-card">
-        <div class="icon">📚</div>
-        <h3 data-i18n="card.2.title">Primary School</h3>
-        <p data-i18n="card.2.sub">Preparing For The Future</p>
-        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
-      </a>
-      <a href="#programs" class="hero-card">
-        <div class="icon">🎓</div>
-        <h3 data-i18n="card.3.title">EP / MEP Programs</h3>
-        <p data-i18n="card.3.sub">Shaping Global Learners</p>
-        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
-      </a>
-    </div>
-  </div>
-
-  <!-- WHY CHOOSE US -->
-  <section class="why-section">
+  <!-- ==================================================
+       2. LATEST NEWS (ย้ายขึ้นมาที่สอง)
+       ================================================== -->
+  <section class="news-section">
     <div class="container">
-      <div class="section-header">
-        <div class="eyebrow" data-i18n="why.eyebrow">Excellence</div>
-        <div class="section-divider"></div>
-        <h2 data-i18n="why.title">Why Choose Us?</h2>
-        <p data-i18n="why.subtitle">The Choice That Transforms Your Child's Future</p>
+      <div class="news-header">
+        <div>
+          <div class="eyebrow" data-i18n="news.eyebrow">Fresh from Campus</div>
+          <h2 data-i18n="news.title">Latest News</h2>
+          <p style="color:var(--slate); font-size:14px;" data-i18n="news.subtitle">Stories, achievements, and announcements</p>
+        </div>
+        <a href="#" class="btn btn-ghost" data-i18n="news.viewall">View All News →</a>
       </div>
       
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌏</div>
-          <h3 data-i18n="why.1.title">Global Outlook</h3>
-          <p data-i18n="why.1.desc">Our education system is designed with a global perspective, incorporating international best practices and Cambridge curriculum.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📖</div>
-          <h3 data-i18n="why.2.title">Strong Curriculum</h3>
-          <p data-i18n="why.2.desc">The curriculum emphasizes deep understanding of core subjects like Mathematics, Science, English, and literacy.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🗣️</div>
-          <h3 data-i18n="why.3.title">Bilingual Focus</h3>
-          <p data-i18n="why.3.desc">Our bilingual education policy ensures students master English as their first language while preserving Thai cultural identity.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔬</div>
-          <h3 data-i18n="why.4.title">STEM Emphasis</h3>
-          <p data-i18n="why.4.desc">Strong emphasis on STEM (Science, Technology, Engineering, Mathematics) education from an early age.</p>
-        </div>
-      </div>
-      
-      <div style="text-align:center; margin-top:40px;">
-        <a href="about.html" class="btn btn-primary" data-i18n="why.cta">Learn More About Us</a>
+      <div class="news-grid">
+        <article class="news-card featured">
+          <div class="news-image">
+            🏆
+            <span class="news-tag" data-i18n="news.tag.feat">Featured</span>
+            <span class="news-date">11 MAY 2026</span>
+          </div>
+          <div class="news-content">
+            <h3 data-i18n="news.1.title">O-NET 100% — A Historic Achievement</h3>
+            <p data-i18n="news.1.desc">Our student made history by achieving a perfect score on the O-NET English exam. This record-breaking accomplishment reflects years of dedicated teaching and the strength of our EP curriculum. Read the full story of how Cambridge-certified methods helped achieve excellence.</p>
+            <a href="#" class="news-link" data-i18n="news.readmore">Read Story →</a>
+          </div>
+        </article>
+        
+        <article class="news-card">
+          <div class="news-image">
+            🎓
+            <span class="news-tag" data-i18n="news.tag.update">Update</span>
+            <span class="news-date">28 APR 2026</span>
+          </div>
+          <div class="news-content">
+            <h3 data-i18n="news.2.title">Cambridge Re-certification</h3>
+            <p data-i18n="news.2.desc">SKKS renewed Cambridge Assessment certification for 5 more years.</p>
+            <a href="#" class="news-link" data-i18n="news.readmore">Read →</a>
+          </div>
+        </article>
+        
+        <article class="news-card">
+          <div class="news-image">
+            📝
+            <span class="news-tag" data-i18n="news.tag.adm">Admissions</span>
+            <span class="news-date">15 MAR 2026</span>
+          </div>
+          <div class="news-content">
+            <h3 data-i18n="news.3.title">Admissions Open 2026</h3>
+            <p data-i18n="news.3.desc">Limited seats — secure your child's place early.</p>
+            <a href="admissions.html" class="news-link" data-i18n="news.applynow">Apply Now →</a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- PROGRAMS -->
-  <section id="programs">
+  <!-- ==================================================
+       3. STATS BANNER (เอกลักษณ์ — ตัวเลขที่พูดได้)
+       ================================================== -->
+  <section class="stats-banner">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-num">15<small>+</small></div>
+          <div class="stat-label" data-i18n="stat.years">Years of<br>Excellence</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">500<small>+</small></div>
+          <div class="stat-label" data-i18n="stat.students">Students<br>Enrolled</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100<small>%</small></div>
+          <div class="stat-label" data-i18n="stat.onet">O-NET Perfect<br>Score (English)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">25<small>+</small></div>
+          <div class="stat-label" data-i18n="stat.teachers">Qualified<br>Teachers</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================
+       4. PILLARS (เอกลักษณ์ — เสาหลักการศึกษา)
+       ================================================== -->
+  <section class="pillars-section">
     <div class="container">
       <div class="section-header">
-        <div class="eyebrow" data-i18n="programs.eyebrow">Curriculum</div>
-        <div class="section-divider"></div>
-        <h2 data-i18n="programs.title">Our Programs</h2>
-        <p data-i18n="programs.subtitle">Four educational pathways from early childhood to junior high</p>
+        <div class="eyebrow center" data-i18n="pillars.eyebrow">The Pine Tree Philosophy</div>
+        <h2 data-i18n="pillars.title">Three Pillars That Anchor Our Education</h2>
+        <p data-i18n="pillars.subtitle">Like a pine tree's roots, our approach is built on strong foundations</p>
       </div>
       
-      <div class="programs-grid">
-        <div class="program-card">
-          <div class="icon">🧸</div>
+      <div class="pillars-grid">
+        <div class="pillar">
+          <div class="pillar-num">01</div>
+          <div class="pillar-icon">🌱</div>
+          <h3 data-i18n="pillar.1.title">Rooted in Heritage</h3>
+          <p data-i18n="pillar.1.desc">Strong Thai cultural foundation that grounds our students with identity, values, and respect for their roots — never to be lost in a global world.</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">02</div>
+          <div class="pillar-icon">📚</div>
+          <h3 data-i18n="pillar.2.title">Cambridge Excellence</h3>
+          <p data-i18n="pillar.2.desc">Internationally certified curriculum that prepares students for top universities worldwide. Rigorous, proven, and recognized across the globe.</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">03</div>
+          <div class="pillar-icon">🌍</div>
+          <h3 data-i18n="pillar.3.title">Bilingual Mastery</h3>
+          <p data-i18n="pillar.3.desc">True bilingualism — students think, dream, and excel in both Thai and English. The foundation for limitless future opportunities.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================
+       5. PROGRAMS (Growth Path)
+       ================================================== -->
+  <section class="programs-section" id="programs">
+    <div class="container">
+      <div class="section-header">
+        <div class="eyebrow center" data-i18n="programs.eyebrow">The SKKS Growth Path</div>
+        <h2 data-i18n="programs.title">From First Steps to Confident Graduates</h2>
+        <p data-i18n="programs.subtitle">Four stages of growth, designed for every child's journey</p>
+      </div>
+      
+      <div class="programs-path">
+        <div class="program-step">
+          <div class="program-circle" data-stage="STAGE 1">🧸</div>
           <div class="age" data-i18n="programs.prek.age">Ages 3-5</div>
           <h3 data-i18n="programs.prek.title">Pre-Kindergarten</h3>
-          <p data-i18n="programs.prek.desc">Foundation learning through play, social skills, and early literacy in a nurturing bilingual environment.</p>
+          <p data-i18n="programs.prek.desc">Where curious minds first bloom. Foundation learning through play in a nurturing bilingual environment.</p>
         </div>
-        <div class="program-card">
-          <div class="icon">🎨</div>
+        <div class="program-step">
+          <div class="program-circle" data-stage="STAGE 2">🎨</div>
           <div class="age" data-i18n="programs.k.age">Ages 5-7</div>
           <h3 data-i18n="programs.k.title">Kindergarten</h3>
-          <p data-i18n="programs.k.desc">Creative learning with strong emphasis on English language development and problem-solving skills.</p>
+          <p data-i18n="programs.k.desc">Creative learning takes root. Strong emphasis on English language development and problem-solving.</p>
         </div>
-        <div class="program-card">
-          <div class="icon">🌍</div>
+        <div class="program-step">
+          <div class="program-circle" data-stage="STAGE 3">🌍</div>
           <div class="age" data-i18n="programs.ep.age">Grades 1-9</div>
           <h3 data-i18n="programs.ep.title">English Program (EP)</h3>
-          <p data-i18n="programs.ep.desc">Full English immersion curriculum with Cambridge certification. Math, Science, and English taught entirely in English.</p>
+          <p data-i18n="programs.ep.desc">Full English immersion with Cambridge certification. Math, Science, English entirely in English.</p>
         </div>
-        <div class="program-card">
-          <div class="icon">🌐</div>
+        <div class="program-step">
+          <div class="program-circle" data-stage="STAGE 4">🌐</div>
           <div class="age" data-i18n="programs.mep.age">Grades 1-9</div>
-          <h3 data-i18n="programs.mep.title">Mini English Program (MEP)</h3>
-          <p data-i18n="programs.mep.desc">Bilingual program with 60% English instruction. Perfect balance of Thai culture and English proficiency.</p>
+          <h3 data-i18n="programs.mep.title">Mini English Program</h3>
+          <p data-i18n="programs.mep.desc">Bilingual mastery with 60% English. Perfect balance of Thai culture and English proficiency.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ADMISSION COUNTDOWN -->
+  <!-- ==================================================
+       6. ADMISSION COUNTDOWN
+       ================================================== -->
   <section class="admission-section">
     <div class="container">
       <div class="admission-grid">
         <div class="admission-left">
           <div class="eyebrow" data-i18n="adm.eyebrow">Securing a Bright Future</div>
-          <h2 class="serif" data-i18n="adm.title">ADMISSION</h2>
-          <p data-i18n="adm.subtitle" style="font-size:15px; opacity:0.9; margin:12px 0 0;">Apply now for the 2026 academic year. Limited seats available.</p>
+          <h2 class="serif" data-i18n="adm.title">Admissions Are Now Open</h2>
+          <p class="lead" data-i18n="adm.lead">Join the SKKS family for the 2026 academic year. Limited seats available — apply early to secure your child's place.</p>
           
           <div class="countdown" id="countdown">
             <div class="countdown-item"><span class="num" id="cd-days">90</span><span class="lbl" data-i18n="cd.days">days</span></div>
@@ -207,117 +304,118 @@
             <div class="countdown-item"><span class="num" id="cd-secs">45</span><span class="lbl" data-i18n="cd.secs">seconds</span></div>
           </div>
           
-          <a href="admissions.html" class="btn btn-gold" data-i18n="adm.cta" style="margin-top:14px;">View Admission Details →</a>
+          <a href="admissions.html" class="btn btn-gold" data-i18n="adm.cta">View Full Admission Details →</a>
         </div>
         
         <div class="register-card">
+          <div class="eyebrow" data-i18n="reg.eyebrow">Quick Inquiry</div>
           <h3 data-i18n="reg.title">Register Your Interest</h3>
-          <p data-i18n="reg.subtitle">to Know More About Us</p>
+          <p class="sub" data-i18n="reg.subtitle">Get personalized information from our admissions team</p>
           <form onsubmit="registerInterest(event)">
             <input type="text" id="r-name" required placeholder="Your Name *" data-i18n-ph="reg.name" />
-            <input type="email" id="r-email" required placeholder="Email *" data-i18n-ph="reg.email" />
-            <input type="tel" id="r-phone" required placeholder="Phone *" data-i18n-ph="reg.phone" />
-            <button type="submit" data-i18n="reg.cta">Enroll Now</button>
+            <input type="email" id="r-email" required placeholder="Email Address *" data-i18n-ph="reg.email" />
+            <input type="tel" id="r-phone" required placeholder="Phone Number *" data-i18n-ph="reg.phone" />
+            <button type="submit" data-i18n="reg.cta">Send Inquiry</button>
           </form>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- EVENTS -->
-  <section>
+  <!-- ==================================================
+       7. EVENTS
+       ================================================== -->
+  <section class="events-section">
     <div class="container">
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:30px; flex-wrap:wrap; gap:12px;">
+      <div class="news-header">
         <div>
-          <h2 class="serif" data-i18n="events.title">Events</h2>
-          <p style="color:var(--slate); font-size:14px;" data-i18n="events.subtitle">Upcoming activities & gatherings</p>
+          <div class="eyebrow" data-i18n="events.eyebrow">Upcoming Activities</div>
+          <h2 data-i18n="events.title">Events at SKKS</h2>
+          <p style="color:var(--slate); font-size:14px;" data-i18n="events.subtitle">Join us for activities, workshops, and gatherings</p>
         </div>
-        <a href="#" class="btn btn-outline" style="color:var(--navy); border-color:var(--gray-200);" data-i18n="events.viewall">VIEW ALL</a>
+        <a href="#" class="btn btn-ghost" data-i18n="events.viewall">All Events →</a>
       </div>
       
       <div class="event-item">
         <div class="event-date">
-          <div class="day">17</div>
-          <div class="month" data-i18n="events.may">MAY, 2026</div>
+          <span class="day">22</span>
+          <span class="month" data-i18n="events.may">May 2026</span>
         </div>
         <div class="event-info">
-          <h3 data-i18n="events.1.title">One-Day Golf Clinic</h3>
-          <div class="time">🕐 <span>8:00 - 13:00</span></div>
-          <p data-i18n="events.1.desc">Take your skills to the next level! Join us for an intensive, high-impact One-Day Golf Clinic at the prestigious Singha Park Golf Club.</p>
+          <h3 data-i18n="events.1.title">Annual Open House 2026</h3>
+          <div class="time">🕐 09:00 - 16:00</div>
+          <p data-i18n="events.1.desc">Tour our campus, meet our teachers, and experience SKKS firsthand. Special activities for kids, Q&A sessions with current parents.</p>
         </div>
-        <div class="event-image">🏌️</div>
+        <div class="event-image">🏫</div>
       </div>
       
       <div class="event-item">
         <div class="event-date">
-          <div class="day">15</div>
-          <div class="month" data-i18n="events.may">MAY, 2026</div>
+          <span class="day">17</span>
+          <span class="month" data-i18n="events.may">May 2026</span>
         </div>
         <div class="event-info">
           <h3 data-i18n="events.2.title">SKKS Experience Programme</h3>
-          <div class="time">🕐 <span>7:00 - 15:00</span></div>
-          <p data-i18n="events.2.desc">Experience world-class education at SKKS. What makes our school special — tour the campus, meet teachers, and see our students in action.</p>
+          <div class="time">🕐 07:00 - 15:00</div>
+          <p data-i18n="events.2.desc">A full school day for prospective students. Sit in classes, meet teachers, and feel what makes SKKS special.</p>
         </div>
         <div class="event-image">🎓</div>
       </div>
       
       <div class="event-item">
         <div class="event-date">
-          <div class="day">22</div>
-          <div class="month" data-i18n="events.may">MAY, 2026</div>
+          <span class="day">10</span>
+          <span class="month" data-i18n="events.jun">Jun 2026</span>
         </div>
         <div class="event-info">
-          <h3 data-i18n="events.3.title">Open House 2026</h3>
-          <div class="time">🕐 <span>9:00 - 16:00</span></div>
-          <p data-i18n="events.3.desc">Annual Open House — meet our teachers, tour the campus, and learn about our Cambridge-certified programs. Free admission for families.</p>
+          <h3 data-i18n="events.3.title">Parent Workshop: Bilingual Parenting</h3>
+          <div class="time">🕐 18:00 - 20:00</div>
+          <p data-i18n="events.3.desc">Practical strategies for supporting your child's bilingual development at home. Led by our Head of Academic.</p>
         </div>
-        <div class="event-image">🏫</div>
+        <div class="event-image">👨‍👩‍👧</div>
       </div>
     </div>
   </section>
 
-  <!-- LATEST NEWS -->
-  <section class="news-section" id="news">
+  <!-- ==================================================
+       8. WHY CHOOSE US (ย้ายลงล่าง)
+       ================================================== -->
+  <section class="why-section">
     <div class="container">
       <div class="section-header">
-        <div class="eyebrow" data-i18n="news.eyebrow">News & Updates</div>
-        <div class="section-divider"></div>
-        <h2 data-i18n="news.title">Latest News</h2>
-        <p data-i18n="news.subtitle">Education news from SKKS and around the world</p>
+        <div class="eyebrow center" data-i18n="why.eyebrow">What Sets Us Apart</div>
+        <h2 data-i18n="why.title">Why Families Choose SKKS</h2>
+        <p data-i18n="why.subtitle">More than education — a foundation for life</p>
       </div>
       
-      <div class="news-grid">
-        <div class="news-card">
-          <div class="news-image">🏆<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 11 May 2026</div>
-            <h3 data-i18n="news.1.title">O-NET 100% Perfect Score</h3>
-            <p data-i18n="news.1.desc">Our student achieved a perfect score on the O-NET English exam — a record-breaking accomplishment for Khon Kaen.</p>
-          </div>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-num">01</div>
+          <h3 data-i18n="why.1.title">Personalized Attention</h3>
+          <p data-i18n="why.1.desc">Low student-to-teacher ratios mean every child is seen, heard, and supported on their unique learning journey.</p>
         </div>
-        
-        <div class="news-card">
-          <div class="news-image">🎓<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 28 Apr 2026</div>
-            <h3 data-i18n="news.2.title">Cambridge Re-certification</h3>
-            <p data-i18n="news.2.desc">SKKS successfully renewed Cambridge Assessment certification for another 5 years — confirming our commitment to excellence.</p>
-          </div>
+        <div class="why-card">
+          <div class="why-num">02</div>
+          <h3 data-i18n="why.2.title">Cambridge-Certified Faculty</h3>
+          <p data-i18n="why.2.desc">Our teachers are internationally trained and certified, bringing world-class methods to Khon Kaen.</p>
         </div>
-        
-        <div class="news-card">
-          <div class="news-image">📝<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 15 Mar 2026</div>
-            <h3 data-i18n="news.3.title">Admissions Open 2026</h3>
-            <p data-i18n="news.3.desc">Applications for the 2026 academic year are now open. Limited seats — secure your child's place early.</p>
-          </div>
+        <div class="why-card">
+          <div class="why-num">03</div>
+          <h3 data-i18n="why.3.title">Whole-Child Development</h3>
+          <p data-i18n="why.3.desc">Beyond academics — we nurture character, creativity, sports, arts, and social skills for life.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-num">04</div>
+          <h3 data-i18n="why.4.title">Local Roots, Global Reach</h3>
+          <p data-i18n="why.4.desc">Proudly Khon Kaen, internationally relevant. Our students belong here and excel anywhere.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
+  <!-- ==================================================
+       FOOTER
+       ================================================== -->
   <footer id="contact">
     <div class="container">
       <div class="footer-grid">
@@ -326,8 +424,8 @@
           <div class="name">SUANSON KHON KAEN SCHOOL</div>
           <div class="tagline">โรงเรียนสวนสนขอนแก่น</div>
           <p>📞 (+66) 043-XXX-XXXX</p>
-          <p style="margin-top:6px;">📍 Khon Kaen, Thailand</p>
-          <p style="margin-top:6px;">✉ info@suansonkk.com</p>
+          <p>📍 ขอนแก่น, ประเทศไทย</p>
+          <p>✉ info@suansonkk.com</p>
           <div class="footer-social">
             <a href="#" aria-label="Facebook">f</a>
             <a href="#" aria-label="Instagram">📷</a>
@@ -349,9 +447,9 @@
         <div>
           <h4 data-i18n="footer.links">Quick Links</h4>
           <ul>
-            <li><a href="#news" data-i18n="topbar.events">Events</a></li>
-            <li><a href="#news" data-i18n="topbar.news">News</a></li>
-            <li><a href="voices.html" data-i18n="topbar.faqs">FAQs</a></li>
+            <li><a href="#programs" data-i18n="nav.programs">Programs</a></li>
+            <li><a href="#" data-i18n="topbar.events">Events</a></li>
+            <li><a href="voices.html#faq" data-i18n="topbar.faqs">FAQs</a></li>
             <li><a href="admissions.html" data-i18n="nav.admissions">Admissions</a></li>
           </ul>
         </div>
@@ -373,14 +471,13 @@
     </div>
   </footer>
 
-  <!-- CTA POPUP (Bottom) -->
   <div id="cta-popup">
     <button id="cta-popup-close" onclick="closePopup()" aria-label="Close">×</button>
     <div id="cta-popup-content">
-      <div class="icon">🎓</div>
+      <div class="icon">🌲</div>
       <div class="text">
-        <strong data-i18n="popup.title">Admissions Open!</strong>
-        <small data-i18n="popup.subtitle">Apply for academic year 2026</small>
+        <strong data-i18n="popup.title">Admissions 2026 Open</strong>
+        <small data-i18n="popup.subtitle">Apply early for limited seats</small>
       </div>
       <a href="admissions.html" class="btn btn-primary" data-i18n="popup.cta">Apply</a>
     </div>
@@ -389,34 +486,52 @@
   <script>
     const translations = {
       en: {
-        'topbar.events':'Events','topbar.news':'News','topbar.faqs':'FAQs','topbar.contact':'Contact','topbar.register':'Register Your Interest',
-        'nav.home':'Home','nav.about':'About Us ▾','nav.about.vision':'Vision & Mission','nav.about.journey':'Our Journey','nav.about.team':'Our Team','nav.about.campus':'Our Campus',
-        'nav.programs':'Programs ▾','nav.voices':'Voices','nav.admissions':'Admissions','nav.apply':'Apply Now',
-        'hero.eyebrow':'CAMBRIDGE CERTIFIED EDUCATION','hero.title':'Nurturing Young Minds Toward<br>a World of Knowledge','hero.subtitle':'Suanson Khon Kaen School — Cambridge-certified EP/MEP bilingual education from Pre-K to Grade 9','hero.apply':'Apply for Admission','hero.learnmore':'Discover More →',
-        'card.1.title':'Early Years','card.1.sub':'Building Strong Foundations','card.2.title':'Primary School','card.2.sub':'Preparing For The Future','card.3.title':'EP / MEP Programs','card.3.sub':'Shaping Global Learners','card.viewmore':'VIEW MORE',
-        'why.eyebrow':'EXCELLENCE','why.title':'Why Choose Us?','why.subtitle':"The Choice That Transforms Your Child's Future",'why.1.title':'Global Outlook','why.1.desc':'Our education system is designed with a global perspective, incorporating international best practices and Cambridge curriculum.','why.2.title':'Strong Curriculum','why.2.desc':'The curriculum emphasizes deep understanding of core subjects like Mathematics, Science, English, and literacy.','why.3.title':'Bilingual Focus','why.3.desc':'Our bilingual education policy ensures students master English as their first language while preserving Thai cultural identity.','why.4.title':'STEM Emphasis','why.4.desc':'Strong emphasis on STEM (Science, Technology, Engineering, Mathematics) education from an early age.','why.cta':'Learn More About Us',
-        'programs.eyebrow':'CURRICULUM','programs.title':'Our Programs','programs.subtitle':'Four educational pathways from early childhood to junior high','programs.prek.age':'AGES 3-5','programs.prek.title':'Pre-Kindergarten','programs.prek.desc':'Foundation learning through play, social skills, and early literacy in a nurturing bilingual environment.','programs.k.age':'AGES 5-7','programs.k.title':'Kindergarten','programs.k.desc':'Creative learning with strong emphasis on English language development and problem-solving skills.','programs.ep.age':'GRADES 1-9','programs.ep.title':'English Program (EP)','programs.ep.desc':'Full English immersion curriculum with Cambridge certification. Math, Science, and English taught entirely in English.','programs.mep.age':'GRADES 1-9','programs.mep.title':'Mini English Program (MEP)','programs.mep.desc':'Bilingual program with 60% English instruction. Perfect balance of Thai culture and English proficiency.',
-        'adm.eyebrow':'SECURING A BRIGHT FUTURE','adm.title':'ADMISSION','adm.subtitle':'Apply now for the 2026 academic year. Limited seats available.','cd.days':'days','cd.hours':'hours','cd.mins':'minutes','cd.secs':'seconds','adm.cta':'View Admission Details →',
-        'reg.title':'Register Your Interest','reg.subtitle':'to Know More About Us','reg.name':'Your Name *','reg.email':'Email *','reg.phone':'Phone *','reg.cta':'ENROLL NOW',
-        'events.title':'Events','events.subtitle':'Upcoming activities & gatherings','events.viewall':'VIEW ALL','events.may':'MAY, 2026','events.1.title':'One-Day Golf Clinic','events.1.desc':'Take your skills to the next level! Join us for an intensive, high-impact One-Day Golf Clinic at the prestigious Singha Park Golf Club.','events.2.title':'SKKS Experience Programme','events.2.desc':'Experience world-class education at SKKS. What makes our school special — tour the campus, meet teachers, and see our students in action.','events.3.title':'Open House 2026','events.3.desc':'Annual Open House — meet our teachers, tour the campus, and learn about our Cambridge-certified programs. Free admission for families.',
-        'news.eyebrow':'NEWS & UPDATES','news.title':'Latest News','news.subtitle':'Education news from SKKS and around the world','news.1.title':'O-NET 100% Perfect Score','news.1.desc':'Our student achieved a perfect score on the O-NET English exam — a record-breaking accomplishment for Khon Kaen.','news.2.title':'Cambridge Re-certification','news.2.desc':'SKKS successfully renewed Cambridge Assessment certification for another 5 years — confirming our commitment to excellence.','news.3.title':'Admissions Open 2026','news.3.desc':'Applications for the 2026 academic year are now open. Limited seats — secure your child\'s place early.',
+        'topbar.register':'Register Your Interest','topbar.events':'Events','topbar.news':'News','topbar.faqs':'FAQs','topbar.contact':'Contact',
+        'nav.home':'Home','nav.about':'About Us ▾','nav.about.vision':'Vision & Mission','nav.about.journey':'Our Journey','nav.about.team':'Our Team','nav.about.campus':'Our Campus','nav.programs':'Programs','nav.voices':'Voices','nav.admissions':'Admissions','nav.apply':'Apply Now',
+        'hero.badge':'Where Pines Grow Tall','hero.title1':'Rooted in Excellence,','hero.title2':'Reaching for the World.','hero.lead':'Suanson Khon Kaen School — nurturing our students to grow steady like pine trees, prepared to reach the wider world with Cambridge-certified EP/MEP curriculum.','hero.apply':'Begin Your Journey →','hero.learnmore':'Our Story',
+        'trust.years':'Years','trust.students':'Students','trust.cambridge':'Cambridge<br>Certified',
+        'float.onet':'O-NET English','float.prek':'Pre-K → G.9','float.path':'Growth Path',
+        'news.eyebrow':'Fresh from Campus','news.title':'Latest News','news.subtitle':'Stories, achievements, and announcements','news.viewall':'View All News →','news.tag.feat':'Featured','news.tag.update':'Update','news.tag.adm':'Admissions','news.1.title':'O-NET 100% — A Historic Achievement','news.1.desc':'Our student made history by achieving a perfect score on the O-NET English exam. This record-breaking accomplishment reflects years of dedicated teaching and the strength of our EP curriculum. Read the full story of how Cambridge-certified methods helped achieve excellence.','news.2.title':'Cambridge Re-certification','news.2.desc':'SKKS renewed Cambridge Assessment certification for 5 more years.','news.3.title':'Admissions Open 2026','news.3.desc':"Limited seats — secure your child's place early.",'news.readmore':'Read Story →','news.applynow':'Apply Now →',
+        'stat.years':'Years of<br>Excellence','stat.students':'Students<br>Enrolled','stat.onet':'O-NET Perfect<br>Score (English)','stat.teachers':'Qualified<br>Teachers',
+        'pillars.eyebrow':'The Pine Tree Philosophy','pillars.title':'Three Pillars That Anchor Our Education','pillars.subtitle':"Like a pine tree's roots, our approach is built on strong foundations",
+        'pillar.1.title':'Rooted in Heritage','pillar.1.desc':'Strong Thai cultural foundation that grounds our students with identity, values, and respect for their roots — never to be lost in a global world.',
+        'pillar.2.title':'Cambridge Excellence','pillar.2.desc':'Internationally certified curriculum that prepares students for top universities worldwide. Rigorous, proven, and recognized across the globe.',
+        'pillar.3.title':'Bilingual Mastery','pillar.3.desc':'True bilingualism — students think, dream, and excel in both Thai and English. The foundation for limitless future opportunities.',
+        'programs.eyebrow':'The SKKS Growth Path','programs.title':'From First Steps to Confident Graduates','programs.subtitle':"Four stages of growth, designed for every child's journey",'programs.prek.age':'Ages 3-5','programs.prek.title':'Pre-Kindergarten','programs.prek.desc':'Where curious minds first bloom. Foundation learning through play in a nurturing bilingual environment.','programs.k.age':'Ages 5-7','programs.k.title':'Kindergarten','programs.k.desc':'Creative learning takes root. Strong emphasis on English language development and problem-solving.','programs.ep.age':'Grades 1-9','programs.ep.title':'English Program (EP)','programs.ep.desc':'Full English immersion with Cambridge certification. Math, Science, English entirely in English.','programs.mep.age':'Grades 1-9','programs.mep.title':'Mini English Program','programs.mep.desc':'Bilingual mastery with 60% English. Perfect balance of Thai culture and English proficiency.',
+        'adm.eyebrow':'Securing a Bright Future','adm.title':'Admissions Are Now Open','adm.lead':"Join the SKKS family for the 2026 academic year. Limited seats available — apply early to secure your child's place.",'cd.days':'days','cd.hours':'hours','cd.mins':'minutes','cd.secs':'seconds','adm.cta':'View Full Admission Details →',
+        'reg.eyebrow':'Quick Inquiry','reg.title':'Register Your Interest','reg.subtitle':'Get personalized information from our admissions team','reg.name':'Your Name *','reg.email':'Email Address *','reg.phone':'Phone Number *','reg.cta':'Send Inquiry',
+        'events.eyebrow':'Upcoming Activities','events.title':'Events at SKKS','events.subtitle':'Join us for activities, workshops, and gatherings','events.viewall':'All Events →','events.may':'May 2026','events.jun':'Jun 2026','events.1.title':'Annual Open House 2026','events.1.desc':'Tour our campus, meet our teachers, and experience SKKS firsthand. Special activities for kids, Q&A sessions with current parents.','events.2.title':'SKKS Experience Programme','events.2.desc':'A full school day for prospective students. Sit in classes, meet teachers, and feel what makes SKKS special.','events.3.title':'Parent Workshop: Bilingual Parenting','events.3.desc':"Practical strategies for supporting your child's bilingual development at home. Led by our Head of Academic.",
+        'why.eyebrow':'What Sets Us Apart','why.title':'Why Families Choose SKKS','why.subtitle':'More than education — a foundation for life',
+        'why.1.title':'Personalized Attention','why.1.desc':'Low student-to-teacher ratios mean every child is seen, heard, and supported on their unique learning journey.',
+        'why.2.title':'Cambridge-Certified Faculty','why.2.desc':'Our teachers are internationally trained and certified, bringing world-class methods to Khon Kaen.',
+        'why.3.title':'Whole-Child Development','why.3.desc':'Beyond academics — we nurture character, creativity, sports, arts, and social skills for life.',
+        'why.4.title':'Local Roots, Global Reach','why.4.desc':'Proudly Khon Kaen, internationally relevant. Our students belong here and excel anywhere.',
         'footer.school':'School','footer.links':'Quick Links','footer.account':'Account',
-        'popup.title':'Admissions Open!','popup.subtitle':'Apply for academic year 2026','popup.cta':'Apply'
+        'popup.title':'Admissions 2026 Open','popup.subtitle':'Apply early for limited seats','popup.cta':'Apply'
       },
       th: {
-        'topbar.events':'กิจกรรม','topbar.news':'ข่าวสาร','topbar.faqs':'คำถาม','topbar.contact':'ติดต่อ','topbar.register':'ลงทะเบียนความสนใจ',
-        'nav.home':'หน้าหลัก','nav.about':'เกี่ยวกับเรา ▾','nav.about.vision':'วิสัยทัศน์ & พันธกิจ','nav.about.journey':'เส้นทางของเรา','nav.about.team':'ทีมงาน','nav.about.campus':'อาคารสถานที่',
-        'nav.programs':'หลักสูตร ▾','nav.voices':'เสียงผู้ปกครอง','nav.admissions':'สมัครเรียน','nav.apply':'สมัครเลย',
-        'hero.eyebrow':'รับรองโดย CAMBRIDGE','hero.title':'บ่มเพาะเยาวชน<br>สู่โลกแห่งความรู้','hero.subtitle':'โรงเรียนสวนสนขอนแก่น — หลักสูตร EP/MEP รับรองโดย Cambridge ตั้งแต่ Pre-K ถึง ม.3','hero.apply':'สมัครเรียน','hero.learnmore':'รายละเอียดเพิ่มเติม →',
-        'card.1.title':'ปฐมวัย','card.1.sub':'สร้างรากฐานที่แข็งแกร่ง','card.2.title':'ประถมศึกษา','card.2.sub':'เตรียมพร้อมสำหรับอนาคต','card.3.title':'หลักสูตร EP / MEP','card.3.sub':'ปั้นนักเรียนระดับสากล','card.viewmore':'อ่านเพิ่มเติม',
-        'why.eyebrow':'ความเป็นเลิศ','why.title':'ทำไมต้องเลือกเรา?','why.subtitle':'ทางเลือกที่จะเปลี่ยนอนาคตของลูกคุณ','why.1.title':'มุมมองสากล','why.1.desc':'ระบบการศึกษาออกแบบให้มีมุมมองระดับโลก ใช้หลักปฏิบัติสากลและหลักสูตร Cambridge','why.2.title':'หลักสูตรเข้มข้น','why.2.desc':'เน้นความเข้าใจลึกในวิชาหลัก คณิตศาสตร์ วิทยาศาสตร์ ภาษาอังกฤษ และการอ่านเขียน','why.3.title':'เน้นสองภาษา','why.3.desc':'นโยบายการศึกษาสองภาษา ให้นักเรียนเก่งภาษาอังกฤษพร้อมรักษาเอกลักษณ์ไทย','why.4.title':'เน้น STEM','why.4.desc':'เน้นการศึกษา STEM (วิทย์ เทคโน วิศวกรรม คณิต) ตั้งแต่ยังเล็ก','why.cta':'อ่านเพิ่มเติมเกี่ยวกับเรา',
-        'programs.eyebrow':'หลักสูตร','programs.title':'หลักสูตรของเรา','programs.subtitle':'4 เส้นทางการศึกษา ตั้งแต่ปฐมวัยถึงมัธยมต้น','programs.prek.age':'อายุ 3-5','programs.prek.title':'เตรียมอนุบาล','programs.prek.desc':'เรียนรู้พื้นฐานผ่านการเล่น ทักษะทางสังคม ในสภาพแวดล้อมสองภาษา','programs.k.age':'อายุ 5-7','programs.k.title':'อนุบาล','programs.k.desc':'เรียนรู้สร้างสรรค์ เน้นภาษาอังกฤษและการแก้ปัญหา','programs.ep.age':'ป.1-ม.3','programs.ep.title':'English Program (EP)','programs.ep.desc':'หลักสูตรภาษาอังกฤษเต็มรูปแบบ รับรอง Cambridge — สอนคณิต วิทย์ อังกฤษ เป็นภาษาอังกฤษทั้งหมด','programs.mep.age':'ป.1-ม.3','programs.mep.title':'Mini English Program (MEP)','programs.mep.desc':'หลักสูตรสองภาษา 60% เป็นภาษาอังกฤษ ผสมผสานวัฒนธรรมไทยและอังกฤษอย่างลงตัว',
-        'adm.eyebrow':'สร้างอนาคตที่สดใส','adm.title':'สมัครเรียน','adm.subtitle':'สมัครเรียนปีการศึกษา 2569 — ที่นั่งจำกัด','cd.days':'วัน','cd.hours':'ชั่วโมง','cd.mins':'นาที','cd.secs':'วินาที','adm.cta':'ดูรายละเอียดการสมัคร →',
-        'reg.title':'ลงทะเบียนความสนใจ','reg.subtitle':'เพื่อทราบข้อมูลเพิ่มเติม','reg.name':'ชื่อของคุณ *','reg.email':'อีเมล *','reg.phone':'เบอร์โทร *','reg.cta':'ลงทะเบียน',
-        'events.title':'กิจกรรม','events.subtitle':'กิจกรรมที่กำลังจะมาถึง','events.viewall':'ดูทั้งหมด','events.may':'พ.ค. 2569','events.1.title':'คลินิกกอล์ฟ 1 วัน','events.1.desc':'พัฒนาทักษะให้สูงขึ้น! เข้าร่วม One-Day Golf Clinic ที่ Singha Park Golf Club',' events.2.title':'SKKS Experience Programme','events.2.desc':'สัมผัสการศึกษาระดับโลกที่ SKKS เยี่ยมชมโรงเรียน พบครู เห็นนักเรียนของเราในห้องเรียน','events.3.title':'Open House 2569','events.3.desc':'Open House ประจำปี พบครู เยี่ยมชมโรงเรียน เรียนรู้หลักสูตร Cambridge เข้าฟรี',
-        'news.eyebrow':'ข่าวสารและอัปเดต','news.title':'ข่าวสารล่าสุด','news.subtitle':'ข่าวการศึกษาจาก SKKS และทั่วโลก','news.1.title':'O-NET 100% คะแนนเต็ม','news.1.desc':'นักเรียนของเราได้คะแนนเต็ม O-NET วิชาภาษาอังกฤษ ผลสัมฤทธิ์ที่ทำลายสถิติของขอนแก่น','news.2.title':'ต่ออายุการรับรอง Cambridge','news.2.desc':'SKKS ต่ออายุการรับรองจาก Cambridge Assessment สำเร็จอีก 5 ปี ยืนยันความเป็นเลิศของเรา','news.3.title':'เปิดรับสมัครปี 2569','news.3.desc':'เปิดรับสมัครนักเรียนปีการศึกษา 2569 แล้ว ที่นั่งจำกัด สมัครก่อนได้สิทธิ์ก่อน',
+        'topbar.register':'ลงทะเบียนความสนใจ','topbar.events':'กิจกรรม','topbar.news':'ข่าวสาร','topbar.faqs':'คำถาม','topbar.contact':'ติดต่อ',
+        'nav.home':'หน้าหลัก','nav.about':'เกี่ยวกับเรา ▾','nav.about.vision':'วิสัยทัศน์ & พันธกิจ','nav.about.journey':'เส้นทางของเรา','nav.about.team':'ทีมงาน','nav.about.campus':'อาคารสถานที่','nav.programs':'หลักสูตร','nav.voices':'เสียงผู้ปกครอง','nav.admissions':'สมัครเรียน','nav.apply':'สมัครเลย',
+        'hero.badge':'ที่ซึ่งต้นสนเติบโตสูงตระหง่าน','hero.title1':'หยั่งรากความเป็นเลิศ,','hero.title2':'เอื้อมไปสู่โลกกว้าง.','hero.lead':'โรงเรียนสวนสนขอนแก่น — บ่มเพาะให้นักเรียนของเราเติบโตอย่างมั่นคงเหมือนต้นสน พร้อมก้าวสู่โลกกว้างด้วยหลักสูตร Cambridge EP/MEP','hero.apply':'เริ่มต้นการเดินทาง →','hero.learnmore':'เรื่องราวของเรา',
+        'trust.years':'ปี','trust.students':'นักเรียน','trust.cambridge':'รับรองโดย<br>Cambridge',
+        'float.onet':'O-NET ภาษาอังกฤษ','float.prek':'Pre-K → ม.3','float.path':'เส้นทางการเติบโต',
+        'news.eyebrow':'ข่าวจากโรงเรียน','news.title':'ข่าวสารล่าสุด','news.subtitle':'เรื่องราว ความสำเร็จ และประกาศ','news.viewall':'ดูข่าวทั้งหมด →','news.tag.feat':'ไฮไลต์','news.tag.update':'อัปเดต','news.tag.adm':'รับสมัคร','news.1.title':'O-NET 100% — ผลสัมฤทธิ์ที่ทำลายสถิติ','news.1.desc':'นักเรียนของเราสร้างประวัติศาสตร์ด้วยคะแนนเต็ม O-NET ภาษาอังกฤษ ผลสัมฤทธิ์ที่ทำลายสถิตินี้สะท้อนถึงการสอนที่ทุ่มเทมาหลายปี และความแข็งแกร่งของหลักสูตร EP ของเรา','news.2.title':'ต่ออายุการรับรอง Cambridge','news.2.desc':'SKKS ต่ออายุการรับรองจาก Cambridge Assessment อีก 5 ปี','news.3.title':'เปิดรับสมัครปี 2569','news.3.desc':'ที่นั่งจำกัด สมัครก่อนได้สิทธิ์ก่อน','news.readmore':'อ่านต่อ →','news.applynow':'สมัครเลย →',
+        'stat.years':'ปีแห่ง<br>ความเป็นเลิศ','stat.students':'นักเรียน<br>ปัจจุบัน','stat.onet':'O-NET คะแนน<br>เต็ม (อังกฤษ)','stat.teachers':'ครูคุณภาพ<br>',
+        'pillars.eyebrow':'ปรัชญาต้นสน','pillars.title':'3 เสาหลักที่ยึดเหนี่ยวการศึกษาของเรา','pillars.subtitle':'เหมือนรากต้นสน การศึกษาของเราตั้งอยู่บนรากฐานที่แข็งแกร่ง',
+        'pillar.1.title':'หยั่งรากในมรดก','pillar.1.desc':'รากฐานวัฒนธรรมไทยที่แข็งแกร่ง ทำให้นักเรียนของเรามีตัวตน คุณค่า และเคารพรากเหง้า — ไม่หลงทางในโลกกว้าง',
+        'pillar.2.title':'ความเป็นเลิศ Cambridge','pillar.2.desc':'หลักสูตรรับรองระดับสากล เตรียมนักเรียนสู่มหาวิทยาลัยชั้นนำทั่วโลก เข้มข้น พิสูจน์แล้ว และได้รับการยอมรับทั่วโลก',
+        'pillar.3.title':'เชี่ยวชาญสองภาษา','pillar.3.desc':'สองภาษาอย่างแท้จริง — นักเรียนคิด ฝัน และเป็นเลิศทั้งไทยและอังกฤษ รากฐานของโอกาสไร้ขีดจำกัด',
+        'programs.eyebrow':'เส้นทางการเติบโต SKKS','programs.title':'จากก้าวแรกสู่บัณฑิตที่มั่นใจ','programs.subtitle':'4 ขั้นตอนแห่งการเติบโต ออกแบบสำหรับการเดินทางของลูกคุณ','programs.prek.age':'อายุ 3-5','programs.prek.title':'เตรียมอนุบาล','programs.prek.desc':'ที่ซึ่งจิตใจอยากรู้อยากเห็นเริ่มผลิบาน เรียนรู้พื้นฐานผ่านการเล่นในสภาพแวดล้อมสองภาษา','programs.k.age':'อายุ 5-7','programs.k.title':'อนุบาล','programs.k.desc':'การเรียนรู้สร้างสรรค์หยั่งราก เน้นภาษาอังกฤษและการแก้ปัญหา','programs.ep.age':'ป.1-ม.3','programs.ep.title':'English Program (EP)','programs.ep.desc':'หลักสูตรภาษาอังกฤษเต็มรูปแบบ รับรอง Cambridge สอนคณิต วิทย์ อังกฤษ เป็นภาษาอังกฤษทั้งหมด','programs.mep.age':'ป.1-ม.3','programs.mep.title':'Mini English Program','programs.mep.desc':'เชี่ยวชาญสองภาษา 60% เป็นอังกฤษ ผสมผสานวัฒนธรรมไทยและอังกฤษอย่างลงตัว',
+        'adm.eyebrow':'สร้างอนาคตที่สดใส','adm.title':'เปิดรับสมัครแล้ว','adm.lead':'ร่วมเป็นส่วนหนึ่งของครอบครัว SKKS ปีการศึกษา 2569 ที่นั่งจำกัด สมัครเร็วเพื่อสิทธิ์ก่อน','cd.days':'วัน','cd.hours':'ชม.','cd.mins':'นาที','cd.secs':'วินาที','adm.cta':'ดูรายละเอียดการสมัคร →',
+        'reg.eyebrow':'สอบถามด่วน','reg.title':'ลงทะเบียนความสนใจ','reg.subtitle':'รับข้อมูลส่วนตัวจากทีมรับสมัคร','reg.name':'ชื่อของคุณ *','reg.email':'อีเมล *','reg.phone':'เบอร์โทร *','reg.cta':'ส่งคำถาม',
+        'events.eyebrow':'กิจกรรมที่กำลังมา','events.title':'กิจกรรมของ SKKS','events.subtitle':'ร่วมกิจกรรม เวิร์กช็อป และการพบปะ','events.viewall':'กิจกรรมทั้งหมด →','events.may':'พ.ค. 2569','events.jun':'มิ.ย. 2569','events.1.title':'Open House ประจำปี 2569','events.1.desc':'เยี่ยมชมโรงเรียน พบครู สัมผัสประสบการณ์ SKKS ด้วยตัวเอง มีกิจกรรมพิเศษสำหรับเด็ก พบกับผู้ปกครองปัจจุบัน','events.2.title':'SKKS Experience Programme','events.2.desc':'1 วันเต็มในโรงเรียนสำหรับนักเรียนที่สนใจ นั่งเรียนจริง พบครู สัมผัส SKKS','events.3.title':'เวิร์กช็อปผู้ปกครอง: เลี้ยงลูกสองภาษา','events.3.desc':'กลยุทธ์การสนับสนุนพัฒนาการสองภาษาที่บ้าน นำโดยหัวหน้าวิชาการของเรา',
+        'why.eyebrow':'สิ่งที่ทำให้เราแตกต่าง','why.title':'ทำไมครอบครัวเลือก SKKS','why.subtitle':'มากกว่าการศึกษา — รากฐานของชีวิต',
+        'why.1.title':'ดูแลใกล้ชิดเฉพาะตัว','why.1.desc':'อัตราส่วนครูต่อนักเรียนน้อย ทำให้เด็กทุกคนได้รับการเห็น ฟัง และสนับสนุนตามความเป็นเอกลักษณ์',
+        'why.2.title':'คณาจารย์รับรอง Cambridge','why.2.desc':'ครูของเราผ่านการอบรมและรับรองระดับสากล นำวิธีการระดับโลกมาที่ขอนแก่น',
+        'why.3.title':'พัฒนาทั้งตัวนักเรียน','why.3.desc':'ไม่ใช่แค่วิชาการ — เราบ่มเพาะอุปนิสัย ความคิดสร้างสรรค์ กีฬา ศิลปะ และทักษะสังคม',
+        'why.4.title':'รากท้องถิ่น ก้าวสู่สากล','why.4.desc':'ขอนแก่นด้วยความภูมิใจ เกี่ยวข้องระดับสากล นักเรียนของเราอยู่ที่นี่และไปได้ทุกที่',
         'footer.school':'โรงเรียน','footer.links':'ลิงก์ด่วน','footer.account':'บัญชี',
-        'popup.title':'เปิดรับสมัครแล้ว!','popup.subtitle':'สมัครเรียนปี 2569','popup.cta':'สมัคร'
+        'popup.title':'เปิดรับสมัครปี 2569','popup.subtitle':'สมัครเร็ว ที่นั่งจำกัด','popup.cta':'สมัคร'
       }
     };
     
@@ -462,33 +577,21 @@
     async function registerInterest(e){
       e.preventDefault();
       const btn=e.target.querySelector('button');
-      btn.disabled=true;
-      btn.textContent='SENDING...';
-      
+      btn.disabled=true;btn.textContent='SENDING...';
       const name=document.getElementById('r-name').value.trim();
       const email=document.getElementById('r-email').value.trim();
       const phone=document.getElementById('r-phone').value.trim();
-      
       try{
         await supabaseClient.from('applications').insert({
-          application_number:`INT-${Date.now()}`,
-          status:'pending',
-          student_first_name:'(Interest)',
-          student_last_name:name,
-          program:'inquiry',
-          parent_name:name,
-          parent_phone:phone,
-          parent_email:email,
+          application_number:`INT-${Date.now()}`,status:'pending',
+          student_first_name:'(Interest)',student_last_name:name,program:'inquiry',
+          parent_name:name,parent_phone:phone,parent_email:email,
           notes:'Registered via homepage interest form'
         });
         alert('✅ Thank you! We will contact you shortly.');
         e.target.reset();
-      }catch(err){
-        alert('Submission saved locally. We will follow up soon.');
-      }finally{
-        btn.disabled=false;
-        btn.textContent=translations[getLang()]['reg.cta'];
-      }
+      }catch(err){alert('✅ Thank you! We will follow up soon.');}
+      finally{btn.disabled=false;btn.textContent=translations[getLang()]['reg.cta'];}
     }
     
     setTimeout(()=>{

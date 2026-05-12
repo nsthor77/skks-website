@@ -214,43 +214,10 @@
         <a href="#" class="btn btn-outline" style="color:var(--navy); border-color:var(--gray-200);" data-i18n="events.viewall">VIEW ALL</a>
       </div>
       
-      <div class="event-item">
-        <div class="event-date">
-          <div class="day">17</div>
-          <div class="month" data-i18n="events.may">MAY, 2026</div>
+      <div id="eventsContainer">
+        <div style="text-align:center; padding:40px; color:var(--slate);">
+          ⏳ Loading events...
         </div>
-        <div class="event-info">
-          <h3 data-i18n="events.1.title">One-Day Golf Clinic</h3>
-          <div class="time">🕐 <span>8:00 - 13:00</span></div>
-          <p data-i18n="events.1.desc">Take your skills to the next level! Join us for an intensive, high-impact One-Day Golf Clinic at the prestigious Singha Park Golf Club.</p>
-        </div>
-        <div class="event-image">🏌️</div>
-      </div>
-      
-      <div class="event-item">
-        <div class="event-date">
-          <div class="day">15</div>
-          <div class="month" data-i18n="events.may">MAY, 2026</div>
-        </div>
-        <div class="event-info">
-          <h3 data-i18n="events.2.title">SKKS Experience Programme</h3>
-          <div class="time">🕐 <span>7:00 - 15:00</span></div>
-          <p data-i18n="events.2.desc">Experience world-class education at SKKS. What makes our school special — tour the campus, meet teachers, and see our students in action.</p>
-        </div>
-        <div class="event-image">🎓</div>
-      </div>
-      
-      <div class="event-item">
-        <div class="event-date">
-          <div class="day">22</div>
-          <div class="month" data-i18n="events.may">MAY, 2026</div>
-        </div>
-        <div class="event-info">
-          <h3 data-i18n="events.3.title">Open House 2026</h3>
-          <div class="time">🕐 <span>9:00 - 16:00</span></div>
-          <p data-i18n="events.3.desc">Annual Open House — meet our teachers, tour the campus, and learn about our Cambridge-certified programs. Free admission for families.</p>
-        </div>
-        <div class="event-image">🏫</div>
       </div>
     </div>
   </section>
@@ -476,6 +443,73 @@
     },5000);
     
     
+    
+    async function loadUpcomingEvents(){
+      try{
+        const today = new Date().toISOString().split('T')[0];
+        const {data, error} = await supabaseClient
+          .from('events')
+          .select('*')
+          .eq('published', true)
+          .gte('event_date', today)
+          .order('event_date', {ascending: true})
+          .limit(3);
+        if(error || !data || data.length === 0){
+          renderFallbackEvents();
+          return;
+        }
+        renderEvents(data);
+      }catch(err){
+        renderFallbackEvents();
+      }
+    }
+    
+    function renderEvents(events){
+      const lang = getLang();
+      const container = document.getElementById('eventsContainer');
+      const monthsEn = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      const monthsTh = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      
+      container.innerHTML = events.map(e => {
+        const d = new Date(e.event_date);
+        const day = d.getDate();
+        const m = lang === 'th' ? monthsTh[d.getMonth()] : monthsEn[d.getMonth()];
+        const yr = lang === 'th' ? (d.getFullYear() + 543) : d.getFullYear();
+        const title = lang === 'th' && e.title_th ? e.title_th : e.title;
+        const desc = lang === 'th' && e.description_th ? e.description_th : (e.description || '');
+        return `<div class="event-item">
+          <div class="event-date">
+            <div class="day">${day}</div>
+            <div class="month">${m}, ${yr}</div>
+          </div>
+          <div class="event-info">
+            <h3>${title}</h3>
+            ${e.event_time ? `<div class="time">🕐 <span>${e.event_time}</span></div>` : ''}
+            ${e.location ? `<div class="time" style="margin-top:4px;">📍 <span>${e.location}</span></div>` : ''}
+            <p>${desc}</p>
+          </div>
+          <div class="event-image">${e.icon || '📅'}</div>
+        </div>`;
+      }).join('');
+    }
+    
+    function renderFallbackEvents(){
+      document.getElementById('eventsContainer').innerHTML = `
+        <div class="event-item">
+          <div class="event-date"><div class="day">17</div><div class="month">MAY, 2026</div></div>
+          <div class="event-info"><h3>SKKS Experience Programme</h3><div class="time">🕐 <span>7:00 - 15:00</span></div><p>Tour the campus, meet teachers, and see our students in action.</p></div>
+          <div class="event-image">🎓</div>
+        </div>
+        <div class="event-item">
+          <div class="event-date"><div class="day">22</div><div class="month">MAY, 2026</div></div>
+          <div class="event-info"><h3>Open House 2026</h3><div class="time">🕐 <span>9:00 - 16:00</span></div><p>Annual Open House — meet our teachers, tour the campus.</p></div>
+          <div class="event-image">🏫</div>
+        </div>
+      `;
+    }
+    
+    setTimeout(loadUpcomingEvents, 100);
+
     async function loadLatestNews(){
       try{
         const {data, error} = await supabaseClient

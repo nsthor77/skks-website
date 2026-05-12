@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tuition Fees — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .fee-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:20px;transition:all 0.2s;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+    .fee-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);border-color:#1B5E3F}
+    .fee-info{flex:1;min-width:240px}
+    .fee-info h3{color:#1B5E3F;margin:0 0 4px;font-size:17px}
+    .fee-info .program{font-size:11px;color:#5BB8E0;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+    .fee-info .desc{font-size:13px;color:#6B7280;line-height:1.5}
+    .fee-amount{text-align:right;min-width:180px}
+    .fee-amount .number{font-size:28px;font-weight:700;color:#1B5E3F;line-height:1}
+    .fee-amount .unit{font-size:11px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+    .fee-actions{display:flex;gap:8px;align-items:center}
+    .badge-cat{display:inline-block;padding:3px 10px;font-size:10px;font-weight:600;letter-spacing:1px;border-radius:4px;text-transform:uppercase}
+    .cat-tuition{background:#DCFCE7;color:#15803D}
+    .cat-registration{background:#DBEAFE;color:#1E40AF}
+    .cat-lunch{background:#FED7AA;color:#C2410C}
+    .cat-school_bus{background:#FEF3C7;color:#A16207}
+    .cat-books{background:#F3E8FF;color:#6B21A8}
+    .cat-activities{background:#FCE7F3;color:#9F1239}
+    .cat-other{background:#F3F4F6;color:#374151}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="tuition-admin.html" class="active">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>💰 Tuition Fees Management</h2>
+          <p>ปรับค่าเทอม ค่าอาหาร และค่าใช้จ่ายอื่นๆ — Manage tuition and fee structure</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          + Add New Fee
+        </button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px;" id="feesList">
+      </div>
+      
+      <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
+        <div style="font-size:64px;">💰</div>
+        <h3 style="color:#1B5E3F;">No fees set up yet</h3>
+        <p>Click "+ Add New Fee" to start</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="feeModal" style="display:none;">
+    <div class="modal-content" style="max-width:600px;">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="color:#1B5E3F; margin:0;">💰 New Fee</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="feeForm" onsubmit="saveFee(event)">
+          <input type="hidden" id="feeId" />
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Program <span style="color:#EF4444;">*</span></label>
+              <select id="feeProgram" required>
+                <option value="all">All Programs (ทุกหลักสูตร)</option>
+                <option value="prek">Pre-K (เตรียมอนุบาล)</option>
+                <option value="k">Kindergarten (อนุบาล)</option>
+                <option value="ep">EP (English Program)</option>
+                <option value="mep">MEP (Mini English Program)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Category <span style="color:#EF4444;">*</span></label>
+              <select id="feeCategory" required>
+                <option value="tuition">Tuition (ค่าเทอม)</option>
+                <option value="registration">Registration (ค่าสมัคร)</option>
+                <option value="lunch">Lunch (ค่าอาหาร)</option>
+                <option value="school_bus">School Bus (ค่ารถ)</option>
+                <option value="books">Books & Materials (หนังสือ)</option>
+                <option value="activities">Activities (กิจกรรม)</option>
+                <option value="other">Other (อื่นๆ)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Name (English) <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="feeName" required placeholder="e.g., Pre-Kindergarten Tuition" />
+          </div>
+          
+          <div class="form-group">
+            <label>Name (Thai)</label>
+            <input type="text" id="feeNameTh" placeholder="เช่น ค่าเทอมเตรียมอนุบาล" />
+          </div>
+          
+          <div class="form-group">
+            <label>Amount (THB) <span style="color:#EF4444;">*</span></label>
+            <input type="number" id="feeAmount" required min="0" step="100" placeholder="28000" />
+          </div>
+          
+          <div class="form-group">
+            <label>Description (English)</label>
+            <input type="text" id="feeDesc" placeholder="e.g., Tuition per term" />
+          </div>
+          
+          <div class="form-group">
+            <label>Description (Thai)</label>
+            <input type="text" id="feeDescTh" placeholder="เช่น ค่าเทอมต่อเทอม" />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Display Order</label>
+              <input type="number" id="feeOrder" value="0" min="0" />
+            </div>
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; margin-top:24px;">
+                <input type="checkbox" id="feeActive" checked />
+                ✅ Active (show in list)
+              </label>
+            </div>
+          </div>
+          
+          <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Fee</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allFees = [];
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await loadFees();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadFees() {
+      const { data, error } = await supabaseClient
+        .from('tuition_fees')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .order('amount', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('❌ Failed to load fees', 'error');
+        return;
+      }
+      
+      allFees = data || [];
+      renderFees();
+    }
+    
+    function renderFees() {
+      const list = document.getElementById('feesList');
+      const empty = document.getElementById('emptyState');
+      
+      if (allFees.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      
+      const programNames = { prek:'Pre-K', k:'K', ep:'EP', mep:'MEP', all:'ALL' };
+      
+      list.innerHTML = allFees.map(f => `
+        <div class="fee-card" style="${!f.active ? 'opacity:0.5;' : ''}">
+          <div class="fee-info">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px; flex-wrap:wrap;">
+              <span class="badge-cat cat-${f.category}">${(f.category || 'other').replace('_',' ')}</span>
+              <span style="font-size:11px; color:#5BB8E0; font-weight:600; padding:2px 8px; background:#EFF6FF; border-radius:4px;">${programNames[f.program] || f.program}</span>
+              ${!f.active ? '<span class="badge-cat cat-other">INACTIVE</span>' : ''}
+            </div>
+            <h3>${f.program_name}</h3>
+            ${f.program_name_th ? `<div style="font-size:13px;color:#6B7280;margin-bottom:4px;">${f.program_name_th}</div>` : ''}
+            <div class="desc">${f.description || ''}${f.description_th ? ` • ${f.description_th}` : ''}</div>
+          </div>
+          <div class="fee-amount">
+            <div class="number">฿${Number(f.amount).toLocaleString('en-US')}</div>
+            <div class="unit">THB</div>
+          </div>
+          <div class="fee-actions">
+            <button class="btn btn-sm btn-secondary" onclick="editFee('${f.id}')">✏️ Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteFee('${f.id}','${f.program_name.replace(/'/g,"\\'")}')">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '💰 New Fee';
+      document.getElementById('feeForm').reset();
+      document.getElementById('feeId').value = '';
+      document.getElementById('feeActive').checked = true;
+      document.getElementById('feeProgram').value = 'all';
+      document.getElementById('feeCategory').value = 'tuition';
+      document.getElementById('feeModal').style.display = 'flex';
+    }
+    
+    function editFee(id) {
+      const f = allFees.find(x => x.id === id);
+      if (!f) return;
+      
+      document.getElementById('modalTitle').textContent = '✏️ Edit Fee';
+      document.getElementById('feeId').value = id;
+      document.getElementById('feeProgram').value = f.program;
+      document.getElementById('feeCategory').value = f.category;
+      document.getElementById('feeName').value = f.program_name;
+      document.getElementById('feeNameTh').value = f.program_name_th || '';
+      document.getElementById('feeAmount').value = f.amount;
+      document.getElementById('feeDesc').value = f.description || '';
+      document.getElementById('feeDescTh').value = f.description_th || '';
+      document.getElementById('feeOrder').value = f.display_order || 0;
+      document.getElementById('feeActive').checked = !!f.active;
+      document.getElementById('feeModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('feeModal').style.display = 'none';
+    }
+    
+    async function saveFee(event) {
+      event.preventDefault();
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      const id = document.getElementById('feeId').value;
+      const data = {
+        program: document.getElementById('feeProgram').value,
+        category: document.getElementById('feeCategory').value,
+        program_name: document.getElementById('feeName').value.trim(),
+        program_name_th: document.getElementById('feeNameTh').value.trim() || null,
+        amount: parseFloat(document.getElementById('feeAmount').value),
+        description: document.getElementById('feeDesc').value.trim() || null,
+        description_th: document.getElementById('feeDescTh').value.trim() || null,
+        display_order: parseInt(document.getElementById('feeOrder').value) || 0,
+        active: document.getElementById('feeActive').checked,
+        updated_at: new Date().toISOString()
+      };
+      
+      try {
+        if (id) {
+          const { error } = await supabaseClient.from('tuition_fees').update(data).eq('id', id);
+          if (error) throw error;
+          dataHelpers.toast('✅ Fee updated!', 'success');
+        } else {
+          const { error } = await supabaseClient.from('tuition_fees').insert(data);
+          if (error) throw error;
+          dataHelpers.toast('🎉 Fee added!', 'success');
+        }
+        closeModal();
+        await loadFees();
+      } catch (err) {
+        dataHelpers.toast('❌ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Fee';
+      }
+    }
+    
+    async function deleteFee(id, name) {
+      if (!confirm(`Delete "${name}"?\n\nThis cannot be undone.`)) return;
+      
+      const { error } = await supabaseClient.from('tuition_fees').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('🗑️ Fee deleted', 'success');
+      await loadFees();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

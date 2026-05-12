@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .event-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;display:flex;gap:18px;transition:all 0.2s;align-items:center;flex-wrap:wrap}
+    .event-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px);border-color:#1B5E3F}
+    .event-date{text-align:center;background:#F0FDF4;border:1px solid #1B5E3F;border-radius:10px;padding:14px 18px;min-width:90px;position:relative}
+    .event-date::before{content:'';position:absolute;top:0;left:14px;right:14px;height:3px;background:#1B5E3F}
+    .event-date .day{font-size:32px;font-weight:800;color:#1B5E3F;line-height:1;display:block}
+    .event-date .month{font-size:11px;color:#374151;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-top:4px;display:block}
+    .event-info{flex:1;min-width:280px}
+    .event-info h3{color:#1B5E3F;margin:0 0 6px;font-size:17px}
+    .event-info .meta{font-size:12px;color:#6B7280;margin-bottom:8px}
+    .event-info .desc{font-size:13px;color:#374151;line-height:1.6}
+    .event-icon-display{font-size:48px;min-width:60px;text-align:center}
+    .event-actions{display:flex;gap:8px;align-items:center}
+    .badge-feat{background:#F59E0B;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:700;letter-spacing:1px}
+    .badge-draft{background:#9CA3AF;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:700;letter-spacing:1px}
+    .badge-past{background:#FEE2E2;color:#991B1B;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:700;letter-spacing:1px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html" class="active">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📅 Events Management</h2>
+          <p>จัดการกิจกรรมที่แสดงบนเว็บหลัก — Manage events shown on website</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          + New Event
+        </button>
+      </div>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card teal">
+          <div class="label">Total Events</div>
+          <div class="value" id="cntTotal">0</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="label">Upcoming</div>
+          <div class="value" id="cntUpcoming">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">Featured</div>
+          <div class="value" id="cntFeatured">0</div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px; margin-top:24px;" id="eventsList">
+      </div>
+      
+      <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
+        <div style="font-size:64px;">📅</div>
+        <h3 style="color:#1B5E3F;">No events yet</h3>
+        <p>Click "+ New Event" to create your first event</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="eventModal" style="display:none;">
+    <div class="modal-content" style="max-width:680px;">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="color:#1B5E3F; margin:0;">📅 New Event</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="eventForm" onsubmit="saveEvent(event)">
+          <input type="hidden" id="eventId" />
+          
+          <div class="form-section-title" style="font-size:14px; color:#1B5E3F; padding-bottom:6px; border-bottom:2px solid #1B5E3F; margin-bottom:14px;">
+            🇬🇧 English
+          </div>
+          
+          <div class="form-group">
+            <label>Title <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="evTitle" required maxlength="120" />
+          </div>
+          
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="evDesc" rows="3" placeholder="Brief description of the event"></textarea>
+          </div>
+          
+          <div class="form-section-title" style="font-size:14px; color:#1B5E3F; padding-bottom:6px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+            🇹🇭 Thai (Optional)
+          </div>
+          
+          <div class="form-group">
+            <label>หัวข้อ (Thai)</label>
+            <input type="text" id="evTitleTh" maxlength="120" />
+          </div>
+          
+          <div class="form-group">
+            <label>คำอธิบาย (Thai)</label>
+            <textarea id="evDescTh" rows="3"></textarea>
+          </div>
+          
+          <div class="form-section-title" style="font-size:14px; color:#1B5E3F; padding-bottom:6px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+            📍 Details
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Event Date <span style="color:#EF4444;">*</span></label>
+              <input type="date" id="evDate" required />
+            </div>
+            <div class="form-group">
+              <label>Event Time</label>
+              <input type="text" id="evTime" placeholder="e.g., 09:00 - 16:00" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="evLocation" placeholder="e.g., SKKS Campus, Khon Kaen" />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Icon</label>
+              <select id="evIcon">
+                <option value="📅">📅 Calendar</option>
+                <option value="🎓">🎓 Graduation</option>
+                <option value="🏫">🏫 School</option>
+                <option value="👨‍👩‍👧">👨‍👩‍👧 Family</option>
+                <option value="🎉">🎉 Celebration</option>
+                <option value="🏆">🏆 Award</option>
+                <option value="📚">📚 Books</option>
+                <option value="🎨">🎨 Art</option>
+                <option value="🎵">🎵 Music</option>
+                <option value="⚽">⚽ Sports</option>
+                <option value="🍱">🍱 Food</option>
+                <option value="🎪">🎪 Carnival</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Display Order</label>
+              <input type="number" id="evOrder" value="0" min="0" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                <input type="checkbox" id="evFeatured" />
+                ⭐ Featured
+              </label>
+            </div>
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                <input type="checkbox" id="evPublished" checked />
+                ✅ Published
+              </label>
+            </div>
+          </div>
+          
+          <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Event</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allEvents = [];
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await loadEvents();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadEvents() {
+      const { data, error } = await supabaseClient
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
+      
+      if (error) {
+        dataHelpers.toast('❌ Failed to load events', 'error');
+        return;
+      }
+      
+      allEvents = data || [];
+      renderEvents();
+      updateStats();
+    }
+    
+    function updateStats() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('cntTotal').textContent = allEvents.length;
+      document.getElementById('cntUpcoming').textContent = allEvents.filter(e => e.event_date >= today && e.published).length;
+      document.getElementById('cntFeatured').textContent = allEvents.filter(e => e.featured).length;
+    }
+    
+    function renderEvents() {
+      const list = document.getElementById('eventsList');
+      const empty = document.getElementById('emptyState');
+      
+      if (allEvents.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      
+      const today = new Date().toISOString().split('T')[0];
+      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      
+      list.innerHTML = allEvents.map(e => {
+        const d = new Date(e.event_date);
+        const day = d.getDate();
+        const month = months[d.getMonth()];
+        const year = d.getFullYear();
+        const isPast = e.event_date < today;
+        
+        return `<div class="event-card" style="${!e.published ? 'opacity:0.5;' : ''}">
+          <div class="event-icon-display">${e.icon || '📅'}</div>
+          <div class="event-date">
+            <span class="day">${day}</span>
+            <span class="month">${month} ${year}</span>
+          </div>
+          <div class="event-info">
+            <div style="display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap;">
+              ${e.featured ? '<span class="badge-feat">⭐ FEATURED</span>' : ''}
+              ${!e.published ? '<span class="badge-draft">📝 DRAFT</span>' : ''}
+              ${isPast ? '<span class="badge-past">⏰ PAST</span>' : ''}
+            </div>
+            <h3>${e.title}</h3>
+            <div class="meta">
+              ${e.event_time ? `🕐 ${e.event_time}` : ''}
+              ${e.location ? ` • 📍 ${e.location}` : ''}
+            </div>
+            <div class="desc">${e.description || '(no description)'}</div>
+          </div>
+          <div class="event-actions">
+            <button class="btn btn-sm btn-secondary" onclick="editEvent('${e.id}')">✏️ Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteEvent('${e.id}','${e.title.replace(/'/g,"\\'")}')">🗑️</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '📅 New Event';
+      document.getElementById('eventForm').reset();
+      document.getElementById('eventId').value = '';
+      document.getElementById('evPublished').checked = true;
+      document.getElementById('evIcon').value = '📅';
+      document.getElementById('evDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('eventModal').style.display = 'flex';
+    }
+    
+    function editEvent(id) {
+      const e = allEvents.find(x => x.id === id);
+      if (!e) return;
+      
+      document.getElementById('modalTitle').textContent = '✏️ Edit Event';
+      document.getElementById('eventId').value = id;
+      document.getElementById('evTitle').value = e.title;
+      document.getElementById('evTitleTh').value = e.title_th || '';
+      document.getElementById('evDesc').value = e.description || '';
+      document.getElementById('evDescTh').value = e.description_th || '';
+      document.getElementById('evDate').value = e.event_date;
+      document.getElementById('evTime').value = e.event_time || '';
+      document.getElementById('evLocation').value = e.location || '';
+      document.getElementById('evIcon').value = e.icon || '📅';
+      document.getElementById('evOrder').value = e.display_order || 0;
+      document.getElementById('evFeatured').checked = !!e.featured;
+      document.getElementById('evPublished').checked = !!e.published;
+      document.getElementById('eventModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('eventModal').style.display = 'none';
+    }
+    
+    async function saveEvent(event) {
+      event.preventDefault();
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      const id = document.getElementById('eventId').value;
+      const data = {
+        title: document.getElementById('evTitle').value.trim(),
+        title_th: document.getElementById('evTitleTh').value.trim() || null,
+        description: document.getElementById('evDesc').value.trim() || null,
+        description_th: document.getElementById('evDescTh').value.trim() || null,
+        event_date: document.getElementById('evDate').value,
+        event_time: document.getElementById('evTime').value.trim() || null,
+        location: document.getElementById('evLocation').value.trim() || null,
+        icon: document.getElementById('evIcon').value,
+        display_order: parseInt(document.getElementById('evOrder').value) || 0,
+        featured: document.getElementById('evFeatured').checked,
+        published: document.getElementById('evPublished').checked,
+        updated_at: new Date().toISOString()
+      };
+      
+      try {
+        if (id) {
+          const { error } = await supabaseClient.from('events').update(data).eq('id', id);
+          if (error) throw error;
+          dataHelpers.toast('✅ Event updated!', 'success');
+        } else {
+          const { error } = await supabaseClient.from('events').insert(data);
+          if (error) throw error;
+          dataHelpers.toast('🎉 Event created!', 'success');
+        }
+        closeModal();
+        await loadEvents();
+      } catch (err) {
+        dataHelpers.toast('❌ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Event';
+      }
+    }
+    
+    async function deleteEvent(id, title) {
+      if (!confirm(`Delete "${title}"?\n\nThis cannot be undone.`)) return;
+      
+      const { error } = await supabaseClient.from('events').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('🗑️ Event deleted', 'success');
+      await loadEvents();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

@@ -357,7 +357,7 @@
         'programs.eyebrow':'หลักสูตร','programs.title':'หลักสูตรของเรา','programs.subtitle':'4 เส้นทางการศึกษา ตั้งแต่ปฐมวัยถึงมัธยมต้น','programs.prek.age':'อายุ 3-5','programs.prek.title':'เตรียมอนุบาล','programs.prek.desc':'เรียนรู้พื้นฐานผ่านการเล่น ทักษะทางสังคม ในสภาพแวดล้อมสองภาษา','programs.k.age':'อายุ 5-7','programs.k.title':'อนุบาล','programs.k.desc':'เรียนรู้สร้างสรรค์ เน้นภาษาอังกฤษและการแก้ปัญหา','programs.ep.age':'ป.1-ม.3','programs.ep.title':'English Program (EP)','programs.ep.desc':'หลักสูตรภาษาอังกฤษเต็มรูปแบบ รับรอง Cambridge — สอนคณิต วิทย์ อังกฤษ เป็นภาษาอังกฤษทั้งหมด','programs.mep.age':'ป.1-ม.3','programs.mep.title':'Mini English Program (MEP)','programs.mep.desc':'หลักสูตรสองภาษา 60% เป็นภาษาอังกฤษ ผสมผสานวัฒนธรรมไทยและอังกฤษอย่างลงตัว',
         'adm.eyebrow':'สร้างอนาคตที่สดใส','adm.title':'สมัครเรียน','adm.subtitle':'สมัครเรียนปีการศึกษา 2569 — ที่นั่งจำกัด','cd.days':'วัน','cd.hours':'ชั่วโมง','cd.mins':'นาที','cd.secs':'วินาที','adm.cta':'ดูรายละเอียดการสมัคร →',
         'reg.title':'ลงทะเบียนความสนใจ','reg.subtitle':'เพื่อทราบข้อมูลเพิ่มเติม','reg.name':'ชื่อของคุณ *','reg.email':'อีเมล *','reg.phone':'เบอร์โทร *','reg.cta':'ลงทะเบียน',
-        'events.title':'กิจกรรม','events.subtitle':'กิจกรรมที่กำลังจะมาถึง','events.viewall':'ดูทั้งหมด','events.may':'พ.ค. 2569','events.1.title':'คลินิกกอล์ฟ 1 วัน','events.1.desc':'พัฒนาทักษะให้สูงขึ้น! เข้าร่วม One-Day Golf Clinic ที่ Singha Park Golf Club',' events.2.title':'SKKS Experience Programme','events.2.desc':'สัมผัสการศึกษาระดับโลกที่ SKKS เยี่ยมชมโรงเรียน พบครู เห็นนักเรียนของเราในห้องเรียน','events.3.title':'Open House 2569','events.3.desc':'Open House ประจำปี พบครู เยี่ยมชมโรงเรียน เรียนรู้หลักสูตร Cambridge เข้าฟรี',
+        'events.title':'กิจกรรม','events.subtitle':'กิจกรรมที่กำลังจะมาถึง','events.viewall':'ดูทั้งหมด','events.may':'พ.ค. 2569','events.1.title':'คลินิกกอล์ฟ 1 วัน','events.1.desc':'พัฒนาทักษะให้สูงขึ้น! เข้าร่วม One-Day Golf Clinic ที่ Singha Park Golf Club','events.2.title':'SKKS Experience Programme','events.2.desc':'สัมผัสการศึกษาระดับโลกที่ SKKS เยี่ยมชมโรงเรียน พบครู เห็นนักเรียนของเราในห้องเรียน','events.3.title':'Open House 2569','events.3.desc':'Open House ประจำปี พบครู เยี่ยมชมโรงเรียน เรียนรู้หลักสูตร Cambridge เข้าฟรี',
         'news.eyebrow':'ข่าวสารและอัปเดต','news.title':'ข่าวสารล่าสุด','news.subtitle':'ข่าวการศึกษาจาก SKKS และทั่วโลก','news.1.title':'O-NET 100% คะแนนเต็ม','news.1.desc':'นักเรียนของเราได้คะแนนเต็ม O-NET วิชาภาษาอังกฤษ ผลสัมฤทธิ์ที่ทำลายสถิติของขอนแก่น','news.2.title':'ต่ออายุการรับรอง Cambridge','news.2.desc':'SKKS ต่ออายุการรับรองจาก Cambridge Assessment สำเร็จอีก 5 ปี ยืนยันความเป็นเลิศของเรา','news.3.title':'เปิดรับสมัครปี 2569','news.3.desc':'เปิดรับสมัครนักเรียนปีการศึกษา 2569 แล้ว ที่นั่งจำกัด สมัครก่อนได้สิทธิ์ก่อน',
         'footer.school':'โรงเรียน','footer.links':'ลิงก์ด่วน','footer.account':'บัญชี',
         'popup.title':'เปิดรับสมัครแล้ว!','popup.subtitle':'สมัครเรียนปี 2569','popup.cta':'สมัคร'
@@ -379,6 +379,8 @@
       document.querySelectorAll('.lang-switch a').forEach(a=>{
         a.classList.toggle('active',a.getAttribute('data-lang')===lang);
       });
+      if(window._cachedEvents) renderEvents(window._cachedEvents);
+      if(window._cachedNews) renderNews(window._cachedNews);
     }
     function toggleMenu(){document.getElementById('navMenu').classList.toggle('show')}
     function closePopup(){
@@ -458,6 +460,7 @@
           renderFallbackEvents();
           return;
         }
+        window._cachedEvents = data;
         renderEvents(data);
       }catch(err){
         renderFallbackEvents();
@@ -522,6 +525,7 @@
           renderFallbackNews();
           return;
         }
+        window._cachedNews = data;
         renderNews(data);
       }catch(err){
         console.warn('News load failed, using fallback');

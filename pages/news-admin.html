@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>News Management — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .news-card-admin{background:white;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;transition:all 0.2s;display:flex;gap:0}
+    .news-card-admin:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px)}
+    .news-thumb{width:200px;height:140px;background:linear-gradient(135deg,#1B5E3F,#4A90B8);display:flex;align-items:center;justify-content:center;font-size:48px;color:white;flex-shrink:0;position:relative;overflow:hidden}
+    .news-thumb img{width:100%;height:100%;object-fit:cover}
+    .news-info{padding:18px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+    .news-info h3{color:#1B5E3F;margin:0 0 6px;font-size:17px}
+    .news-info .meta{font-size:12px;color:#6B7280;margin-bottom:8px}
+    .news-info p{font-size:13px;color:#374151;line-height:1.5;margin-bottom:12px}
+    .news-actions{display:flex;gap:8px;align-items:center}
+    .badge-tag{background:#1B5E3F;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:600;letter-spacing:1px}
+    .badge-featured{background:#F59E0B;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:600;letter-spacing:1px}
+    .badge-draft{background:#9CA3AF;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:600;letter-spacing:1px}
+    
+    .upload-area{border:2px dashed #D1D5DB;border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all 0.15s;background:#F9FAFB}
+    .upload-area:hover{border-color:#1B5E3F;background:#F0FDF4}
+    .upload-area.drag{border-color:#1B5E3F;background:#ECFDF5}
+    .upload-area .icon{font-size:36px;margin-bottom:8px}
+    .upload-area p{margin:0;font-size:13px;color:#6B7280}
+    .preview-image{max-width:100%;max-height:240px;border-radius:8px;margin-top:12px;display:block}
+    
+    @media(max-width:700px){
+      .news-card-admin{flex-direction:column}
+      .news-thumb{width:100%;height:180px}
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="news-admin.html" class="active">📰 News</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💰 Finance</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📰 News Management</h2>
+          <p>Manage news articles displayed on the public website</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          + New Article
+        </button>
+      </div>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card teal">
+          <div class="label">Total Articles</div>
+          <div class="value" id="cntTotal">0</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="label">Published</div>
+          <div class="value" id="cntPublished">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">Featured</div>
+          <div class="value" id="cntFeatured">0</div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px; margin-top:24px;" id="newsList">
+      </div>
+      
+      <div id="emptyState" style="display:none; text-align:center; padding:60px 20px; color:#6B7280;">
+        <div style="font-size:64px; margin-bottom:14px;">📭</div>
+        <h3 style="color:#1B5E3F;">No news articles yet</h3>
+        <p>Click "+ New Article" to create your first news</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="newsModal" style="display:none;">
+    <div class="modal-content" style="max-width:760px;">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="color:#1B5E3F; margin:0;">📰 New Article</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="newsForm" onsubmit="saveNews(event)">
+          <input type="hidden" id="newsId" />
+          
+          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin-bottom:14px;">
+            📸 Featured Image
+          </div>
+          
+          <div class="upload-area" id="uploadArea" onclick="document.getElementById('imageInput').click()">
+            <div class="icon">📤</div>
+            <p><strong>Click to upload</strong> or drag image here</p>
+            <p style="font-size:11px;">JPG, PNG, WebP — max 5MB</p>
+            <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageSelect(event)" />
+          </div>
+          <img id="imagePreview" class="preview-image" style="display:none;" />
+          <input type="hidden" id="newsImageUrl" />
+          
+          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+            🇬🇧 English Content
+          </div>
+          
+          <div class="form-group">
+            <label>Title <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="newsTitle" required maxlength="120" />
+          </div>
+          
+          <div class="form-group">
+            <label>Short Excerpt (shown on homepage card)</label>
+            <textarea id="newsExcerpt" rows="2" maxlength="200" placeholder="Brief summary of the news (1-2 sentences)"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>Full Content (optional, for detail page)</label>
+            <textarea id="newsContent" rows="5" placeholder="Full article content"></textarea>
+          </div>
+          
+          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+            🇹🇭 Thai Content (Optional)
+          </div>
+          
+          <div class="form-group">
+            <label>หัวข้อ (Thai)</label>
+            <input type="text" id="newsTitleTh" maxlength="120" placeholder="หัวข้อภาษาไทย" />
+          </div>
+          
+          <div class="form-group">
+            <label>คำโปรย (Thai)</label>
+            <textarea id="newsExcerptTh" rows="2" maxlength="200" placeholder="คำโปรยภาษาไทย"></textarea>
+          </div>
+          
+          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+            ⚙️ Settings
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tag</label>
+              <select id="newsTag">
+                <option value="SKKS">SKKS</option>
+                <option value="Featured">Featured</option>
+                <option value="Update">Update</option>
+                <option value="Admissions">Admissions</option>
+                <option value="Event">Event</option>
+                <option value="Achievement">Achievement</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Publish Date</label>
+              <input type="date" id="newsDate" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="newsFeatured" />
+                ⭐ Featured (highlight on homepage)
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="newsPublished" checked />
+                ✅ Published (visible to public)
+              </label>
+            </div>
+          </div>
+          
+          <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Article</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allNews = [];
+    let editingNewsId = null;
+    let selectedFile = null;
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await loadNews();
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadNews() {
+      const { data, error } = await supabaseClient
+        .from('news')
+        .select('*')
+        .order('publish_date', { ascending: false });
+      
+      if (error) {
+        console.error('Load news error:', error);
+        dataHelpers.toast('❌ Failed to load news', 'error');
+        return;
+      }
+      
+      allNews = data || [];
+      renderNews();
+      updateStats();
+    }
+    
+    function updateStats() {
+      document.getElementById('cntTotal').textContent = allNews.length;
+      document.getElementById('cntPublished').textContent = allNews.filter(n => n.published).length;
+      document.getElementById('cntFeatured').textContent = allNews.filter(n => n.featured).length;
+    }
+    
+    function renderNews() {
+      const list = document.getElementById('newsList');
+      const empty = document.getElementById('emptyState');
+      
+      if (allNews.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      
+      list.innerHTML = allNews.map(n => `
+        <div class="news-card-admin">
+          <div class="news-thumb">
+            ${n.image_url ? `<img src="${n.image_url}" alt="${n.title}" />` : '📰'}
+          </div>
+          <div class="news-info">
+            <div>
+              <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
+                <span class="badge-tag">${n.tag || 'SKKS'}</span>
+                ${n.featured ? '<span class="badge-featured">⭐ FEATURED</span>' : ''}
+                ${!n.published ? '<span class="badge-draft">📝 DRAFT</span>' : ''}
+              </div>
+              <h3>${n.title}</h3>
+              <div class="meta">📅 ${dataHelpers.formatDate(n.publish_date)}</div>
+              <p>${n.excerpt || '(no excerpt)'}</p>
+            </div>
+            <div class="news-actions">
+              <button class="btn btn-sm btn-secondary" onclick="editNews('${n.id}')">✏️ Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteNews('${n.id}', '${n.title.replace(/'/g, "\\'")}')">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function openCreateModal() {
+      editingNewsId = null;
+      selectedFile = null;
+      document.getElementById('modalTitle').textContent = '📰 New Article';
+      document.getElementById('newsForm').reset();
+      document.getElementById('newsId').value = '';
+      document.getElementById('newsImageUrl').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('newsDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('newsPublished').checked = true;
+      document.getElementById('newsModal').style.display = 'flex';
+    }
+    
+    async function editNews(id) {
+      const news = allNews.find(n => n.id === id);
+      if (!news) return;
+      
+      editingNewsId = id;
+      selectedFile = null;
+      document.getElementById('modalTitle').textContent = '✏️ Edit Article';
+      document.getElementById('newsId').value = id;
+      document.getElementById('newsTitle').value = news.title || '';
+      document.getElementById('newsTitleTh').value = news.title_th || '';
+      document.getElementById('newsExcerpt').value = news.excerpt || '';
+      document.getElementById('newsExcerptTh').value = news.excerpt_th || '';
+      document.getElementById('newsContent').value = news.content || '';
+      document.getElementById('newsTag').value = news.tag || 'SKKS';
+      document.getElementById('newsDate').value = news.publish_date || '';
+      document.getElementById('newsFeatured').checked = !!news.featured;
+      document.getElementById('newsPublished').checked = !!news.published;
+      document.getElementById('newsImageUrl').value = news.image_url || '';
+      
+      if (news.image_url) {
+        const preview = document.getElementById('imagePreview');
+        preview.src = news.image_url;
+        preview.style.display = 'block';
+      } else {
+        document.getElementById('imagePreview').style.display = 'none';
+      }
+      
+      document.getElementById('newsModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('newsModal').style.display = 'none';
+      editingNewsId = null;
+      selectedFile = null;
+    }
+    
+    function handleImageSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 5 * 1024 * 1024) {
+        dataHelpers.toast('❌ Image too large (max 5MB)', 'error');
+        return;
+      }
+      
+      selectedFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById('imagePreview');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    async function uploadImage(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const fileName = `news-${Date.now()}.${ext}`;
+      
+      const { data, error } = await supabaseClient.storage
+        .from('news-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+      
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabaseClient.storage
+        .from('news-images')
+        .getPublicUrl(fileName);
+      
+      return publicUrl;
+    }
+    
+    async function saveNews(event) {
+      event.preventDefault();
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      try {
+        let imageUrl = document.getElementById('newsImageUrl').value || null;
+        
+        if (selectedFile) {
+          btn.textContent = '📤 Uploading image...';
+          imageUrl = await uploadImage(selectedFile);
+        }
+        
+        const newsData = {
+          title: document.getElementById('newsTitle').value.trim(),
+          title_th: document.getElementById('newsTitleTh').value.trim() || null,
+          excerpt: document.getElementById('newsExcerpt').value.trim() || null,
+          excerpt_th: document.getElementById('newsExcerptTh').value.trim() || null,
+          content: document.getElementById('newsContent').value.trim() || null,
+          image_url: imageUrl,
+          tag: document.getElementById('newsTag').value,
+          publish_date: document.getElementById('newsDate').value || new Date().toISOString().split('T')[0],
+          featured: document.getElementById('newsFeatured').checked,
+          published: document.getElementById('newsPublished').checked,
+          updated_at: new Date().toISOString()
+        };
+        
+        btn.textContent = '💾 Saving article...';
+        
+        if (editingNewsId) {
+          const { error } = await supabaseClient
+            .from('news')
+            .update(newsData)
+            .eq('id', editingNewsId);
+          if (error) throw error;
+          dataHelpers.toast('✅ Article updated!', 'success');
+        } else {
+          const { error } = await supabaseClient
+            .from('news')
+            .insert(newsData);
+          if (error) throw error;
+          dataHelpers.toast('🎉 Article published!', 'success');
+        }
+        
+        closeModal();
+        await loadNews();
+      } catch (err) {
+        console.error(err);
+        dataHelpers.toast('❌ Failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Article';
+      }
+    }
+    
+    async function deleteNews(id, title) {
+      if (!confirm(`Delete "${title}"?\n\nThis cannot be undone.`)) return;
+      
+      const { error } = await supabaseClient
+        .from('news')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        dataHelpers.toast('❌ Delete failed: ' + error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast('🗑️ Article deleted', 'success');
+      await loadNews();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

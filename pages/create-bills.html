@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bills Management — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .bill-row{display:grid;grid-template-columns:1fr 1.5fr 1fr 1fr auto;gap:14px;align-items:center;padding:14px;background:white;border:1px solid #E5E7EB;border-radius:10px;margin-bottom:10px;transition:all 0.15s}
+    .bill-row:hover{box-shadow:0 4px 12px rgba(0,0,0,0.06);border-color:#1B5E3F}
+    .bill-num{font-family:monospace;font-size:13px;color:#1B5E3F;font-weight:700}
+    .bill-info h4{margin:0 0 4px;color:#1B5E3F;font-size:14px}
+    .bill-info p{margin:0;font-size:12px;color:#6B7280}
+    .bill-amount{text-align:right;font-size:18px;font-weight:700;color:#1B5E3F}
+    .bill-status{padding:4px 12px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;text-align:center}
+    .status-unpaid{background:#FEE2E2;color:#991B1B}
+    .status-pending{background:#FEF3C7;color:#A16207}
+    .status-paid{background:#DCFCE7;color:#15803D}
+    .status-overdue{background:#FED7AA;color:#C2410C}
+    @media(max-width:800px){.bill-row{grid-template-columns:1fr;gap:8px;text-align:left}.bill-amount{text-align:left}}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="payment-approvals.html">✅ Approvals</a>
+        <a href="create-bills.html" class="active">📄 Bills</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📄 Bills Management</h2>
+          <p>ออกบิลค้างชำระให้นักเรียน — Create and manage bills</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" onclick="openBulkModal()">📋 Bulk Create</button>
+          <button class="btn btn-primary" onclick="openCreateModal()">+ New Bill</button>
+        </div>
+      </div>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card teal">
+          <div class="label">Total Bills</div>
+          <div class="value" id="cntTotal">0</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="label">Unpaid</div>
+          <div class="value" id="cntUnpaid">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">Pending Review</div>
+          <div class="value" id="cntPending">0</div>
+        </div>
+        <div class="stat-card teal">
+          <div class="label">Paid</div>
+          <div class="value" id="cntPaid">0</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;">
+        <select id="filterStatus" onchange="renderBills()" style="padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;">
+          <option value="">All Status</option>
+          <option value="unpaid">Unpaid</option>
+          <option value="pending">Pending Review</option>
+          <option value="paid">Paid</option>
+        </select>
+        <input type="search" id="searchBill" placeholder="🔍 Search bill# or student..." oninput="renderBills()" style="flex:1; min-width:200px; padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;" />
+      </div>
+
+      <div id="billsList"></div>
+      
+      <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
+        <div style="font-size:64px;">📄</div>
+        <h3 style="color:#1B5E3F;">No bills yet</h3>
+        <p>Click "+ New Bill" to create your first bill</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="billModal" style="display:none;">
+    <div class="modal-content" style="max-width:600px;">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="color:#1B5E3F; margin:0;">📄 New Bill</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="billForm" onsubmit="saveBill(event)">
+          <input type="hidden" id="billId" />
+          
+          <div class="form-group">
+            <label>Student <span style="color:#EF4444;">*</span></label>
+            <select id="billStudent" required>
+              <option value="">-- Select Student --</option>
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category <span style="color:#EF4444;">*</span></label>
+              <select id="billCategory" required onchange="autoFillFromCategory()">
+                <option value="">-- Select --</option>
+                <option value="tuition">Tuition (ค่าเทอม)</option>
+                <option value="registration">Registration (ค่าสมัคร)</option>
+                <option value="lunch">Lunch (ค่าอาหาร)</option>
+                <option value="school_bus">School Bus (ค่ารถ)</option>
+                <option value="books">Books (หนังสือ)</option>
+                <option value="activities">Activities (กิจกรรม)</option>
+                <option value="other">Other (อื่นๆ)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount (THB) <span style="color:#EF4444;">*</span></label>
+              <input type="number" id="billAmount" required min="0" step="100" placeholder="0" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Description <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="billDesc" required placeholder="e.g., Term 1/2026 Tuition Fee" />
+          </div>
+          
+          <div class="form-group">
+            <label>Description (Thai)</label>
+            <input type="text" id="billDescTh" placeholder="เช่น ค่าเทอม 1/2569" />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Term</label>
+              <input type="text" id="billTerm" placeholder="e.g., 1/2026" />
+            </div>
+            <div class="form-group">
+              <label>Academic Year</label>
+              <input type="text" id="billYear" placeholder="2026" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Issue Date</label>
+              <input type="date" id="billIssueDate" />
+            </div>
+            <div class="form-group">
+              <label>Due Date <span style="color:#EF4444;">*</span></label>
+              <input type="date" id="billDueDate" required />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Notes (optional)</label>
+            <textarea id="billNotes" rows="2"></textarea>
+          </div>
+          
+          <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Bill</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="bulkModal" style="display:none;">
+    <div class="modal-content" style="max-width:600px;">
+      <div class="modal-header">
+        <h3 style="color:#1B5E3F; margin:0;">📋 Bulk Create Bills</h3>
+        <button class="modal-close" onclick="closeBulk()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="background:#FEF3C7; padding:14px; border-radius:8px; font-size:13px; color:#92400E; margin-bottom:18px;">
+          ⚠️ ระบบจะสร้างบิลให้นักเรียนทุกคนในหลักสูตรที่เลือก ตามจำนวนเงินที่ระบุ
+        </p>
+        <form id="bulkForm" onsubmit="bulkCreate(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Filter Program</label>
+              <select id="bulkProgram">
+                <option value="all">All Programs</option>
+                <option value="prek">Pre-K only</option>
+                <option value="k">K only</option>
+                <option value="ep">EP only</option>
+                <option value="mep">MEP only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Category <span style="color:#EF4444;">*</span></label>
+              <select id="bulkCategory" required>
+                <option value="tuition">Tuition</option>
+                <option value="lunch">Lunch (Monthly)</option>
+                <option value="school_bus">School Bus (Monthly)</option>
+                <option value="books">Books</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Amount per student (THB) <span style="color:#EF4444;">*</span></label>
+            <input type="number" id="bulkAmount" required min="0" step="100" />
+          </div>
+          <div class="form-group">
+            <label>Description <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="bulkDesc" required placeholder="e.g., Term 1/2026 Tuition" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Due Date <span style="color:#EF4444;">*</span></label>
+              <input type="date" id="bulkDueDate" required />
+            </div>
+            <div class="form-group">
+              <label>Term</label>
+              <input type="text" id="bulkTerm" placeholder="1/2026" />
+            </div>
+          </div>
+          <div id="bulkPreview" style="background:#F0FDF4; padding:14px; border-radius:8px; margin-top:14px; font-size:13px; color:#1B5E3F;">
+            <strong>Will create:</strong> <span id="bulkCount">0</span> bills
+          </div>
+          <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeBulk()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="bulkBtn">🚀 Create All Bills</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allBills = [];
+    let allStudents = [];
+    let allFees = [];
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await Promise.all([loadBills(), loadStudents(), loadFees()]);
+      
+      document.getElementById('bulkProgram').addEventListener('change', updateBulkPreview);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadBills() {
+      const { data, error } = await supabaseClient
+        .from('bills')
+        .select('*, students(first_name, last_name, nickname, program, grade)')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('❌ Load failed', 'error');
+        return;
+      }
+      
+      allBills = data || [];
+      renderBills();
+      updateStats();
+    }
+    
+    async function loadStudents() {
+      const { data } = await supabaseClient
+        .from('students')
+        .select('id, first_name, last_name, nickname, program, grade, status')
+        .eq('status', 'active')
+        .order('first_name', { ascending: true });
+      
+      allStudents = data || [];
+      
+      const select = document.getElementById('billStudent');
+      select.innerHTML = '<option value="">-- Select Student --</option>' +
+        allStudents.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''} - ${(s.program||'').toUpperCase()} ${s.grade||''}</option>`).join('');
+    }
+    
+    async function loadFees() {
+      const { data } = await supabaseClient
+        .from('tuition_fees')
+        .select('*')
+        .eq('active', true);
+      allFees = data || [];
+    }
+    
+    function autoFillFromCategory() {
+      const cat = document.getElementById('billCategory').value;
+      const fee = allFees.find(f => f.category === cat && f.program === 'all');
+      if (fee) {
+        document.getElementById('billAmount').value = fee.amount;
+        document.getElementById('billDesc').value = fee.program_name;
+        document.getElementById('billDescTh').value = fee.program_name_th || '';
+      }
+    }
+    
+    function updateStats() {
+      document.getElementById('cntTotal').textContent = allBills.length;
+      document.getElementById('cntUnpaid').textContent = allBills.filter(b => b.status === 'unpaid').length;
+      document.getElementById('cntPending').textContent = allBills.filter(b => b.status === 'pending').length;
+      document.getElementById('cntPaid').textContent = allBills.filter(b => b.status === 'paid').length;
+    }
+    
+    function renderBills() {
+      const list = document.getElementById('billsList');
+      const empty = document.getElementById('emptyState');
+      
+      const filterStatus = document.getElementById('filterStatus').value;
+      const search = document.getElementById('searchBill').value.toLowerCase().trim();
+      
+      let filtered = allBills;
+      if (filterStatus) filtered = filtered.filter(b => b.status === filterStatus);
+      if (search) {
+        filtered = filtered.filter(b => {
+          const s = b.students || {};
+          const txt = `${b.bill_number} ${s.first_name} ${s.last_name} ${s.nickname || ''}`.toLowerCase();
+          return txt.includes(search);
+        });
+      }
+      
+      if (filtered.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      
+      const today = new Date().toISOString().split('T')[0];
+      
+      list.innerHTML = filtered.map(b => {
+        const s = b.students || {};
+        const overdue = b.status === 'unpaid' && b.due_date < today;
+        const status = overdue ? 'overdue' : b.status;
+        const statusText = {
+          unpaid: 'UNPAID',
+          pending: 'PENDING',
+          paid: '✅ PAID',
+          overdue: 'OVERDUE'
+        }[status];
+        
+        return `<div class="bill-row">
+          <div>
+            <div class="bill-num">${b.bill_number}</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">${dataHelpers.formatDate(b.issue_date)}</div>
+          </div>
+          <div class="bill-info">
+            <h4>${s.first_name || '?'} ${s.last_name || ''}${s.nickname ? ` (${s.nickname})` : ''}</h4>
+            <p>${(s.program||'').toUpperCase()} ${s.grade || ''} • ${b.description}</p>
+          </div>
+          <div class="bill-amount">฿${Number(b.amount).toLocaleString('en-US')}</div>
+          <div style="text-align:center;">
+            <div class="bill-status status-${status}">${statusText}</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Due: ${dataHelpers.formatDate(b.due_date)}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm btn-secondary" onclick="editBill('${b.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteBill('${b.id}','${b.bill_number}')">🗑️</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '📄 New Bill';
+      document.getElementById('billForm').reset();
+      document.getElementById('billId').value = '';
+      document.getElementById('billIssueDate').value = new Date().toISOString().split('T')[0];
+      const due = new Date();
+      due.setDate(due.getDate() + 30);
+      document.getElementById('billDueDate').value = due.toISOString().split('T')[0];
+      document.getElementById('billYear').value = new Date().getFullYear();
+      document.getElementById('billModal').style.display = 'flex';
+    }
+    
+    function editBill(id) {
+      const b = allBills.find(x => x.id === id);
+      if (!b) return;
+      
+      document.getElementById('modalTitle').textContent = '✏️ Edit Bill';
+      document.getElementById('billId').value = id;
+      document.getElementById('billStudent').value = b.student_id;
+      document.getElementById('billCategory').value = b.category;
+      document.getElementById('billAmount').value = b.amount;
+      document.getElementById('billDesc').value = b.description;
+      document.getElementById('billDescTh').value = b.description_th || '';
+      document.getElementById('billTerm').value = b.term || '';
+      document.getElementById('billYear').value = b.academic_year || '';
+      document.getElementById('billIssueDate').value = b.issue_date;
+      document.getElementById('billDueDate').value = b.due_date;
+      document.getElementById('billNotes').value = b.notes || '';
+      document.getElementById('billModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('billModal').style.display = 'none';
+    }
+    
+    async function generateBillNumber() {
+      const yr = new Date().getFullYear();
+      const { count } = await supabaseClient
+        .from('bills')
+        .select('*', { count: 'exact', head: true });
+      return `BILL-${yr}-${String((count || 0) + 1).padStart(5, '0')}`;
+    }
+    
+    async function saveBill(event) {
+      event.preventDefault();
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      try {
+        const id = document.getElementById('billId').value;
+        const data = {
+          student_id: document.getElementById('billStudent').value,
+          category: document.getElementById('billCategory').value,
+          amount: parseFloat(document.getElementById('billAmount').value),
+          description: document.getElementById('billDesc').value.trim(),
+          description_th: document.getElementById('billDescTh').value.trim() || null,
+          term: document.getElementById('billTerm').value.trim() || null,
+          academic_year: document.getElementById('billYear').value.trim() || null,
+          issue_date: document.getElementById('billIssueDate').value || new Date().toISOString().split('T')[0],
+          due_date: document.getElementById('billDueDate').value,
+          notes: document.getElementById('billNotes').value.trim() || null,
+          updated_at: new Date().toISOString()
+        };
+        
+        if (id) {
+          const { error } = await supabaseClient.from('bills').update(data).eq('id', id);
+          if (error) throw error;
+          dataHelpers.toast('✅ Bill updated!', 'success');
+        } else {
+          data.bill_number = await generateBillNumber();
+          data.status = 'unpaid';
+          const { error } = await supabaseClient.from('bills').insert(data);
+          if (error) throw error;
+          dataHelpers.toast('🎉 Bill created!', 'success');
+        }
+        
+        closeModal();
+        await loadBills();
+      } catch (err) {
+        dataHelpers.toast('❌ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Bill';
+      }
+    }
+    
+    async function deleteBill(id, num) {
+      if (!confirm(`Delete bill ${num}?`)) return;
+      const { error } = await supabaseClient.from('bills').delete().eq('id', id);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      dataHelpers.toast('🗑️ Bill deleted', 'success');
+      await loadBills();
+    }
+    
+    function openBulkModal() {
+      document.getElementById('bulkForm').reset();
+      document.getElementById('bulkProgram').value = 'all';
+      const due = new Date();
+      due.setDate(due.getDate() + 30);
+      document.getElementById('bulkDueDate').value = due.toISOString().split('T')[0];
+      updateBulkPreview();
+      document.getElementById('bulkModal').style.display = 'flex';
+    }
+    
+    function updateBulkPreview() {
+      const program = document.getElementById('bulkProgram').value;
+      const count = program === 'all' ? allStudents.length : allStudents.filter(s => s.program === program).length;
+      document.getElementById('bulkCount').textContent = count;
+    }
+    
+    function closeBulk() {
+      document.getElementById('bulkModal').style.display = 'none';
+    }
+    
+    async function bulkCreate(event) {
+      event.preventDefault();
+      const btn = document.getElementById('bulkBtn');
+      const program = document.getElementById('bulkProgram').value;
+      const students = program === 'all' ? allStudents : allStudents.filter(s => s.program === program);
+      
+      if (students.length === 0) {
+        dataHelpers.toast('❌ No students found', 'error');
+        return;
+      }
+      
+      if (!confirm(`Create ${students.length} bills?`)) return;
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Creating...';
+      
+      try {
+        const yr = new Date().getFullYear();
+        const { count } = await supabaseClient.from('bills').select('*', { count: 'exact', head: true });
+        let nextSeq = (count || 0) + 1;
+        
+        const bills = students.map((s, i) => ({
+          bill_number: `BILL-${yr}-${String(nextSeq + i).padStart(5, '0')}`,
+          student_id: s.id,
+          category: document.getElementById('bulkCategory').value,
+          amount: parseFloat(document.getElementById('bulkAmount').value),
+          description: document.getElementById('bulkDesc').value.trim(),
+          term: document.getElementById('bulkTerm').value.trim() || null,
+          academic_year: String(yr),
+          issue_date: new Date().toISOString().split('T')[0],
+          due_date: document.getElementById('bulkDueDate').value,
+          status: 'unpaid'
+        }));
+        
+        const { error } = await supabaseClient.from('bills').insert(bills);
+        if (error) throw error;
+        
+        dataHelpers.toast(`🎉 ${students.length} bills created!`, 'success');
+        closeBulk();
+        await loadBills();
+      } catch (err) {
+        dataHelpers.toast('❌ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 Create All Bills';
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

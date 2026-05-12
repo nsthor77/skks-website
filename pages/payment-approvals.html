@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Approvals — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .slip-card{background:white;border:1px solid #E5E7EB;border-radius:14px;padding:18px;display:grid;grid-template-columns:140px 1fr auto;gap:18px;align-items:center;margin-bottom:14px;transition:all 0.2s}
+    .slip-card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.08);border-color:#1B5E3F}
+    .slip-thumb{width:140px;height:140px;background:#F9FAFB;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;border:1px solid #E5E7EB}
+    .slip-thumb img{width:100%;height:100%;object-fit:cover}
+    .slip-info h3{color:#1B5E3F;margin:0 0 6px;font-size:16px}
+    .slip-info .student{font-size:13px;color:#374151;margin-bottom:4px}
+    .slip-info .bill-ref{font-size:12px;color:#9CA3AF;font-family:monospace;margin-bottom:8px}
+    .slip-info .amount{font-size:24px;font-weight:800;color:#1B5E3F;margin:4px 0}
+    .slip-info .meta{font-size:12px;color:#6B7280;line-height:1.6}
+    .slip-actions{display:flex;flex-direction:column;gap:8px;min-width:120px}
+    .status-pending{background:#FEF3C7;color:#A16207;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px}
+    .status-approved{background:#DCFCE7;color:#15803D;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px}
+    .status-rejected{background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px}
+    @media(max-width:760px){.slip-card{grid-template-columns:1fr;text-align:center}.slip-thumb{width:100%;height:200px}.slip-actions{flex-direction:row;justify-content:center}}
+    
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+    .lightbox.show{display:flex}
+    .lightbox img{max-width:90%;max-height:90vh;border-radius:8px}
+    .lightbox-close{position:absolute;top:20px;right:30px;background:white;color:#1B5E3F;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="payment-approvals.html" class="active">✅ Approvals</a>
+        <a href="create-bills.html">📄 Bills</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>✅ Payment Approvals</h2>
+          <p>ตรวจสลิปจากผู้ปกครอง — Review and approve payment slips</p>
+        </div>
+        <button class="btn btn-secondary" onclick="loadSlips()">🔄 Refresh</button>
+      </div>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card amber">
+          <div class="label">⏳ Pending Review</div>
+          <div class="value" id="cntPending">0</div>
+        </div>
+        <div class="stat-card teal">
+          <div class="label">✅ Approved Today</div>
+          <div class="value" id="cntApproved">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">Total This Month</div>
+          <div class="value" id="cntMonth">0</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;">
+        <select id="filterStatus" onchange="renderSlips()" style="padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;">
+          <option value="pending">⏳ Pending (Default)</option>
+          <option value="">All Status</option>
+          <option value="approved">✅ Approved</option>
+          <option value="rejected">❌ Rejected</option>
+        </select>
+        <input type="search" id="search" placeholder="🔍 Search student..." oninput="renderSlips()" style="flex:1; min-width:200px; padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;" />
+      </div>
+
+      <div id="slipsList"></div>
+      
+      <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
+        <div style="font-size:64px;">📭</div>
+        <h3 style="color:#1B5E3F;">No slips to review</h3>
+        <p>เมื่อผู้ปกครองอัปสลิป จะปรากฏที่นี่</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">✕</button>
+    <img id="lightboxImg" src="" alt="Slip" onclick="event.stopPropagation()" />
+  </div>
+
+  <div class="modal" id="rejectModal" style="display:none;">
+    <div class="modal-content" style="max-width:500px;">
+      <div class="modal-header">
+        <h3 style="color:#EF4444; margin:0;">❌ Reject Slip</h3>
+        <button class="modal-close" onclick="closeReject()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="rejectForm" onsubmit="confirmReject(event)">
+          <input type="hidden" id="rejectSlipId" />
+          <div class="form-group">
+            <label>Reason for rejection <span style="color:#EF4444;">*</span></label>
+            <select id="rejectReasonPreset" onchange="document.getElementById('rejectReason').value = this.value">
+              <option value="">-- Quick reasons --</option>
+              <option value="ไม่พบเงินเข้าในบัญชี">ไม่พบเงินเข้าในบัญชี</option>
+              <option value="จำนวนเงินไม่ตรง">จำนวนเงินไม่ตรง</option>
+              <option value="สลิปไม่ชัดเจน — กรุณาส่งใหม่">สลิปไม่ชัดเจน — กรุณาส่งใหม่</option>
+              <option value="โอนผิดบัญชี">โอนผิดบัญชี</option>
+              <option value="วันที่โอนไม่ตรงกัน">วันที่โอนไม่ตรงกัน</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Detailed reason</label>
+            <textarea id="rejectReason" rows="3" required></textarea>
+          </div>
+          <div class="modal-footer" style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeReject()">Cancel</button>
+            <button type="submit" class="btn" style="background:#EF4444; color:white;">❌ Reject</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allSlips = [];
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await loadSlips();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadSlips() {
+      const { data, error } = await supabaseClient
+        .from('payment_slips')
+        .select('*, bills(bill_number, description, amount), students(first_name, last_name, nickname, program, grade)')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        dataHelpers.toast('❌ Load failed', 'error');
+        return;
+      }
+      
+      allSlips = data || [];
+      renderSlips();
+      updateStats();
+    }
+    
+    function updateStats() {
+      const today = new Date().toISOString().split('T')[0];
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      const monthStartStr = monthStart.toISOString().split('T')[0];
+      
+      document.getElementById('cntPending').textContent = allSlips.filter(s => s.status === 'pending').length;
+      document.getElementById('cntApproved').textContent = allSlips.filter(s => s.status === 'approved' && s.reviewed_at && s.reviewed_at.split('T')[0] === today).length;
+      document.getElementById('cntMonth').textContent = allSlips.filter(s => s.created_at && s.created_at.split('T')[0] >= monthStartStr).length;
+    }
+    
+    function renderSlips() {
+      const list = document.getElementById('slipsList');
+      const empty = document.getElementById('emptyState');
+      
+      const filterStatus = document.getElementById('filterStatus').value;
+      const search = document.getElementById('search').value.toLowerCase().trim();
+      
+      let filtered = allSlips;
+      if (filterStatus) filtered = filtered.filter(s => s.status === filterStatus);
+      if (search) {
+        filtered = filtered.filter(slip => {
+          const s = slip.students || {};
+          const txt = `${s.first_name} ${s.last_name} ${s.nickname || ''}`.toLowerCase();
+          return txt.includes(search);
+        });
+      }
+      
+      if (filtered.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      
+      list.innerHTML = filtered.map(slip => {
+        const s = slip.students || {};
+        const bill = slip.bills || {};
+        const isPending = slip.status === 'pending';
+        
+        return `<div class="slip-card">
+          <div class="slip-thumb" onclick="viewSlip('${slip.slip_url}')">
+            ${slip.slip_url ? `<img src="${slip.slip_url}" alt="Slip" />` : '<div style="color:#9CA3AF;font-size:48px;">📄</div>'}
+          </div>
+          <div class="slip-info">
+            <div style="margin-bottom:6px;"><span class="status-${slip.status}">${slip.status.toUpperCase()}</span></div>
+            <h3>${s.first_name || '?'} ${s.last_name || ''}${s.nickname ? ` (${s.nickname})` : ''}</h3>
+            <div class="student">${(s.program||'').toUpperCase()} ${s.grade || ''}</div>
+            <div class="bill-ref">${bill.bill_number || '(no bill)'} • ${bill.description || ''}</div>
+            <div class="amount">฿${Number(slip.amount).toLocaleString('en-US')}</div>
+            <div class="meta">
+              ${slip.transfer_date ? `📅 Transferred: ${slip.transfer_date}` : ''}
+              ${slip.transfer_time ? ` ${slip.transfer_time}` : ''}<br>
+              ${slip.bank_name ? `🏦 ${slip.bank_name}` : ''}
+              ${slip.reference_number ? ` • Ref: ${slip.reference_number}` : ''}<br>
+              ${slip.notes ? `📝 ${slip.notes}` : ''}
+              ${!isPending && slip.rejection_reason ? `<br><span style="color:#EF4444;">❌ ${slip.rejection_reason}</span>` : ''}
+              <div style="margin-top:6px; color:#9CA3AF; font-size:11px;">Submitted: ${new Date(slip.created_at).toLocaleString('th-TH')}</div>
+            </div>
+          </div>
+          <div class="slip-actions">
+            ${isPending ? `
+              <button class="btn btn-sm" style="background:#10B981;color:white;" onclick="approve('${slip.id}')">✅ Approve</button>
+              <button class="btn btn-sm" style="background:#EF4444;color:white;" onclick="openReject('${slip.id}')">❌ Reject</button>
+            ` : ''}
+            <button class="btn btn-sm btn-secondary" onclick="viewSlip('${slip.slip_url}')">👁️ View</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    
+    function viewSlip(url) {
+      if (!url) return;
+      document.getElementById('lightboxImg').src = url;
+      document.getElementById('lightbox').classList.add('show');
+    }
+    
+    function closeLightbox(e) {
+      if (e && e.target.tagName === 'IMG') return;
+      document.getElementById('lightbox').classList.remove('show');
+    }
+    
+    async function approve(id) {
+      if (!confirm('✅ ยืนยันการอนุมัติสลิปนี้?\n\nระบบจะ:\n1. บันทึก Payment record\n2. เปลี่ยนสถานะบิลเป็น "Paid"\n3. ส่งใบเสร็จให้ผู้ปกครอง')) return;
+      
+      const slip = allSlips.find(x => x.id === id);
+      if (!slip) return;
+      
+      try {
+        const user = await supabaseClient.auth.getUser();
+        
+        const { error: updateSlipError } = await supabaseClient
+          .from('payment_slips')
+          .update({
+            status: 'approved',
+            reviewed_by: user.data.user.id,
+            reviewed_at: new Date().toISOString()
+          })
+          .eq('id', id);
+        if (updateSlipError) throw updateSlipError;
+        
+        const yr = new Date().getFullYear();
+        const { count } = await supabaseClient.from('payments').select('*', { count: 'exact', head: true });
+        const receiptNum = `RCP-${yr}-${String((count || 0) + 1).padStart(5, '0')}`;
+        
+        const { data: paymentData, error: paymentError } = await supabaseClient
+          .from('payments')
+          .insert({
+            receipt_number: receiptNum,
+            student_id: slip.student_id,
+            amount: slip.amount,
+            category: slip.bills?.description ? 'tuition' : 'other',
+            payment_method: 'bank_transfer',
+            payment_date: slip.transfer_date || new Date().toISOString().split('T')[0],
+            status: 'completed',
+            notes: `Auto-approved from slip ${slip.bills?.bill_number || ''} • Bank: ${slip.bank_name || ''} • Ref: ${slip.reference_number || ''}`
+          })
+          .select()
+          .single();
+        if (paymentError) throw paymentError;
+        
+        if (slip.bill_id) {
+          await supabaseClient
+            .from('bills')
+            .update({
+              status: 'paid',
+              paid_at: new Date().toISOString(),
+              payment_id: paymentData.id
+            })
+            .eq('id', slip.bill_id);
+        }
+        
+        await supabaseClient
+          .from('finance_transactions')
+          .insert({
+            transaction_type: 'income',
+            category: 'tuition',
+            amount: slip.amount,
+            description: `Payment from ${slip.students?.first_name || ''} ${slip.students?.last_name || ''} - ${slip.bills?.description || ''}`,
+            transaction_date: slip.transfer_date || new Date().toISOString().split('T')[0]
+          });
+        
+        dataHelpers.toast('✅ Approved! Receipt: ' + receiptNum, 'success');
+        await loadSlips();
+      } catch (err) {
+        console.error(err);
+        dataHelpers.toast('❌ Failed: ' + err.message, 'error');
+      }
+    }
+    
+    function openReject(id) {
+      document.getElementById('rejectSlipId').value = id;
+      document.getElementById('rejectForm').reset();
+      document.getElementById('rejectModal').style.display = 'flex';
+    }
+    
+    function closeReject() {
+      document.getElementById('rejectModal').style.display = 'none';
+    }
+    
+    async function confirmReject(event) {
+      event.preventDefault();
+      const id = document.getElementById('rejectSlipId').value;
+      const reason = document.getElementById('rejectReason').value.trim();
+      
+      if (!reason) return;
+      
+      try {
+        const user = await supabaseClient.auth.getUser();
+        const { error } = await supabaseClient
+          .from('payment_slips')
+          .update({
+            status: 'rejected',
+            reviewed_by: user.data.user.id,
+            reviewed_at: new Date().toISOString(),
+            rejection_reason: reason
+          })
+          .eq('id', id);
+        if (error) throw error;
+        
+        dataHelpers.toast('❌ Slip rejected', 'success');
+        closeReject();
+        await loadSlips();
+      } catch (err) {
+        dataHelpers.toast('❌ Failed: ' + err.message, 'error');
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Settings — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .setting-card{background:white;border:1px solid #E5E7EB;border-radius:14px;padding:28px;margin-bottom:20px}
+    .setting-card h3{color:#1B5E3F;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid #1B5E3F;font-size:17px}
+    .qr-preview-area{background:#F9FAFB;border:2px dashed #D1D5DB;border-radius:12px;padding:24px;text-align:center;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s}
+    .qr-preview-area:hover{border-color:#1B5E3F;background:#F0FDF4}
+    .qr-preview-area img{max-width:280px;max-height:280px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+    .qr-preview-area .icon{font-size:64px;color:#9CA3AF;margin-bottom:12px}
+    .qr-preview-area h4{color:#1B5E3F;margin:8px 0;font-size:16px}
+    .qr-preview-area p{margin:0;color:#6B7280;font-size:13px}
+    .info-box{background:#EFF6FF;border-left:4px solid #5BB8E0;padding:16px;border-radius:8px;margin-bottom:20px}
+    .info-box .ic{font-size:24px;margin-bottom:6px}
+    .info-box h4{color:#1B5E3F;margin:0 0 6px;font-size:15px}
+    .info-box p{margin:0;font-size:13px;color:#374151;line-height:1.6}
+    .layout-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+    @media(max-width:900px){.layout-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="payment-approvals.html">✅ Approvals</a>
+        <a href="create-bills.html">📄 Bills</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="payment-settings.html" class="owner-only active" style="display:none">⚙️ Settings</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>⚙️ Payment Settings</h2>
+          <p>ตั้งค่าบัญชีธนาคารและ QR Code สำหรับรับชำระเงิน — Owner only</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="ic">ℹ️</div>
+        <h4>เกี่ยวกับการตั้งค่านี้</h4>
+        <p>ข้อมูลที่ตั้งไว้จะแสดงให้ผู้ปกครองเห็นเมื่อกดปุ่ม "Pay Now" — ผู้ปกครองจะใช้ QR Code นี้สแกนจ่ายเงิน หรือโอนเข้าเลขบัญชีที่ระบุ</p>
+      </div>
+
+      <form id="settingsForm" onsubmit="saveSettings(event)">
+        <div class="layout-grid">
+          
+          <div>
+            <div class="setting-card">
+              <h3>🏦 Bank Account Information</h3>
+              
+              <div class="form-group">
+                <label>Bank Name <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="bankName" required placeholder="e.g., Bangkok Bank (ธนาคารกรุงเทพ)" />
+              </div>
+              
+              <div class="form-group">
+                <label>Account Number <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="accountNumber" required placeholder="e.g., 123-4-56789-0" style="font-family:monospace;letter-spacing:1px;font-size:16px;" />
+              </div>
+              
+              <div class="form-group">
+                <label>Account Name <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="accountName" required placeholder="โรงเรียนสวนสนขอนแก่น" />
+              </div>
+              
+              <div class="form-group">
+                <label>Branch</label>
+                <input type="text" id="branch" placeholder="e.g., Khon Kaen Branch" />
+              </div>
+              
+              <div class="form-group">
+                <label>PromptPay ID (เบอร์โทร 10 หลัก หรือเลขประจำตัว 13 หลัก)</label>
+                <input type="text" id="promptpayId" placeholder="0812345678" style="font-family:monospace;" />
+              </div>
+            </div>
+            
+            <div class="setting-card">
+              <h3>📝 Payment Notice</h3>
+              <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">ข้อความที่แสดงให้ผู้ปกครองอ่านก่อนจ่าย</p>
+              
+              <div class="form-group">
+                <label>Notice (English)</label>
+                <textarea id="paymentNote" rows="3" placeholder="Please transfer the exact amount and upload your transfer slip."></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label>หมายเหตุ (ภาษาไทย)</label>
+                <textarea id="paymentNoteTh" rows="3" placeholder="กรุณาโอนเงินตามจำนวนที่ระบุ แล้วอัปโหลดสลิป..."></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <div class="setting-card">
+              <h3>📱 PromptPay QR Code</h3>
+              <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">อัปโหลดรูป QR Code จากแอปธนาคาร — ผู้ปกครองจะสแกนจาก QR นี้</p>
+              
+              <div class="qr-preview-area" onclick="document.getElementById('qrInput').click()">
+                <img id="qrPreview" src="" style="display:none;" />
+                <div id="qrPlaceholder">
+                  <div class="icon">📱</div>
+                  <h4>คลิกเพื่ออัปโหลด QR Code</h4>
+                  <p>หรือ Drag & Drop รูป QR ลงที่นี่</p>
+                  <p style="margin-top:8px;font-size:11px;">PNG, JPG — แนะนำ 500x500 px</p>
+                </div>
+                <input type="file" id="qrInput" accept="image/*" style="display:none;" onchange="handleQrSelect(event)" />
+              </div>
+              
+              <div style="margin-top:12px;text-align:center;">
+                <button type="button" class="btn btn-sm btn-secondary" onclick="removeQr()" id="removeQrBtn" style="display:none;">
+                  🗑️ Remove QR
+                </button>
+              </div>
+              
+              <input type="hidden" id="qrCodeUrl" />
+            </div>
+            
+            <div class="setting-card" style="background:#F0FDF4; border-color:#1B5E3F;">
+              <h3 style="color:#1B5E3F;">📋 วิธีรับ QR Code</h3>
+              <ol style="margin:0; padding-left:20px; line-height:1.8; font-size:13px; color:#374151;">
+                <li>เปิดแอปธนาคารของบัญชีโรงเรียน</li>
+                <li>เมนู <strong>"PromptPay"</strong> หรือ <strong>"QR รับเงิน"</strong></li>
+                <li>เลือก "แสดง QR Code ของฉัน"</li>
+                <li>กด <strong>บันทึก/Share</strong> เป็นรูป</li>
+                <li>มาที่หน้านี้ → คลิกอัปโหลด</li>
+              </ol>
+              <p style="margin-top:12px; font-size:12px; color:#1B5E3F; font-weight:600;">
+                💡 ตอนนี้ใช้ Placeholder ก่อน — ค่อยอัปจริงตอนพร้อม
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div style="text-align:center; margin-top:24px;">
+          <button type="submit" class="btn btn-primary" id="saveBtn" style="padding:14px 40px; font-size:15px;">
+            💾 Save All Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let currentSettings = null;
+    let selectedQrFile = null;
+    
+    async function init() {
+      const profile = await requireOwner();
+      if (!profile) return;
+      
+      document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      
+      await loadSettings();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadSettings() {
+      const { data, error } = await supabaseClient
+        .from('payment_settings')
+        .select('*')
+        .limit(1)
+        .single();
+      
+      if (error) {
+        console.error(error);
+        return;
+      }
+      
+      currentSettings = data;
+      
+      document.getElementById('bankName').value = data.bank_name || '';
+      document.getElementById('accountNumber').value = data.account_number || '';
+      document.getElementById('accountName').value = data.account_name || '';
+      document.getElementById('branch').value = data.branch || '';
+      document.getElementById('promptpayId').value = data.promptpay_id || '';
+      document.getElementById('paymentNote').value = data.payment_note || '';
+      document.getElementById('paymentNoteTh').value = data.payment_note_th || '';
+      document.getElementById('qrCodeUrl').value = data.qr_code_url || '';
+      
+      if (data.qr_code_url) {
+        showQrPreview(data.qr_code_url);
+      }
+    }
+    
+    function handleQrSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 5 * 1024 * 1024) {
+        dataHelpers.toast('❌ File too large (max 5MB)', 'error');
+        return;
+      }
+      
+      selectedQrFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = e => showQrPreview(e.target.result);
+      reader.readAsDataURL(file);
+    }
+    
+    function showQrPreview(url) {
+      document.getElementById('qrPreview').src = url;
+      document.getElementById('qrPreview').style.display = 'block';
+      document.getElementById('qrPlaceholder').style.display = 'none';
+      document.getElementById('removeQrBtn').style.display = 'inline-block';
+    }
+    
+    function removeQr() {
+      if (!confirm('Remove the QR Code?')) return;
+      selectedQrFile = null;
+      document.getElementById('qrCodeUrl').value = '';
+      document.getElementById('qrPreview').src = '';
+      document.getElementById('qrPreview').style.display = 'none';
+      document.getElementById('qrPlaceholder').style.display = 'block';
+      document.getElementById('removeQrBtn').style.display = 'none';
+      document.getElementById('qrInput').value = '';
+    }
+    
+    async function uploadQr(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const fileName = `qr-${Date.now()}.${ext}`;
+      
+      const { data, error } = await supabaseClient.storage
+        .from('payment-qr')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+      
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabaseClient.storage
+        .from('payment-qr')
+        .getPublicUrl(fileName);
+      
+      return publicUrl;
+    }
+    
+    async function saveSettings(event) {
+      event.preventDefault();
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      
+      try {
+        let qrUrl = document.getElementById('qrCodeUrl').value || null;
+        
+        if (selectedQrFile) {
+          btn.textContent = '📤 Uploading QR...';
+          qrUrl = await uploadQr(selectedQrFile);
+        }
+        
+        const data = {
+          bank_name: document.getElementById('bankName').value.trim(),
+          account_number: document.getElementById('accountNumber').value.trim(),
+          account_name: document.getElementById('accountName').value.trim(),
+          branch: document.getElementById('branch').value.trim() || null,
+          promptpay_id: document.getElementById('promptpayId').value.trim() || null,
+          payment_note: document.getElementById('paymentNote').value.trim() || null,
+          payment_note_th: document.getElementById('paymentNoteTh').value.trim() || null,
+          qr_code_url: qrUrl,
+          active: true,
+          updated_at: new Date().toISOString()
+        };
+        
+        btn.textContent = '💾 Saving...';
+        
+        const { error } = await supabaseClient
+          .from('payment_settings')
+          .update(data)
+          .eq('id', currentSettings.id);
+        
+        if (error) throw error;
+        
+        dataHelpers.toast('✅ Settings saved!', 'success');
+        await loadSettings();
+        selectedQrFile = null;
+      } catch (err) {
+        console.error(err);
+        dataHelpers.toast('❌ Save failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save All Settings';
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

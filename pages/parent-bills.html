@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Bills — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body{background:linear-gradient(135deg, #F0FDF4 0%, #DBEAFE 100%); min-height:100vh; padding-bottom:40px;}
+    .parent-topbar{background:white;padding:14px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .parent-topbar h1{color:#1B5E3F;margin:0;font-size:18px}
+    .container{max-width:900px;margin:0 auto;padding:0 20px}
+    
+    .bill-card{background:white;border-radius:14px;padding:22px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 4px 12px rgba(0,0,0,0.04);flex-wrap:wrap}
+    .bill-info{flex:1;min-width:220px}
+    .bill-info h3{color:#1B5E3F;margin:0 0 6px;font-size:17px}
+    .bill-info .student{font-size:13px;color:#5BB8E0;font-weight:600;margin-bottom:4px}
+    .bill-info .meta{font-size:12px;color:#6B7280;line-height:1.6}
+    .bill-amount{text-align:right;min-width:140px}
+    .bill-amount .num{font-size:28px;font-weight:800;color:#1B5E3F;line-height:1}
+    .bill-amount .unit{font-size:11px;color:#9CA3AF;letter-spacing:1px;margin-top:2px}
+    .status-tag{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:1px;border-radius:6px;text-transform:uppercase}
+    .s-unpaid{background:#FEE2E2;color:#991B1B}
+    .s-pending{background:#FEF3C7;color:#A16207}
+    .s-paid{background:#DCFCE7;color:#15803D}
+    .s-overdue{background:#FED7AA;color:#C2410C}
+    
+    .pay-modal-content{max-width:700px}
+    .qr-display{text-align:center;background:#F9FAFB;padding:24px;border-radius:12px;margin:14px 0}
+    .qr-display img{max-width:280px;height:auto;border-radius:8px}
+    .qr-display .amount-big{font-size:36px;font-weight:800;color:#1B5E3F;margin:10px 0}
+    .bank-info{background:#F0FDF4;padding:14px 18px;border-radius:10px;border-left:4px solid #1B5E3F;margin:14px 0}
+    .bank-info p{margin:6px 0;font-size:14px;color:#374151}
+    .bank-info strong{color:#1B5E3F}
+    
+    .slip-upload-area{border:2px dashed #1B5E3F;border-radius:12px;padding:30px;text-align:center;cursor:pointer;background:#F0FDF4;transition:all 0.15s}
+    .slip-upload-area:hover{background:#DCFCE7}
+    .slip-upload-area.has-file{padding:14px}
+    .slip-preview{max-width:200px;max-height:200px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="parent-topbar">
+    <h1>🌲 SKKS — Parent Portal</h1>
+    <div>
+      <a href="../index.html" class="btn btn-secondary" style="margin-right:8px;">← Home</a>
+      <button class="btn btn-secondary" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="loading-state" id="loadingMsg" style="text-align:center;padding:60px;">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <h2 style="color:#1B5E3F; margin-bottom:6px;">📄 บิลและการชำระเงิน</h2>
+      <p style="color:#6B7280; margin-bottom:20px;">รายการบิลค้างชำระและประวัติการจ่ายเงิน</p>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card amber">
+          <div class="label">บิลค้างชำระ</div>
+          <div class="value" id="cntUnpaid">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">รอตรวจสอบ</div>
+          <div class="value" id="cntPending">0</div>
+        </div>
+        <div class="stat-card teal">
+          <div class="label">ยอดค้างชำระทั้งหมด</div>
+          <div class="value" id="totalDue" style="font-size:18px;">฿0</div>
+        </div>
+      </div>
+
+      <h3 style="color:#1B5E3F; margin:24px 0 12px;">⏰ บิลที่ต้องชำระ</h3>
+      <div id="unpaidList"></div>
+      
+      <h3 style="color:#1B5E3F; margin:32px 0 12px;">✅ ชำระแล้ว</h3>
+      <div id="paidList"></div>
+      
+      <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
+        <div style="font-size:64px;">📭</div>
+        <h3 style="color:#1B5E3F;">ยังไม่มีบิล</h3>
+        <p>เมื่อโรงเรียนออกบิลให้ จะปรากฏที่นี่</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="payModal" style="display:none;">
+    <div class="modal-content pay-modal-content">
+      <div class="modal-header">
+        <h3 style="color:#1B5E3F; margin:0;">💳 ชำระเงิน</h3>
+        <button class="modal-close" onclick="closePay()">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="paymentDetails"></div>
+        
+        <h4 style="color:#1B5E3F; margin:20px 0 10px;">📤 อัปโหลดสลิป</h4>
+        <p style="font-size:13px; color:#6B7280; margin-bottom:14px;">หลังโอนเงินแล้ว อัปโหลดสลิปที่นี่ — ครูจะตรวจสอบและส่งใบเสร็จกลับให้</p>
+        
+        <form id="slipForm" onsubmit="submitSlip(event)">
+          <div class="slip-upload-area" id="slipUploadArea" onclick="document.getElementById('slipInput').click()">
+            <div id="slipPlaceholder">
+              <div style="font-size:48px;">📤</div>
+              <h4 style="margin:8px 0 4px; color:#1B5E3F;">คลิกเพื่ออัปโหลดสลิป</h4>
+              <p style="margin:0; font-size:12px; color:#6B7280;">JPG, PNG — สูงสุด 5MB</p>
+            </div>
+            <img id="slipPreview" class="slip-preview" style="display:none;" />
+            <input type="file" id="slipInput" accept="image/*" style="display:none;" onchange="handleSlipSelect(event)" />
+          </div>
+          
+          <div class="form-row" style="margin-top:14px;">
+            <div class="form-group">
+              <label>วันที่โอน</label>
+              <input type="date" id="transferDate" />
+            </div>
+            <div class="form-group">
+              <label>เวลา</label>
+              <input type="time" id="transferTime" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>ธนาคารต้นทาง</label>
+              <input type="text" id="fromBank" placeholder="เช่น SCB, กรุงไทย" />
+            </div>
+            <div class="form-group">
+              <label>เลขอ้างอิง (ถ้ามี)</label>
+              <input type="text" id="referenceNumber" placeholder="REF#" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>หมายเหตุ (optional)</label>
+            <textarea id="slipNotes" rows="2"></textarea>
+          </div>
+          
+          <div class="modal-footer" style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+            <button type="button" class="btn btn-secondary" onclick="closePay()">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">📤 ส่งสลิป</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allBills = [];
+    let paymentSettings = null;
+    let currentBill = null;
+    let selectedSlipFile = null;
+    
+    async function init() {
+      const profile = await requireAuth();
+      if (!profile) return;
+      
+      await Promise.all([loadBills(), loadPaymentSettings()]);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadBills() {
+      const { data, error } = await supabaseClient
+        .from('bills')
+        .select('*, students(first_name, last_name, nickname, program, grade)')
+        .order('due_date', { ascending: true });
+      
+      if (error) {
+        console.error(error);
+        return;
+      }
+      
+      allBills = data || [];
+      renderBills();
+      updateStats();
+    }
+    
+    async function loadPaymentSettings() {
+      const { data } = await supabaseClient
+        .from('payment_settings')
+        .select('*')
+        .eq('active', true)
+        .single();
+      paymentSettings = data;
+    }
+    
+    function updateStats() {
+      const unpaid = allBills.filter(b => b.status === 'unpaid');
+      const pending = allBills.filter(b => b.status === 'pending');
+      const totalDue = unpaid.reduce((sum, b) => sum + parseFloat(b.amount), 0);
+      
+      document.getElementById('cntUnpaid').textContent = unpaid.length;
+      document.getElementById('cntPending').textContent = pending.length;
+      document.getElementById('totalDue').textContent = '฿' + Math.round(totalDue).toLocaleString('en-US');
+    }
+    
+    function renderBills() {
+      const unpaidList = document.getElementById('unpaidList');
+      const paidList = document.getElementById('paidList');
+      const empty = document.getElementById('emptyState');
+      
+      if (allBills.length === 0) {
+        empty.style.display = 'block';
+        unpaidList.innerHTML = '';
+        paidList.innerHTML = '';
+        return;
+      }
+      empty.style.display = 'none';
+      
+      const today = new Date().toISOString().split('T')[0];
+      const unpaid = allBills.filter(b => b.status !== 'paid');
+      const paid = allBills.filter(b => b.status === 'paid');
+      
+      unpaidList.innerHTML = unpaid.length === 0 ? '<p style="color:#6B7280; text-align:center; padding:20px;">ไม่มีบิลค้างชำระ 🎉</p>' : unpaid.map(b => {
+        const s = b.students || {};
+        const overdue = b.status === 'unpaid' && b.due_date < today;
+        const status = overdue ? 'overdue' : b.status;
+        const statusText = { unpaid:'ค้างชำระ', pending:'รอตรวจ', overdue:'เลยกำหนด' }[status];
+        
+        return `<div class="bill-card">
+          <div class="bill-info">
+            <span class="status-tag s-${status}">${statusText}</span>
+            <h3 style="margin-top:6px;">${b.description}</h3>
+            <div class="student">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''} • ${(s.program||'').toUpperCase()} ${s.grade||''}</div>
+            <div class="meta">
+              📅 กำหนดชำระ: ${dataHelpers.formatDate(b.due_date)} ${overdue ? '<span style="color:#EF4444;">⚠️</span>' : ''}<br>
+              📄 ${b.bill_number}
+            </div>
+          </div>
+          <div class="bill-amount">
+            <div class="num">฿${Number(b.amount).toLocaleString('en-US')}</div>
+            <div class="unit">THB</div>
+          </div>
+          ${b.status === 'unpaid' || overdue ? `<button class="btn btn-primary" onclick="openPay('${b.id}')" style="padding:12px 24px;">💳 ชำระเงิน</button>` : '<div style="font-size:13px; color:#A16207;">⏳ รอตรวจสอบ</div>'}
+        </div>`;
+      }).join('');
+      
+      paidList.innerHTML = paid.length === 0 ? '<p style="color:#6B7280; text-align:center; padding:20px;">ยังไม่มีรายการที่ชำระแล้ว</p>' : paid.map(b => {
+        const s = b.students || {};
+        return `<div class="bill-card" style="opacity:0.75;">
+          <div class="bill-info">
+            <span class="status-tag s-paid">✅ ชำระแล้ว</span>
+            <h3 style="margin-top:6px;">${b.description}</h3>
+            <div class="student">${s.first_name} ${s.last_name} • ${(s.program||'').toUpperCase()} ${s.grade||''}</div>
+            <div class="meta">📅 ชำระเมื่อ: ${b.paid_at ? new Date(b.paid_at).toLocaleDateString('th-TH') : '-'}</div>
+          </div>
+          <div class="bill-amount">
+            <div class="num" style="color:#15803D;">฿${Number(b.amount).toLocaleString('en-US')}</div>
+            <div class="unit">PAID</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    
+    function openPay(billId) {
+      currentBill = allBills.find(b => b.id === billId);
+      if (!currentBill || !paymentSettings) return;
+      
+      selectedSlipFile = null;
+      const s = currentBill.students || {};
+      
+      document.getElementById('paymentDetails').innerHTML = `
+        <h4 style="color:#1B5E3F; margin:0 0 10px;">💰 จำนวนเงิน</h4>
+        <div class="qr-display">
+          <div class="amount-big">฿${Number(currentBill.amount).toLocaleString('en-US')}</div>
+          <div style="color:#6B7280; font-size:13px;">${currentBill.description}<br>${s.first_name} ${s.last_name}</div>
+          ${paymentSettings.qr_code_url ? `<img src="${paymentSettings.qr_code_url}" alt="QR Code" style="margin-top:14px;" />` : '<div style="margin-top:14px; padding:30px; background:#F3F4F6; border-radius:8px; color:#9CA3AF;">QR Code จะปรากฏที่นี่<br><small>(Owner ยังไม่ได้อัป QR Code)</small></div>'}
+          <p style="margin:10px 0 0; font-size:12px; color:#6B7280;">สแกน QR เพื่อจ่ายด้วย PromptPay</p>
+        </div>
+        
+        <div class="bank-info">
+          <h4 style="color:#1B5E3F; margin:0 0 10px;">🏦 หรือโอนผ่านธนาคาร</h4>
+          <p><strong>ธนาคาร:</strong> ${paymentSettings.bank_name}</p>
+          <p><strong>เลขบัญชี:</strong> <span style="font-family:monospace;letter-spacing:1px;font-size:16px;">${paymentSettings.account_number}</span></p>
+          <p><strong>ชื่อบัญชี:</strong> ${paymentSettings.account_name}</p>
+          ${paymentSettings.branch ? `<p><strong>สาขา:</strong> ${paymentSettings.branch}</p>` : ''}
+        </div>
+        
+        ${paymentSettings.payment_note_th ? `<p style="background:#FEF3C7; padding:12px; border-radius:8px; font-size:13px; color:#92400E;">💡 ${paymentSettings.payment_note_th}</p>` : ''}
+      `;
+      
+      document.getElementById('slipForm').reset();
+      document.getElementById('slipPreview').style.display = 'none';
+      document.getElementById('slipPlaceholder').style.display = 'block';
+      document.getElementById('transferDate').value = new Date().toISOString().split('T')[0];
+      
+      document.getElementById('payModal').style.display = 'flex';
+    }
+    
+    function closePay() {
+      document.getElementById('payModal').style.display = 'none';
+      currentBill = null;
+      selectedSlipFile = null;
+    }
+    
+    function handleSlipSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 5 * 1024 * 1024) {
+        dataHelpers.toast('❌ ไฟล์ใหญ่เกิน 5MB', 'error');
+        return;
+      }
+      
+      selectedSlipFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('slipPreview').src = e.target.result;
+        document.getElementById('slipPreview').style.display = 'block';
+        document.getElementById('slipPlaceholder').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    async function submitSlip(event) {
+      event.preventDefault();
+      
+      if (!selectedSlipFile) {
+        dataHelpers.toast('❌ กรุณาเลือกรูปสลิป', 'error');
+        return;
+      }
+      
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ กำลังอัปโหลด...';
+      
+      try {
+        const user = await supabaseClient.auth.getUser();
+        const userId = user.data.user.id;
+        
+        const ext = selectedSlipFile.name.split('.').pop().toLowerCase();
+        const fileName = `${userId}/${currentBill.id}-${Date.now()}.${ext}`;
+        
+        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+          .from('payment-slips')
+          .upload(fileName, selectedSlipFile, { cacheControl: '3600', upsert: false });
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabaseClient.storage
+          .from('payment-slips')
+          .getPublicUrl(fileName);
+        
+        btn.textContent = '💾 บันทึก...';
+        
+        const slipData = {
+          bill_id: currentBill.id,
+          student_id: currentBill.student_id,
+          parent_id: userId,
+          slip_url: publicUrl,
+          amount: currentBill.amount,
+          transfer_date: document.getElementById('transferDate').value || null,
+          transfer_time: document.getElementById('transferTime').value || null,
+          reference_number: document.getElementById('referenceNumber').value.trim() || null,
+          bank_name: document.getElementById('fromBank').value.trim() || null,
+          notes: document.getElementById('slipNotes').value.trim() || null,
+          status: 'pending'
+        };
+        
+        const { error: insertError } = await supabaseClient.from('payment_slips').insert(slipData);
+        if (insertError) throw insertError;
+        
+        await supabaseClient
+          .from('bills')
+          .update({ status: 'pending' })
+          .eq('id', currentBill.id);
+        
+        dataHelpers.toast('✅ ส่งสลิปสำเร็จ! ครูจะตรวจสอบให้เร็วๆ นี้', 'success');
+        closePay();
+        await loadBills();
+      } catch (err) {
+        console.error(err);
+        dataHelpers.toast('❌ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📤 ส่งสลิป';
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

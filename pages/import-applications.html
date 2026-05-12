@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Import Applications — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    .import-container{display:grid;grid-template-columns:1fr 1.5fr;gap:24px;margin-top:20px}
+    @media(max-width:900px){.import-container{grid-template-columns:1fr}}
+    .step-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:24px;margin-bottom:16px}
+    .step-card h3{color:#1B5E3F;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+    .step-num{display:inline-flex;width:28px;height:28px;background:#1B5E3F;color:white;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+    
+    .download-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#2D7551;color:white;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;border:none;cursor:pointer;transition:all 0.15s;font-family:inherit}
+    .download-btn:hover{background:#1B5E3F;transform:translateY(-1px);color:white}
+    
+    .upload-zone{border:2px dashed #D1D5DB;border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.15s;background:#F9FAFB}
+    .upload-zone:hover{border-color:#1B5E3F;background:#F0FDF4}
+    .upload-zone.drag{border-color:#1B5E3F;background:#ECFDF5;border-style:solid}
+    .upload-zone .big-icon{font-size:54px;margin-bottom:12px}
+    .upload-zone h4{margin:0 0 6px;color:#1B5E3F;font-size:16px}
+    .upload-zone p{margin:0;font-size:13px;color:#6B7280}
+    
+    .preview-table{width:100%;border-collapse:collapse;font-size:12px;background:white;border-radius:8px;overflow:hidden;border:1px solid #E5E7EB}
+    .preview-table th{background:#F0FDF4;color:#1B5E3F;padding:10px 8px;text-align:left;font-weight:600;border-bottom:2px solid #1B5E3F;position:sticky;top:0;white-space:nowrap}
+    .preview-table td{padding:8px;border-bottom:1px solid #F3F4F6;font-size:12px;vertical-align:top}
+    .preview-table tr.invalid td{background:#FEF2F2}
+    .preview-table tr.valid td{background:#F0FDF4}
+    .preview-table .row-status{font-size:14px;text-align:center}
+    .preview-table .err-text{color:#EF4444;font-size:11px;display:block;margin-top:2px}
+    
+    .field-info{display:flex;align-items:flex-start;gap:8px;padding:10px;background:#EFF6FF;border-radius:8px;margin-bottom:10px;font-size:12px}
+    .field-info .ic{font-size:16px;line-height:1}
+    .field-info .txt{flex:1;line-height:1.5}
+    .field-info code{background:#DBEAFE;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:11px}
+    
+    .stats-row{display:flex;gap:12px;margin:14px 0}
+    .stat-pill{flex:1;background:white;border:1px solid #E5E7EB;border-radius:8px;padding:14px;text-align:center}
+    .stat-pill.green{border-color:#10B981;background:#ECFDF5}
+    .stat-pill.red{border-color:#EF4444;background:#FEF2F2}
+    .stat-pill.gray{border-color:#9CA3AF;background:#F9FAFB}
+    .stat-pill .num{font-size:24px;font-weight:700;color:#1B5E3F;display:block}
+    .stat-pill.green .num{color:#10B981}
+    .stat-pill.red .num{color:#EF4444}
+    .stat-pill .lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px;display:block}
+    
+    .scroll-table{max-height:400px;overflow-y:auto;overflow-x:auto;border-radius:8px;border:1px solid #E5E7EB}
+    
+    .progress-bar{height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;margin:12px 0}
+    .progress-fill{height:100%;background:#1B5E3F;transition:width 0.3s}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="applications.html">📝 Applications</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="reports.html">📄 Reports</a>
+        <a href="finance.html" class="owner-only" style="display:none">💰 Finance</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📥 Import Applications</h2>
+          <p>นำเข้าใบสมัครจาก Excel หรือ CSV ทีละหลายๆ คน — Bulk Import from Excel/CSV</p>
+        </div>
+        <a href="applications.html" class="btn btn-secondary">← Back to Applications</a>
+      </div>
+
+      <div class="import-container">
+        
+        <div>
+          <div class="step-card">
+            <h3><span class="step-num">1</span> ดาวน์โหลด Template</h3>
+            <p style="font-size:13px;color:#6B7280;margin-bottom:14px;line-height:1.6;">
+              เริ่มต้นด้วยการดาวน์โหลด template — มี header ครบทุกช่อง + ตัวอย่างให้ดู
+            </p>
+            <button class="download-btn" onclick="downloadTemplate('xlsx')">
+              📥 Download Excel Template
+            </button>
+            <br><br>
+            <button class="download-btn" onclick="downloadTemplate('csv')" style="background:#5BB8E0;">
+              📄 Download CSV Template
+            </button>
+          </div>
+
+          <div class="step-card">
+            <h3><span class="step-num">2</span> รูปแบบข้อมูล</h3>
+            <div class="field-info">
+              <span class="ic">✅</span>
+              <div class="txt">
+                <strong>จำเป็น:</strong> <code>first_name</code>, <code>last_name</code>, <code>parent_name</code>, <code>parent_phone</code>
+              </div>
+            </div>
+            <div class="field-info" style="background:#FEF3C7;">
+              <span class="ic">📋</span>
+              <div class="txt">
+                <strong>แนะนำ:</strong> <code>program</code> (prek/k/ep/mep), <code>grade</code>, <code>birth_date</code> (YYYY-MM-DD), <code>parent_email</code>
+              </div>
+            </div>
+            <div class="field-info" style="background:#F3F4F6;">
+              <span class="ic">💡</span>
+              <div class="txt">
+                <strong>ตัวเลือก:</strong> <code>nickname</code>, <code>gender</code> (male/female), <code>nationality</code>, <code>notes</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <h3><span class="step-num">3</span> ตัวอย่างข้อมูล</h3>
+            <div style="background:#F9FAFB;padding:12px;border-radius:8px;font-family:monospace;font-size:11px;line-height:1.6;color:#374151;overflow-x:auto;">
+              first_name: <strong>Pranom</strong><br>
+              last_name: <strong>Jaidee</strong><br>
+              nickname: Pim<br>
+              birth_date: <strong>2018-03-15</strong><br>
+              gender: female<br>
+              program: <strong>ep</strong><br>
+              grade: Grade 2<br>
+              parent_name: <strong>Khun Somchai</strong><br>
+              parent_phone: <strong>081-234-5678</strong><br>
+              parent_email: somchai@email.com
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="step-card">
+            <h3><span class="step-num">4</span> Upload ไฟล์</h3>
+            <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">
+              อัปโหลดไฟล์ที่กรอกแล้ว — ระบบจะแสดง preview ก่อน import
+            </p>
+            
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+              <div class="big-icon">📤</div>
+              <h4>คลิกเพื่ออัปโหลด</h4>
+              <p>หรือ Drag & Drop ไฟล์ลงที่นี่</p>
+              <p style="margin-top:8px;font-size:11px;">รองรับ .xlsx, .xls, .csv</p>
+              <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleFile(event)" />
+            </div>
+          </div>
+
+          <div class="step-card" id="previewCard" style="display:none;">
+            <h3><span class="step-num">5</span> Preview & Validate</h3>
+            
+            <div class="stats-row">
+              <div class="stat-pill gray">
+                <span class="num" id="totalRows">0</span>
+                <span class="lbl">Total Rows</span>
+              </div>
+              <div class="stat-pill green">
+                <span class="num" id="validRows">0</span>
+                <span class="lbl">Valid</span>
+              </div>
+              <div class="stat-pill red">
+                <span class="num" id="invalidRows">0</span>
+                <span class="lbl">Errors</span>
+              </div>
+            </div>
+            
+            <div class="scroll-table">
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th style="width:30px;">✓</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Program</th>
+                    <th>Grade</th>
+                    <th>Parent</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody id="previewBody">
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="progress-bar" id="progressBar" style="display:none;">
+              <div class="progress-fill" id="progressFill" style="width:0%;"></div>
+            </div>
+            
+            <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+              <button class="btn btn-secondary" onclick="resetImport()">Cancel</button>
+              <button class="btn btn-primary" id="importBtn" onclick="confirmImport()" style="background:#10B981;">
+                ✅ Import <span id="validCount">0</span> Applications
+              </button>
+            </div>
+          </div>
+
+          <div class="step-card" id="resultCard" style="display:none;">
+            <h3 style="color:#10B981;">🎉 Import Complete!</h3>
+            <div id="resultMessage" style="background:#ECFDF5;padding:16px;border-radius:8px;color:#065F46;margin-bottom:16px;line-height:1.6;">
+            </div>
+            <div style="display:flex;gap:10px;">
+              <a href="applications.html" class="btn btn-primary" style="background:#1B5E3F;">📝 View Applications</a>
+              <button class="btn btn-secondary" onclick="resetImport()">📥 Import More</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let parsedData = [];
+    let validData = [];
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      const uz = document.getElementById('uploadZone');
+      ['dragenter', 'dragover'].forEach(ev => {
+        uz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); uz.classList.add('drag'); });
+      });
+      ['dragleave', 'drop'].forEach(ev => {
+        uz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); uz.classList.remove('drag'); });
+      });
+      uz.addEventListener('drop', e => {
+        const f = e.dataTransfer.files[0];
+        if (f) processFile(f);
+      });
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function downloadTemplate(format) {
+      const headers = ['first_name','last_name','nickname','birth_date','gender','nationality','program','grade','parent_name','parent_phone','parent_email','parent_address','notes'];
+      const samples = [
+        {first_name:'Pranom',last_name:'Jaidee',nickname:'Pim',birth_date:'2018-03-15',gender:'female',nationality:'Thai',program:'ep',grade:'Grade 2',parent_name:'Khun Somchai',parent_phone:'081-234-5678',parent_email:'somchai@email.com',parent_address:'123 Mittraphap Rd, Khon Kaen',notes:'Allergic to peanuts'},
+        {first_name:'Tanawat',last_name:'Suwannarong',nickname:'Tan',birth_date:'2017-07-22',gender:'male',nationality:'Thai',program:'ep',grade:'Grade 3',parent_name:'Khun Niran',parent_phone:'081-345-6789',parent_email:'niran@email.com',parent_address:'456 Sri Chan Rd, Khon Kaen',notes:''},
+        {first_name:'Somchai',last_name:'Phongchai',nickname:'Chai',birth_date:'2019-02-14',gender:'male',nationality:'Thai',program:'mep',grade:'Grade 1',parent_name:'Khun Wanida',parent_phone:'081-567-8901',parent_email:'wanida@email.com',parent_address:'',notes:''},
+      ];
+      
+      if (format === 'xlsx') {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(samples, { header: headers });
+        ws['!cols'] = headers.map(() => ({ wch: 18 }));
+        XLSX.utils.book_append_sheet(wb, ws, 'Applications');
+        XLSX.writeFile(wb, 'SKKS-Applications-Template.xlsx');
+      } else {
+        const csv = [headers.join(',')].concat(samples.map(r => headers.map(h => `"${(r[h]||'').toString().replace(/"/g,'""')}"`).join(','))).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'SKKS-Applications-Template.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      
+      dataHelpers.toast('📥 Template downloaded!', 'success');
+    }
+    
+    function handleFile(event) {
+      const file = event.target.files[0];
+      if (file) processFile(file);
+    }
+    
+    function processFile(file) {
+      if (file.size > 5 * 1024 * 1024) {
+        dataHelpers.toast('❌ File too large (max 5MB)', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+          
+          if (rows.length === 0) {
+            dataHelpers.toast('❌ No data found in file', 'error');
+            return;
+          }
+          
+          parsedData = rows;
+          validateAndPreview();
+        } catch (err) {
+          console.error(err);
+          dataHelpers.toast('❌ Failed to parse file: ' + err.message, 'error');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    
+    function validateRow(row, idx) {
+      const errors = [];
+      if (!row.first_name || !String(row.first_name).trim()) errors.push('first_name required');
+      if (!row.last_name || !String(row.last_name).trim()) errors.push('last_name required');
+      if (!row.parent_name || !String(row.parent_name).trim()) errors.push('parent_name required');
+      if (!row.parent_phone || !String(row.parent_phone).trim()) errors.push('parent_phone required');
+      
+      if (row.program) {
+        const p = String(row.program).toLowerCase().trim();
+        if (!['prek','k','ep','mep'].includes(p)) errors.push('program must be prek/k/ep/mep');
+      }
+      
+      if (row.gender) {
+        const g = String(row.gender).toLowerCase().trim();
+        if (!['male','female','other'].includes(g)) errors.push('gender must be male/female/other');
+      }
+      
+      if (row.birth_date) {
+        const d = String(row.birth_date).trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d) && !d.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
+          errors.push('birth_date format: YYYY-MM-DD');
+        }
+      }
+      
+      if (row.parent_email && !String(row.parent_email).match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        errors.push('invalid email');
+      }
+      
+      return errors;
+    }
+    
+    function normalizeDate(d) {
+      if (!d) return null;
+      const s = String(d).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+      try {
+        const dt = new Date(s);
+        if (!isNaN(dt)) return dt.toISOString().split('T')[0];
+      } catch(e){}
+      return null;
+    }
+    
+    function validateAndPreview() {
+      validData = [];
+      let valid = 0, invalid = 0;
+      
+      const tbody = document.getElementById('previewBody');
+      tbody.innerHTML = '';
+      
+      parsedData.forEach((row, idx) => {
+        const errors = validateRow(row, idx);
+        const isValid = errors.length === 0;
+        
+        if (isValid) {
+          valid++;
+          validData.push(row);
+        } else {
+          invalid++;
+        }
+        
+        const tr = document.createElement('tr');
+        tr.className = isValid ? 'valid' : 'invalid';
+        tr.innerHTML = `
+          <td class="row-status">${isValid ? '✅' : '❌'}</td>
+          <td>${escapeHtml(row.first_name || '—')}</td>
+          <td>${escapeHtml(row.last_name || '—')}${row.nickname ? `<br><em style="color:#9CA3AF;font-size:10px;">(${escapeHtml(row.nickname)})</em>` : ''}</td>
+          <td>${escapeHtml(row.program || '—')}<br><span style="color:#6B7280;font-size:10px;">${escapeHtml(row.grade || '')}</span></td>
+          <td>${escapeHtml(row.grade || '—')}</td>
+          <td>${escapeHtml(row.parent_name || '—')}</td>
+          <td style="font-family:monospace;font-size:11px;">${escapeHtml(row.parent_phone || '—')}</td>
+          <td style="font-size:11px;">${escapeHtml(row.parent_email || '—')}</td>
+        `;
+        if (!isValid) {
+          const errCell = tr.querySelector('td:nth-child(2)');
+          errCell.insertAdjacentHTML('beforeend', `<span class="err-text">⚠️ ${errors.join(', ')}</span>`);
+        }
+        tbody.appendChild(tr);
+      });
+      
+      document.getElementById('totalRows').textContent = parsedData.length;
+      document.getElementById('validRows').textContent = valid;
+      document.getElementById('invalidRows').textContent = invalid;
+      document.getElementById('validCount').textContent = valid;
+      document.getElementById('previewCard').style.display = 'block';
+      document.getElementById('resultCard').style.display = 'none';
+      
+      const btn = document.getElementById('importBtn');
+      btn.disabled = valid === 0;
+      btn.style.opacity = valid === 0 ? 0.5 : 1;
+      
+      document.getElementById('previewCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+    
+    async function confirmImport() {
+      if (validData.length === 0) {
+        dataHelpers.toast('❌ No valid rows to import', 'error');
+        return;
+      }
+      
+      if (!confirm(`Import ${validData.length} applications?\n\nนี้จะเพิ่มใบสมัครทั้งหมดเข้า database`)) return;
+      
+      const btn = document.getElementById('importBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Importing...';
+      document.getElementById('progressBar').style.display = 'block';
+      
+      const { count: existingCount } = await supabaseClient
+        .from('applications')
+        .select('*', { count: 'exact', head: true });
+      
+      const yr = new Date().getFullYear();
+      let nextSeq = (existingCount || 0) + 1;
+      
+      const records = validData.map((row, i) => {
+        const appNum = `APP-${yr}-${String(nextSeq + i).padStart(4, '0')}`;
+        return {
+          application_number: appNum,
+          status: 'pending',
+          student_first_name: String(row.first_name).trim(),
+          student_last_name: String(row.last_name).trim(),
+          student_nickname: row.nickname ? String(row.nickname).trim() : null,
+          student_birth_date: normalizeDate(row.birth_date),
+          student_gender: row.gender ? String(row.gender).toLowerCase().trim() : null,
+          student_nationality: row.nationality ? String(row.nationality).trim() : 'Thai',
+          program: row.program ? String(row.program).toLowerCase().trim() : null,
+          grade: row.grade ? String(row.grade).trim() : null,
+          parent_name: String(row.parent_name).trim(),
+          parent_relation: 'parent',
+          parent_phone: String(row.parent_phone).trim(),
+          parent_email: row.parent_email ? String(row.parent_email).trim() : null,
+          parent_address: row.parent_address ? String(row.parent_address).trim() : null,
+          notes: row.notes ? String(row.notes).trim() : 'Imported from Excel/CSV'
+        };
+      });
+      
+      let success = 0;
+      let failed = 0;
+      const errors = [];
+      const batchSize = 10;
+      
+      for (let i = 0; i < records.length; i += batchSize) {
+        const batch = records.slice(i, i + batchSize);
+        const { data, error } = await supabaseClient
+          .from('applications')
+          .insert(batch)
+          .select();
+        
+        if (error) {
+          failed += batch.length;
+          errors.push(error.message);
+        } else {
+          success += (data || []).length;
+        }
+        
+        const pct = Math.round(((i + batchSize) / records.length) * 100);
+        document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
+      }
+      
+      document.getElementById('previewCard').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'block';
+      
+      let resultHtml = `<strong>📊 Summary:</strong><br>
+        ✅ Successfully imported: <strong>${success}</strong> applications<br>`;
+      if (failed > 0) {
+        resultHtml += `❌ Failed: <strong>${failed}</strong><br>
+        <details style="margin-top:8px;font-size:12px;"><summary style="cursor:pointer;">Show errors</summary>
+        <ul style="margin:8px 0 0 20px;">${errors.map(e => `<li>${escapeHtml(e)}</li>`).join('')}</ul></details>`;
+      }
+      document.getElementById('resultMessage').innerHTML = resultHtml;
+      
+      dataHelpers.toast(`🎉 Imported ${success} applications!`, 'success');
+      
+      document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function resetImport() {
+      parsedData = [];
+      validData = [];
+      document.getElementById('fileInput').value = '';
+      document.getElementById('previewCard').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('progressBar').style.display = 'none';
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('uploadZone').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    init();
+  </script>
+</body>
+</html>

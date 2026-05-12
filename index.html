@@ -123,32 +123,9 @@
         <p data-i18n="news.subtitle">Education news from SKKS and around the world</p>
       </div>
       
-      <div class="news-grid">
-        <div class="news-card">
-          <div class="news-image">🏆<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 11 May 2026</div>
-            <h3 data-i18n="news.1.title">O-NET 100% Perfect Score</h3>
-            <p data-i18n="news.1.desc">Our student achieved a perfect score on the O-NET English exam — a record-breaking accomplishment for Khon Kaen.</p>
-          </div>
-        </div>
-        
-        <div class="news-card">
-          <div class="news-image">🎓<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 28 Apr 2026</div>
-            <h3 data-i18n="news.2.title">Cambridge Re-certification</h3>
-            <p data-i18n="news.2.desc">SKKS successfully renewed Cambridge Assessment certification for another 5 years — confirming our commitment to excellence.</p>
-          </div>
-        </div>
-        
-        <div class="news-card">
-          <div class="news-image">📝<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 15 Mar 2026</div>
-            <h3 data-i18n="news.3.title">Admissions Open 2026</h3>
-            <p data-i18n="news.3.desc">Applications for the 2026 academic year are now open. Limited seats — secure your child's place early.</p>
-          </div>
+      <div class="news-grid" id="newsGrid">
+        <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--slate);">
+          ⏳ Loading news...
         </div>
       </div>
     </div>
@@ -498,6 +475,85 @@
       }
     },5000);
     
+    
+    async function loadLatestNews(){
+      try{
+        const {data, error} = await supabaseClient
+          .from('news')
+          .select('*')
+          .eq('published', true)
+          .order('publish_date', {ascending: false})
+          .limit(3);
+        if(error || !data || data.length === 0){
+          renderFallbackNews();
+          return;
+        }
+        renderNews(data);
+      }catch(err){
+        console.warn('News load failed, using fallback');
+        renderFallbackNews();
+      }
+    }
+    
+    function renderNews(news){
+      const lang = getLang();
+      const grid = document.getElementById('newsGrid');
+      const monthsEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const monthsTh = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      
+      grid.innerHTML = news.map(n => {
+        const d = new Date(n.publish_date);
+        const m = lang === 'th' ? monthsTh[d.getMonth()] : monthsEn[d.getMonth()];
+        const yr = lang === 'th' ? (d.getFullYear() + 543) : d.getFullYear();
+        const dateStr = `${d.getDate()} ${m} ${yr}`;
+        const title = lang === 'th' && n.title_th ? n.title_th : n.title;
+        const excerpt = lang === 'th' && n.excerpt_th ? n.excerpt_th : (n.excerpt || '');
+        const imageHtml = n.image_url 
+          ? `<img src="${n.image_url}" alt="${title}" style="width:100%;height:100%;object-fit:cover;" /><div class="news-tag">${n.tag || 'SKKS'}</div>`
+          : `📰<div class="news-tag">${n.tag || 'SKKS'}</div>`;
+        return `<div class="news-card">
+          <div class="news-image">${imageHtml}</div>
+          <div class="news-content">
+            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · ${dateStr}</div>
+            <h3>${title}</h3>
+            <p>${excerpt}</p>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    
+    function renderFallbackNews(){
+      const grid = document.getElementById('newsGrid');
+      grid.innerHTML = `
+        <div class="news-card">
+          <div class="news-image">🏆<div class="news-tag">SKKS</div></div>
+          <div class="news-content">
+            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 11 May 2026</div>
+            <h3>O-NET 100% Perfect Score</h3>
+            <p>Our student achieved a perfect score on the O-NET English exam.</p>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-image">🎓<div class="news-tag">SKKS</div></div>
+          <div class="news-content">
+            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 28 Apr 2026</div>
+            <h3>Cambridge Re-certification</h3>
+            <p>SKKS successfully renewed Cambridge Assessment certification.</p>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-image">📝<div class="news-tag">SKKS</div></div>
+          <div class="news-content">
+            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 15 Mar 2026</div>
+            <h3>Admissions Open 2026</h3>
+            <p>Applications for the 2026 academic year are now open.</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    setTimeout(loadLatestNews, 100);
+
     setLang(getLang());
   </script>
   <script src="js/supabase-client.js"></script>

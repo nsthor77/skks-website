@@ -171,33 +171,4 @@ const auth = {
 };
 
 window.auth = auth;
-
-// ===========================================
-// Auto-hide navbar items based on user's role
-// ===========================================
-auth._applyNavRoleFilter = async function() {
-  try {
-    const profile = await auth.getProfile();
-    if (!profile) return;
-    
-    const role = profile.role;
-    document.querySelectorAll('.admin-nav a[data-roles]').forEach(a => {
-      const allowed = (a.getAttribute('data-roles') || '').split(',').map(s => s.trim());
-      if (!allowed.includes(role)) {
-        a.style.display = 'none';
-      }
-    });
-  } catch (e) {
-    console.warn('Nav role filter error:', e);
-  }
-};
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => auth._applyNavRoleFilter(), 100);
-  });
-} else {
-  setTimeout(() => auth._applyNavRoleFilter(), 100);
-}
-
-console.log('✅ Auth module loaded (with role-based nav)');
+console.log('✅ Auth module loaded');

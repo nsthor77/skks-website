@@ -171,7 +171,7 @@
     async function loadBills() {
       const { data, error } = await supabaseClient
         .from('bills')
-        .select('*, students(*, profiles:profile_id(first_name, last_name, first_name_th, last_name_th, nickname))')
+        .select('*, students(first_name, last_name, nickname, program, grade)')
         .order('due_date', { ascending: true });
       
       if (error) {
@@ -179,7 +179,7 @@
         return;
       }
       
-      allBills = dataHelpers.flattenStudentJoin(data || []);
+      allBills = data || [];
       renderBills();
       updateStats();
     }

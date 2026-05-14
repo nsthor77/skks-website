@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKKS — Suanson Khon Kaen School</title>
+  <meta name="description" content="A Cambridge-certified bilingual education from Pre-Kindergarten to Grade 9. Where curiosity becomes mastery." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/premium.css" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0A2F1F" />
+  <style>
+    .hero-premium{position:relative;padding:100px 0 80px;background:linear-gradient(180deg,#FAFAF7 0%,#FFFFFF 100%);overflow:hidden}
+    .hero-premium::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(10,47,31,0.04),transparent 50%),radial-gradient(circle at 80% 100%,rgba(212,175,55,0.05),transparent 50%);pointer-events:none}
+    .hero-content{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 24px;text-align:center}
+    .hero-premium h1{font-size:clamp(40px,7vw,76px);line-height:1.02;letter-spacing:-0.035em;font-weight:800;color:var(--forest-900)}
+    .hero-premium h1 .accent{color:var(--gold-700);font-style:italic;font-weight:700}
+    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:var(--r-xl);overflow:hidden;max-width:900px;margin:60px auto 0;border:0.5px solid var(--border)}
+    .stats-bar .stat{background:white;padding:28px 16px;text-align:center;border:none;border-radius:0}
+    .stats-bar .stat-value{font-size:36px}
+    @media(max-width:640px){.stats-bar{grid-template-columns:repeat(2,1fr)}}
+    .programs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:48px}
+    .program-card{background:white;border-radius:var(--r-xl);padding:32px;border:0.5px solid var(--border);transition:all var(--slow);position:relative;overflow:hidden}
+    .program-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--forest-700);transform:scaleX(0);transform-origin:left;transition:transform var(--slow)}
+    .program-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+    .program-card:hover::before{transform:scaleX(1)}
+    .program-card .pgm-eyebrow{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--gold-700);text-transform:uppercase;margin-bottom:12px}
+    .program-card h3{font-size:24px;margin-bottom:10px;letter-spacing:-0.02em;color:var(--forest-900)}
+    .program-card .age{font-size:13px;color:var(--text-3);font-weight:500;margin-bottom:16px}
+    .program-card p{font-size:14px;line-height:1.7;color:var(--text-2)}
+    .program-card .price{font-size:24px;font-weight:700;color:var(--forest-900);margin-top:20px;padding-top:20px;border-top:0.5px solid var(--border);letter-spacing:-0.02em}
+    .program-card .price .period{font-size:13px;color:var(--text-3);font-weight:500}
+    .why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;margin-top:48px}
+    .why-item .icon-wrap{width:48px;height:48px;background:var(--forest-50);color:var(--forest-700);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+    .why-item h4{font-size:17px;margin-bottom:8px}
+    .why-item p{font-size:14px;line-height:1.65}
+    .cta-section{background:var(--forest-900);color:white;border-radius:var(--r-2xl);padding:64px 48px;text-align:center;margin:80px 24px;position:relative;overflow:hidden}
+    .cta-section h2{color:white;font-size:clamp(28px,4vw,42px);margin-bottom:16px;letter-spacing:-0.025em}
+    .cta-section p{color:rgba(255,255,255,0.8);max-width:520px;margin:0 auto 28px;font-size:16px;line-height:1.65}
+    .cta-section .btn-primary{background:var(--gold-500);color:var(--forest-900)}
+    .cta-section .btn-primary:hover{background:var(--gold-100)}
+    .cta-section .btn-ghost{color:white;border-color:rgba(255,255,255,0.3)}
+    .cta-section .btn-ghost:hover{background:rgba(255,255,255,0.1)}
+    .footer-premium{background:var(--forest-900);color:rgba(255,255,255,0.8);padding:64px 0 32px}
+    .footer-premium .container{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px}
+    @media(max-width:768px){.footer-premium .container{grid-template-columns:1fr;gap:32px}}
+    .footer-premium h5{color:white;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+    .footer-premium ul{list-style:none}
+    .footer-premium li{margin-bottom:10px}
+    .footer-premium a{color:rgba(255,255,255,0.7);font-size:14px}
+    .footer-premium a:hover{color:white}
+    .footer-brand{display:flex;align-items:center;gap:12px;color:white;font-weight:700;font-size:18px;margin-bottom:16px}
+    .footer-brand img{width:36px;height:36px;border-radius:8px}
+    .footer-bottom{max-width:var(--max-w);margin:48px auto 0;padding:24px 24px 0;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:rgba(255,255,255,0.5)}
+    @media(max-width:640px){.footer-bottom{flex-direction:column;gap:12px;text-align:center}}
+    .lang-switch{display:flex;gap:4px;background:var(--gray-100);border-radius:var(--r-md);padding:3px}
+    .lang-switch button{background:transparent;border:none;padding:5px 10px;font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;border-radius:6px;transition:all var(--fast);font-family:inherit}
+    .lang-switch button.active{background:white;color:var(--forest-900);box-shadow:var(--shadow-sm)}
+  </style>
+</head>
+<body>
+  <nav class="nav-premium">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <img src="images/logo.png" alt="SKKS" />
+        <span>SKKS</span>
+      </a>
+      <div class="nav-links">
+        <a href="#programs">Programs</a>
+        <a href="about.html">About</a>
+        <a href="voices.html">Voices</a>
+        <a href="admissions.html">Admissions</a>
+      </div>
+      <div class="nav-cta">
+        <div class="lang-switch">
+          <button class="active" onclick="setLang('en', event)">EN</button>
+          <button onclick="setLang('th', event)">TH</button>
+        </div>
+        <a href="login.html" class="btn btn-ghost btn-sm">Sign in</a>
+        <a href="admissions.html" class="btn btn-primary btn-sm">Apply now</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero-premium">
+    <div class="hero-content">
+      <div class="eyebrow" style="margin-bottom:24px;">Cambridge-certified · Est. 1995</div>
+      <h1>Where curiosity<br>becomes <span class="accent">mastery.</span></h1>
+      <p class="lead" style="margin:28px auto 0;">A bilingual education from Pre-Kindergarten to Grade 9 — built on academic rigor, run with craft, refined for the world ahead.</p>
+      <div class="hero-actions" style="margin-top:36px;">
+        <a href="admissions.html" class="btn btn-primary btn-lg">Schedule a visit</a>
+        <a href="#programs" class="btn btn-ghost btn-lg">Explore programs →</a>
+      </div>
+      
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-value">98<span style="font-size:18px;font-weight:600;color:var(--gold-700);">%</span></div>
+          <div class="stat-label">Parent NPS</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">1:8</div>
+          <div class="stat-label">Student/Teacher</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">30<span style="font-size:18px;font-weight:600;color:var(--gold-700);"> yr</span></div>
+          <div class="stat-label">Heritage</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">500+</div>
+          <div class="stat-label">Alumni</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="programs">
+    <div class="container">
+      <div style="text-align:center;max-width:720px;margin:0 auto 16px;">
+        <div class="eyebrow">Our Programs</div>
+        <h2 style="margin-top:12px;">An education designed for outcomes.</h2>
+        <p class="lead" style="margin:16px auto 0;">From the first years of curiosity to the foundation of intellectual independence — every program is structured to develop both mind and character.</p>
+      </div>
+      
+      <div class="programs-grid">
+        <div class="program-card">
+          <div class="pgm-eyebrow">Foundation</div>
+          <h3>Pre-Kindergarten</h3>
+          <div class="age">Ages 2–4</div>
+          <p>Play-based discovery in a nurturing bilingual environment. Where the lifelong love of learning begins.</p>
+          <div class="price">฿28,000<span class="period"> / term</span></div>
+        </div>
+        
+        <div class="program-card">
+          <div class="pgm-eyebrow">Foundation</div>
+          <h3>Kindergarten</h3>
+          <div class="age">Ages 4–6</div>
+          <p>Literacy, numeracy, and social skills woven into rich, hands-on experiences across two languages.</p>
+          <div class="price">฿32,000<span class="period"> / term</span></div>
+        </div>
+        
+        <div class="program-card" style="border:1px solid var(--forest-700);">
+          <div class="pgm-eyebrow" style="color:var(--forest-700);">Flagship · Most chosen</div>
+          <h3>English Program</h3>
+          <div class="age">Grade 1–9</div>
+          <p>Our flagship Cambridge curriculum, taught 60–70% in English by international and Thai educators.</p>
+          <div class="price">฿45,000<span class="period"> / term</span></div>
+        </div>
+        
+        <div class="program-card">
+          <div class="pgm-eyebrow">Bilingual</div>
+          <h3>Mini English Program</h3>
+          <div class="age">Grade 1–9</div>
+          <p>A balanced bilingual track with 30–40% English instruction — strong Thai roots, global readiness.</p>
+          <div class="price">฿35,000<span class="period"> / term</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:white;border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);">
+    <div class="container">
+      <div style="text-align:center;max-width:720px;margin:0 auto 16px;">
+        <div class="eyebrow">Why SKKS</div>
+        <h2 style="margin-top:12px;">Standards you can measure.<br>Care you can feel.</h2>
+      </div>
+      
+      <div class="why-grid">
+        <div class="why-item">
+          <div class="icon-wrap">📐</div>
+          <h4>Cambridge-aligned</h4>
+          <p>Curriculum mapped to Cambridge Primary & Lower Secondary standards, with internal benchmarking each term.</p>
+        </div>
+        <div class="why-item">
+          <div class="icon-wrap">👥</div>
+          <h4>1:8 ratio</h4>
+          <p>Small classes mean every child is seen, known, and challenged — every single day.</p>
+        </div>
+        <div class="why-item">
+          <div class="icon-wrap">🌏</div>
+          <h4>Truly bilingual</h4>
+          <p>Native-speaking teachers across both languages — fluency isn't a goal, it's the environment.</p>
+        </div>
+        <div class="why-item">
+          <div class="icon-wrap">🎯</div>
+          <h4>Outcomes-driven</h4>
+          <p>Termly progress reports, parent conferences, and transparent assessment — no surprises.</p>
+        </div>
+        <div class="why-item">
+          <div class="icon-wrap">🏛️</div>
+          <h4>30-year heritage</h4>
+          <p>Three decades of educating Khon Kaen's most thoughtful families.</p>
+        </div>
+        <div class="why-item">
+          <div class="icon-wrap">🌲</div>
+          <h4>Built for character</h4>
+          <p>Academics matter. So do integrity, curiosity, and resilience — we cultivate all four.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="cta-section">
+      <h2>Begin the conversation.</h2>
+      <p>Schedule a private tour, meet the head of school, and see your child's future in motion.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="admissions.html" class="btn btn-primary btn-lg">Apply for admission</a>
+        <a href="about.html" class="btn btn-ghost btn-lg">Learn more about us</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer-premium">
+    <div class="container">
+      <div>
+        <div class="footer-brand">
+          <img src="images/logo.png" alt="SKKS" />
+          <span>SKKS</span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;color:rgba(255,255,255,0.7);max-width:320px;">
+          Suanson Khon Kaen School — a Cambridge-certified bilingual school educating curious minds from Pre-K to Grade 9.
+        </p>
+      </div>
+      
+      <div>
+        <h5>School</h5>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="voices.html">Voices</a></li>
+          <li><a href="#programs">Programs</a></li>
+          <li><a href="admissions.html">Admissions</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h5>Portal</h5>
+        <ul>
+          <li><a href="login.html">Parent login</a></li>
+          <li><a href="login.html">Staff login</a></li>
+          <li><a href="verify.html">Verify document</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="mailto:info@suansonkk.com">info@suansonkk.com</a></li>
+          <li><a href="tel:+66432223344">+66 43 222 3344</a></li>
+          <li style="color:rgba(255,255,255,0.5);font-size:14px;">Khon Kaen, Thailand</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div>© 2026 Suanson Khon Kaen School. All rights reserved.</div>
+      <div>Cambridge International Centre</div>
+    </div>
+  </footer>
+
+  <script>
+    function setLang(lang, ev) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
+      if (ev && ev.target) ev.target.classList.add('active');
+    }
+    
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

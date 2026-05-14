@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admissions — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/premium.css" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .adm-hero{padding:80px 0 60px;background:linear-gradient(180deg,#FAFAF7,white);text-align:center}
+    .adm-hero h1{font-size:clamp(40px,6vw,64px);letter-spacing:-0.03em;font-weight:800;color:var(--forest-900);margin-bottom:20px;line-height:1.05}
+    
+    .process{padding:80px 0;background:white}
+    .process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px}
+    @media(max-width:900px){.process-steps{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.process-steps{grid-template-columns:1fr}}
+    .step{position:relative}
+    .step-num{font-size:48px;font-weight:700;color:var(--forest-50);line-height:1;letter-spacing:-0.03em;margin-bottom:14px;font-family:'Inter',serif}
+    .step h4{font-size:17px;color:var(--forest-900);margin-bottom:8px;letter-spacing:-0.015em}
+    .step p{font-size:14px;color:var(--text-2);line-height:1.65}
+    
+    .form-section{padding:80px 0;background:var(--bg)}
+    .form-card{background:white;border-radius:var(--r-2xl);padding:48px;border:0.5px solid var(--border);max-width:680px;margin:48px auto 0;box-shadow:var(--shadow-md)}
+    .form-card h2{font-size:28px;letter-spacing:-0.025em;margin-bottom:12px}
+    .form-card .sub{color:var(--text-2);margin-bottom:32px;font-size:15px;line-height:1.6}
+    
+    .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    @media(max-width:768px){.info-grid{grid-template-columns:1fr}}
+    .info-card{background:white;padding:28px;border:0.5px solid var(--border);border-radius:var(--r-xl)}
+    .info-card h4{margin-bottom:10px;font-size:16px}
+    .info-card .num{font-size:36px;font-weight:700;color:var(--forest-900);letter-spacing:-0.03em;line-height:1;margin-bottom:8px}
+    .info-card p{font-size:13px;color:var(--text-2);line-height:1.6}
+    
+    .footer-premium{background:var(--forest-900);color:rgba(255,255,255,0.8);padding:48px 0 24px}
+    .footer-bottom{max-width:var(--max-w);margin:0 auto;padding:24px;text-align:center;font-size:13px;color:rgba(255,255,255,0.5)}
+  </style>
+</head>
+<body>
+  <nav class="nav-premium">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="images/logo.png" alt="SKKS" />
+        <span>SKKS</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html#programs">Programs</a>
+        <a href="about.html">About</a>
+        <a href="voices.html">Voices</a>
+        <a href="admissions.html" class="active">Admissions</a>
+      </div>
+      <div class="nav-cta">
+        <a href="login.html" class="btn btn-ghost btn-sm">Sign in</a>
+        <a href="#apply" class="btn btn-primary btn-sm">Apply now</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="adm-hero">
+    <div class="container-narrow">
+      <div class="eyebrow" style="margin-bottom:20px;">Admissions</div>
+      <h1>Your child's future,<br>begins here.</h1>
+      <p class="lead" style="margin:24px auto 0;max-width:580px;">Applications for 2026/27 academic year are now open. Limited seats per grade.</p>
+      <div style="margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="#apply" class="btn btn-primary btn-lg">Start application</a>
+        <a href="#visit" class="btn btn-ghost btn-lg">Schedule a visit</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="process" id="process">
+    <div class="container-narrow">
+      <div style="text-align:center;max-width:600px;margin:0 auto;">
+        <div class="eyebrow">The Process</div>
+        <h2 style="margin-top:12px;">Four simple steps.</h2>
+      </div>
+      
+      <div class="process-steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h4>Submit application</h4>
+          <p>Complete the online form below. Takes about 5 minutes.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h4>Schedule visit</h4>
+          <p>Tour the school, meet the head, observe a class in session.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h4>Assessment</h4>
+          <p>Friendly interview + age-appropriate skills evaluation.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <h4>Decision</h4>
+          <p>Receive admission decision within 7 business days.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section" id="apply">
+    <div class="container-narrow">
+      <div style="text-align:center;max-width:600px;margin:0 auto;">
+        <div class="eyebrow">Apply now</div>
+        <h2 style="margin-top:12px;">Begin your child's journey.</h2>
+      </div>
+      
+      <div class="form-card">
+        <h2>Application form</h2>
+        <p class="sub">We'll respond within 24 hours to schedule your school visit. All information is kept strictly confidential.</p>
+        
+        <form id="appForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Child's first name *</label>
+              <input type="text" id="firstName" required />
+            </div>
+            <div class="form-group">
+              <label>Child's last name *</label>
+              <input type="text" id="lastName" required />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Date of birth *</label>
+              <input type="date" id="birthDate" required />
+            </div>
+            <div class="form-group">
+              <label>Program *</label>
+              <select id="program" required>
+                <option value="">Select program...</option>
+                <option value="prek">Pre-Kindergarten · ฿28,000/term</option>
+                <option value="k">Kindergarten · ฿32,000/term</option>
+                <option value="ep">English Program · ฿45,000/term</option>
+                <option value="mep">Mini English Program · ฿35,000/term</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Parent's full name *</label>
+            <input type="text" id="parentName" required />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Parent's email *</label>
+              <input type="email" id="parentEmail" required />
+            </div>
+            <div class="form-group">
+              <label>Parent's phone *</label>
+              <input type="tel" id="parentPhone" required placeholder="+66 8X XXX XXXX" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Tell us about your child <span style="color:var(--text-3);font-weight:400;">(optional)</span></label>
+            <textarea id="notes" rows="4" placeholder="Interests, previous schooling, special considerations..."></textarea>
+          </div>
+          
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:24px;font-size:13px;color:var(--text-2);line-height:1.5;">
+            <input type="checkbox" id="consent" required style="margin-top:3px;width:auto;" />
+            <label for="consent" style="margin:0;font-weight:400;color:var(--text-2);">I consent to SKKS contacting me regarding this application. Read our <a href="#" style="color:var(--forest-700);text-decoration:underline;">privacy policy</a>.</label>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%;" id="submitBtn">
+            Submit application
+          </button>
+          
+          <p style="margin-top:16px;text-align:center;font-size:13px;color:var(--text-3);">
+            We'll respond within 24 hours.
+          </p>
+        </form>
+        
+        <div id="successMsg" style="display:none;text-align:center;padding:32px;background:var(--success-bg);border-radius:var(--r-lg);">
+          <div style="font-size:48px;margin-bottom:12px;">✓</div>
+          <h3 style="color:var(--success);margin-bottom:8px;">Application received</h3>
+          <p style="color:var(--text-2);font-size:14px;">We've received your application. Our admissions team will contact you within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:80px 0;background:white;border-top:0.5px solid var(--border);">
+    <div class="container-narrow">
+      <div style="text-align:center;max-width:600px;margin:0 auto;">
+        <div class="eyebrow">By the numbers</div>
+        <h2 style="margin-top:12px;">Why families choose SKKS.</h2>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="num">98%</div>
+          <h4>Parent satisfaction</h4>
+          <p>Net Promoter Score based on annual family surveys.</p>
+        </div>
+        <div class="info-card">
+          <div class="num">1:8</div>
+          <h4>Student to teacher</h4>
+          <p>Small classes, deep relationships, individual attention.</p>
+        </div>
+        <div class="info-card">
+          <div class="num">87%</div>
+          <h4>Top 10% nationally</h4>
+          <p>Of our Grade 9 graduates score in the top decile of national exams.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-premium">
+    <div class="footer-bottom">© 2026 Suanson Khon Kaen School · Khon Kaen, Thailand</div>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://nuzhkhchimemuetoewzn.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_prRghlKfBE1VqrpJDZmmSA_1XifObOJ';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    document.getElementById('appForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span> Submitting...';
+      
+      try {
+        const { error } = await sb.from('applications').insert({
+          first_name: document.getElementById('firstName').value,
+          last_name: document.getElementById('lastName').value,
+          birth_date: document.getElementById('birthDate').value,
+          program: document.getElementById('program').value,
+          parent_name: document.getElementById('parentName').value,
+          parent_email: document.getElementById('parentEmail').value,
+          parent_phone: document.getElementById('parentPhone').value,
+          notes: document.getElementById('notes').value,
+          status: 'pending'
+        });
+        
+        if (error) throw error;
+        
+        document.getElementById('appForm').style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      } catch (err) {
+        alert('Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit application';
+      }
+    });
+  </script>
+</body>
+</html>

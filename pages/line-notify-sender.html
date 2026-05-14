@@ -218,7 +218,7 @@
     }
     
     async function loadSingleStudents() {
-      const { data } = await supabaseClient.from('students').select('id, first_name, last_name').eq('status', 'active').order('first_name');
+      const data = await dataHelpers.loadStudentsWithProfiles(supabaseClient, { status: 'active' });
       const sel = document.getElementById('filterValue');
       sel.innerHTML = (data || []).map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}</option>`).join('');
     }

@@ -147,16 +147,7 @@
     }
     
     async function loadStudents() {
-      const { data } = await supabaseClient
-        .from('students')
-        .select('*')
-        .eq('status', 'active')
-        .order('first_name');
-      allStudents = data || [];
-      
-      const sel = document.getElementById('selectStudent');
-      sel.innerHTML = '<option value="">Select Student...</option>' +
-        allStudents.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''} - ${(s.program||'').toUpperCase()} ${s.grade||''}</option>`).join('');
+      allStudents = await dataHelpers.loadStudentsWithProfiles(supabaseClient, { status: 'active' });
     }
     
     async function loadSubjects() {

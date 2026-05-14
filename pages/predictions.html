@@ -120,11 +120,7 @@
       
       await new Promise(r => setTimeout(r, 1500));
       
-      const { data: students } = await supabaseClient
-        .from('students')
-        .select('*')
-        .eq('status', 'active')
-        .limit(20);
+      const students = (await dataHelpers.loadStudentsWithProfiles(supabaseClient, { status: 'active' })).slice(0, 20);
       
       const predictions = [];
       

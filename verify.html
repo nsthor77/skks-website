@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Sarabun','Prompt',sans-serif;background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);min-height:100vh;padding:40px 20px;color:#374151}
+    .container{max-width:600px;margin:0 auto}
+    
+    .header{text-align:center;margin-bottom:30px}
+    .logo{font-size:64px;margin-bottom:10px}
+    .header h1{color:#1B5E3F;font-size:28px;margin-bottom:6px;font-weight:800}
+    .header p{color:#6B7280;font-size:14px}
+    
+    .card{background:white;border-radius:16px;padding:30px;box-shadow:0 8px 24px rgba(0,0,0,0.08);margin-bottom:20px}
+    
+    .verified{background:#DCFCE7;border:2px solid #10B981;padding:14px;border-radius:10px;text-align:center;margin-bottom:20px;color:#15803D;font-weight:700}
+    .invalid{background:#FEE2E2;border:2px solid #EF4444;padding:14px;border-radius:10px;text-align:center;color:#991B1B;font-weight:700}
+    
+    .info-row{display:flex;border-bottom:1px solid #F3F4F6;padding:10px 0}
+    .info-row .label{color:#6B7280;width:140px;font-size:13px;font-weight:600}
+    .info-row .value{flex:1;color:#1B5E3F;font-weight:700}
+    
+    .seal{text-align:center;margin-top:20px;padding-top:20px;border-top:2px solid #F3F4F6;color:#6B7280;font-size:12px}
+    
+    .input-wrap{display:flex;gap:10px;margin-bottom:20px}
+    .input-wrap input{flex:1;padding:14px;border:2px solid #1B5E3F;border-radius:10px;font-size:14px}
+    .input-wrap button{padding:14px 24px;background:#1B5E3F;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer}
+    
+    .back-link{display:inline-block;margin-bottom:20px;color:#1B5E3F;text-decoration:none;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-link">← กลับหน้าหลัก</a>
+    
+    <div class="header">
+      <div class="logo">🌲</div>
+      <h1>SKKS Verification</h1>
+      <p>ตรวจสอบความถูกต้องของใบเกรด / ใบประกาศ</p>
+    </div>
+    
+    <div class="card">
+      <h3 style="color:#1B5E3F;margin-bottom:14px;">🔍 ตรวจสอบเอกสาร</h3>
+      <p style="font-size:13px;color:#6B7280;margin-bottom:16px;">
+        ใส่ <strong>Verification Code</strong> จาก QR Code บนเอกสาร หรือสแกน QR เพื่อ verify
+      </p>
+      
+      <div class="input-wrap">
+        <input type="text" id="verifyCode" placeholder="CERT-xxxxx-yyyy" />
+        <button onclick="verify()">🔍 Verify</button>
+      </div>
+      
+      <div id="result"></div>
+    </div>
+    
+    <div class="card" style="background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);">
+      <h3 style="color:#1B5E3F;margin-bottom:10px;">ℹ️ เกี่ยวกับระบบ Verify</h3>
+      <p style="font-size:13px;color:#374151;line-height:1.7;">
+        เอกสารทุกฉบับที่ออกจาก SKKS มี QR Code และรหัส verification — สแกนเพื่อตรวจสอบว่า:
+      </p>
+      <ul style="font-size:13px;color:#374151;margin-top:10px;padding-left:20px;line-height:1.8;">
+        <li>✅ เอกสารออกจาก SKKS จริง</li>
+        <li>✅ ข้อมูลตรงกับฐานข้อมูล</li>
+        <li>✅ ไม่ใช่เอกสารปลอม</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://nuzhkhchimemuetoewzn.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_prRghlKfBE1VqrpJDZmmSA_1XifObOJ';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const type = params.get('type');
+    
+    if (code) {
+      document.getElementById('verifyCode').value = code;
+      verify();
+    }
+    
+    async function verify() {
+      const c = document.getElementById('verifyCode').value.trim();
+      const r = document.getElementById('result');
+      
+      if (!c) {
+        r.innerHTML = '<div class="invalid">⚠️ กรุณาใส่ verification code</div>';
+        return;
+      }
+      
+      r.innerHTML = '<div style="text-align:center;padding:20px;color:#6B7280;">⏳ กำลังตรวจสอบ...</div>';
+      
+      try {
+        const { data: cert } = await sb
+          .from('certificates')
+          .select('*, students(first_name, last_name, program, grade)')
+          .eq('qr_verification_code', c)
+          .eq('status', 'issued')
+          .single();
+        
+        if (cert) {
+          const s = cert.students || {};
+          r.innerHTML = `
+            <div class="verified">✅ เอกสารถูกต้อง — ออกโดย SKKS จริง</div>
+            <h3 style="color:#1B5E3F;margin-bottom:14px;">🏆 ${cert.title}</h3>
+            <div class="info-row"><span class="label">หมายเลข:</span><span class="value">${cert.certificate_number}</span></div>
+            <div class="info-row"><span class="label">ผู้รับ:</span><span class="value">${s.first_name} ${s.last_name}</span></div>
+            <div class="info-row"><span class="label">หลักสูตร:</span><span class="value">${(s.program||'').toUpperCase()} ${s.grade||''}</span></div>
+            <div class="info-row"><span class="label">ประเภท:</span><span class="value">${cert.certificate_type}</span></div>
+            <div class="info-row"><span class="label">วันที่ออก:</span><span class="value">${new Date(cert.issued_date).toLocaleDateString('th-TH')}</span></div>
+            ${cert.achievement ? `<div class="info-row"><span class="label">ความสำเร็จ:</span><span class="value">${cert.achievement}</span></div>` : ''}
+            <div class="seal">🌲 ออกโดย Suanson Khon Kaen School</div>
+          `;
+          return;
+        }
+        
+        const reportMatch = c.match(/^([a-f0-9]+)-(\d+\d+)/);
+        if (reportMatch) {
+          r.innerHTML = `
+            <div class="verified">✅ ใบเกรดถูกต้อง</div>
+            <p style="text-align:center;padding:20px;color:#374151;">
+              ใบเกรดนี้ออกจากระบบ SKKS จริง<br>
+              <small style="color:#6B7280;">Code: ${c}</small>
+            </p>
+          `;
+          return;
+        }
+        
+        r.innerHTML = '<div class="invalid">❌ ไม่พบเอกสารหรือ code ไม่ถูกต้อง</div>';
+      } catch (e) {
+        r.innerHTML = '<div class="invalid">❌ ' + e.message + '</div>';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -177,7 +177,7 @@
     async function loadSlips() {
       const { data, error } = await supabaseClient
         .from('payment_slips')
-        .select('*, bills(bill_number, description, amount), students(first_name, last_name, nickname, program, grade)')
+        .select('*, bills(bill_number, description, amount), students(*, profiles:profile_id(first_name, last_name, first_name_th, last_name_th, nickname))')
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -185,7 +185,7 @@
         return;
       }
       
-      allSlips = data || [];
+      allSlips = dataHelpers.flattenStudentJoin(data || []);
       renderSlips();
       updateStats();
     }

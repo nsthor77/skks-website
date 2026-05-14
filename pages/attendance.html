@@ -176,12 +176,7 @@
     }
     
     async function loadStudents() {
-      const { data } = await supabaseClient
-        .from('students')
-        .select('id, first_name, last_name, nickname, program, grade, student_number')
-        .eq('status', 'active')
-        .order('first_name');
-      allStudents = data || [];
+      allStudents = await dataHelpers.loadStudentsWithProfiles(supabaseClient, { status: 'active' });
     }
     
     function populateGradeFilter() {

@@ -289,7 +289,7 @@
     async function loadBills() {
       const { data, error } = await supabaseClient
         .from('bills')
-        .select('*, students(first_name, last_name, nickname, program, grade)')
+        .select('*, students(*, profiles:profile_id(first_name, last_name, first_name_th, last_name_th, nickname))')
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -297,23 +297,13 @@
         return;
       }
       
-      allBills = data || [];
+      allBills = dataHelpers.flattenStudentJoin(data || []);
       renderBills();
       updateStats();
     }
     
     async function loadStudents() {
-      const { data } = await supabaseClient
-        .from('students')
-        .select('id, first_name, last_name, nickname, program, grade, status')
-        .eq('status', 'active')
-        .order('first_name', { ascending: true });
-      
-      allStudents = data || [];
-      
-      const select = document.getElementById('billStudent');
-      select.innerHTML = '<option value="">-- Select Student --</option>' +
-        allStudents.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''} - ${(s.program||'').toUpperCase()} ${s.grade||''}</option>`).join('');
+      allStudents = await dataHelpers.loadStudentsWithProfiles(supabaseClient, { status: 'active' });
     }
     
     async function loadFees() {

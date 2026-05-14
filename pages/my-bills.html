@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Bills — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+    .sum-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center}
+    .sum-card.unpaid{border-color:#EF4444;background:#FEF2F2}
+    .sum-card.paid{border-color:#10B981;background:#F0FDF4}
+    .sum-card.pending{border-color:#F59E0B;background:#FEF3C7}
+    .sum-num{font-size:24px;font-weight:800;color:#1B5E3F}
+    .sum-card.unpaid .sum-num{color:#991B1B}
+    .sum-card.paid .sum-num{color:#15803D}
+    .sum-card.pending .sum-num{color:#A16207}
+    .sum-lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:6px}
+    
+    .bill-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+    .bill-card.unpaid{border-left:4px solid #EF4444}
+    .bill-card.paid{border-left:4px solid #10B981}
+    .bill-card.pending{border-left:4px solid #F59E0B}
+    .bill-info{flex:1}
+    .bill-title{font-weight:700;color:#1B5E3F;font-size:15px;margin-bottom:4px}
+    .bill-meta{font-size:11px;color:#6B7280}
+    .bill-amount{font-size:22px;font-weight:800;color:#1B5E3F}
+    .bill-status{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+    .status-unpaid{background:#FEE2E2;color:#991B1B}
+    .status-paid{background:#DCFCE7;color:#15803D}
+    .status-pending{background:#FEF3C7;color:#A16207}
+    
+    .pay-btn{padding:10px 20px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="student-dashboard.html">🏠 Home</a>
+        <a href="my-grades.html">📊 My Grades</a>
+        <a href="my-bills.html" class="active">💰 My Bills</a>
+        <a href="my-attendance.html">📅 Attendance</a>
+        <a href="my-certificates.html">🏆 Certs</a>
+        <a href="profile.html">👤 Profile</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>💰 My Bills</h2>
+          <p>บิลค่าเทอม และการชำระเงิน</p>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="sum-card unpaid">
+          <div class="sum-num" id="unpaidAmount">฿0</div>
+          <div class="sum-lbl">Unpaid <span id="unpaidCount">0</span></div>
+        </div>
+        <div class="sum-card pending">
+          <div class="sum-num" id="pendingAmount">฿0</div>
+          <div class="sum-lbl">Pending Review</div>
+        </div>
+        <div class="sum-card paid">
+          <div class="sum-num" id="paidAmount">฿0</div>
+          <div class="sum-lbl">Paid</div>
+        </div>
+      </div>
+
+      <div id="billsList"></div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    async function init() {
+      const profile = await requireStudent();
+      if (!profile) return;
+      
+      const { data: student } = await supabaseClient
+        .from('students')
+        .select('*')
+        .eq('profile_id', profile.id)
+        .single();
+      
+      if (!student) {
+        document.getElementById('loadingMsg').innerHTML = 
+          '<p style="text-align:center;color:#9CA3AF;padding:40px;">No student record found.</p>';
+        return;
+      }
+      
+      const { data: bills } = await supabaseClient
+        .from('bills')
+        .select('*')
+        .eq('student_id', student.id)
+        .order('due_date', { ascending: true });
+      
+      renderBills(bills || []);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function renderBills(bills) {
+      const unpaid = bills.filter(b => b.status === 'unpaid');
+      const pending = bills.filter(b => b.status === 'pending');
+      const paid = bills.filter(b => b.status === 'paid');
+      
+      const sumAmount = arr => arr.reduce((s, b) => s + Number(b.amount), 0);
+      
+      document.getElementById('unpaidAmount').textContent = '฿' + sumAmount(unpaid).toLocaleString();
+      document.getElementById('unpaidCount').textContent = unpaid.length;
+      document.getElementById('pendingAmount').textContent = '฿' + sumAmount(pending).toLocaleString();
+      document.getElementById('paidAmount').textContent = '฿' + sumAmount(paid).toLocaleString();
+      
+      const list = document.getElementById('billsList');
+      
+      if (bills.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:60px;color:#9CA3AF;background:white;border-radius:12px;border:1px solid #E5E7EB;"><div style="font-size:48px;">📭</div><p style="margin-top:14px;">ยังไม่มีบิล</p></div>';
+        return;
+      }
+      
+      list.innerHTML = bills.map(b => {
+        const icon = b.status === 'paid' ? '✅' : b.status === 'pending' ? '⏳' : '❌';
+        const isOverdue = b.status === 'unpaid' && new Date(b.due_date) < new Date();
+        const overdueTag = isOverdue ? '<span style="color:#991B1B;font-weight:700;font-size:11px;">⚠️ OVERDUE</span> • ' : '';
+        
+        return `<div class="bill-card ${b.status}">
+          <div class="bill-info">
+            <div class="bill-title">${b.description_th || b.description}</div>
+            <div class="bill-meta">
+              ${overdueTag}Due: ${new Date(b.due_date).toLocaleDateString('th-TH')} • ${b.bill_number}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="bill-amount">฿${Number(b.amount).toLocaleString()}</div>
+            <div class="bill-status status-${b.status}">${icon} ${b.status}</div>
+          </div>
+          ${b.status === 'unpaid' ? `<button class="pay-btn" onclick="payBill('${b.id}', ${b.amount})">💳 Pay Now</button>` : ''}
+        </div>`;
+      }).join('');
+    }
+    
+    function payBill(id, amount) {
+      alert(`💰 Payment for ฿${amount.toLocaleString()}\n\nIn production: This redirects to QR payment / Credit card gateway.\n\nFor demo: Visit /pages/parent-bills.html for full payment flow.`);
+    }
+    
+    init();
+  </script>
+</body>
+</html>

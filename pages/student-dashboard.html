@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .hero{background:linear-gradient(135deg,#1B5E3F 0%,#5BB8E0 100%);color:white;padding:24px;border-radius:14px;margin-bottom:20px;display:flex;align-items:center;gap:18px}
+    .avatar-big{width:72px;height:72px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;flex-shrink:0}
+    .hero h2{margin:0;font-size:22px;color:white}
+    .hero .meta{font-size:13px;opacity:0.9;margin-top:4px}
+    .hero .badges{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+    .hero .badge{background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600}
+    
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+    .stat-box{background:white;border-radius:12px;padding:18px;border:1px solid #E5E7EB;text-align:center}
+    .stat-num{font-size:28px;font-weight:800;color:#1B5E3F}
+    .stat-lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+    
+    .quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+    .action-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all 0.15s;text-decoration:none;color:inherit;display:block}
+    .action-card:hover{border-color:#1B5E3F;transform:translateY(-2px);box-shadow:0 8px 20px rgba(27,94,63,0.12)}
+    .action-icon{font-size:32px;margin-bottom:8px}
+    .action-title{font-weight:700;color:#1B5E3F;font-size:14px}
+    .action-desc{font-size:11px;color:#6B7280;margin-top:4px}
+    
+    .section{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:20px;margin-bottom:18px}
+    .section h3{color:#1B5E3F;margin:0 0 14px;font-size:16px;padding-bottom:8px;border-bottom:2px solid #1B5E3F}
+    
+    .grade-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F3F4F6;font-size:13px}
+    .grade-item:last-child{border-bottom:none}
+    .grade-letter{font-size:20px;font-weight:800;padding:4px 12px;border-radius:6px}
+    .grade-a{background:#DCFCE7;color:#15803D}
+    .grade-b{background:#DBEAFE;color:#1E40AF}
+    .grade-c{background:#FEF3C7;color:#A16207}
+    .grade-d{background:#FED7AA;color:#9A3412}
+    .grade-f{background:#FEE2E2;color:#991B1B}
+    
+    .bill-item{padding:10px;background:#F9FAFB;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+    .bill-paid{background:#DCFCE7;color:#15803D}
+    .bill-unpaid{background:#FEE2E2;color:#991B1B}
+    .bill-pending{background:#FEF3C7;color:#A16207}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="student-dashboard.html" class="active">🏠 Home</a>
+        <a href="my-grades.html">📊 My Grades</a>
+        <a href="my-bills.html">💰 My Bills</a>
+        <a href="my-attendance.html">📅 Attendance</a>
+        <a href="my-certificates.html">🏆 Certs</a>
+        <a href="profile.html">👤 Profile</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="hero">
+        <div class="avatar-big" id="avatar">?</div>
+        <div style="flex:1;">
+          <h2 id="studentName">Loading...</h2>
+          <div class="meta" id="studentMeta">—</div>
+          <div class="badges">
+            <span class="badge" id="badgeProgram">—</span>
+            <span class="badge" id="badgeGrade">—</span>
+            <span class="badge">🆔 <span id="badgeNumber">—</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="cntGPA">—</div>
+          <div class="stat-lbl">GPA</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="cntAttendance">—</div>
+          <div class="stat-lbl">Attendance</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="cntBills">—</div>
+          <div class="stat-lbl">Unpaid Bills</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="cntCerts">—</div>
+          <div class="stat-lbl">Certificates</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <a href="my-grades.html" class="action-card">
+          <div class="action-icon">📊</div>
+          <div class="action-title">View Grades</div>
+          <div class="action-desc">ดูคะแนนทั้งหมด</div>
+        </a>
+        <a href="my-bills.html" class="action-card">
+          <div class="action-icon">💰</div>
+          <div class="action-title">Pay Bills</div>
+          <div class="action-desc">ชำระค่าเทอม</div>
+        </a>
+        <a href="my-attendance.html" class="action-card">
+          <div class="action-icon">📅</div>
+          <div class="action-title">Attendance</div>
+          <div class="action-desc">การมาเรียน</div>
+        </a>
+        <a href="my-certificates.html" class="action-card">
+          <div class="action-icon">🏆</div>
+          <div class="action-title">Certificates</div>
+          <div class="action-desc">ใบประกาศ</div>
+        </a>
+      </div>
+
+      <div class="section">
+        <h3>📊 Recent Grades</h3>
+        <div id="gradesList">
+          <p style="text-align:center;color:#9CA3AF;padding:20px;">No grades yet</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>💰 Recent Bills</h3>
+        <div id="billsList">
+          <p style="text-align:center;color:#9CA3AF;padding:20px;">No bills</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let currentStudent = null;
+    
+    async function init() {
+      const profile = await requireStudent();
+      if (!profile) return;
+      
+      // Find student record linked to this profile
+      const { data: student } = await supabaseClient
+        .from('students')
+        .select('*')
+        .eq('profile_id', profile.id)
+        .single();
+      
+      if (!student) {
+        document.getElementById('loadingMsg').innerHTML = 
+          '<div style="text-align:center;padding:40px;"><div style="font-size:64px;">🎓</div>' +
+          '<p style="margin-top:14px;color:#6B7280;">No student record found for this account.<br>' +
+          'Please contact the school admin.</p></div>';
+        return;
+      }
+      
+      currentStudent = student;
+      
+      const initials = ((profile.first_name||'?')[0] + (profile.last_name||'')[0]).toUpperCase();
+      document.getElementById('avatar').textContent = initials;
+      document.getElementById('studentName').textContent = 
+        `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Student';
+      document.getElementById('studentMeta').textContent = 
+        `${profile.nickname ? '"' + profile.nickname + '"' : ''} • ${profile.email}`;
+      document.getElementById('badgeProgram').textContent = (student.program || '').toUpperCase();
+      document.getElementById('badgeGrade').textContent = student.grade || '—';
+      document.getElementById('badgeNumber').textContent = student.student_number || '—';
+      
+      await Promise.all([loadGrades(), loadBills(), loadAttendance(), loadCerts()]);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadGrades() {
+      const { data: grades } = await supabaseClient
+        .from('student_grades')
+        .select('*, subjects(name, name_th, code)')
+        .eq('student_id', currentStudent.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (!grades || grades.length === 0) return;
+      
+      const avgGPA = grades.reduce((sum, g) => sum + Number(g.gpa || 0), 0) / grades.length;
+      document.getElementById('cntGPA').textContent = avgGPA.toFixed(2);
+      
+      document.getElementById('gradesList').innerHTML = grades.map(g => {
+        const letter = g.letter_grade || 'N/A';
+        const cls = letter.startsWith('A') ? 'grade-a' : letter.startsWith('B') ? 'grade-b' :
+                    letter.startsWith('C') ? 'grade-c' : letter.startsWith('D') ? 'grade-d' : 'grade-f';
+        return `<div class="grade-item">
+          <div>
+            <div style="font-weight:600;color:#1B5E3F;">${g.subjects?.name || g.subjects?.code || 'Subject'}</div>
+            <div style="font-size:11px;color:#6B7280;">Term ${g.term}/${g.academic_year} • ${Number(g.total_score || 0).toFixed(1)} pts</div>
+          </div>
+          <div class="grade-letter ${cls}">${letter}</div>
+        </div>`;
+      }).join('');
+    }
+    
+    async function loadBills() {
+      const { data: bills } = await supabaseClient
+        .from('bills')
+        .select('*')
+        .eq('student_id', currentStudent.id)
+        .order('due_date', { ascending: true })
+        .limit(5);
+      
+      if (!bills || bills.length === 0) return;
+      
+      const unpaid = bills.filter(b => b.status === 'unpaid').length;
+      document.getElementById('cntBills').textContent = unpaid;
+      
+      document.getElementById('billsList').innerHTML = bills.map(b => {
+        const cls = b.status === 'paid' ? 'bill-paid' : b.status === 'pending' ? 'bill-pending' : 'bill-unpaid';
+        const icon = b.status === 'paid' ? '✅' : b.status === 'pending' ? '⏳' : '❌';
+        return `<div class="bill-item">
+          <div>
+            <div style="font-weight:600;color:#374151;">${b.description_th || b.description}</div>
+            <div style="font-size:11px;color:#9CA3AF;">Due: ${new Date(b.due_date).toLocaleDateString('th-TH')}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:800;color:#1B5E3F;">฿${Number(b.amount).toLocaleString()}</div>
+            <div class="${cls}" style="font-size:10px;padding:2px 8px;border-radius:4px;display:inline-block;margin-top:2px;">${icon} ${b.status}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    
+    async function loadAttendance() {
+      const { data: att } = await supabaseClient
+        .from('attendance')
+        .select('status')
+        .eq('student_id', currentStudent.id);
+      
+      if (!att || att.length === 0) {
+        document.getElementById('cntAttendance').textContent = '—';
+        return;
+      }
+      
+      const present = att.filter(a => a.status === 'present').length;
+      const rate = (present / att.length * 100).toFixed(0);
+      document.getElementById('cntAttendance').textContent = rate + '%';
+    }
+    
+    async function loadCerts() {
+      const { count } = await supabaseClient
+        .from('certificates')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', currentStudent.id)
+        .eq('status', 'issued');
+      
+      document.getElementById('cntCerts').textContent = count || 0;
+    }
+    
+    init();
+  </script>
+</body>
+</html>

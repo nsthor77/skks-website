@@ -36,28 +36,28 @@
         <h1>SKKS Admin</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="analytics.html">📈 Analytics</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="grades-admin.html">📝 Grades</a>
-        <a href="ai-grading.html">🤖 AI Grade</a>
-        <a href="ai-comments.html">💬 AI Comments</a>
-        <a href="predictions.html">🔮 Predictions</a>
-        <a href="report-cards.html">📄 Reports</a>
-        <a href="certificates.html">🏆 Certs</a>
-        <a href="attendance.html">📅 Attendance</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="payment-approvals.html">✅ Approvals</a>
-        <a href="create-bills.html">📄 Bills</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="events-admin.html" class="active">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="line-notify-sender.html">📱 LINE</a>
-        <a href="applications.html">📝 Apps</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="school-settings.html" class="owner-only" style="display:none">⚙️ School</a>
-        <a href="payment-gateways.html" class="owner-only" style="display:none">🌐 Gateways</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="dashboard.html" data-roles="admin,owner,developer">📊 Dashboard</a>
+        <a href="analytics.html" data-roles="admin,owner,developer">📈 Analytics</a>
+        <a href="students.html" data-roles="admin,owner,developer">🎓 Students</a>
+        <a href="grades-admin.html" data-roles="teacher,admin,owner,developer">📝 Grades</a>
+        <a href="ai-grading.html" data-roles="teacher,admin,owner,developer">🤖 AI Grade</a>
+        <a href="ai-comments.html" data-roles="teacher,admin,owner,developer">💬 AI Comments</a>
+        <a href="attendance.html" data-roles="teacher,admin,owner,developer">📅 Attendance</a>
+        <a href="report-cards.html" data-roles="admin,owner,developer">📄 Reports</a>
+        <a href="certificates.html" data-roles="admin,owner,developer">🏆 Certs</a>
+        <a href="predictions.html" data-roles="admin,owner,developer">🔮 Predictions</a>
+        <a href="payments.html" data-roles="admin,owner,developer">💳 Payments</a>
+        <a href="payment-approvals.html" data-roles="admin,owner,developer">✅ Approvals</a>
+        <a href="create-bills.html" data-roles="admin,owner,developer">📄 Bills</a>
+        <a href="tuition-admin.html" data-roles="admin,owner,developer">💰 Tuition</a>
+        <a href="events-admin.html" class="active" data-roles="admin,owner,developer">📅 Events</a>
+        <a href="news-admin.html" data-roles="admin,owner,developer">📰 News</a>
+        <a href="line-notify-sender.html" data-roles="admin,owner,developer">📱 LINE</a>
+        <a href="applications.html" data-roles="admin,owner,developer">📝 Apps</a>
+        <a href="finance.html" data-roles="owner,developer" class="owner-only">💎 Finance</a>
+        <a href="school-settings.html" data-roles="owner,developer" class="owner-only">⚙️ School</a>
+        <a href="payment-gateways.html" data-roles="owner,developer" class="owner-only">🌐 Gateways</a>
+        <a href="users.html" data-roles="owner,developer" class="owner-only">👥 Users</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
@@ -219,7 +219,7 @@
     let allEvents = [];
     
     async function init() {
-      const profile = await requireStaff();
+      const profile = await requireAdmin();
       if (!profile) return;
       
       if (profile.role === 'owner' || profile.role === 'developer') {

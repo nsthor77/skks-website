@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Attendance — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+    .stat-box{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center}
+    .stat-num{font-size:28px;font-weight:800}
+    .stat-lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+    .green{color:#10B981}
+    .yellow{color:#F59E0B}
+    .red{color:#EF4444}
+    .gray{color:#6B7280}
+    
+    .calendar{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:20px;margin-bottom:18px}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:14px}
+    .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;font-size:11px;background:#F9FAFB}
+    .cal-day.present{background:#DCFCE7;color:#15803D}
+    .cal-day.late{background:#FEF3C7;color:#A16207}
+    .cal-day.absent{background:#FEE2E2;color:#991B1B}
+    .cal-day.excused{background:#DBEAFE;color:#1E40AF}
+    .cal-day.weekend{background:#F3F4F6;color:#9CA3AF;font-style:italic}
+    .cal-day .date{font-weight:700;font-size:14px}
+    .cal-day .ico{font-size:14px;margin-top:2px}
+    .day-header{font-size:11px;font-weight:700;color:#6B7280;text-align:center;padding:6px;text-transform:uppercase}
+    
+    .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;justify-content:center}
+    .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B7280}
+    .legend-color{width:14px;height:14px;border-radius:3px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="student-dashboard.html">🏠 Home</a>
+        <a href="my-grades.html">📊 My Grades</a>
+        <a href="my-bills.html">💰 My Bills</a>
+        <a href="my-attendance.html" class="active">📅 Attendance</a>
+        <a href="my-certificates.html">🏆 Certs</a>
+        <a href="profile.html">👤 Profile</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📅 My Attendance</h2>
+          <p>การมาเรียนของฉัน</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num green" id="cntPresent">0</div>
+          <div class="stat-lbl">Present</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num yellow" id="cntLate">0</div>
+          <div class="stat-lbl">Late</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num red" id="cntAbsent">0</div>
+          <div class="stat-lbl">Absent</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="rate">—</div>
+          <div class="stat-lbl">Attendance Rate</div>
+        </div>
+      </div>
+
+      <div class="calendar">
+        <h3 style="color:#1B5E3F;margin:0 0 10px;">📅 Last 30 Days</h3>
+        <div class="cal-grid" id="dayHeaders">
+          <div class="day-header">Mon</div>
+          <div class="day-header">Tue</div>
+          <div class="day-header">Wed</div>
+          <div class="day-header">Thu</div>
+          <div class="day-header">Fri</div>
+          <div class="day-header">Sat</div>
+          <div class="day-header">Sun</div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        
+        <div class="legend">
+          <div class="legend-item"><div class="legend-color" style="background:#DCFCE7;"></div>Present</div>
+          <div class="legend-item"><div class="legend-color" style="background:#FEF3C7;"></div>Late</div>
+          <div class="legend-item"><div class="legend-color" style="background:#FEE2E2;"></div>Absent</div>
+          <div class="legend-item"><div class="legend-color" style="background:#DBEAFE;"></div>Excused</div>
+          <div class="legend-item"><div class="legend-color" style="background:#F3F4F6;"></div>Weekend</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    async function init() {
+      const profile = await requireStudent();
+      if (!profile) return;
+      
+      const { data: student } = await supabaseClient
+        .from('students')
+        .select('*')
+        .eq('profile_id', profile.id)
+        .single();
+      
+      if (!student) return;
+      
+      const { data: att } = await supabaseClient
+        .from('attendance')
+        .select('*')
+        .eq('student_id', student.id)
+        .order('attendance_date', { ascending: false });
+      
+      renderStats(att || []);
+      renderCalendar(att || []);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function renderStats(records) {
+      const present = records.filter(r => r.status === 'present').length;
+      const late = records.filter(r => r.status === 'late').length;
+      const absent = records.filter(r => r.status === 'absent').length;
+      const total = records.length;
+      const rate = total > 0 ? Math.round(((present + late * 0.5) / total) * 100) : 0;
+      
+      document.getElementById('cntPresent').textContent = present;
+      document.getElementById('cntLate').textContent = late;
+      document.getElementById('cntAbsent').textContent = absent;
+      document.getElementById('rate').textContent = rate + '%';
+      
+      const rateEl = document.getElementById('rate');
+      rateEl.className = 'stat-num ' + (rate >= 90 ? 'green' : rate >= 80 ? 'yellow' : 'red');
+    }
+    
+    function renderCalendar(records) {
+      const grid = document.getElementById('calGrid');
+      const today = new Date();
+      const map = {};
+      records.forEach(r => { map[r.attendance_date] = r.status; });
+      
+      const days = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        days.push(d);
+      }
+      
+      // Add empty cells for first row alignment (Mon = 1, Sun = 0)
+      const firstDay = days[0];
+      const dayOfWeek = (firstDay.getDay() + 6) % 7; // Convert: Mon=0
+      const emptyCells = Array(dayOfWeek).fill(null);
+      
+      grid.innerHTML = [...emptyCells, ...days].map(d => {
+        if (!d) return '<div></div>';
+        const dStr = d.toISOString().split('T')[0];
+        const day = (d.getDay() + 6) % 7;
+        const isWeekend = day >= 5;
+        const status = map[dStr];
+        
+        let icon = '';
+        let cls = 'weekend';
+        if (!isWeekend) {
+          if (status === 'present') { icon = '✓'; cls = 'present'; }
+          else if (status === 'late') { icon = '⏰'; cls = 'late'; }
+          else if (status === 'absent') { icon = '✗'; cls = 'absent'; }
+          else if (status === 'excused') { icon = '📝'; cls = 'excused'; }
+          else cls = '';
+        }
+        
+        return `<div class="cal-day ${cls}">
+          <div class="date">${d.getDate()}</div>
+          <div class="ico">${icon}</div>
+        </div>`;
+      }).join('');
+    }
+    
+    init();
+  </script>
+</body>
+</html>

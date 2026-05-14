@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grades — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .grade-grid{background:white;border-radius:12px;overflow-x:auto;border:1px solid #E5E7EB}
+    .grade-table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+    .grade-table th{background:#F0FDF4;color:#1B5E3F;padding:12px 10px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;border-bottom:2px solid #1B5E3F;position:sticky;top:0;z-index:2}
+    .grade-table td{padding:10px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+    .grade-table tr:hover{background:#F9FAFB}
+    .grade-input{width:65px;padding:6px 8px;border:1px solid #D1D5DB;border-radius:6px;text-align:center;font-family:monospace;font-size:13px}
+    .grade-input:focus{outline:none;border-color:#1B5E3F;box-shadow:0 0 0 2px rgba(27,94,63,0.1)}
+    .grade-display{font-weight:700;font-size:16px;color:#1B5E3F;text-align:center;width:55px;display:inline-block}
+    .letter-badge{display:inline-block;padding:4px 12px;border-radius:6px;font-size:13px;font-weight:700;min-width:40px;text-align:center}
+    .grade-A{background:#DCFCE7;color:#15803D}
+    .grade-B{background:#DBEAFE;color:#1E40AF}
+    .grade-C{background:#FEF3C7;color:#A16207}
+    .grade-D{background:#FED7AA;color:#C2410C}
+    .grade-F{background:#FEE2E2;color:#991B1B}
+    .student-cell{display:flex;align-items:center;gap:10px}
+    .avatar{width:32px;height:32px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+    .student-name{font-weight:600;color:#1B5E3F;font-size:13px;line-height:1.2}
+    .student-meta{font-size:11px;color:#9CA3AF;margin-top:2px}
+    
+    .filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;background:white;padding:14px;border-radius:10px;border:1px solid #E5E7EB}
+    .filter-bar select, .filter-bar input{padding:8px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px}
+    
+    .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:#6B7280;justify-content:center}
+    .legend span{display:flex;align-items:center;gap:4px}
+    .legend .dot{width:10px;height:10px;border-radius:3px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html" class="active">📝 Grades</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html">🏆 Certificates</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📝 Grade Management</h2>
+          <p>บันทึกคะแนนนักเรียน — ระบบคำนวณเกรด GPA อัตโนมัติ</p>
+        </div>
+        <button class="btn btn-primary" onclick="saveAllGrades()">💾 Save All Changes</button>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filterTerm" onchange="loadGrades()">
+          <option value="1/2026">Term 1 / 2026</option>
+          <option value="2/2026">Term 2 / 2026</option>
+          <option value="1/2025">Term 1 / 2025</option>
+        </select>
+        <select id="filterSubject" onchange="loadGrades()">
+          <option value="">Select Subject...</option>
+        </select>
+        <select id="filterProgram" onchange="loadGrades()">
+          <option value="">All Programs</option>
+          <option value="prek">Pre-K</option>
+          <option value="k">K</option>
+          <option value="ep">EP</option>
+          <option value="mep">MEP</option>
+        </select>
+        <select id="filterGrade" onchange="loadGrades()">
+          <option value="">All Grades</option>
+        </select>
+        <input type="search" id="searchStudent" placeholder="🔍 ค้นหานักเรียน..." oninput="renderGrades()" style="flex:1;min-width:180px;" />
+      </div>
+
+      <div class="grade-grid">
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th style="width:35%;">Student</th>
+              <th style="width:14%;text-align:center;">Assignments<br><small style="font-weight:400;">(30%)</small></th>
+              <th style="width:14%;text-align:center;">Midterm<br><small style="font-weight:400;">(30%)</small></th>
+              <th style="width:14%;text-align:center;">Final<br><small style="font-weight:400;">(40%)</small></th>
+              <th style="width:10%;text-align:center;">Total</th>
+              <th style="width:8%;text-align:center;">Grade</th>
+              <th style="width:5%;text-align:center;">GPA</th>
+            </tr>
+          </thead>
+          <tbody id="gradesBody">
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="legend">
+        <span><span class="dot grade-A"></span> A: 90+</span>
+        <span><span class="dot grade-B"></span> B: 80-89</span>
+        <span><span class="dot grade-C"></span> C: 70-79</span>
+        <span><span class="dot grade-D"></span> D: 60-69</span>
+        <span><span class="dot grade-F"></span> F: 0-59</span>
+      </div>
+      
+      <div id="emptyState" style="display:none;text-align:center;padding:60px 20px;">
+        <div style="font-size:64px;">📚</div>
+        <h3 style="color:#1B5E3F;">เลือก Subject เพื่อเริ่ม</h3>
+        <p>เลือกวิชาที่ต้องการกรอกคะแนนจาก dropdown ด้านบน</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allStudents = [];
+    let allSubjects = [];
+    let gradeScales = [];
+    let currentGrades = {};
+    let changedRows = new Set();
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await Promise.all([loadStudents(), loadSubjects(), loadGradeScales()]);
+      populateGradeFilter();
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadStudents() {
+      const { data } = await supabaseClient
+        .from('students')
+        .select('id, first_name, last_name, nickname, program, grade, student_number')
+        .eq('status', 'active')
+        .order('first_name');
+      allStudents = data || [];
+    }
+    
+    async function loadSubjects() {
+      const { data } = await supabaseClient
+        .from('subjects')
+        .select('*')
+        .eq('active', true)
+        .order('display_order');
+      allSubjects = data || [];
+      
+      const sel = document.getElementById('filterSubject');
+      sel.innerHTML = '<option value="">Select Subject...</option>' +
+        allSubjects.map(s => `<option value="${s.id}">${s.code} - ${s.name} (${(s.program||'').toUpperCase()})</option>`).join('');
+    }
+    
+    async function loadGradeScales() {
+      const { data } = await supabaseClient
+        .from('grade_scales')
+        .select('*')
+        .eq('active', true)
+        .order('min_score', { ascending: false });
+      gradeScales = data || [];
+    }
+    
+    function populateGradeFilter() {
+      const grades = [...new Set(allStudents.map(s => s.grade).filter(Boolean))].sort();
+      const sel = document.getElementById('filterGrade');
+      sel.innerHTML = '<option value="">All Grades</option>' +
+        grades.map(g => `<option value="${g}">${g}</option>`).join('');
+    }
+    
+    async function loadGrades() {
+      const subjectId = document.getElementById('filterSubject').value;
+      const term = document.getElementById('filterTerm').value;
+      
+      currentGrades = {};
+      changedRows.clear();
+      
+      if (!subjectId) {
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('gradesBody').innerHTML = '';
+        return;
+      }
+      
+      document.getElementById('emptyState').style.display = 'none';
+      
+      const [termNum, year] = term.split('/');
+      const { data } = await supabaseClient
+        .from('student_grades')
+        .select('*')
+        .eq('subject_id', subjectId)
+        .eq('term', termNum)
+        .eq('academic_year', year);
+      
+      (data || []).forEach(g => {
+        currentGrades[g.student_id] = g;
+      });
+      
+      renderGrades();
+    }
+    
+    function renderGrades() {
+      const tbody = document.getElementById('gradesBody');
+      const program = document.getElementById('filterProgram').value;
+      const grade = document.getElementById('filterGrade').value;
+      const search = document.getElementById('searchStudent').value.toLowerCase().trim();
+      const subjectId = document.getElementById('filterSubject').value;
+      
+      if (!subjectId) {
+        tbody.innerHTML = '';
+        return;
+      }
+      
+      let filtered = allStudents;
+      if (program) filtered = filtered.filter(s => s.program === program);
+      if (grade) filtered = filtered.filter(s => s.grade === grade);
+      if (search) {
+        filtered = filtered.filter(s => {
+          const t = `${s.first_name} ${s.last_name} ${s.nickname || ''}`.toLowerCase();
+          return t.includes(search);
+        });
+      }
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA3AF;">No students match filters</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(s => {
+        const g = currentGrades[s.id] || {};
+        const initials = ((s.first_name||'?')[0] + (s.last_name||'')[0]).toUpperCase();
+        return `<tr data-student="${s.id}">
+          <td>
+            <div class="student-cell">
+              <div class="avatar">${initials}</div>
+              <div>
+                <div class="student-name">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''}</div>
+                <div class="student-meta">${(s.program||'').toUpperCase()} ${s.grade||''} • ${s.student_number||''}</div>
+              </div>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <input type="number" class="grade-input" min="0" max="100" step="0.01" value="${g.assignment_score || ''}" 
+              oninput="updateRow('${s.id}', 'assignment_score', this.value)" placeholder="-" />
+          </td>
+          <td style="text-align:center;">
+            <input type="number" class="grade-input" min="0" max="100" step="0.01" value="${g.midterm_score || ''}" 
+              oninput="updateRow('${s.id}', 'midterm_score', this.value)" placeholder="-" />
+          </td>
+          <td style="text-align:center;">
+            <input type="number" class="grade-input" min="0" max="100" step="0.01" value="${g.final_score || ''}" 
+              oninput="updateRow('${s.id}', 'final_score', this.value)" placeholder="-" />
+          </td>
+          <td style="text-align:center;">
+            <span class="grade-display" id="total-${s.id}">${g.total_score ? Number(g.total_score).toFixed(1) : '-'}</span>
+          </td>
+          <td style="text-align:center;">
+            <span id="letter-${s.id}">${g.letter_grade ? `<span class="letter-badge grade-${g.letter_grade[0]}">${g.letter_grade}</span>` : '-'}</span>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-weight:700;color:#1B5E3F;" id="gpa-${s.id}">${g.gpa ? Number(g.gpa).toFixed(2) : '-'}</span>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+    
+    function updateRow(studentId, field, value) {
+      if (!currentGrades[studentId]) {
+        currentGrades[studentId] = { student_id: studentId };
+      }
+      currentGrades[studentId][field] = value === '' ? null : parseFloat(value);
+      changedRows.add(studentId);
+      
+      const g = currentGrades[studentId];
+      const asgn = parseFloat(g.assignment_score) || 0;
+      const mid = parseFloat(g.midterm_score) || 0;
+      const fin = parseFloat(g.final_score) || 0;
+      
+      const total = (asgn * 0.3) + (mid * 0.3) + (fin * 0.4);
+      g.total_score = total;
+      
+      const scale = gradeScales.find(s => total >= parseFloat(s.min_score) && total <= parseFloat(s.max_score));
+      if (scale) {
+        g.letter_grade = scale.grade;
+        g.gpa = parseFloat(scale.gpa);
+      }
+      
+      document.getElementById(`total-${studentId}`).textContent = total > 0 ? total.toFixed(1) : '-';
+      document.getElementById(`letter-${studentId}`).innerHTML = scale ? `<span class="letter-badge grade-${scale.grade[0]}">${scale.grade}</span>` : '-';
+      document.getElementById(`gpa-${studentId}`).textContent = scale ? Number(scale.gpa).toFixed(2) : '-';
+    }
+    
+    async function saveAllGrades() {
+      if (changedRows.size === 0) {
+        dataHelpers.toast('No changes to save', 'info');
+        return;
+      }
+      
+      const subjectId = document.getElementById('filterSubject').value;
+      const [termNum, year] = document.getElementById('filterTerm').value.split('/');
+      
+      if (!subjectId) {
+        dataHelpers.toast('❌ Select a subject first', 'error');
+        return;
+      }
+      
+      if (!confirm(`Save grades for ${changedRows.size} students?`)) return;
+      
+      const user = await supabaseClient.auth.getUser();
+      const records = Array.from(changedRows).map(studentId => {
+        const g = currentGrades[studentId];
+        return {
+          student_id: studentId,
+          subject_id: subjectId,
+          term: termNum,
+          academic_year: year,
+          assignment_score: g.assignment_score,
+          midterm_score: g.midterm_score,
+          final_score: g.final_score,
+          total_score: g.total_score,
+          letter_grade: g.letter_grade,
+          gpa: g.gpa,
+          teacher_id: user.data.user.id,
+          updated_at: new Date().toISOString()
+        };
+      });
+      
+      const { error } = await supabaseClient
+        .from('student_grades')
+        .upsert(records, { onConflict: 'student_id,subject_id,term,academic_year' });
+      
+      if (error) {
+        dataHelpers.toast('❌ Save failed: ' + error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(`✅ Saved ${changedRows.size} grades!`, 'success');
+      changedRows.clear();
+      await loadGrades();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

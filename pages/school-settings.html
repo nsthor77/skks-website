@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Settings — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .layout{display:grid;grid-template-columns:240px 1fr;gap:20px}
+    @media(max-width:800px){.layout{grid-template-columns:1fr}}
+    .side-menu{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:14px;height:fit-content;position:sticky;top:80px}
+    .side-menu a{display:block;padding:10px 12px;color:#374151;text-decoration:none;border-radius:8px;font-size:13px;margin-bottom:4px;cursor:pointer}
+    .side-menu a:hover{background:#F9FAFB}
+    .side-menu a.active{background:#1B5E3F;color:white}
+    .setting-section{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:24px;margin-bottom:18px;display:none}
+    .setting-section.active{display:block}
+    .setting-section h3{color:#1B5E3F;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid #1B5E3F;font-size:17px}
+    .line-card{background:#F9FAFB;border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid #E5E7EB}
+    .line-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px}
+    .line-card-header h4{margin:0;color:#1B5E3F;font-size:14px}
+    .line-card-desc{font-size:12px;color:#6B7280;margin-bottom:10px}
+    .line-template{background:white;padding:10px;border-radius:6px;font-size:12px;color:#374151;font-family:monospace;border:1px solid #E5E7EB;margin-bottom:10px}
+    .switch{position:relative;display:inline-block;width:48px;height:24px}
+    .switch input{opacity:0;width:0;height:0}
+    .switch .slider{position:absolute;cursor:pointer;inset:0;background:#D1D5DB;border-radius:24px;transition:0.2s}
+    .switch .slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.2s}
+    .switch input:checked + .slider{background:#10B981}
+    .switch input:checked + .slider::before{transform:translateX(24px)}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html">🏆 Certificates</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="school-settings.html" class="owner-only active" style="display:none">⚙️ Settings</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>⚙️ School Settings</h2>
+          <p>ตั้งค่าโรงเรียน + LINE Notifications — Owner only</p>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div class="side-menu">
+          <a class="tab-link active" onclick="showTab('school')">🏫 School Info</a>
+          <a class="tab-link" onclick="showTab('principal')">👤 Principal</a>
+          <a class="tab-link" onclick="showTab('line')">📱 LINE Notify</a>
+          <a class="tab-link" onclick="showTab('payment')">💳 Payment Account</a>
+        </div>
+        
+        <div>
+          <div class="setting-section active" id="tab-school">
+            <h3>🏫 School Information</h3>
+            <form onsubmit="saveSchool(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>School Name (English)</label>
+                  <input type="text" id="schoolName" />
+                </div>
+                <div class="form-group">
+                  <label>ชื่อโรงเรียน (ไทย)</label>
+                  <input type="text" id="schoolNameTh" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Address</label>
+                <textarea id="schoolAddress" rows="2"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="tel" id="schoolPhone" />
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="schoolEmail" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Website</label>
+                  <input type="url" id="schoolWebsite" />
+                </div>
+                <div class="form-group">
+                  <label>Registration Number</label>
+                  <input type="text" id="schoolRegNum" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Motto (English)</label>
+                  <input type="text" id="motto" />
+                </div>
+                <div class="form-group">
+                  <label>คำขวัญ (ไทย)</label>
+                  <input type="text" id="mottoTh" />
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <button class="btn btn-primary" type="submit">💾 Save School Info</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="setting-section" id="tab-principal">
+            <h3>👤 Principal Information</h3>
+            <form onsubmit="saveSchool(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Principal Name (English)</label>
+                  <input type="text" id="principalName" />
+                </div>
+                <div class="form-group">
+                  <label>ชื่อผู้อำนวยการ (ไทย)</label>
+                  <input type="text" id="principalNameTh" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Title (English)</label>
+                  <input type="text" id="principalTitle" placeholder="Principal" />
+                </div>
+                <div class="form-group">
+                  <label>ตำแหน่ง (ไทย)</label>
+                  <input type="text" id="principalTitleTh" placeholder="ผู้อำนวยการ" />
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <button class="btn btn-primary" type="submit">💾 Save Principal Info</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="setting-section" id="tab-line">
+            <h3>📱 LINE Notify Settings</h3>
+            <p style="font-size:13px;color:#6B7280;background:#FEF3C7;padding:14px;border-radius:8px;margin-bottom:18px;">
+              💡 LINE Notify ส่ง notification ฟรีให้ผู้ปกครอง — ตั้งค่า token ที่ <a href="https://notify-bot.line.me" target="_blank" style="color:#1B5E3F;font-weight:600;">notify-bot.line.me</a>
+            </p>
+            
+            <div class="form-group" style="background:#F0FDF4;padding:14px;border-radius:10px;border:1px solid #1B5E3F;margin-bottom:18px;">
+              <label style="font-weight:700;color:#1B5E3F;">🔑 LINE Notify Token (Global)</label>
+              <input type="text" id="lineGlobalToken" placeholder="kxXXXXXXXXXXXXXXXXXXXX" style="font-family:monospace;" />
+              <p style="font-size:11px;color:#6B7280;margin-top:6px;">หาได้ที่ notify-bot.line.me → My Page → Generate Token</p>
+            </div>
+            
+            <div id="lineFeatures"></div>
+          </div>
+
+          <div class="setting-section" id="tab-payment">
+            <h3>💳 Payment Account</h3>
+            <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">
+              ตั้งค่าบัญชีสำหรับรับชำระเงิน — <a href="payment-settings.html" style="color:#1B5E3F;font-weight:600;">ไปที่ Payment Settings →</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let school = null;
+    let lineSettings = [];
+    
+    async function init() {
+      const profile = await requireOwner();
+      if (!profile) return;
+      
+      document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      
+      await Promise.all([loadSchool(), loadLine()]);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function showTab(t) {
+      document.querySelectorAll('.tab-link').forEach(a => a.classList.remove('active'));
+      document.querySelectorAll('.setting-section').forEach(s => s.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`tab-${t}`).classList.add('active');
+    }
+    
+    async function loadSchool() {
+      const { data } = await supabaseClient.from('school_settings').select('*').limit(1).single();
+      school = data;
+      if (!school) return;
+      
+      document.getElementById('schoolName').value = school.school_name || '';
+      document.getElementById('schoolNameTh').value = school.school_name_th || '';
+      document.getElementById('schoolAddress').value = school.school_address || '';
+      document.getElementById('schoolPhone').value = school.school_phone || '';
+      document.getElementById('schoolEmail').value = school.school_email || '';
+      document.getElementById('schoolWebsite').value = school.school_website || '';
+      document.getElementById('schoolRegNum').value = school.registration_number || '';
+      document.getElementById('motto').value = school.motto || '';
+      document.getElementById('mottoTh').value = school.motto_th || '';
+      document.getElementById('principalName').value = school.principal_name || '';
+      document.getElementById('principalNameTh').value = school.principal_name_th || '';
+      document.getElementById('principalTitle').value = school.principal_title || '';
+      document.getElementById('principalTitleTh').value = school.principal_title_th || '';
+    }
+    
+    async function loadLine() {
+      const { data } = await supabaseClient.from('line_settings').select('*');
+      lineSettings = data || [];
+      
+      const container = document.getElementById('lineFeatures');
+      container.innerHTML = lineSettings.map(s => `
+        <div class="line-card">
+          <div class="line-card-header">
+            <h4>${getFeatureIcon(s.feature)} ${getFeatureName(s.feature)}</h4>
+            <label class="switch">
+              <input type="checkbox" ${s.enabled ? 'checked' : ''} onchange="toggleLine('${s.feature}', this.checked)" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="line-card-desc">${s.description || ''}</div>
+          <div class="line-template">${s.template || ''}</div>
+        </div>
+      `).join('');
+    }
+    
+    function getFeatureIcon(f) {
+      return { bill_due:'💰', payment_received:'✅', grade_published:'📊', attendance_alert:'⏰', event_reminder:'🎉' }[f] || '📌';
+    }
+    function getFeatureName(f) {
+      return { bill_due:'แจ้งเตือนบิลค้างชำระ', payment_received:'แจ้งเตือนรับชำระเงิน', grade_published:'แจ้งเตือนใบเกรดออก', attendance_alert:'แจ้งเตือนนักเรียนขาดเรียน', event_reminder:'แจ้งเตือนกิจกรรม' }[f] || f;
+    }
+    
+    async function toggleLine(feature, enabled) {
+      const { error } = await supabaseClient
+        .from('line_settings')
+        .update({ enabled, updated_at: new Date().toISOString() })
+        .eq('feature', feature);
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        await loadLine();
+        return;
+      }
+      dataHelpers.toast(`✅ ${enabled ? 'Enabled' : 'Disabled'}: ${getFeatureName(feature)}`, 'success');
+    }
+    
+    async function saveSchool(event) {
+      event.preventDefault();
+      const data = {
+        school_name: document.getElementById('schoolName').value,
+        school_name_th: document.getElementById('schoolNameTh').value,
+        school_address: document.getElementById('schoolAddress').value,
+        school_phone: document.getElementById('schoolPhone').value,
+        school_email: document.getElementById('schoolEmail').value,
+        school_website: document.getElementById('schoolWebsite').value,
+        registration_number: document.getElementById('schoolRegNum').value,
+        motto: document.getElementById('motto').value,
+        motto_th: document.getElementById('mottoTh').value,
+        principal_name: document.getElementById('principalName').value,
+        principal_name_th: document.getElementById('principalNameTh').value,
+        principal_title: document.getElementById('principalTitle').value,
+        principal_title_th: document.getElementById('principalTitleTh').value,
+        updated_at: new Date().toISOString()
+      };
+      
+      const { error } = await supabaseClient
+        .from('school_settings')
+        .update(data)
+        .eq('id', school.id);
+      
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast('✅ Settings saved!', 'success');
+      await loadSchool();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

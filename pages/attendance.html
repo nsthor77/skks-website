@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .att-grid{background:white;border-radius:12px;overflow-x:auto;border:1px solid #E5E7EB}
+    .att-table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
+    .att-table th{background:#F0FDF4;color:#1B5E3F;padding:12px 10px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;border-bottom:2px solid #1B5E3F;text-transform:uppercase;position:sticky;top:0}
+    .att-table td{padding:10px;border-bottom:1px solid #F3F4F6}
+    .att-table tr:hover{background:#F9FAFB}
+    .student-cell{display:flex;align-items:center;gap:10px}
+    .avatar{width:32px;height:32px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+    
+    .status-btns{display:flex;gap:6px;flex-wrap:wrap}
+    .status-btn{padding:6px 12px;border:1px solid #D1D5DB;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:0.5px;background:white;transition:all 0.15s}
+    .status-btn:hover{transform:translateY(-1px)}
+    .status-btn.active.present{background:#10B981;color:white;border-color:#10B981}
+    .status-btn.active.late{background:#F59E0B;color:white;border-color:#F59E0B}
+    .status-btn.active.absent{background:#EF4444;color:white;border-color:#EF4444}
+    .status-btn.active.excused{background:#5BB8E0;color:white;border-color:#5BB8E0}
+    
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+    .stat-attendance{background:white;border-radius:10px;padding:18px;border:1px solid #E5E7EB;text-align:center}
+    .stat-attendance .icon{font-size:28px;margin-bottom:6px}
+    .stat-attendance .num{font-size:28px;font-weight:800;color:#1B5E3F}
+    .stat-attendance .lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+    
+    .filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;background:white;padding:14px;border-radius:10px;border:1px solid #E5E7EB}
+    .filter-bar select, .filter-bar input{padding:8px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px}
+    
+    .quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .quick-btn{padding:8px 14px;background:#F0FDF4;color:#1B5E3F;border:1px solid #1B5E3F;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.15s}
+    .quick-btn:hover{background:#1B5E3F;color:white}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html">🏆 Certificates</a>
+        <a href="attendance.html" class="active">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📅 Attendance</h2>
+          <p>เช็คชื่อนักเรียน — บันทึกการขาด-ลา-มาสาย</p>
+        </div>
+        <button class="btn btn-primary" onclick="saveAttendance()">💾 Save All</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-attendance">
+          <div class="icon">👥</div>
+          <div class="num" id="cntTotal">0</div>
+          <div class="lbl">Total Students</div>
+        </div>
+        <div class="stat-attendance" style="background:#ECFDF5;">
+          <div class="icon">✅</div>
+          <div class="num" id="cntPresent" style="color:#10B981;">0</div>
+          <div class="lbl">Present</div>
+        </div>
+        <div class="stat-attendance" style="background:#FEF3C7;">
+          <div class="icon">⏰</div>
+          <div class="num" id="cntLate" style="color:#F59E0B;">0</div>
+          <div class="lbl">Late</div>
+        </div>
+        <div class="stat-attendance" style="background:#FEE2E2;">
+          <div class="icon">❌</div>
+          <div class="num" id="cntAbsent" style="color:#EF4444;">0</div>
+          <div class="lbl">Absent</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <input type="date" id="dateFilter" onchange="loadAttendance()" />
+        <select id="programFilter" onchange="renderRows()">
+          <option value="">All Programs</option>
+          <option value="prek">Pre-K</option>
+          <option value="k">K</option>
+          <option value="ep">EP</option>
+          <option value="mep">MEP</option>
+        </select>
+        <select id="gradeFilter" onchange="renderRows()">
+          <option value="">All Grades</option>
+        </select>
+        <input type="search" id="searchStudent" placeholder="🔍 ค้นหา..." oninput="renderRows()" style="flex:1;min-width:180px;" />
+      </div>
+
+      <div class="quick-actions">
+        <button class="quick-btn" onclick="markAll('present')">✅ Mark All Present</button>
+        <button class="quick-btn" onclick="markAll('absent')">❌ Mark All Absent</button>
+        <button class="quick-btn" onclick="markAll(null)">🔄 Reset</button>
+      </div>
+
+      <div class="att-grid">
+        <table class="att-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th style="width:240px;">Status</th>
+              <th style="width:120px;">Check-in</th>
+              <th style="width:140px;">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="attBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allStudents = [];
+    let currentAttendance = {};
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      document.getElementById('dateFilter').value = new Date().toISOString().split('T')[0];
+      
+      await loadStudents();
+      populateGradeFilter();
+      await loadAttendance();
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadStudents() {
+      const { data } = await supabaseClient
+        .from('students')
+        .select('id, first_name, last_name, nickname, program, grade, student_number')
+        .eq('status', 'active')
+        .order('first_name');
+      allStudents = data || [];
+    }
+    
+    function populateGradeFilter() {
+      const grades = [...new Set(allStudents.map(s => s.grade).filter(Boolean))].sort();
+      const sel = document.getElementById('gradeFilter');
+      sel.innerHTML = '<option value="">All Grades</option>' +
+        grades.map(g => `<option value="${g}">${g}</option>`).join('');
+    }
+    
+    async function loadAttendance() {
+      const date = document.getElementById('dateFilter').value;
+      const { data } = await supabaseClient
+        .from('attendance')
+        .select('*')
+        .eq('attendance_date', date);
+      
+      currentAttendance = {};
+      (data || []).forEach(a => {
+        currentAttendance[a.student_id] = a;
+      });
+      
+      renderRows();
+    }
+    
+    function renderRows() {
+      const program = document.getElementById('programFilter').value;
+      const grade = document.getElementById('gradeFilter').value;
+      const search = document.getElementById('searchStudent').value.toLowerCase().trim();
+      
+      let filtered = allStudents;
+      if (program) filtered = filtered.filter(s => s.program === program);
+      if (grade) filtered = filtered.filter(s => s.grade === grade);
+      if (search) filtered = filtered.filter(s => `${s.first_name} ${s.last_name} ${s.nickname||''}`.toLowerCase().includes(search));
+      
+      const tbody = document.getElementById('attBody');
+      tbody.innerHTML = filtered.map(s => {
+        const a = currentAttendance[s.id] || { status: null };
+        const initials = ((s.first_name||'?')[0] + (s.last_name||'')[0]).toUpperCase();
+        
+        return `<tr data-student="${s.id}">
+          <td>
+            <div class="student-cell">
+              <div class="avatar">${initials}</div>
+              <div>
+                <div style="font-weight:600;color:#1B5E3F;">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''}</div>
+                <div style="font-size:11px;color:#9CA3AF;">${(s.program||'').toUpperCase()} ${s.grade||''}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="status-btns">
+              <button class="status-btn ${a.status==='present'?'active present':''}" onclick="setStatus('${s.id}','present')">✅ Present</button>
+              <button class="status-btn ${a.status==='late'?'active late':''}" onclick="setStatus('${s.id}','late')">⏰ Late</button>
+              <button class="status-btn ${a.status==='absent'?'active absent':''}" onclick="setStatus('${s.id}','absent')">❌ Absent</button>
+              <button class="status-btn ${a.status==='excused'?'active excused':''}" onclick="setStatus('${s.id}','excused')">🏥 Excused</button>
+            </div>
+          </td>
+          <td>
+            <input type="time" value="${a.check_in_time || ''}" onchange="setField('${s.id}','check_in_time',this.value)" style="padding:6px 8px;border:1px solid #D1D5DB;border-radius:6px;font-size:12px;" />
+          </td>
+          <td>
+            <input type="text" value="${a.notes || ''}" placeholder="หมายเหตุ" onchange="setField('${s.id}','notes',this.value)" style="padding:6px 8px;border:1px solid #D1D5DB;border-radius:6px;font-size:12px;width:100%;" />
+          </td>
+        </tr>`;
+      }).join('');
+      
+      updateStats();
+    }
+    
+    function updateStats() {
+      const stats = { present:0, late:0, absent:0, excused:0 };
+      Object.values(currentAttendance).forEach(a => { if (stats[a.status] !== undefined) stats[a.status]++; });
+      
+      document.getElementById('cntTotal').textContent = allStudents.length;
+      document.getElementById('cntPresent').textContent = stats.present;
+      document.getElementById('cntLate').textContent = stats.late;
+      document.getElementById('cntAbsent').textContent = stats.absent;
+    }
+    
+    function setStatus(studentId, status) {
+      if (!currentAttendance[studentId]) currentAttendance[studentId] = { student_id: studentId };
+      currentAttendance[studentId].status = status;
+      if (status === 'present' || status === 'late') {
+        if (!currentAttendance[studentId].check_in_time) {
+          currentAttendance[studentId].check_in_time = new Date().toTimeString().substring(0,5);
+        }
+      }
+      renderRows();
+    }
+    
+    function setField(studentId, field, value) {
+      if (!currentAttendance[studentId]) currentAttendance[studentId] = { student_id: studentId };
+      currentAttendance[studentId][field] = value || null;
+    }
+    
+    function markAll(status) {
+      const program = document.getElementById('programFilter').value;
+      const grade = document.getElementById('gradeFilter').value;
+      let filtered = allStudents;
+      if (program) filtered = filtered.filter(s => s.program === program);
+      if (grade) filtered = filtered.filter(s => s.grade === grade);
+      
+      filtered.forEach(s => {
+        if (status) setStatus(s.id, status);
+        else delete currentAttendance[s.id];
+      });
+      renderRows();
+    }
+    
+    async function saveAttendance() {
+      const date = document.getElementById('dateFilter').value;
+      const user = await supabaseClient.auth.getUser();
+      
+      const records = Object.values(currentAttendance).filter(a => a.status).map(a => ({
+        student_id: a.student_id,
+        attendance_date: date,
+        status: a.status,
+        check_in_time: a.check_in_time || null,
+        notes: a.notes || null,
+        recorded_by: user.data.user.id
+      }));
+      
+      if (records.length === 0) {
+        dataHelpers.toast('No attendance to save', 'info');
+        return;
+      }
+      
+      const { error } = await supabaseClient
+        .from('attendance')
+        .upsert(records, { onConflict: 'student_id,attendance_date' });
+      
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast(`✅ Saved ${records.length} records!`, 'success');
+      await loadAttendance();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

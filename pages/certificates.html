@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Certificates — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700;900&family=Sarabun:wght@300;400;500;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    @media print{.admin-topbar,.page-header,.action-bar{display:none!important}}
+    
+    .cert-page{background:#F9FAFB;padding:40px 20px;border-radius:12px;display:flex;justify-content:center;min-height:600px}
+    
+    .certificate{width:800px;height:600px;background:white;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.15);font-family:'Cinzel','Playfair Display',serif}
+    
+    .cert-classic{background:linear-gradient(135deg,#FFFEF0 0%,#FFF8E0 100%)}
+    .cert-classic::before{content:'';position:absolute;inset:20px;border:3px solid #C4A661;border-radius:8px}
+    .cert-classic::after{content:'';position:absolute;inset:28px;border:1px solid #C4A661;border-radius:4px}
+    
+    .cert-modern{background:white}
+    .cert-modern::before{content:'';position:absolute;top:0;left:0;right:0;height:120px;background:linear-gradient(135deg,#1B5E3F 0%,#5BB8E0 100%)}
+    .cert-modern::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(135deg,#1B5E3F 0%,#0F2A3F 100%)}
+    
+    .cert-elegant{background:#FAFBFD}
+    .cert-elegant::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(27,94,63,0.03) 0%,rgba(91,184,224,0.03) 100%)}
+    
+    .cert-royal{background:linear-gradient(135deg,#0F2A3F 0%,#1B5E3F 100%);color:white}
+    .cert-royal::before{content:'';position:absolute;inset:30px;border:2px solid #C4A661;border-radius:8px}
+    
+    .cert-honor{background:linear-gradient(135deg,#FFF8E0 0%,#FFE9B3 100%)}
+    .cert-honor::before{content:'';position:absolute;inset:30px;border:4px double #B58A1B;border-radius:8px}
+    
+    .cert-content{position:relative;z-index:2;padding:60px 80px;text-align:center;height:100%;display:flex;flex-direction:column;justify-content:center}
+    
+    .cert-logo{font-size:64px;margin-bottom:14px}
+    
+    .cert-title{font-size:42px;font-weight:900;color:#1B5E3F;letter-spacing:8px;text-transform:uppercase;margin-bottom:6px}
+    .cert-royal .cert-title, .cert-modern .cert-title{color:#C4A661}
+    
+    .cert-subtitle{font-size:14px;color:#6B7280;letter-spacing:4px;text-transform:uppercase;margin-bottom:28px}
+    .cert-royal .cert-subtitle{color:#E5E7EB}
+    
+    .cert-presented{font-size:13px;color:#6B7280;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;font-family:'Sarabun',sans-serif}
+    .cert-royal .cert-presented{color:#E5E7EB}
+    
+    .cert-name{font-size:38px;font-weight:700;color:#1B5E3F;font-family:'Cinzel',serif;margin-bottom:20px;border-bottom:2px solid #C4A661;padding-bottom:8px;display:inline-block}
+    .cert-royal .cert-name{color:#C4A661;border-bottom-color:#C4A661}
+    
+    .cert-body{font-size:14px;line-height:1.8;color:#374151;margin-bottom:14px;max-width:580px;margin-left:auto;margin-right:auto;font-family:'Sarabun',sans-serif}
+    .cert-royal .cert-body{color:#E5E7EB}
+    
+    .cert-achievement{font-size:18px;font-weight:700;color:#C4A661;margin-bottom:8px;font-family:'Sarabun',sans-serif}
+    
+    .cert-date{font-size:12px;color:#6B7280;margin-top:20px;font-family:'Sarabun',sans-serif}
+    .cert-royal .cert-date{color:#E5E7EB}
+    
+    .cert-signatures{display:flex;justify-content:space-around;align-items:flex-end;margin-top:30px}
+    .cert-sig{text-align:center;min-width:180px}
+    .cert-sig .line{border-bottom:1px solid #1B5E3F;width:160px;margin-bottom:6px;height:30px}
+    .cert-royal .cert-sig .line{border-color:#C4A661}
+    .cert-sig .name{font-weight:700;font-size:12px;color:#1B5E3F;font-family:'Sarabun',sans-serif}
+    .cert-royal .cert-sig .name{color:#C4A661}
+    .cert-sig .title{font-size:11px;color:#6B7280;margin-top:2px;font-family:'Sarabun',sans-serif}
+    .cert-royal .cert-sig .title{color:#E5E7EB}
+    
+    .cert-qr{position:absolute;bottom:25px;right:25px;background:white;padding:6px;border-radius:6px;z-index:3}
+    .cert-qr canvas{display:block;border-radius:3px}
+    .cert-qr .code{font-size:8px;color:#6B7280;margin-top:2px;font-family:monospace;text-align:center;font-weight:600;font-family:'Sarabun',sans-serif}
+    
+    .cert-seal{position:absolute;bottom:50px;left:50px;width:90px;height:90px;background:radial-gradient(circle,#C4A661 0%,#9B7E1F 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:28px;border:3px solid #9B7E1F;z-index:3}
+    
+    .action-bar{position:sticky;top:64px;background:white;padding:14px;border-radius:10px;border:1px solid #E5E7EB;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;z-index:10}
+    .action-bar select, .action-bar input{padding:8px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px}
+    
+    .template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+    .template-card{background:white;border:2px solid #E5E7EB;border-radius:10px;padding:14px;cursor:pointer;transition:all 0.15s;text-align:center}
+    .template-card:hover{border-color:#1B5E3F;transform:translateY(-2px)}
+    .template-card.active{border-color:#1B5E3F;background:#F0FDF4}
+    .template-card h4{margin:8px 0 4px;color:#1B5E3F;font-size:14px}
+    .template-card p{margin:0;font-size:11px;color:#6B7280}
+    .template-icon{font-size:36px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html" class="active">🏆 Certificates</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>🏆 Certificates</h2>
+          <p>ออกใบประกาศนียบัตร 5 templates — Award, Honor, Graduation, Achievement, Participation</p>
+        </div>
+      </div>
+
+      <h3 style="color:#1B5E3F;margin:0 0 12px;">เลือก Template</h3>
+      <div class="template-grid">
+        <div class="template-card active" data-template="classic" onclick="selectTemplate('classic')">
+          <div class="template-icon">📜</div>
+          <h4>Classic Gold</h4>
+          <p>คลาสสิก สง่างาม</p>
+        </div>
+        <div class="template-card" data-template="modern" onclick="selectTemplate('modern')">
+          <div class="template-icon">✨</div>
+          <h4>Modern Blue</h4>
+          <p>โมเดิร์น สดใส</p>
+        </div>
+        <div class="template-card" data-template="elegant" onclick="selectTemplate('elegant')">
+          <div class="template-icon">🌟</div>
+          <h4>Elegant Pastel</h4>
+          <p>เรียบหรู</p>
+        </div>
+        <div class="template-card" data-template="royal" onclick="selectTemplate('royal')">
+          <div class="template-icon">👑</div>
+          <h4>Royal Dark</h4>
+          <p>หรูหรา</p>
+        </div>
+        <div class="template-card" data-template="honor" onclick="selectTemplate('honor')">
+          <div class="template-icon">🥇</div>
+          <h4>Honor Gold</h4>
+          <p>เกียรตินิยม</p>
+        </div>
+      </div>
+      
+      <div class="action-bar">
+        <select id="selectStudent">
+          <option value="">Select Student...</option>
+        </select>
+        <select id="certType">
+          <option value="achievement">Achievement</option>
+          <option value="honor">Honor Roll</option>
+          <option value="graduation">Graduation</option>
+          <option value="participation">Participation</option>
+          <option value="completion">Course Completion</option>
+        </select>
+        <input type="text" id="certTitle" placeholder="Title (e.g., Outstanding Student)" style="flex:1;min-width:180px;" />
+        <button class="btn btn-primary" onclick="generateCert()">🔄 Generate</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+        <button class="btn" style="background:#5BB8E0;color:white;" onclick="downloadPDF()">📥 PDF</button>
+        <button class="btn" style="background:#10B981;color:white;" onclick="saveCert()">💾 Save</button>
+      </div>
+
+      <div class="cert-page" id="certPage">
+        <div style="text-align:center;padding:60px 20px;color:#6B7280;">
+          <div style="font-size:64px;">🏆</div>
+          <h3 style="color:#1B5E3F;">เลือก Template และ Student แล้วคลิก Generate</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allStudents = [];
+    let schoolSettings = null;
+    let currentTemplate = 'classic';
+    let currentStudent = null;
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await Promise.all([loadStudents(), loadSchool()]);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadStudents() {
+      const { data } = await supabaseClient
+        .from('students')
+        .select('*')
+        .order('first_name');
+      allStudents = data || [];
+      
+      const sel = document.getElementById('selectStudent');
+      sel.innerHTML = '<option value="">Select Student...</option>' +
+        allStudents.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} - ${(s.program||'').toUpperCase()} ${s.grade||''}</option>`).join('');
+    }
+    
+    async function loadSchool() {
+      const { data } = await supabaseClient
+        .from('school_settings')
+        .select('*')
+        .limit(1)
+        .single();
+      schoolSettings = data || {};
+    }
+    
+    function selectTemplate(t) {
+      currentTemplate = t;
+      document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+      document.querySelector(`[data-template="${t}"]`).classList.add('active');
+      if (currentStudent) generateCert();
+    }
+    
+    function generateCert() {
+      const studentId = document.getElementById('selectStudent').value;
+      const type = document.getElementById('certType').value;
+      const customTitle = document.getElementById('certTitle').value;
+      
+      if (!studentId) {
+        dataHelpers.toast('Select a student', 'error');
+        return;
+      }
+      
+      currentStudent = allStudents.find(s => s.id === studentId);
+      
+      const titles = {
+        achievement: { en: 'Certificate of Achievement', th: 'ใบประกาศนียบัตรเกียรติคุณ' },
+        honor: { en: 'Honor Roll Certificate', th: 'ใบประกาศเกียรตินิยม' },
+        graduation: { en: 'Certificate of Graduation', th: 'ใบประกาศนียบัตรการสำเร็จการศึกษา' },
+        participation: { en: 'Certificate of Participation', th: 'ใบประกาศการเข้าร่วม' },
+        completion: { en: 'Certificate of Completion', th: 'ใบประกาศการสำเร็จหลักสูตร' }
+      };
+      
+      const today = new Date();
+      const verifyCode = `CERT-${currentStudent.id.substring(0,8)}-${Date.now().toString(36)}`;
+      
+      const page = document.getElementById('certPage');
+      page.innerHTML = `
+        <div class="certificate cert-${currentTemplate}" id="certElement">
+          <div class="cert-content">
+            <div class="cert-logo">🌲</div>
+            <div class="cert-title">Certificate</div>
+            <div class="cert-subtitle">${titles[type].en}</div>
+            <div class="cert-presented">This certificate is proudly presented to</div>
+            <div class="cert-name">${currentStudent.first_name} ${currentStudent.last_name}</div>
+            ${customTitle ? `<div class="cert-achievement">"${customTitle}"</div>` : ''}
+            <div class="cert-body">
+              ${titles[type].th}<br>
+              ${currentStudent.first_name} ${currentStudent.last_name} of ${(currentStudent.program||'').toUpperCase()} ${currentStudent.grade||''}<br>
+              has successfully demonstrated outstanding achievement and dedication<br>
+              at ${schoolSettings.school_name || 'Suanson Khon Kaen School'}
+            </div>
+            <div class="cert-date">Issued on ${today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            
+            <div class="cert-signatures">
+              <div class="cert-sig">
+                <div class="line"></div>
+                <div class="name">${schoolSettings.principal_name_th || 'คุณนิติธาดา สุวรรณรงค์'}</div>
+                <div class="title">${schoolSettings.principal_title_th || 'ผู้อำนวยการ'}</div>
+              </div>
+              <div class="cert-sig">
+                <div class="line"></div>
+                <div class="name">Class Teacher</div>
+                <div class="title">ครูประจำชั้น</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cert-seal">🏆</div>
+          
+          <div class="cert-qr">
+            <canvas id="certQR"></canvas>
+            <div class="code">${verifyCode.substring(0,12)}</div>
+          </div>
+        </div>
+      `;
+      
+      QRCode.toCanvas(document.getElementById('certQR'), 
+        `https://suansonkk.com/verify?type=cert&code=${verifyCode}`, 
+        { width: 70, margin: 1 });
+      
+      window._lastVerifyCode = verifyCode;
+    }
+    
+    function downloadPDF() {
+      const el = document.getElementById('certElement');
+      if (!el) {
+        dataHelpers.toast('Generate certificate first', 'error');
+        return;
+      }
+      
+      html2pdf().from(el).set({
+        margin: 0,
+        filename: `Certificate-${currentStudent.first_name}-${currentStudent.last_name}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'px', format: [800, 600], orientation: 'landscape' }
+      }).save();
+    }
+    
+    async function saveCert() {
+      if (!currentStudent || !window._lastVerifyCode) {
+        dataHelpers.toast('Generate first', 'error');
+        return;
+      }
+      
+      const type = document.getElementById('certType').value;
+      const title = document.getElementById('certTitle').value || `${type} Certificate`;
+      
+      const yr = new Date().getFullYear();
+      const { count } = await supabaseClient.from('certificates').select('*', { count: 'exact', head: true });
+      const certNum = `CERT-${yr}-${String((count||0)+1).padStart(5,'0')}`;
+      
+      const { error } = await supabaseClient.from('certificates').insert({
+        certificate_number: certNum,
+        student_id: currentStudent.id,
+        certificate_type: type,
+        title: title,
+        template: currentTemplate,
+        qr_verification_code: window._lastVerifyCode,
+        status: 'issued'
+      });
+      
+      if (error) {
+        dataHelpers.toast('❌ ' + error.message, 'error');
+        return;
+      }
+      
+      dataHelpers.toast('✅ Certificate saved: ' + certNum, 'success');
+    }
+    
+    init();
+  </script>
+</body>
+</html>

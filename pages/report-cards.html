@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Cards — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    @media print{.admin-topbar,.page-header,.action-bar{display:none!important}.report-card{box-shadow:none!important;page-break-after:always}}
+    .report-card{background:white;border:2px solid #1B5E3F;border-radius:14px;padding:30px;margin-bottom:20px;font-family:'Sarabun',sans-serif;position:relative;max-width:800px;margin:0 auto 20px}
+    .rc-header{display:flex;align-items:center;gap:18px;border-bottom:3px solid #1B5E3F;padding-bottom:18px;margin-bottom:20px}
+    .rc-logo{width:80px;height:80px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px}
+    .rc-school h2{color:#1B5E3F;margin:0;font-size:22px;font-weight:800}
+    .rc-school p{margin:4px 0 0;color:#6B7280;font-size:13px;line-height:1.4}
+    .rc-title{text-align:center;background:#F0FDF4;color:#1B5E3F;padding:10px;border-radius:8px;margin-bottom:18px;font-weight:700;font-size:15px;letter-spacing:1px}
+    .rc-info{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;font-size:13px}
+    .rc-info-row{display:flex;border-bottom:1px solid #E5E7EB;padding:8px 0}
+    .rc-info-row .label{color:#6B7280;width:120px;font-weight:600}
+    .rc-info-row .value{color:#1B5E3F;font-weight:700;flex:1}
+    .rc-grades{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px}
+    .rc-grades th{background:#1B5E3F;color:white;padding:10px 8px;text-align:left;font-size:11px;letter-spacing:1px}
+    .rc-grades th:not(:first-child){text-align:center}
+    .rc-grades td{padding:8px;border-bottom:1px solid #E5E7EB}
+    .rc-grades td:not(:first-child){text-align:center}
+    .rc-grades tr:nth-child(even){background:#F9FAFB}
+    .rc-grades .total-row{background:#F0FDF4;font-weight:800;color:#1B5E3F}
+    .rc-grade-A{color:#15803D;font-weight:800}
+    .rc-grade-B{color:#1E40AF;font-weight:800}
+    .rc-grade-C{color:#A16207;font-weight:800}
+    .rc-grade-D{color:#C2410C;font-weight:800}
+    .rc-grade-F{color:#991B1B;font-weight:800}
+    .rc-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+    .rc-stat{background:#F0FDF4;padding:12px;border-radius:8px;text-align:center;border:1px solid #1B5E3F}
+    .rc-stat .label{font-size:10px;color:#1B5E3F;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .rc-stat .value{font-size:22px;font-weight:800;color:#1B5E3F;margin-top:4px}
+    .rc-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;padding-top:18px;border-top:2px solid #E5E7EB}
+    .rc-signature{text-align:center}
+    .rc-signature .line{border-bottom:1px solid #1B5E3F;width:200px;margin:30px auto 6px}
+    .rc-signature .name{font-weight:700;color:#1B5E3F;font-size:13px}
+    .rc-signature .title{color:#6B7280;font-size:11px;margin-top:2px}
+    .rc-qr{text-align:center}
+    .rc-qr canvas{border-radius:4px}
+    .rc-qr .verify{font-size:9px;color:#6B7280;margin-top:4px}
+    .rc-remarks{background:#FEF3C7;padding:12px;border-radius:8px;font-size:12px;color:#92400E;margin-bottom:16px}
+    
+    .action-bar{position:sticky;top:64px;background:white;padding:14px;border-radius:10px;border:1px solid #E5E7EB;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;z-index:10}
+    .action-bar select{padding:8px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="report-cards.html" class="active">📄 Reports</a>
+        <a href="certificates.html">🏆 Certificates</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📄 Report Cards</h2>
+          <p>ใบเกรดนักเรียน — Print, Download PDF, ส่งให้ผู้ปกครอง</p>
+        </div>
+      </div>
+      
+      <div class="action-bar">
+        <select id="selectStudent">
+          <option value="">Select Student...</option>
+        </select>
+        <select id="selectTerm">
+          <option value="1/2026">Term 1 / 2026</option>
+          <option value="2/2026">Term 2 / 2026</option>
+        </select>
+        <button class="btn btn-primary" onclick="generateReport()">🔄 Generate</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+        <button class="btn" style="background:#5BB8E0;color:white;" onclick="downloadPDF()">📥 Download PDF</button>
+      </div>
+
+      <div id="reportContainer">
+        <div style="text-align:center;padding:60px 20px;color:#6B7280;">
+          <div style="font-size:64px;">📄</div>
+          <h3 style="color:#1B5E3F;">เลือกนักเรียนเพื่อดูใบเกรด</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allStudents = [];
+    let allSubjects = [];
+    let schoolSettings = null;
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await Promise.all([loadStudents(), loadSubjects(), loadSchool()]);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadStudents() {
+      const { data } = await supabaseClient
+        .from('students')
+        .select('*')
+        .eq('status', 'active')
+        .order('first_name');
+      allStudents = data || [];
+      
+      const sel = document.getElementById('selectStudent');
+      sel.innerHTML = '<option value="">Select Student...</option>' +
+        allStudents.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''} - ${(s.program||'').toUpperCase()} ${s.grade||''}</option>`).join('');
+    }
+    
+    async function loadSubjects() {
+      const { data } = await supabaseClient
+        .from('subjects')
+        .select('*')
+        .eq('active', true)
+        .order('display_order');
+      allSubjects = data || [];
+    }
+    
+    async function loadSchool() {
+      const { data } = await supabaseClient
+        .from('school_settings')
+        .select('*')
+        .limit(1)
+        .single();
+      schoolSettings = data;
+    }
+    
+    async function generateReport() {
+      const studentId = document.getElementById('selectStudent').value;
+      const term = document.getElementById('selectTerm').value;
+      
+      if (!studentId) {
+        dataHelpers.toast('Select a student', 'error');
+        return;
+      }
+      
+      const student = allStudents.find(s => s.id === studentId);
+      const [termNum, year] = term.split('/');
+      
+      const { data: grades } = await supabaseClient
+        .from('student_grades')
+        .select('*, subjects(name, name_th, code, credits)')
+        .eq('student_id', studentId)
+        .eq('term', termNum)
+        .eq('academic_year', year);
+      
+      const { count: totalDays } = await supabaseClient
+        .from('attendance')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', studentId);
+      
+      const { count: presentDays } = await supabaseClient
+        .from('attendance')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', studentId)
+        .eq('status', 'present');
+      
+      const attendanceRate = totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(1) : null;
+      
+      renderReport(student, grades || [], term, attendanceRate);
+    }
+    
+    function renderReport(student, grades, term, attendanceRate) {
+      const container = document.getElementById('reportContainer');
+      const totalCredits = grades.reduce((sum, g) => sum + (g.subjects?.credits || 0), 0);
+      const totalGPA = grades.length > 0 ? (grades.reduce((sum, g) => sum + ((g.gpa || 0) * (g.subjects?.credits || 1)), 0) / totalCredits).toFixed(2) : '-';
+      const reportNum = `RC-${new Date().getFullYear()}-${student.student_number?.replace(/\D/g, '') || '0000'}`;
+      const verifyCode = `${student.id.substring(0,8)}-${term.replace('/','')}`;
+      
+      const school = schoolSettings || {};
+      
+      container.innerHTML = `
+        <div class="report-card" id="reportCard">
+          <div class="rc-header">
+            <div class="rc-logo">🌲</div>
+            <div class="rc-school" style="flex:1;">
+              <h2>${school.school_name_th || 'โรงเรียนสวนสนขอนแก่น'}</h2>
+              <h2 style="font-size:14px; color:#5BB8E0; margin-top:2px;">${school.school_name || 'Suanson Khon Kaen School'}</h2>
+              <p>${school.school_address || 'Khon Kaen, Thailand'}</p>
+              <p>📞 ${school.school_phone || ''} | 📧 ${school.school_email || ''}</p>
+            </div>
+            <div style="text-align:right;font-size:11px;color:#6B7280;">
+              <div>Report No.</div>
+              <div style="font-family:monospace;color:#1B5E3F;font-weight:800;font-size:14px;">${reportNum}</div>
+            </div>
+          </div>
+          
+          <div class="rc-title">ใบรายงานผลการเรียน / STUDENT REPORT CARD<br>
+            <span style="font-size:12px; font-weight:500;">ภาคเรียนที่ ${term} • Academic Term ${term}</span>
+          </div>
+          
+          <div class="rc-info">
+            <div>
+              <div class="rc-info-row"><span class="label">Student ID:</span><span class="value">${student.student_number || '-'}</span></div>
+              <div class="rc-info-row"><span class="label">Name:</span><span class="value">${student.first_name} ${student.last_name}</span></div>
+              <div class="rc-info-row"><span class="label">ชื่อ-นามสกุล:</span><span class="value">${student.first_name_th || student.first_name} ${student.last_name_th || student.last_name}</span></div>
+              <div class="rc-info-row"><span class="label">Nickname:</span><span class="value">${student.nickname || '-'}</span></div>
+            </div>
+            <div>
+              <div class="rc-info-row"><span class="label">Program:</span><span class="value">${(student.program || '').toUpperCase()}</span></div>
+              <div class="rc-info-row"><span class="label">Grade:</span><span class="value">${student.grade || '-'}</span></div>
+              <div class="rc-info-row"><span class="label">Class:</span><span class="value">${student.class_room || '-'}</span></div>
+              <div class="rc-info-row"><span class="label">DOB:</span><span class="value">${student.birth_date ? new Date(student.birth_date).toLocaleDateString('th-TH') : '-'}</span></div>
+            </div>
+          </div>
+          
+          <h3 style="color:#1B5E3F; margin:0 0 10px;">📊 Academic Performance</h3>
+          
+          <table class="rc-grades">
+            <thead>
+              <tr>
+                <th>Subject / วิชา</th>
+                <th>Credits</th>
+                <th>Assignments<br><small>(30%)</small></th>
+                <th>Midterm<br><small>(30%)</small></th>
+                <th>Final<br><small>(40%)</small></th>
+                <th>Total</th>
+                <th>Grade</th>
+                <th>GPA</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${grades.length === 0 ? '<tr><td colspan="8" style="text-align:center;padding:30px;color:#9CA3AF;">No grades recorded for this term</td></tr>' :
+                grades.map(g => `<tr>
+                  <td><strong>${g.subjects?.code || ''}</strong><br><span style="color:#6B7280;font-size:11px;">${g.subjects?.name || ''}<br>${g.subjects?.name_th || ''}</span></td>
+                  <td>${g.subjects?.credits || '-'}</td>
+                  <td>${g.assignment_score ? Number(g.assignment_score).toFixed(1) : '-'}</td>
+                  <td>${g.midterm_score ? Number(g.midterm_score).toFixed(1) : '-'}</td>
+                  <td>${g.final_score ? Number(g.final_score).toFixed(1) : '-'}</td>
+                  <td><strong>${g.total_score ? Number(g.total_score).toFixed(1) : '-'}</strong></td>
+                  <td><span class="rc-grade-${g.letter_grade ? g.letter_grade[0] : ''}">${g.letter_grade || '-'}</span></td>
+                  <td>${g.gpa ? Number(g.gpa).toFixed(2) : '-'}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+          
+          <div class="rc-summary">
+            <div class="rc-stat">
+              <div class="label">Subjects</div>
+              <div class="value">${grades.length}</div>
+            </div>
+            <div class="rc-stat">
+              <div class="label">Credits</div>
+              <div class="value">${totalCredits.toFixed(1)}</div>
+            </div>
+            <div class="rc-stat" style="background:#1B5E3F;color:white;border:none;">
+              <div class="label" style="color:white;">Term GPA</div>
+              <div class="value" style="color:white;">${totalGPA}</div>
+            </div>
+            <div class="rc-stat">
+              <div class="label">Attendance</div>
+              <div class="value">${attendanceRate ? attendanceRate + '%' : '-'}</div>
+            </div>
+          </div>
+          
+          <div class="rc-remarks">
+            <strong>📝 Teacher's Remarks:</strong> นักเรียนมีพัฒนาการที่ดีในทุกวิชา ขอให้รักษามาตรฐานนี้ต่อไป
+          </div>
+          
+          <div class="rc-footer">
+            <div class="rc-signature">
+              <div class="line"></div>
+              <div class="name">${school.principal_name_th || 'คุณนิติธาดา สุวรรณรงค์'}</div>
+              <div class="title">${school.principal_title_th || 'ผู้อำนวยการ'} / ${school.principal_title || 'Principal'}</div>
+            </div>
+            <div class="rc-qr">
+              <canvas id="qrCanvas"></canvas>
+              <div class="verify">ตรวจสอบ: ${verifyCode}</div>
+            </div>
+            <div class="rc-signature">
+              <div class="line"></div>
+              <div class="name">Parent / ผู้ปกครอง</div>
+              <div class="title">วันที่: _____________</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      QRCode.toCanvas(document.getElementById('qrCanvas'), 
+        `https://suansonkk.com/verify?type=report&code=${verifyCode}`, 
+        { width: 80, margin: 1 });
+    }
+    
+    function downloadPDF() {
+      const el = document.getElementById('reportCard');
+      if (!el) {
+        dataHelpers.toast('Generate report first', 'error');
+        return;
+      }
+      
+      const studentId = document.getElementById('selectStudent').value;
+      const student = allStudents.find(s => s.id === studentId);
+      const term = document.getElementById('selectTerm').value.replace('/', '-');
+      
+      html2pdf().from(el).set({
+        margin: 10,
+        filename: `ReportCard-${student.first_name}-${term}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).save();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

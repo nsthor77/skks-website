@@ -1,599 +1,293 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SKKS — Suanson Khon Kaen School</title>
-  <meta name="description" content="Suanson Khon Kaen School (SKKS) — Cambridge-certified EP/MEP education from Pre-K to Grade 9 in Khon Kaen." />
-  <meta property="og:title" content="SKKS — Suanson Khon Kaen School" />
-  <meta property="og:description" content="Nurturing young minds — Cambridge-certified bilingual education" />
-  <meta property="og:image" content="images/hero-bg.png" />
-  <meta property="og:url" content="https://suansonkk.com" />
+  <meta name="description" content="A Cambridge-certified bilingual education from Pre-Kindergarten to Grade 9. Where curiosity becomes mastery." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/premium.css" />
   <link rel="icon" type="image/png" href="images/logo.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0A2F1F" />
+  <style>
+    .hero-premium{position:relative;padding:120px 0 100px;background:#FAFAF7;overflow:hidden;border-bottom:0.5px solid var(--border)}
+    .hero-content{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 32px;text-align:center}
+    .hero-premium h1{font-size:clamp(48px,8vw,92px);line-height:0.98;letter-spacing:-0.04em;font-weight:800;color:var(--forest-900);margin-bottom:32px}
+    .hero-premium h1 .accent{color:var(--gold-700);font-style:italic;font-weight:700}
+    .hero-premium .lead{font-size:clamp(17px,1.6vw,21px);max-width:600px;margin:0 auto;color:var(--text-2);line-height:1.55}
+    .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+    
+    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:1040px;margin:80px auto 0;padding:0 32px}
+    .stats-bar .stat{text-align:center;padding:0 16px;border-right:0.5px solid var(--border)}
+    .stats-bar .stat:last-child{border-right:none}
+    .stats-bar .stat-value{font-size:48px;font-weight:800;color:var(--forest-900);letter-spacing:-0.035em;line-height:1;margin-bottom:10px}
+    .stats-bar .stat-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:1.5px}
+    @media(max-width:640px){.stats-bar{grid-template-columns:repeat(2,1fr);gap:32px 0}.stats-bar .stat{border:none}}
+    
+    .section-quiet{padding:120px 0;background:white}
+    .section-soft{padding:120px 0;background:var(--bg)}
+    
+    .section-head{text-align:center;max-width:760px;margin:0 auto 72px}
+    .section-head h2{font-size:clamp(32px,4vw,52px);letter-spacing:-0.03em;font-weight:700;color:var(--forest-900);line-height:1.1;margin-top:16px}
+    .section-head .lead{margin:24px auto 0;font-size:17px;line-height:1.6}
+    
+    .programs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:var(--r-2xl);overflow:hidden;border:0.5px solid var(--border)}
+    @media(max-width:900px){.programs-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:520px){.programs-grid{grid-template-columns:1fr}}
+    .program-card{background:white;padding:40px 32px;transition:background var(--fast);position:relative}
+    .program-card:hover{background:var(--bg)}
+    .program-card .pgm-num{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--gold-700);text-transform:uppercase;margin-bottom:20px;font-family:'Inter',monospace}
+    .program-card h3{font-size:26px;margin-bottom:8px;letter-spacing:-0.02em;color:var(--forest-900);font-weight:700;line-height:1.15}
+    .program-card .age{font-size:13px;color:var(--text-3);font-weight:500;margin-bottom:24px}
+    .program-card p{font-size:14px;line-height:1.65;color:var(--text-2);min-height:88px}
+    .program-card .price{font-size:22px;font-weight:700;color:var(--forest-900);margin-top:28px;padding-top:24px;border-top:0.5px solid var(--border);letter-spacing:-0.02em}
+    .program-card .price .period{font-size:12px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-left:4px}
+    .program-card.flagship{background:var(--forest-900);color:white}
+    .program-card.flagship h3{color:white}
+    .program-card.flagship p{color:rgba(255,255,255,0.75)}
+    .program-card.flagship .age{color:var(--gold-500)}
+    .program-card.flagship .pgm-num{color:var(--gold-500)}
+    .program-card.flagship .price{color:white;border-top-color:rgba(255,255,255,0.15)}
+    .program-card.flagship .price .period{color:rgba(255,255,255,0.6)}
+    
+    .pillars-list{max-width:920px;margin:0 auto}
+    .pillar-row{display:grid;grid-template-columns:80px 240px 1fr;gap:48px;padding:40px 0;border-bottom:0.5px solid var(--border);align-items:start}
+    .pillar-row:last-child{border-bottom:none}
+    @media(max-width:768px){.pillar-row{grid-template-columns:1fr;gap:12px}}
+    .pillar-num{font-size:42px;font-weight:700;color:var(--gold-700);letter-spacing:-0.03em;font-family:'Inter',serif;line-height:1}
+    .pillar-title{font-size:22px;font-weight:700;color:var(--forest-900);letter-spacing:-0.02em;line-height:1.2}
+    .pillar-desc{font-size:16px;color:var(--text-2);line-height:1.65}
+    
+    .cta-section{background:var(--forest-900);color:white;border-radius:0;padding:120px 32px;text-align:center;margin:0}
+    .cta-section h2{color:white;font-size:clamp(36px,5vw,64px);margin-bottom:24px;letter-spacing:-0.03em;font-weight:700;line-height:1.05}
+    .cta-section p{color:rgba(255,255,255,0.7);max-width:580px;margin:0 auto 40px;font-size:17px;line-height:1.6}
+    .cta-section .btn{padding:14px 32px;font-size:15px}
+    .cta-section .btn-primary{background:var(--gold-500);color:var(--forest-900)}
+    .cta-section .btn-primary:hover{background:white}
+    .cta-section .btn-ghost{color:white;border-color:rgba(255,255,255,0.25)}
+    .cta-section .btn-ghost:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.4)}
+    
+    .footer-premium{background:var(--forest-900);color:rgba(255,255,255,0.7);padding:80px 32px 32px;border-top:1px solid rgba(255,255,255,0.08)}
+    .footer-premium .container{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:64px;max-width:var(--max-w);margin:0 auto}
+    @media(max-width:768px){.footer-premium .container{grid-template-columns:1fr;gap:40px}}
+    .footer-premium h5{color:white;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+    .footer-premium ul{list-style:none;padding:0;margin:0}
+    .footer-premium li{margin-bottom:12px}
+    .footer-premium a{color:rgba(255,255,255,0.6);font-size:14px;transition:color var(--fast)}
+    .footer-premium a:hover{color:white}
+    .footer-brand{color:white;font-weight:800;font-size:22px;letter-spacing:-0.025em;margin-bottom:20px}
+    .footer-tagline{color:rgba(255,255,255,0.5);font-size:13px;line-height:1.7;max-width:320px}
+    .footer-bottom{max-width:var(--max-w);margin:64px auto 0;padding:32px 0 0;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:0.5px}
+    @media(max-width:640px){.footer-bottom{flex-direction:column;gap:16px;text-align:center}}
+    
+    .lang-switch{display:flex;gap:0;border:1px solid var(--border-2);border-radius:var(--r-md);overflow:hidden}
+    .lang-switch button{background:transparent;border:none;padding:6px 12px;font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;font-family:inherit;transition:all var(--fast)}
+    .lang-switch button.active{background:var(--forest-900);color:white}
+  </style>
 </head>
 <body>
-
-  <div class="top-bar">
-    <div class="container top-bar-content">
-      <div class="top-bar-left">
-        <span>📞 (+66) 043-XXX-XXXX</span>
-        <span class="hide-mobile">✉ info@suansonkk.com</span>
-      </div>
-      <div class="top-bar-right">
-        <a href="#news" class="hide-mobile" data-i18n="topbar.events">Events</a>
-        <a href="#news" class="hide-mobile" data-i18n="topbar.news">News</a>
-        <a href="voices.html" class="hide-mobile" data-i18n="topbar.faqs">FAQs</a>
-        <a href="#contact" class="hide-mobile" data-i18n="topbar.contact">Contact</a>
-        <a href="admissions.html" class="btn-register" data-i18n="topbar.register">Register Your Interest</a>
-        <span class="lang-switch">
-          <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a>
-          <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="logo">
+  <nav class="nav-premium">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
         <img src="images/logo.png" alt="SKKS" />
-        <div class="logo-text">
-          <strong>SKKS</strong>
-          <span>Suanson Khon Kaen School</span>
-        </div>
+        <span>SKKS</span>
       </a>
-      
-      <ul class="nav-menu" id="navMenu">
-        <li><a href="index.html" class="active" data-i18n="nav.home">Home</a></li>
-        <li class="has-dropdown">
-          <a href="about.html" data-i18n="nav.about">About Us ▾</a>
-          <ul class="dropdown">
-            <li><a href="about.html#vision" data-i18n="nav.about.vision">Vision & Mission</a></li>
-            <li><a href="about.html#journey" data-i18n="nav.about.journey">Our Journey</a></li>
-            <li><a href="about.html#team" data-i18n="nav.about.team">Our Team</a></li>
-            <li><a href="about.html#campus" data-i18n="nav.about.campus">Our Campus</a></li>
-          </ul>
-        </li>
-        <li class="has-dropdown">
-          <a href="#programs" data-i18n="nav.programs">Programs ▾</a>
-          <ul class="dropdown">
-            <li><a href="#programs">Pre-K</a></li>
-            <li><a href="#programs">Kindergarten</a></li>
-            <li><a href="#programs">English Program (EP)</a></li>
-            <li><a href="#programs">Mini English Program (MEP)</a></li>
-          </ul>
-        </li>
-        <li><a href="voices.html" data-i18n="nav.voices">Voices</a></li>
-        <li><a href="admissions.html" data-i18n="nav.admissions">Admissions</a></li>
-        <li><a href="admissions.html" class="btn-cta" data-i18n="nav.apply">Apply Now</a></li>
-      </ul>
-      
-      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menu">☰</button>
+      <div class="nav-links">
+        <a href="#programs">Programs</a>
+        <a href="about.html">About</a>
+        <a href="voices.html">Voices</a>
+        <a href="admissions.html">Admissions</a>
+      </div>
+      <div class="nav-cta">
+        <div class="lang-switch">
+          <button class="active" onclick="setLang('en', event)">EN</button>
+          <button onclick="setLang('th', event)">TH</button>
+        </div>
+        <a href="login.html" class="btn btn-ghost btn-sm">Sign in</a>
+        <a href="admissions.html" class="btn btn-primary btn-sm">Apply now</a>
+      </div>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
+  <section class="hero-premium">
     <div class="hero-content">
-      <div class="eyebrow" data-i18n="hero.eyebrow">Cambridge Certified Education</div>
-      <h1 data-i18n="hero.title">Nurturing Young Minds Toward<br>a World of Knowledge</h1>
-      <p data-i18n="hero.subtitle">Suanson Khon Kaen School — บ่มเพาะเยาวชนสู่โลกแห่งการเรียนรู้ ด้วยหลักสูตร EP/MEP รับรองโดย Cambridge</p>
-      <div class="hero-buttons">
-        <a href="admissions.html" class="btn btn-primary" data-i18n="hero.apply">Apply for Admission</a>
-        <a href="about.html" class="btn btn-outline" data-i18n="hero.learnmore">Discover More →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3 HERO CARDS -->
-  <div class="container">
-    <div class="hero-cards">
-      <a href="#programs" class="hero-card">
-        <div class="icon">🌱</div>
-        <h3 data-i18n="card.1.title">Early Years</h3>
-        <p data-i18n="card.1.sub">Building Strong Foundations</p>
-        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
-      </a>
-      <a href="#programs" class="hero-card">
-        <div class="icon">📚</div>
-        <h3 data-i18n="card.2.title">Primary School</h3>
-        <p data-i18n="card.2.sub">Preparing For The Future</p>
-        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
-      </a>
-      <a href="#programs" class="hero-card">
-        <div class="icon">🎓</div>
-        <h3 data-i18n="card.3.title">EP / MEP Programs</h3>
-        <p data-i18n="card.3.sub">Shaping Global Learners</p>
-        <div class="view-more" data-i18n="card.viewmore">VIEW MORE</div>
-      </a>
-    </div>
-  </div>
-
-  <!-- LATEST NEWS -->
-  <section class="news-section" id="news">
-    <div class="container">
-      <div class="section-header">
-        <div class="eyebrow" data-i18n="news.eyebrow">News & Updates</div>
-        <div class="section-divider"></div>
-        <h2 data-i18n="news.title">Latest News</h2>
-        <p data-i18n="news.subtitle">Education news from SKKS and around the world</p>
+      <div class="eyebrow" style="margin-bottom:32px;color:var(--forest-700);">Cambridge-certified — Established 1995</div>
+      <h1>Where curiosity<br>becomes <span class="accent">mastery.</span></h1>
+      <p class="lead">A bilingual education from Pre-Kindergarten to Grade 9 — built on academic rigor, run with craft, refined for the world ahead.</p>
+      <div class="hero-actions">
+        <a href="admissions.html" class="btn btn-primary btn-lg">Schedule a visit</a>
+        <a href="#programs" class="btn btn-ghost btn-lg">Explore programs</a>
       </div>
       
-      <div class="news-grid" id="newsGrid">
-        <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--slate);">
-          ⏳ Loading news...
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-value">98%</div>
+          <div class="stat-label">Parent satisfaction</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">1:8</div>
+          <div class="stat-label">Student to teacher</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">30</div>
+          <div class="stat-label">Years of heritage</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">500+</div>
+          <div class="stat-label">Alumni worldwide</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PROGRAMS -->
-  <section id="programs">
+  <section class="section-quiet" id="programs">
     <div class="container">
-      <div class="section-header">
-        <div class="eyebrow" data-i18n="programs.eyebrow">Curriculum</div>
-        <div class="section-divider"></div>
-        <h2 data-i18n="programs.title">Our Programs</h2>
-        <p data-i18n="programs.subtitle">Four educational pathways from early childhood to junior high</p>
+      <div class="section-head">
+        <div class="eyebrow">Programs</div>
+        <h2>An education designed<br>for outcomes.</h2>
+        <p class="lead">From the first years of curiosity to the foundation of intellectual independence — every program is structured to develop both mind and character.</p>
       </div>
       
       <div class="programs-grid">
         <div class="program-card">
-          <div class="icon">🧸</div>
-          <div class="age" data-i18n="programs.prek.age">Ages 3-5</div>
-          <h3 data-i18n="programs.prek.title">Pre-Kindergarten</h3>
-          <p data-i18n="programs.prek.desc">Foundation learning through play, social skills, and early literacy in a nurturing bilingual environment.</p>
+          <div class="pgm-num">01 — Foundation</div>
+          <h3>Pre-Kindergarten</h3>
+          <div class="age">Ages 2 to 4</div>
+          <p>Play-based discovery in a nurturing bilingual environment. Where the lifelong love of learning begins.</p>
+          <div class="price">฿28,000<span class="period">/ term</span></div>
         </div>
+        
         <div class="program-card">
-          <div class="icon">🎨</div>
-          <div class="age" data-i18n="programs.k.age">Ages 5-7</div>
-          <h3 data-i18n="programs.k.title">Kindergarten</h3>
-          <p data-i18n="programs.k.desc">Creative learning with strong emphasis on English language development and problem-solving skills.</p>
+          <div class="pgm-num">02 — Foundation</div>
+          <h3>Kindergarten</h3>
+          <div class="age">Ages 4 to 6</div>
+          <p>Literacy, numeracy, and social skills woven into rich, hands-on experiences across two languages.</p>
+          <div class="price">฿32,000<span class="period">/ term</span></div>
         </div>
+        
+        <div class="program-card flagship">
+          <div class="pgm-num">03 — Flagship</div>
+          <h3>English Program</h3>
+          <div class="age">Grade 1 to 9</div>
+          <p>Our flagship Cambridge curriculum, taught 60 to 70 percent in English by international and Thai educators.</p>
+          <div class="price">฿45,000<span class="period">/ term</span></div>
+        </div>
+        
         <div class="program-card">
-          <div class="icon">🌍</div>
-          <div class="age" data-i18n="programs.ep.age">Grades 1-9</div>
-          <h3 data-i18n="programs.ep.title">English Program (EP)</h3>
-          <p data-i18n="programs.ep.desc">Full English immersion curriculum with Cambridge certification. Math, Science, and English taught entirely in English.</p>
-        </div>
-        <div class="program-card">
-          <div class="icon">🌐</div>
-          <div class="age" data-i18n="programs.mep.age">Grades 1-9</div>
-          <h3 data-i18n="programs.mep.title">Mini English Program (MEP)</h3>
-          <p data-i18n="programs.mep.desc">Bilingual program with 60% English instruction. Perfect balance of Thai culture and English proficiency.</p>
+          <div class="pgm-num">04 — Bilingual</div>
+          <h3>Mini English Program</h3>
+          <div class="age">Grade 1 to 9</div>
+          <p>A balanced bilingual track with 30 to 40 percent English instruction — strong Thai roots, global readiness.</p>
+          <div class="price">฿35,000<span class="period">/ term</span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ADMISSION COUNTDOWN -->
-  <section class="admission-section">
+  <section class="section-soft">
     <div class="container">
-      <div class="admission-grid">
-        <div class="admission-left">
-          <div class="eyebrow" data-i18n="adm.eyebrow">Securing a Bright Future</div>
-          <h2 class="serif" data-i18n="adm.title">ADMISSION</h2>
-          <p data-i18n="adm.subtitle" style="font-size:15px; opacity:0.9; margin:12px 0 0;">Apply now for the 2026 academic year. Limited seats available.</p>
-          
-          <div class="countdown" id="countdown">
-            <div class="countdown-item"><span class="num" id="cd-days">90</span><span class="lbl" data-i18n="cd.days">days</span></div>
-            <div class="countdown-item"><span class="num" id="cd-hours">12</span><span class="lbl" data-i18n="cd.hours">hours</span></div>
-            <div class="countdown-item"><span class="num" id="cd-mins">30</span><span class="lbl" data-i18n="cd.mins">minutes</span></div>
-            <div class="countdown-item"><span class="num" id="cd-secs">45</span><span class="lbl" data-i18n="cd.secs">seconds</span></div>
-          </div>
-          
-          <a href="admissions.html" class="btn btn-gold" data-i18n="adm.cta" style="margin-top:14px;">View Admission Details →</a>
+      <div class="section-head">
+        <div class="eyebrow">Principles</div>
+        <h2>Standards you can measure.<br>Care you can feel.</h2>
+      </div>
+      
+      <div class="pillars-list">
+        <div class="pillar-row">
+          <div class="pillar-num">01</div>
+          <div class="pillar-title">Cambridge-aligned</div>
+          <div class="pillar-desc">Curriculum mapped to Cambridge Primary and Lower Secondary standards, with internal benchmarking each term. Standards held, not negotiated.</div>
         </div>
-        
-        <div class="register-card">
-          <h3 data-i18n="reg.title">Register Your Interest</h3>
-          <p data-i18n="reg.subtitle">to Know More About Us</p>
-          <form onsubmit="registerInterest(event)">
-            <input type="text" id="r-name" required placeholder="Your Name *" data-i18n-ph="reg.name" />
-            <input type="email" id="r-email" required placeholder="Email *" data-i18n-ph="reg.email" />
-            <input type="tel" id="r-phone" required placeholder="Phone *" data-i18n-ph="reg.phone" />
-            <button type="submit" data-i18n="reg.cta">Enroll Now</button>
-          </form>
+        <div class="pillar-row">
+          <div class="pillar-num">02</div>
+          <div class="pillar-title">1:8 ratio</div>
+          <div class="pillar-desc">Small classes mean every child is seen, known, and challenged every single day. Relationships are the foundation of learning.</div>
+        </div>
+        <div class="pillar-row">
+          <div class="pillar-num">03</div>
+          <div class="pillar-title">Truly bilingual</div>
+          <div class="pillar-desc">Native-speaking teachers across both languages. Fluency is not a goal — it is the environment.</div>
+        </div>
+        <div class="pillar-row">
+          <div class="pillar-num">04</div>
+          <div class="pillar-title">Outcomes-driven</div>
+          <div class="pillar-desc">Termly progress reports, parent conferences, and transparent assessment. No surprises. Just partnership.</div>
+        </div>
+        <div class="pillar-row">
+          <div class="pillar-num">05</div>
+          <div class="pillar-title">Thirty-year heritage</div>
+          <div class="pillar-desc">Three decades of educating Khon Kaen's most thoughtful families. Trust earned, not assumed.</div>
+        </div>
+        <div class="pillar-row">
+          <div class="pillar-num">06</div>
+          <div class="pillar-title">Built for character</div>
+          <div class="pillar-desc">Academics matter. So do integrity, curiosity, and resilience. We cultivate all four with equal care.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- EVENTS -->
-  <section>
-    <div class="container">
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:30px; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h2 class="serif" data-i18n="events.title">Events</h2>
-          <p style="color:var(--slate); font-size:14px;" data-i18n="events.subtitle">Upcoming activities & gatherings</p>
-        </div>
-        <a href="#" class="btn btn-outline" style="color:var(--navy); border-color:var(--gray-200);" data-i18n="events.viewall">VIEW ALL</a>
-      </div>
-      
-      <div id="eventsContainer">
-        <div style="text-align:center; padding:40px; color:var(--slate);">
-          ⏳ Loading events...
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY CHOOSE US -->
-  <section class="why-section">
-    <div class="container">
-      <div class="section-header">
-        <div class="eyebrow" data-i18n="why.eyebrow">Excellence</div>
-        <div class="section-divider"></div>
-        <h2 data-i18n="why.title">Why Choose Us?</h2>
-        <p data-i18n="why.subtitle">The Choice That Transforms Your Child's Future</p>
-      </div>
-      
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌏</div>
-          <h3 data-i18n="why.1.title">Global Outlook</h3>
-          <p data-i18n="why.1.desc">Our education system is designed with a global perspective, incorporating international best practices and Cambridge curriculum.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📖</div>
-          <h3 data-i18n="why.2.title">Strong Curriculum</h3>
-          <p data-i18n="why.2.desc">The curriculum emphasizes deep understanding of core subjects like Mathematics, Science, English, and literacy.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🗣️</div>
-          <h3 data-i18n="why.3.title">Bilingual Focus</h3>
-          <p data-i18n="why.3.desc">Our bilingual education policy ensures students master English as their first language while preserving Thai cultural identity.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔬</div>
-          <h3 data-i18n="why.4.title">STEM Emphasis</h3>
-          <p data-i18n="why.4.desc">Strong emphasis on STEM (Science, Technology, Engineering, Mathematics) education from an early age.</p>
-        </div>
-      </div>
-      
-      <div style="text-align:center; margin-top:40px;">
-        <a href="about.html" class="btn btn-primary" data-i18n="why.cta">Learn More About Us</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer id="contact">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <img src="images/logo.png" alt="SKKS" />
-          <div class="name">SUANSON KHON KAEN SCHOOL</div>
-          <div class="tagline">โรงเรียนสวนสนขอนแก่น</div>
-          <p>📞 (+66) 043-XXX-XXXX</p>
-          <p style="margin-top:6px;">📍 Khon Kaen, Thailand</p>
-          <p style="margin-top:6px;">✉ info@suansonkk.com</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Facebook">f</a>
-            <a href="#" aria-label="Instagram">📷</a>
-            <a href="#" aria-label="LINE">L</a>
-            <a href="#" aria-label="YouTube">▶</a>
-          </div>
-        </div>
-        
-        <div>
-          <h4 data-i18n="footer.school">School</h4>
-          <ul>
-            <li><a href="about.html" data-i18n="nav.about">About Us</a></li>
-            <li><a href="about.html#team" data-i18n="nav.about.team">Our Team</a></li>
-            <li><a href="about.html#campus" data-i18n="nav.about.campus">Our Campus</a></li>
-            <li><a href="voices.html" data-i18n="nav.voices">Parent Voices</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 data-i18n="footer.links">Quick Links</h4>
-          <ul>
-            <li><a href="#news" data-i18n="topbar.events">Events</a></li>
-            <li><a href="#news" data-i18n="topbar.news">News</a></li>
-            <li><a href="voices.html" data-i18n="topbar.faqs">FAQs</a></li>
-            <li><a href="admissions.html" data-i18n="nav.admissions">Admissions</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 data-i18n="footer.account">Account</h4>
-          <ul>
-            <li><a href="login.html">Sign In</a></li>
-            <li><a href="login.html">Sign Up</a></li>
-            <li><a href="staff-invite.html">Staff Invite</a></li>
-            <li><a href="admissions.html">Apply Now</a></li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="footer-bottom">
-        © 2026 Suanson Khon Kaen School. All rights reserved. • <a href="https://suansonkk.com">suansonkk.com</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- CTA POPUP (Bottom) -->
-  <div id="cta-popup">
-    <button id="cta-popup-close" onclick="closePopup()" aria-label="Close">×</button>
-    <div id="cta-popup-content">
-      <div class="icon">🎓</div>
-      <div class="text">
-        <strong data-i18n="popup.title">Admissions Open!</strong>
-        <small data-i18n="popup.subtitle">Apply for academic year 2026</small>
-      </div>
-      <a href="admissions.html" class="btn btn-primary" data-i18n="popup.cta">Apply</a>
+  <div class="cta-section">
+    <h2>Begin the conversation.</h2>
+    <p>Schedule a private tour, meet the head of school, and see your child's future in motion.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="admissions.html" class="btn btn-primary btn-lg">Apply for admission</a>
+      <a href="about.html" class="btn btn-ghost btn-lg">Learn more about us</a>
     </div>
   </div>
 
+  <footer class="footer-premium">
+    <div class="container">
+      <div>
+        <div class="footer-brand">SKKS</div>
+        <p class="footer-tagline">Suanson Khon Kaen School — a Cambridge-certified bilingual school educating curious minds from Pre-Kindergarten to Grade 9.</p>
+      </div>
+      
+      <div>
+        <h5>School</h5>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="voices.html">Voices</a></li>
+          <li><a href="#programs">Programs</a></li>
+          <li><a href="admissions.html">Admissions</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h5>Portal</h5>
+        <ul>
+          <li><a href="login.html">Sign in</a></li>
+          <li><a href="verify.html">Verify document</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="mailto:info@suansonkk.com">info@suansonkk.com</a></li>
+          <li><a href="tel:+66432223344">+66 43 222 3344</a></li>
+          <li style="color:rgba(255,255,255,0.4);font-size:14px;">Khon Kaen, Thailand</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div>© 2026 Suanson Khon Kaen School. All rights reserved.</div>
+      <div>CAMBRIDGE INTERNATIONAL CENTRE</div>
+    </div>
+  </footer>
+
   <script>
-    const translations = {
-      en: {
-        'topbar.events':'Events','topbar.news':'News','topbar.faqs':'FAQs','topbar.contact':'Contact','topbar.register':'Register Your Interest',
-        'nav.home':'Home','nav.about':'About Us ▾','nav.about.vision':'Vision & Mission','nav.about.journey':'Our Journey','nav.about.team':'Our Team','nav.about.campus':'Our Campus',
-        'nav.programs':'Programs ▾','nav.voices':'Voices','nav.admissions':'Admissions','nav.apply':'Apply Now',
-        'hero.eyebrow':'CAMBRIDGE CERTIFIED EDUCATION','hero.title':'Nurturing Young Minds Toward<br>a World of Knowledge','hero.subtitle':'Suanson Khon Kaen School — Cambridge-certified EP/MEP bilingual education from Pre-K to Grade 9','hero.apply':'Apply for Admission','hero.learnmore':'Discover More →',
-        'card.1.title':'Early Years','card.1.sub':'Building Strong Foundations','card.2.title':'Primary School','card.2.sub':'Preparing For The Future','card.3.title':'EP / MEP Programs','card.3.sub':'Shaping Global Learners','card.viewmore':'VIEW MORE',
-        'why.eyebrow':'EXCELLENCE','why.title':'Why Choose Us?','why.subtitle':"The Choice That Transforms Your Child's Future",'why.1.title':'Global Outlook','why.1.desc':'Our education system is designed with a global perspective, incorporating international best practices and Cambridge curriculum.','why.2.title':'Strong Curriculum','why.2.desc':'The curriculum emphasizes deep understanding of core subjects like Mathematics, Science, English, and literacy.','why.3.title':'Bilingual Focus','why.3.desc':'Our bilingual education policy ensures students master English as their first language while preserving Thai cultural identity.','why.4.title':'STEM Emphasis','why.4.desc':'Strong emphasis on STEM (Science, Technology, Engineering, Mathematics) education from an early age.','why.cta':'Learn More About Us',
-        'programs.eyebrow':'CURRICULUM','programs.title':'Our Programs','programs.subtitle':'Four educational pathways from early childhood to junior high','programs.prek.age':'AGES 3-5','programs.prek.title':'Pre-Kindergarten','programs.prek.desc':'Foundation learning through play, social skills, and early literacy in a nurturing bilingual environment.','programs.k.age':'AGES 5-7','programs.k.title':'Kindergarten','programs.k.desc':'Creative learning with strong emphasis on English language development and problem-solving skills.','programs.ep.age':'GRADES 1-9','programs.ep.title':'English Program (EP)','programs.ep.desc':'Full English immersion curriculum with Cambridge certification. Math, Science, and English taught entirely in English.','programs.mep.age':'GRADES 1-9','programs.mep.title':'Mini English Program (MEP)','programs.mep.desc':'Bilingual program with 60% English instruction. Perfect balance of Thai culture and English proficiency.',
-        'adm.eyebrow':'SECURING A BRIGHT FUTURE','adm.title':'ADMISSION','adm.subtitle':'Apply now for the 2026 academic year. Limited seats available.','cd.days':'days','cd.hours':'hours','cd.mins':'minutes','cd.secs':'seconds','adm.cta':'View Admission Details →',
-        'reg.title':'Register Your Interest','reg.subtitle':'to Know More About Us','reg.name':'Your Name *','reg.email':'Email *','reg.phone':'Phone *','reg.cta':'ENROLL NOW',
-        'events.title':'Events','events.subtitle':'Upcoming activities & gatherings','events.viewall':'VIEW ALL','events.may':'MAY, 2026','events.1.title':'One-Day Golf Clinic','events.1.desc':'Take your skills to the next level! Join us for an intensive, high-impact One-Day Golf Clinic at the prestigious Singha Park Golf Club.','events.2.title':'SKKS Experience Programme','events.2.desc':'Experience world-class education at SKKS. What makes our school special — tour the campus, meet teachers, and see our students in action.','events.3.title':'Open House 2026','events.3.desc':'Annual Open House — meet our teachers, tour the campus, and learn about our Cambridge-certified programs. Free admission for families.',
-        'news.eyebrow':'NEWS & UPDATES','news.title':'Latest News','news.subtitle':'Education news from SKKS and around the world','news.1.title':'O-NET 100% Perfect Score','news.1.desc':'Our student achieved a perfect score on the O-NET English exam — a record-breaking accomplishment for Khon Kaen.','news.2.title':'Cambridge Re-certification','news.2.desc':'SKKS successfully renewed Cambridge Assessment certification for another 5 years — confirming our commitment to excellence.','news.3.title':'Admissions Open 2026','news.3.desc':'Applications for the 2026 academic year are now open. Limited seats — secure your child\'s place early.',
-        'footer.school':'School','footer.links':'Quick Links','footer.account':'Account',
-        'popup.title':'Admissions Open!','popup.subtitle':'Apply for academic year 2026','popup.cta':'Apply'
-      },
-      th: {
-        'topbar.events':'กิจกรรม','topbar.news':'ข่าวสาร','topbar.faqs':'คำถาม','topbar.contact':'ติดต่อ','topbar.register':'ลงทะเบียนความสนใจ',
-        'nav.home':'หน้าหลัก','nav.about':'เกี่ยวกับเรา ▾','nav.about.vision':'วิสัยทัศน์ & พันธกิจ','nav.about.journey':'เส้นทางของเรา','nav.about.team':'ทีมงาน','nav.about.campus':'อาคารสถานที่',
-        'nav.programs':'หลักสูตร ▾','nav.voices':'เสียงผู้ปกครอง','nav.admissions':'สมัครเรียน','nav.apply':'สมัครเลย',
-        'hero.eyebrow':'รับรองโดย CAMBRIDGE','hero.title':'บ่มเพาะเยาวชน<br>สู่โลกแห่งความรู้','hero.subtitle':'โรงเรียนสวนสนขอนแก่น — หลักสูตร EP/MEP รับรองโดย Cambridge ตั้งแต่ Pre-K ถึง ม.3','hero.apply':'สมัครเรียน','hero.learnmore':'รายละเอียดเพิ่มเติม →',
-        'card.1.title':'ปฐมวัย','card.1.sub':'สร้างรากฐานที่แข็งแกร่ง','card.2.title':'ประถมศึกษา','card.2.sub':'เตรียมพร้อมสำหรับอนาคต','card.3.title':'หลักสูตร EP / MEP','card.3.sub':'ปั้นนักเรียนระดับสากล','card.viewmore':'อ่านเพิ่มเติม',
-        'why.eyebrow':'ความเป็นเลิศ','why.title':'ทำไมต้องเลือกเรา?','why.subtitle':'ทางเลือกที่จะเปลี่ยนอนาคตของลูกคุณ','why.1.title':'มุมมองสากล','why.1.desc':'ระบบการศึกษาออกแบบให้มีมุมมองระดับโลก ใช้หลักปฏิบัติสากลและหลักสูตร Cambridge','why.2.title':'หลักสูตรเข้มข้น','why.2.desc':'เน้นความเข้าใจลึกในวิชาหลัก คณิตศาสตร์ วิทยาศาสตร์ ภาษาอังกฤษ และการอ่านเขียน','why.3.title':'เน้นสองภาษา','why.3.desc':'นโยบายการศึกษาสองภาษา ให้นักเรียนเก่งภาษาอังกฤษพร้อมรักษาเอกลักษณ์ไทย','why.4.title':'เน้น STEM','why.4.desc':'เน้นการศึกษา STEM (วิทย์ เทคโน วิศวกรรม คณิต) ตั้งแต่ยังเล็ก','why.cta':'อ่านเพิ่มเติมเกี่ยวกับเรา',
-        'programs.eyebrow':'หลักสูตร','programs.title':'หลักสูตรของเรา','programs.subtitle':'4 เส้นทางการศึกษา ตั้งแต่ปฐมวัยถึงมัธยมต้น','programs.prek.age':'อายุ 3-5','programs.prek.title':'เตรียมอนุบาล','programs.prek.desc':'เรียนรู้พื้นฐานผ่านการเล่น ทักษะทางสังคม ในสภาพแวดล้อมสองภาษา','programs.k.age':'อายุ 5-7','programs.k.title':'อนุบาล','programs.k.desc':'เรียนรู้สร้างสรรค์ เน้นภาษาอังกฤษและการแก้ปัญหา','programs.ep.age':'ป.1-ม.3','programs.ep.title':'English Program (EP)','programs.ep.desc':'หลักสูตรภาษาอังกฤษเต็มรูปแบบ รับรอง Cambridge — สอนคณิต วิทย์ อังกฤษ เป็นภาษาอังกฤษทั้งหมด','programs.mep.age':'ป.1-ม.3','programs.mep.title':'Mini English Program (MEP)','programs.mep.desc':'หลักสูตรสองภาษา 60% เป็นภาษาอังกฤษ ผสมผสานวัฒนธรรมไทยและอังกฤษอย่างลงตัว',
-        'adm.eyebrow':'สร้างอนาคตที่สดใส','adm.title':'สมัครเรียน','adm.subtitle':'สมัครเรียนปีการศึกษา 2569 — ที่นั่งจำกัด','cd.days':'วัน','cd.hours':'ชั่วโมง','cd.mins':'นาที','cd.secs':'วินาที','adm.cta':'ดูรายละเอียดการสมัคร →',
-        'reg.title':'ลงทะเบียนความสนใจ','reg.subtitle':'เพื่อทราบข้อมูลเพิ่มเติม','reg.name':'ชื่อของคุณ *','reg.email':'อีเมล *','reg.phone':'เบอร์โทร *','reg.cta':'ลงทะเบียน',
-        'events.title':'กิจกรรม','events.subtitle':'กิจกรรมที่กำลังจะมาถึง','events.viewall':'ดูทั้งหมด','events.may':'พ.ค. 2569','events.1.title':'คลินิกกอล์ฟ 1 วัน','events.1.desc':'พัฒนาทักษะให้สูงขึ้น! เข้าร่วม One-Day Golf Clinic ที่ Singha Park Golf Club','events.2.title':'SKKS Experience Programme','events.2.desc':'สัมผัสการศึกษาระดับโลกที่ SKKS เยี่ยมชมโรงเรียน พบครู เห็นนักเรียนของเราในห้องเรียน','events.3.title':'Open House 2569','events.3.desc':'Open House ประจำปี พบครู เยี่ยมชมโรงเรียน เรียนรู้หลักสูตร Cambridge เข้าฟรี',
-        'news.eyebrow':'ข่าวสารและอัปเดต','news.title':'ข่าวสารล่าสุด','news.subtitle':'ข่าวการศึกษาจาก SKKS และทั่วโลก','news.1.title':'O-NET 100% คะแนนเต็ม','news.1.desc':'นักเรียนของเราได้คะแนนเต็ม O-NET วิชาภาษาอังกฤษ ผลสัมฤทธิ์ที่ทำลายสถิติของขอนแก่น','news.2.title':'ต่ออายุการรับรอง Cambridge','news.2.desc':'SKKS ต่ออายุการรับรองจาก Cambridge Assessment สำเร็จอีก 5 ปี ยืนยันความเป็นเลิศของเรา','news.3.title':'เปิดรับสมัครปี 2569','news.3.desc':'เปิดรับสมัครนักเรียนปีการศึกษา 2569 แล้ว ที่นั่งจำกัด สมัครก่อนได้สิทธิ์ก่อน',
-        'footer.school':'โรงเรียน','footer.links':'ลิงก์ด่วน','footer.account':'บัญชี',
-        'popup.title':'เปิดรับสมัครแล้ว!','popup.subtitle':'สมัครเรียนปี 2569','popup.cta':'สมัคร'
-      }
-    };
-    
-    function getLang(){return localStorage.getItem('skks_lang')||'en'}
-    function setLang(lang){
-      localStorage.setItem('skks_lang',lang);
-      document.documentElement.lang=lang;
-      document.querySelectorAll('[data-i18n]').forEach(el=>{
-        const key=el.getAttribute('data-i18n');
-        if(translations[lang][key])el.innerHTML=translations[lang][key];
-      });
-      document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
-        const key=el.getAttribute('data-i18n-ph');
-        if(translations[lang][key])el.placeholder=translations[lang][key];
-      });
-      document.querySelectorAll('.lang-switch a').forEach(a=>{
-        a.classList.toggle('active',a.getAttribute('data-lang')===lang);
-      });
-      if(window._cachedEvents) renderEvents(window._cachedEvents);
-      if(window._cachedNews) renderNews(window._cachedNews);
+    function setLang(lang, ev) {
+      localStorage.setItem('skks_lang', lang);
+      document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
+      if (ev && ev.target) ev.target.classList.add('active');
     }
-    function toggleMenu(){document.getElementById('navMenu').classList.toggle('show')}
-    function closePopup(){
-      document.getElementById('cta-popup').classList.remove('show');
-      localStorage.setItem('skks_popup_closed',Date.now());
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
-    
-    function updateCountdown(){
-      const target=new Date('2026-08-09T23:59:59').getTime();
-      const now=new Date().getTime();
-      const diff=target-now;
-      if(diff<0)return;
-      const days=Math.floor(diff/(1000*60*60*24));
-      const hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-      const mins=Math.floor((diff%(1000*60*60))/(1000*60));
-      const secs=Math.floor((diff%(1000*60))/1000);
-      document.getElementById('cd-days').textContent=String(days).padStart(2,'0');
-      document.getElementById('cd-hours').textContent=String(hours).padStart(2,'0');
-      document.getElementById('cd-mins').textContent=String(mins).padStart(2,'0');
-      document.getElementById('cd-secs').textContent=String(secs).padStart(2,'0');
-    }
-    updateCountdown();
-    setInterval(updateCountdown,1000);
-    
-    async function registerInterest(e){
-      e.preventDefault();
-      const btn=e.target.querySelector('button');
-      btn.disabled=true;
-      btn.textContent='SENDING...';
-      
-      const name=document.getElementById('r-name').value.trim();
-      const email=document.getElementById('r-email').value.trim();
-      const phone=document.getElementById('r-phone').value.trim();
-      
-      try{
-        await supabaseClient.from('applications').insert({
-          application_number:`INT-${Date.now()}`,
-          status:'pending',
-          student_first_name:'(Interest)',
-          student_last_name:name,
-          program:'inquiry',
-          parent_name:name,
-          parent_phone:phone,
-          parent_email:email,
-          notes:'Registered via homepage interest form'
-        });
-        alert('✅ Thank you! We will contact you shortly.');
-        e.target.reset();
-      }catch(err){
-        alert('Submission saved locally. We will follow up soon.');
-      }finally{
-        btn.disabled=false;
-        btn.textContent=translations[getLang()]['reg.cta'];
-      }
-    }
-    
-    setTimeout(()=>{
-      const lastClosed=localStorage.getItem('skks_popup_closed');
-      if(!lastClosed||(Date.now()-parseInt(lastClosed))>86400000){
-        document.getElementById('cta-popup').classList.add('show');
-      }
-    },5000);
-    
-    
-    
-    async function loadUpcomingEvents(){
-      try{
-        const today = new Date().toISOString().split('T')[0];
-        const {data, error} = await supabaseClient
-          .from('events')
-          .select('*')
-          .eq('published', true)
-          .gte('event_date', today)
-          .order('event_date', {ascending: true})
-          .limit(3);
-        if(error || !data || data.length === 0){
-          renderFallbackEvents();
-          return;
-        }
-        window._cachedEvents = data;
-        renderEvents(data);
-      }catch(err){
-        renderFallbackEvents();
-      }
-    }
-    
-    function renderEvents(events){
-      const lang = getLang();
-      const container = document.getElementById('eventsContainer');
-      const monthsEn = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-      const monthsTh = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-      
-      container.innerHTML = events.map(e => {
-        const d = new Date(e.event_date);
-        const day = d.getDate();
-        const m = lang === 'th' ? monthsTh[d.getMonth()] : monthsEn[d.getMonth()];
-        const yr = lang === 'th' ? (d.getFullYear() + 543) : d.getFullYear();
-        const title = lang === 'th' && e.title_th ? e.title_th : e.title;
-        const desc = lang === 'th' && e.description_th ? e.description_th : (e.description || '');
-        return `<div class="event-item">
-          <div class="event-date">
-            <div class="day">${day}</div>
-            <div class="month">${m}, ${yr}</div>
-          </div>
-          <div class="event-info">
-            <h3>${title}</h3>
-            ${e.event_time ? `<div class="time">🕐 <span>${e.event_time}</span></div>` : ''}
-            ${e.location ? `<div class="time" style="margin-top:4px;">📍 <span>${e.location}</span></div>` : ''}
-            <p>${desc}</p>
-          </div>
-          <div class="event-image">${e.icon || '📅'}</div>
-        </div>`;
-      }).join('');
-    }
-    
-    function renderFallbackEvents(){
-      document.getElementById('eventsContainer').innerHTML = `
-        <div class="event-item">
-          <div class="event-date"><div class="day">17</div><div class="month">MAY, 2026</div></div>
-          <div class="event-info"><h3>SKKS Experience Programme</h3><div class="time">🕐 <span>7:00 - 15:00</span></div><p>Tour the campus, meet teachers, and see our students in action.</p></div>
-          <div class="event-image">🎓</div>
-        </div>
-        <div class="event-item">
-          <div class="event-date"><div class="day">22</div><div class="month">MAY, 2026</div></div>
-          <div class="event-info"><h3>Open House 2026</h3><div class="time">🕐 <span>9:00 - 16:00</span></div><p>Annual Open House — meet our teachers, tour the campus.</p></div>
-          <div class="event-image">🏫</div>
-        </div>
-      `;
-    }
-    
-    setTimeout(loadUpcomingEvents, 100);
-
-    async function loadLatestNews(){
-      try{
-        const {data, error} = await supabaseClient
-          .from('news')
-          .select('*')
-          .eq('published', true)
-          .order('publish_date', {ascending: false})
-          .limit(3);
-        if(error || !data || data.length === 0){
-          renderFallbackNews();
-          return;
-        }
-        window._cachedNews = data;
-        renderNews(data);
-      }catch(err){
-        console.warn('News load failed, using fallback');
-        renderFallbackNews();
-      }
-    }
-    
-    function renderNews(news){
-      const lang = getLang();
-      const grid = document.getElementById('newsGrid');
-      const monthsEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const monthsTh = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-      
-      grid.innerHTML = news.map(n => {
-        const d = new Date(n.publish_date);
-        const m = lang === 'th' ? monthsTh[d.getMonth()] : monthsEn[d.getMonth()];
-        const yr = lang === 'th' ? (d.getFullYear() + 543) : d.getFullYear();
-        const dateStr = `${d.getDate()} ${m} ${yr}`;
-        const title = lang === 'th' && n.title_th ? n.title_th : n.title;
-        const excerpt = lang === 'th' && n.excerpt_th ? n.excerpt_th : (n.excerpt || '');
-        const imageHtml = n.image_url 
-          ? `<img src="${n.image_url}" alt="${title}" style="width:100%;height:100%;object-fit:cover;" /><div class="news-tag">${n.tag || 'SKKS'}</div>`
-          : `📰<div class="news-tag">${n.tag || 'SKKS'}</div>`;
-        return `<div class="news-card">
-          <div class="news-image">${imageHtml}</div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · ${dateStr}</div>
-            <h3>${title}</h3>
-            <p>${excerpt}</p>
-          </div>
-        </div>`;
-      }).join('');
-    }
-    
-    function renderFallbackNews(){
-      const grid = document.getElementById('newsGrid');
-      grid.innerHTML = `
-        <div class="news-card">
-          <div class="news-image">🏆<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 11 May 2026</div>
-            <h3>O-NET 100% Perfect Score</h3>
-            <p>Our student achieved a perfect score on the O-NET English exam.</p>
-          </div>
-        </div>
-        <div class="news-card">
-          <div class="news-image">🎓<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 28 Apr 2026</div>
-            <h3>Cambridge Re-certification</h3>
-            <p>SKKS successfully renewed Cambridge Assessment certification.</p>
-          </div>
-        </div>
-        <div class="news-card">
-          <div class="news-image">📝<div class="news-tag">SKKS</div></div>
-          <div class="news-content">
-            <div style="font-size:11px; color:var(--slate); margin-bottom:6px;">SKKS · 15 Mar 2026</div>
-            <h3>Admissions Open 2026</h3>
-            <p>Applications for the 2026 academic year are now open.</p>
-          </div>
-        </div>
-      `;
-    }
-    
-    setTimeout(loadLatestNews, 100);
-
-    setLang(getLang());
   </script>
-  <script src="js/supabase-client.js"></script>
 </body>
 </html>

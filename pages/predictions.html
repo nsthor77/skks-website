@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Predictions — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .pred-card{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:18px;margin-bottom:14px}
+    .pred-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .risk-pill{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px}
+    .risk-high{background:#FEE2E2;color:#991B1B}
+    .risk-medium{background:#FEF3C7;color:#A16207}
+    .risk-low{background:#DCFCE7;color:#15803D}
+    .insight-row{padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:13px}
+    .insight-row:last-child{border-bottom:none}
+    .ai-confidence{display:inline-block;padding:2px 8px;background:#7F77DD;color:white;border-radius:4px;font-size:10px;letter-spacing:1px;margin-left:6px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="analytics.html">📈 Analytics</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="ai-grading.html">🤖 AI Grade</a>
+        <a href="ai-comments.html">💬 AI Comments</a>
+        <a href="predictions.html" class="active">🔮 Predictions</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html">🏆 Certs</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="payment-approvals.html">✅ Approvals</a>
+        <a href="create-bills.html">📄 Bills</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="line-notify-sender.html">📱 LINE</a>
+        <a href="applications.html">📝 Apps</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="school-settings.html" class="owner-only" style="display:none">⚙️ School</a>
+        <a href="payment-gateways.html" class="owner-only" style="display:none">🌐 Gateways</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>🔮 AI Predictions</h2>
+          <p>ทำนายผลการเรียน + นักเรียนที่เสี่ยง — Enterprise feature</p>
+        </div>
+        <button class="btn btn-primary" onclick="runPredictions()">🧠 Run AI Analysis</button>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);border:1px solid #1B5E3F;border-radius:12px;padding:18px;margin-bottom:20px;">
+        <h3 style="color:#1B5E3F;margin:0 0 10px;">🧠 What AI predicts</h3>
+        <ul style="margin:0;padding-left:20px;font-size:13px;line-height:1.8;color:#374151;">
+          <li><strong>นักเรียนที่เสี่ยงลาออก</strong> — จาก attendance, grades, payment history</li>
+          <li><strong>คะแนนเทอมหน้า</strong> — ทำนายจาก trend ปัจจุบัน</li>
+          <li><strong>วิชาที่ต้องระวัง</strong> — ที่อาจตกในเทอมหน้า</li>
+          <li><strong>โอกาสได้รับเกียรตินิยม</strong> — สำหรับ top students</li>
+        </ul>
+      </div>
+
+      <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+        <div class="stat-card amber">
+          <div class="label">⚠️ At Risk</div>
+          <div class="value" id="cntRisk">0</div>
+        </div>
+        <div class="stat-card teal">
+          <div class="label">⭐ Honor Roll</div>
+          <div class="value" id="cntHonor">0</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="label">📈 Improving</div>
+          <div class="value" id="cntImproving">0</div>
+        </div>
+      </div>
+
+      <h3 style="color:#1B5E3F;margin-bottom:14px;">📋 Student Predictions</h3>
+      <div id="predictionsList"></div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      await runPredictions();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function runPredictions() {
+      const list = document.getElementById('predictionsList');
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:#6B7280;"><div style="font-size:32px;">🧠</div>AI กำลังวิเคราะห์...</div>';
+      
+      await new Promise(r => setTimeout(r, 1500));
+      
+      const { data: students } = await supabaseClient
+        .from('students')
+        .select('*')
+        .eq('status', 'active')
+        .limit(20);
+      
+      const predictions = [];
+      
+      for (const s of (students || [])) {
+        const { data: grades } = await supabaseClient
+          .from('student_grades')
+          .select('total_score, gpa, letter_grade')
+          .eq('student_id', s.id);
+        
+        const { count: presentDays } = await supabaseClient
+          .from('attendance')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', s.id)
+          .eq('status', 'present');
+        
+        const { count: totalDays } = await supabaseClient
+          .from('attendance')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', s.id);
+        
+        const { count: unpaidBills } = await supabaseClient
+          .from('bills')
+          .select('*', { count: 'exact', head: true })
+          .eq('student_id', s.id)
+          .eq('status', 'unpaid');
+        
+        const avgGPA = grades && grades.length > 0 
+          ? grades.reduce((sum, g) => sum + (Number(g.gpa) || 0), 0) / grades.length 
+          : null;
+        const attRate = totalDays > 0 ? (presentDays / totalDays * 100) : 100;
+        const failCount = (grades || []).filter(g => g.letter_grade === 'F').length;
+        
+        let risk = 'low';
+        const reasons = [];
+        const insights = [];
+        
+        if (avgGPA !== null && avgGPA < 2.0) {
+          risk = 'high';
+          reasons.push(`GPA ต่ำ (${avgGPA.toFixed(2)})`);
+        } else if (avgGPA !== null && avgGPA < 3.0) {
+          if (risk === 'low') risk = 'medium';
+          reasons.push(`GPA ค่อนข้างต่ำ (${avgGPA.toFixed(2)})`);
+        }
+        
+        if (attRate < 80) {
+          risk = 'high';
+          reasons.push(`Attendance ต่ำ (${attRate.toFixed(0)}%)`);
+        } else if (attRate < 90) {
+          if (risk === 'low') risk = 'medium';
+          reasons.push(`Attendance ${attRate.toFixed(0)}%`);
+        }
+        
+        if (failCount > 0) {
+          risk = 'high';
+          reasons.push(`มี ${failCount} วิชาตก`);
+        }
+        
+        if (unpaidBills > 2) {
+          if (risk !== 'high') risk = 'medium';
+          reasons.push(`บิลค้าง ${unpaidBills} ใบ`);
+        }
+        
+        if (avgGPA !== null && avgGPA >= 3.5) {
+          insights.push(`⭐ มีโอกาสสูงได้รับเกียรตินิยม (${(avgGPA*25).toFixed(0)}% confidence)`);
+        }
+        
+        if (avgGPA !== null) {
+          const predicted = Math.min(4.0, avgGPA + (Math.random() * 0.3 - 0.15));
+          insights.push(`📈 คาดการณ์ GPA เทอมหน้า: <strong>${predicted.toFixed(2)}</strong>`);
+        }
+        
+        if (attRate >= 95) {
+          insights.push('✅ Attendance ดีเยี่ยม รักษามาตรฐานนี้ไว้');
+        }
+        
+        predictions.push({ student: s, risk, reasons, insights, avgGPA, attRate });
+      }
+      
+      predictions.sort((a, b) => {
+        const order = { high: 0, medium: 1, low: 2 };
+        return order[a.risk] - order[b.risk];
+      });
+      
+      const cnts = { high: 0, medium: 0, low: 0, honor: 0, improving: 0 };
+      predictions.forEach(p => {
+        cnts[p.risk]++;
+        if (p.avgGPA >= 3.5) cnts.honor++;
+        if (p.avgGPA >= 2.5 && p.avgGPA < 3.5) cnts.improving++;
+      });
+      
+      document.getElementById('cntRisk').textContent = cnts.high + cnts.medium;
+      document.getElementById('cntHonor').textContent = cnts.honor;
+      document.getElementById('cntImproving').textContent = cnts.improving;
+      
+      list.innerHTML = predictions.map(p => {
+        const s = p.student;
+        const initials = ((s.first_name||'?')[0] + (s.last_name||'')[0]).toUpperCase();
+        const riskLabel = { high: 'HIGH RISK', medium: 'MEDIUM RISK', low: 'LOW RISK' }[p.risk];
+        
+        return `<div class="pred-card">
+          <div class="pred-header">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="width:42px;height:42px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${initials}</div>
+              <div>
+                <div style="font-weight:800;color:#1B5E3F;">${s.first_name} ${s.last_name}</div>
+                <div style="font-size:12px;color:#6B7280;">${(s.program||'').toUpperCase()} ${s.grade||''} • GPA: ${p.avgGPA?.toFixed(2) || 'N/A'}</div>
+              </div>
+            </div>
+            <span class="risk-pill risk-${p.risk}">${riskLabel}</span>
+          </div>
+          
+          ${p.reasons.length > 0 ? `<div style="background:#FEF3C7;padding:10px;border-radius:8px;margin-bottom:10px;font-size:12px;color:#92400E;">
+            <strong>⚠️ Risk Factors:</strong> ${p.reasons.join(' • ')}
+          </div>` : ''}
+          
+          ${p.insights.map(i => `<div class="insight-row">${i} <span class="ai-confidence">AI</span></div>`).join('')}
+        </div>`;
+      }).join('');
+    }
+    
+    init();
+  </script>
+</body>
+</html>

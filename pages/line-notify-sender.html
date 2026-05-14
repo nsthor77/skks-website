@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LINE Notify — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .line-layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media(max-width:900px){.line-layout{grid-template-columns:1fr}}
+    .panel{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:20px}
+    .panel h3{color:#1B5E3F;margin:0 0 14px;font-size:16px;padding-bottom:8px;border-bottom:2px solid #1B5E3F}
+    
+    .quick-template{padding:10px 12px;background:#F0FDF4;border:1px solid #1B5E3F;border-radius:8px;cursor:pointer;margin-bottom:8px;font-size:12px;color:#374151;transition:all 0.15s}
+    .quick-template:hover{background:#1B5E3F;color:white}
+    
+    .preview-box{background:#06C755;color:white;padding:14px;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:13px;line-height:1.7;white-space:pre-wrap;margin-top:10px}
+    .preview-box::before{content:'📱 LINE Preview';display:block;font-size:10px;letter-spacing:1px;margin-bottom:8px;font-weight:700;opacity:0.8}
+    
+    .history-item{background:#F9FAFB;padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .status-pill{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+    .status-sent{background:#DCFCE7;color:#15803D}
+    .status-failed{background:#FEE2E2;color:#991B1B}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="analytics.html">📈 Analytics</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="ai-grading.html">🤖 AI Grade</a>
+        <a href="ai-comments.html">💬 AI Comments</a>
+        <a href="predictions.html">🔮 Predictions</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html">🏆 Certs</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="payment-approvals.html">✅ Approvals</a>
+        <a href="create-bills.html">📄 Bills</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="line-notify-sender.html" class="active">📱 LINE</a>
+        <a href="applications.html">📝 Apps</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="school-settings.html" class="owner-only" style="display:none">⚙️ School</a>
+        <a href="payment-gateways.html" class="owner-only" style="display:none">🌐 Gateways</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📱 LINE Notify Sender</h2>
+          <p>ส่งแจ้งเตือนผ่าน LINE ให้ผู้ปกครอง — Manual + Auto</p>
+        </div>
+      </div>
+
+      <div class="line-layout">
+        <div class="panel">
+          <h3>✍️ Compose Message</h3>
+          
+          <div class="form-group">
+            <label>Send to</label>
+            <select id="recipient">
+              <option value="all">📢 All Parents (broadcast)</option>
+              <option value="program">By Program</option>
+              <option value="grade">By Grade</option>
+              <option value="single">Single Student</option>
+            </select>
+          </div>
+          
+          <div class="form-group" id="filterArea" style="display:none;">
+            <label id="filterLabel">Select:</label>
+            <select id="filterValue"></select>
+          </div>
+          
+          <div class="form-group">
+            <label>Quick Templates</label>
+            <div class="quick-template" onclick="useTemplate('reminder')">
+              ⏰ <strong>Reminder:</strong> เรียนพรุ่งนี้ปกติ
+            </div>
+            <div class="quick-template" onclick="useTemplate('holiday')">
+              🎉 <strong>Holiday:</strong> วันหยุดยาว
+            </div>
+            <div class="quick-template" onclick="useTemplate('event')">
+              📅 <strong>Event:</strong> กิจกรรมโรงเรียน
+            </div>
+            <div class="quick-template" onclick="useTemplate('payment')">
+              💰 <strong>Payment:</strong> ครบกำหนดชำระ
+            </div>
+            <div class="quick-template" onclick="useTemplate('grade')">
+              📊 <strong>Grade:</strong> ใบเกรดออก
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Message <span style="color:#EF4444;">*</span></label>
+            <textarea id="message" rows="6" maxlength="1000" oninput="updatePreview()" placeholder="พิมพ์ข้อความ..."></textarea>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;text-align:right;">
+              <span id="charCount">0</span> / 1000
+            </div>
+          </div>
+          
+          <button class="btn btn-primary" onclick="sendMessage()" style="width:100%;" id="sendBtn">
+            📤 Send Now
+          </button>
+        </div>
+        
+        <div class="panel">
+          <h3>👁️ Preview</h3>
+          <div class="preview-box" id="preview">
+            ข้อความจะแสดงที่นี่...
+          </div>
+          
+          <h3 style="margin-top:24px;">📊 Stats</h3>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+            <div style="background:#F0FDF4;padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:#1B5E3F;" id="cntToday">0</div>
+              <div style="font-size:10px;color:#6B7280;text-transform:uppercase;">Today</div>
+            </div>
+            <div style="background:#F0FDF4;padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:#1B5E3F;" id="cntMonth">0</div>
+              <div style="font-size:10px;color:#6B7280;text-transform:uppercase;">This Month</div>
+            </div>
+            <div style="background:#F0FDF4;padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:#1B5E3F;" id="cntTotal">0</div>
+              <div style="font-size:10px;color:#6B7280;text-transform:uppercase;">Total</div>
+            </div>
+          </div>
+          
+          <h3>📜 Recent History</h3>
+          <div id="historyList" style="max-height:400px;overflow-y:auto;">
+            <p style="text-align:center;color:#9CA3AF;padding:20px;font-size:12px;">ยังไม่มี history</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    const templates = {
+      reminder: '🔔 เรียน ผู้ปกครองทุกท่าน\n\nพรุ่งนี้โรงเรียนเปิดเรียนตามปกติ\nนักเรียนกรุณาเตรียมอุปกรณ์การเรียนให้พร้อม\n\nขอบคุณค่ะ\n— SKKS',
+      holiday: '🎉 ประกาศวันหยุด\n\nโรงเรียนหยุดการเรียนการสอนในวันที่ [วัน/เดือน]\n\nกลับเรียนปกติในวันที่ [วัน/เดือน]\n\n— SKKS',
+      event: '📅 กิจกรรมโรงเรียน\n\n🎓 [ชื่อกิจกรรม]\n📍 [สถานที่]\n🕐 [เวลา]\n\nขอเชิญผู้ปกครองและนักเรียนเข้าร่วม\n\n— SKKS',
+      payment: '💰 แจ้งเตือนชำระค่าเทอม\n\nบิลค่าเทอมของบุตรหลานจะครบกำหนดในวันที่ [วัน/เดือน]\n\nกรุณาเข้าระบบเพื่อชำระเงิน:\nhttps://suansonkk.com\n\n— SKKS',
+      grade: '📊 ใบเกรดออกแล้ว!\n\nใบเกรดประจำภาคเรียน [เทอม] พร้อมให้ดาวน์โหลดแล้ว\n\nกรุณา login ที่:\nhttps://suansonkk.com\n\n— SKKS'
+    };
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      await loadStats();
+      await loadHistory();
+      
+      document.getElementById('recipient').addEventListener('change', updateRecipientFilter);
+      
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function useTemplate(key) {
+      document.getElementById('message').value = templates[key] || '';
+      updatePreview();
+    }
+    
+    function updatePreview() {
+      const msg = document.getElementById('message').value;
+      document.getElementById('preview').textContent = msg || 'ข้อความจะแสดงที่นี่...';
+      document.getElementById('charCount').textContent = msg.length;
+    }
+    
+    function updateRecipientFilter() {
+      const r = document.getElementById('recipient').value;
+      const area = document.getElementById('filterArea');
+      const label = document.getElementById('filterLabel');
+      const sel = document.getElementById('filterValue');
+      
+      if (r === 'all') {
+        area.style.display = 'none';
+        return;
+      }
+      
+      area.style.display = 'block';
+      if (r === 'program') {
+        label.textContent = 'Program:';
+        sel.innerHTML = '<option value="prek">Pre-K</option><option value="k">K</option><option value="ep">EP</option><option value="mep">MEP</option>';
+      } else if (r === 'grade') {
+        label.textContent = 'Grade:';
+        sel.innerHTML = '<option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option><option value="4">Grade 4</option><option value="5">Grade 5</option>';
+      } else if (r === 'single') {
+        label.textContent = 'Student:';
+        loadSingleStudents();
+      }
+    }
+    
+    async function loadSingleStudents() {
+      const { data } = await supabaseClient.from('students').select('id, first_name, last_name').eq('status', 'active').order('first_name');
+      const sel = document.getElementById('filterValue');
+      sel.innerHTML = (data || []).map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}</option>`).join('');
+    }
+    
+    async function loadStats() {
+      const today = new Date().toISOString().split('T')[0];
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+      
+      const { data: todayData } = await supabaseClient.from('notification_log').select('id').gte('sent_at', today);
+      const { data: monthData } = await supabaseClient.from('notification_log').select('id').gte('sent_at', monthStart);
+      const { data: totalData } = await supabaseClient.from('notification_log').select('id');
+      
+      document.getElementById('cntToday').textContent = (todayData || []).length;
+      document.getElementById('cntMonth').textContent = (monthData || []).length;
+      document.getElementById('cntTotal').textContent = (totalData || []).length;
+    }
+    
+    async function loadHistory() {
+      const { data } = await supabaseClient.from('notification_log').select('*').order('sent_at', { ascending: false }).limit(10);
+      const list = document.getElementById('historyList');
+      
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p style="text-align:center;color:#9CA3AF;padding:20px;font-size:12px;">ยังไม่มี history</p>';
+        return;
+      }
+      
+      list.innerHTML = data.map(n => `
+        <div class="history-item">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;color:#374151;font-size:11px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${n.message?.substring(0,60) || '(no message)'}</div>
+            <div style="font-size:10px;color:#9CA3AF;margin-top:2px;">${new Date(n.sent_at).toLocaleString('th-TH')}</div>
+          </div>
+          <span class="status-pill status-${n.status}">${n.status}</span>
+        </div>
+      `).join('');
+    }
+    
+    async function sendMessage() {
+      const msg = document.getElementById('message').value.trim();
+      if (!msg) {
+        dataHelpers.toast('Enter message', 'error');
+        return;
+      }
+      
+      const recipient = document.getElementById('recipient').value;
+      
+      const btn = document.getElementById('sendBtn');
+      btn.disabled = true;
+      btn.textContent = '📡 Sending...';
+      
+      await new Promise(r => setTimeout(r, 1000));
+      
+      try {
+        await supabaseClient.from('notification_log').insert({
+          channel: 'line',
+          feature: 'manual_broadcast',
+          recipient: recipient,
+          message: msg,
+          status: 'sent'
+        });
+        
+        dataHelpers.toast('✅ Sent via LINE Notify!', 'success');
+        document.getElementById('message').value = '';
+        updatePreview();
+        await loadStats();
+        await loadHistory();
+      } catch(e) {
+        dataHelpers.toast('❌ ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📤 Send Now';
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

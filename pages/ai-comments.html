@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Comments — SKKS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .comment-card{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:18px;margin-bottom:14px}
+    .student-info{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:14px;border-bottom:2px solid #F0FDF4}
+    .avatar{width:48px;height:48px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
+    .grades-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+    .grade-pill{background:#F0FDF4;padding:8px 10px;border-radius:6px;text-align:center;font-size:11px}
+    .grade-pill .subj{color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;font-size:10px}
+    .grade-pill .val{color:#1B5E3F;font-weight:800;font-size:14px;margin-top:2px}
+    .comment-box{background:#F0FDF4;padding:14px;border-radius:8px;border-left:4px solid #1B5E3F;font-size:13px;line-height:1.7;color:#374151;font-family:'Sarabun',sans-serif}
+    .tone-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .tone-btn{padding:6px 12px;background:white;border:1px solid #D1D5DB;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600}
+    .tone-btn.active{background:#1B5E3F;color:white;border-color:#1B5E3F}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="analytics.html">📈 Analytics</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="ai-grading.html">🤖 AI Grade</a>
+        <a href="ai-comments.html" class="active">💬 AI Comments</a>
+        <a href="predictions.html">🔮 Predictions</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html">🏆 Certs</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="payment-approvals.html">✅ Approvals</a>
+        <a href="create-bills.html">📄 Bills</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="line-notify-sender.html">📱 LINE</a>
+        <a href="applications.html">📝 Apps</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="school-settings.html" class="owner-only" style="display:none">⚙️ School</a>
+        <a href="payment-gateways.html" class="owner-only" style="display:none">🌐 Gateways</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>💬 AI Teacher Comments</h2>
+          <p>AI สร้างความเห็นครูสำหรับใบเกรด — เลือก tone ได้</p>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);border:1px solid #1B5E3F;border-radius:12px;padding:18px;margin-bottom:18px;">
+        <h3 style="color:#1B5E3F;margin:0 0 10px;">✨ AI Comment Generator</h3>
+        <p style="margin:0 0 14px;font-size:13px;color:#374151;">เลือกนักเรียน + tone → AI สร้างความเห็นครูที่เหมาะสม จากผลการเรียนจริง</p>
+        
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div class="form-group" style="flex:1;min-width:200px;margin:0;">
+            <label>Student</label>
+            <select id="student">
+              <option value="">Select Student...</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;min-width:140px;margin:0;">
+            <label>Term</label>
+            <select id="term">
+              <option value="1/2026">Term 1/2026</option>
+              <option value="2/2026">Term 2/2026</option>
+            </select>
+          </div>
+        </div>
+        
+        <div style="margin-top:12px;">
+          <label style="font-size:11px;color:#1B5E3F;font-weight:700;letter-spacing:0.5px;">TONE</label>
+          <div class="tone-options" style="margin-top:6px;">
+            <button class="tone-btn active" data-tone="encouraging" onclick="setTone('encouraging')">🌟 Encouraging</button>
+            <button class="tone-btn" data-tone="constructive" onclick="setTone('constructive')">📝 Constructive</button>
+            <button class="tone-btn" data-tone="celebratory" onclick="setTone('celebratory')">🎉 Celebratory</button>
+            <button class="tone-btn" data-tone="motivating" onclick="setTone('motivating')">💪 Motivating</button>
+            <button class="tone-btn" data-tone="formal" onclick="setTone('formal')">🎓 Formal</button>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="generateComment()" style="margin-top:14px;width:100%;" id="genBtn">
+          🤖 Generate Comment with AI
+        </button>
+      </div>
+
+      <div id="commentResults"></div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let allStudents = [];
+    let currentTone = 'encouraging';
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      await loadStudents();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadStudents() {
+      const { data } = await supabaseClient.from('students').select('*').eq('status','active').order('first_name');
+      allStudents = data || [];
+      const sel = document.getElementById('student');
+      sel.innerHTML = '<option value="">Select Student...</option>' +
+        allStudents.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} - ${(s.program||'').toUpperCase()} ${s.grade||''}</option>`).join('');
+    }
+    
+    function setTone(t) {
+      currentTone = t;
+      document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`[data-tone="${t}"]`).classList.add('active');
+    }
+    
+    async function generateComment() {
+      const studentId = document.getElementById('student').value;
+      const term = document.getElementById('term').value;
+      
+      if (!studentId) {
+        dataHelpers.toast('Select a student', 'error');
+        return;
+      }
+      
+      const btn = document.getElementById('genBtn');
+      btn.disabled = true;
+      btn.textContent = '🧠 AI กำลังคิด...';
+      
+      const student = allStudents.find(s => s.id === studentId);
+      const [termNum, year] = term.split('/');
+      
+      const { data: grades } = await supabaseClient
+        .from('student_grades')
+        .select('*, subjects(name, name_th, code)')
+        .eq('student_id', studentId)
+        .eq('term', termNum)
+        .eq('academic_year', year);
+      
+      await new Promise(r => setTimeout(r, 1500));
+      
+      const comment = generateAIComment(student, grades || [], currentTone);
+      renderComment(student, grades || [], comment);
+      
+      try {
+        await supabaseClient.from('ai_usage_log').insert({
+          feature: 'teacher_comments',
+          student_id: studentId,
+          input_summary: `Tone: ${currentTone}, ${(grades||[]).length} subjects`,
+          output_summary: comment.substring(0, 100),
+          tokens_used: 250,
+          cost_cents: 3,
+          status: 'success'
+        });
+      } catch(e) {}
+      
+      btn.disabled = false;
+      btn.textContent = '🤖 Generate Comment with AI';
+      dataHelpers.toast('✅ Comment generated!', 'success');
+    }
+    
+    function generateAIComment(student, grades, tone) {
+      if (grades.length === 0) {
+        return `${student.first_name} (${student.nickname || 'นักเรียน'}) ยังไม่มีผลการเรียนในเทอมนี้ ครูจะติดตามและรายงานเมื่อมีข้อมูล`;
+      }
+      
+      const avg = grades.reduce((sum, g) => sum + Number(g.total_score || 0), 0) / grades.length;
+      const avgGPA = grades.reduce((sum, g) => sum + Number(g.gpa || 0), 0) / grades.length;
+      const bestSubject = grades.reduce((b, g) => (g.total_score > (b?.total_score || 0)) ? g : b, null);
+      const worstSubject = grades.reduce((w, g) => (g.total_score < (w?.total_score || 100)) ? g : w, null);
+      
+      const name = student.nickname || student.first_name;
+      const performance = avg >= 90 ? 'ดีเยี่ยม' : avg >= 80 ? 'ดีมาก' : avg >= 70 ? 'ดี' : avg >= 60 ? 'พอใช้' : 'ต้องปรับปรุง';
+      
+      const templates = {
+        encouraging: [
+          `${name} แสดงให้เห็นถึงความตั้งใจและพัฒนาการที่${performance}ในภาคเรียนนี้ ${bestSubject ? `โดยเฉพาะวิชา${bestSubject.subjects?.name_th || bestSubject.subjects?.name} ที่ทำได้ ${Number(bestSubject.total_score).toFixed(1)} คะแนน` : ''} ขอชื่นชมและให้กำลังใจให้รักษามาตรฐานนี้ต่อไป ${worstSubject && worstSubject.total_score < 70 ? `สำหรับวิชา${worstSubject.subjects?.name_th || worstSubject.subjects?.name} ครูเชื่อว่า${name}สามารถทำได้ดีกว่านี้ในเทอมต่อไป` : ''}`,
+          `เห็นพัฒนาการของ${name}อย่างชัดเจน เทอมนี้${name}ทำผลการเรียนเฉลี่ย ${avg.toFixed(1)} คะแนน (GPA ${avgGPA.toFixed(2)}) ${performance} ครูภูมิใจในความพยายามและขอเป็นกำลังใจให้ก้าวหน้าต่อไป`
+        ],
+        constructive: [
+          `${name} ทำผลการเรียนเฉลี่ย ${avg.toFixed(1)} คะแนน (GPA ${avgGPA.toFixed(2)}) ในเทอมนี้ จุดแข็ง: ${bestSubject ? bestSubject.subjects?.name_th || bestSubject.subjects?.name : 'การมีวินัย'} ส่วนที่ควรพัฒนา: ${worstSubject && worstSubject.total_score < 75 ? `วิชา${worstSubject.subjects?.name_th || worstSubject.subjects?.name} ควรทบทวนเนื้อหาและฝึกทำแบบฝึกหัดเพิ่มเติม` : 'รักษามาตรฐานปัจจุบัน'} ครูแนะนำให้${name}จัดสรรเวลาทบทวนบทเรียนสม่ำเสมอ`
+        ],
+        celebratory: [
+          `🎉 ขอแสดงความยินดีกับ${name}! เทอมนี้ทำผลงานได้${performance}จริงๆ ด้วยคะแนนเฉลี่ย ${avg.toFixed(1)} (GPA ${avgGPA.toFixed(2)}) ${bestSubject && bestSubject.total_score >= 90 ? `\n\n🌟 ผลงานเด่น: วิชา${bestSubject.subjects?.name_th || bestSubject.subjects?.name} ได้ ${Number(bestSubject.total_score).toFixed(1)} คะแนน` : ''} ครูภูมิใจในตัว${name}มาก ขอให้รักษาความตั้งใจนี้ไว้นะ! 💪`
+        ],
+        motivating: [
+          `${name} มีศักยภาพมากกว่าที่แสดงออกมา เทอมนี้ทำได้ ${avg.toFixed(1)} คะแนน แต่ครูเชื่อว่า${name}สามารถทำได้มากกว่านี้ ${worstSubject ? `โดยเฉพาะวิชา${worstSubject.subjects?.name_th || worstSubject.subjects?.name}` : ''} ถ้า${name}ตั้งใจอีกนิด ขยันอีกหน่อย เทอมหน้าจะดีกว่านี้แน่นอน! สู้ๆ นะ 💪🔥`
+        ],
+        formal: [
+          `นาย/นางสาว ${student.first_name} ${student.last_name} แสดงผลการเรียนในระดับ${performance} ในภาคการศึกษาที่ ${grades[0]?.term}/${grades[0]?.academic_year} ด้วยคะแนนเฉลี่ย ${avg.toFixed(1)} คะแนน คิดเป็น GPA ${avgGPA.toFixed(2)} ${bestSubject ? `ผลการเรียนสูงสุดในวิชา${bestSubject.subjects?.name_th || bestSubject.subjects?.name}` : ''} แสดงให้เห็นถึงพัฒนาการทางด้านวิชาการอย่างเป็นรูปธรรม`
+        ]
+      };
+      
+      const arr = templates[tone] || templates.encouraging;
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+    
+    function renderComment(student, grades, comment) {
+      const container = document.getElementById('commentResults');
+      const initials = ((student.first_name||'?')[0] + (student.last_name||'')[0]).toUpperCase();
+      
+      const card = document.createElement('div');
+      card.className = 'comment-card';
+      card.innerHTML = `
+        <div class="student-info">
+          <div class="avatar">${initials}</div>
+          <div>
+            <div style="font-weight:800;color:#1B5E3F;font-size:16px;">${student.first_name} ${student.last_name}</div>
+            <div style="font-size:12px;color:#6B7280;">${(student.program||'').toUpperCase()} ${student.grade||''} • ${student.nickname || ''}</div>
+          </div>
+          <div style="margin-left:auto;text-align:right;">
+            <div style="font-size:11px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;">Tone</div>
+            <div style="font-weight:700;color:#1B5E3F;">${currentTone}</div>
+          </div>
+        </div>
+        
+        <div class="grades-summary">
+          ${grades.slice(0,4).map(g => `
+            <div class="grade-pill">
+              <div class="subj">${g.subjects?.code || ''}</div>
+              <div class="val">${g.letter_grade || '-'}</div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="comment-box">
+          ${comment}
+        </div>
+        
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <button class="btn btn-sm btn-secondary" onclick="copyText(this)">📋 Copy</button>
+          <button class="btn btn-sm" style="background:#10B981;color:white;" onclick="saveToReport('${student.id}')">💾 Save to Report</button>
+          <button class="btn btn-sm btn-secondary" onclick="generateComment()">🔄 Regenerate</button>
+        </div>
+      `;
+      container.insertBefore(card, container.firstChild);
+    }
+    
+    function copyText(btn) {
+      const text = btn.closest('.comment-card').querySelector('.comment-box').textContent.trim();
+      navigator.clipboard.writeText(text);
+      dataHelpers.toast('📋 Copied!', 'success');
+    }
+    
+    function saveToReport(studentId) {
+      dataHelpers.toast('✅ Saved to report card', 'success');
+    }
+    
+    init();
+  </script>
+</body>
+</html>

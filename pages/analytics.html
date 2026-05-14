@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics — SKKS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+    .stat-box{background:white;border-radius:12px;padding:18px;border:1px solid #E5E7EB;position:relative;overflow:hidden}
+    .stat-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:#1B5E3F}
+    .stat-box.blue::before{background:#5BB8E0}
+    .stat-box.amber::before{background:#F59E0B}
+    .stat-box.purple::before{background:#7F77DD}
+    .stat-box.coral::before{background:#D85A30}
+    .stat-icon{font-size:24px;margin-bottom:6px}
+    .stat-num{font-size:28px;font-weight:800;color:#1B5E3F;line-height:1.1}
+    .stat-lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:600}
+    .stat-trend{font-size:11px;margin-top:6px;display:inline-block;padding:2px 8px;border-radius:4px;font-weight:600}
+    .trend-up{background:#DCFCE7;color:#15803D}
+    .trend-down{background:#FEE2E2;color:#991B1B}
+    .trend-neutral{background:#F3F4F6;color:#6B7280}
+    
+    .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+    @media(max-width:900px){.charts-grid{grid-template-columns:1fr}}
+    .chart-card{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:20px}
+    .chart-card h3{color:#1B5E3F;margin:0 0 14px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+    .chart-wrap{position:relative;height:280px}
+    
+    .insight-card{background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);border-radius:12px;padding:18px;border:1px solid #1B5E3F;margin-bottom:18px}
+    .insight-card h3{color:#1B5E3F;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+    .insight-list{list-style:none;padding:0;margin:0;font-size:13px;color:#374151;line-height:1.8}
+    .insight-list li::before{content:'💡 ';margin-right:4px}
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SKKS" />
+        <h1>SKKS Admin</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="analytics.html" class="active">📈 Analytics</a>
+        <a href="students.html">🎓 Students</a>
+        <a href="grades-admin.html">📝 Grades</a>
+        <a href="ai-grading.html">🤖 AI Grade</a>
+        <a href="ai-comments.html">💬 AI Comments</a>
+        <a href="predictions.html">🔮 Predictions</a>
+        <a href="report-cards.html">📄 Reports</a>
+        <a href="certificates.html">🏆 Certs</a>
+        <a href="attendance.html">📅 Attendance</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="payment-approvals.html">✅ Approvals</a>
+        <a href="create-bills.html">📄 Bills</a>
+        <a href="tuition-admin.html">💰 Tuition</a>
+        <a href="events-admin.html">📅 Events</a>
+        <a href="news-admin.html">📰 News</a>
+        <a href="line-notify-sender.html">📱 LINE</a>
+        <a href="applications.html">📝 Apps</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+        <a href="school-settings.html" class="owner-only" style="display:none">⚙️ School</a>
+        <a href="payment-gateways.html" class="owner-only" style="display:none">🌐 Gateways</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📈 Analytics Dashboard</h2>
+          <p>Real-time insights — สรุปภาพรวมโรงเรียน</p>
+        </div>
+        <button class="btn btn-secondary" onclick="loadAll()">🔄 Refresh</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-icon">👥</div>
+          <div class="stat-num" id="totalStudents">0</div>
+          <div class="stat-lbl">Total Students</div>
+        </div>
+        <div class="stat-box blue">
+          <div class="stat-icon">📝</div>
+          <div class="stat-num" id="appsPending">0</div>
+          <div class="stat-lbl">Pending Apps</div>
+        </div>
+        <div class="stat-box amber">
+          <div class="stat-icon">💰</div>
+          <div class="stat-num" id="unpaidBills">0</div>
+          <div class="stat-lbl">Unpaid Bills</div>
+        </div>
+        <div class="stat-box purple">
+          <div class="stat-icon">💎</div>
+          <div class="stat-num" id="revenueMonth">฿0</div>
+          <div class="stat-lbl">Revenue (Month)</div>
+        </div>
+        <div class="stat-box coral">
+          <div class="stat-icon">⏰</div>
+          <div class="stat-num" id="outstandingRevenue">฿0</div>
+          <div class="stat-lbl">Outstanding</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-num" id="certIssued">0</div>
+          <div class="stat-lbl">Certificates</div>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <h3>🔮 AI Insights</h3>
+        <ul class="insight-list" id="insightsList">
+          <li>Loading insights...</li>
+        </ul>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>👥 Students by Program</h3>
+          <div class="chart-wrap"><canvas id="programChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>📅 Attendance — Last 7 Days</h3>
+          <div class="chart-wrap"><canvas id="attendanceChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>📊 Grade Distribution</h3>
+          <div class="chart-wrap"><canvas id="gradeChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>💰 Bills Status</h3>
+          <div class="chart-wrap"><canvas id="billsChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-top:18px;">
+        <h3>📈 Revenue Trend — Last 6 Months</h3>
+        <div class="chart-wrap" style="height:300px;"><canvas id="revenueChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let charts = {};
+    
+    async function init() {
+      const profile = await requireStaff();
+      if (!profile) return;
+      
+      if (profile.role === 'owner' || profile.role === 'developer') {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      
+      await loadAll();
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    async function loadAll() {
+      Object.values(charts).forEach(c => c?.destroy());
+      charts = {};
+      
+      await Promise.all([
+        loadKPIs(),
+        loadProgramChart(),
+        loadAttendanceChart(),
+        loadGradeChart(),
+        loadBillsChart(),
+        loadRevenueChart(),
+        loadInsights()
+      ]);
+    }
+    
+    async function loadKPIs() {
+      const { data: students } = await supabaseClient.from('students').select('id').eq('status', 'active');
+      const { data: apps } = await supabaseClient.from('applications').select('id, status').eq('status', 'pending');
+      const { data: unpaidBills } = await supabaseClient.from('bills').select('amount').eq('status', 'unpaid');
+      const { data: paidThisMonth } = await supabaseClient.from('bills').select('amount').eq('status', 'paid')
+        .gte('paid_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
+      const { data: certs } = await supabaseClient.from('certificates').select('id').eq('status', 'issued');
+      
+      const outstandingTotal = (unpaidBills || []).reduce((sum, b) => sum + Number(b.amount), 0);
+      const revenueTotal = (paidThisMonth || []).reduce((sum, b) => sum + Number(b.amount), 0);
+      
+      document.getElementById('totalStudents').textContent = (students || []).length;
+      document.getElementById('appsPending').textContent = (apps || []).length;
+      document.getElementById('unpaidBills').textContent = (unpaidBills || []).length;
+      document.getElementById('revenueMonth').textContent = '฿' + revenueTotal.toLocaleString();
+      document.getElementById('outstandingRevenue').textContent = '฿' + outstandingTotal.toLocaleString();
+      document.getElementById('certIssued').textContent = (certs || []).length;
+    }
+    
+    async function loadProgramChart() {
+      const { data } = await supabaseClient.from('students').select('program').eq('status', 'active');
+      const counts = { prek: 0, k: 0, ep: 0, mep: 0 };
+      (data || []).forEach(s => { if (counts[s.program] !== undefined) counts[s.program]++; });
+      
+      charts.program = new Chart(document.getElementById('programChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Pre-K', 'Kindergarten', 'EP', 'MEP'],
+          datasets: [{
+            data: [counts.prek, counts.k, counts.ep, counts.mep],
+            backgroundColor: ['#FAC775', '#5BB8E0', '#1B5E3F', '#7F77DD']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } } }
+      });
+    }
+    
+    async function loadAttendanceChart() {
+      const dates = [];
+      const present = [], late = [], absent = [];
+      
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dStr = d.toISOString().split('T')[0];
+        dates.push(d.toLocaleDateString('th-TH', { month: 'short', day: 'numeric' }));
+        
+        const { data } = await supabaseClient.from('attendance').select('status').eq('attendance_date', dStr);
+        const counts = { present: 0, late: 0, absent: 0 };
+        (data || []).forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+        present.push(counts.present);
+        late.push(counts.late);
+        absent.push(counts.absent);
+      }
+      
+      charts.attendance = new Chart(document.getElementById('attendanceChart'), {
+        type: 'bar',
+        data: {
+          labels: dates,
+          datasets: [
+            { label: 'Present', data: present, backgroundColor: '#10B981' },
+            { label: 'Late', data: late, backgroundColor: '#F59E0B' },
+            { label: 'Absent', data: absent, backgroundColor: '#EF4444' }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+    
+    async function loadGradeChart() {
+      const { data } = await supabaseClient.from('student_grades').select('letter_grade');
+      const counts = {};
+      (data || []).forEach(g => {
+        if (g.letter_grade) counts[g.letter_grade] = (counts[g.letter_grade] || 0) + 1;
+      });
+      
+      const labels = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'].filter(g => counts[g]);
+      const values = labels.map(g => counts[g]);
+      
+      charts.grade = new Chart(document.getElementById('gradeChart'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{ data: values, backgroundColor: labels.map(g => {
+            if (g.startsWith('A')) return '#10B981';
+            if (g.startsWith('B')) return '#5BB8E0';
+            if (g.startsWith('C')) return '#F59E0B';
+            if (g.startsWith('D')) return '#F97316';
+            return '#EF4444';
+          }) }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+    }
+    
+    async function loadBillsChart() {
+      const { data: unpaid } = await supabaseClient.from('bills').select('id').eq('status', 'unpaid');
+      const { data: pending } = await supabaseClient.from('bills').select('id').eq('status', 'pending');
+      const { data: paid } = await supabaseClient.from('bills').select('id').eq('status', 'paid');
+      
+      charts.bills = new Chart(document.getElementById('billsChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Unpaid', 'Pending Review', 'Paid'],
+          datasets: [{
+            data: [(unpaid||[]).length, (pending||[]).length, (paid||[]).length],
+            backgroundColor: ['#EF4444', '#F59E0B', '#10B981']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+    
+    async function loadRevenueChart() {
+      const months = [];
+      const revenues = [];
+      
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const start = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+        const end = new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString();
+        
+        months.push(d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+        
+        const { data } = await supabaseClient.from('bills').select('amount').eq('status', 'paid').gte('paid_at', start).lte('paid_at', end);
+        const total = (data || []).reduce((sum, b) => sum + Number(b.amount), 0);
+        revenues.push(total);
+      }
+      
+      charts.revenue = new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Revenue (THB)',
+            data: revenues,
+            borderColor: '#1B5E3F',
+            backgroundColor: 'rgba(27,94,63,0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, ticks: { callback: v => '฿' + v.toLocaleString() } } } }
+      });
+    }
+    
+    async function loadInsights() {
+      const insights = [];
+      
+      const { data: students } = await supabaseClient.from('students').select('id').eq('status', 'active');
+      const totalStudents = (students || []).length;
+      
+      const { data: unpaid } = await supabaseClient.from('bills').select('amount, due_date').eq('status', 'unpaid');
+      const overdue = (unpaid || []).filter(b => new Date(b.due_date) < new Date());
+      
+      if (overdue.length > 0) {
+        const overdueAmount = overdue.reduce((sum, b) => sum + Number(b.amount), 0);
+        insights.push(`มีบิลค้างชำระเกินกำหนด <strong>${overdue.length} ใบ</strong> รวม <strong>฿${overdueAmount.toLocaleString()}</strong> ควรติดตาม`);
+      }
+      
+      const today = new Date().toISOString().split('T')[0];
+      const { data: todayAtt } = await supabaseClient.from('attendance').select('status').eq('attendance_date', today);
+      const absentToday = (todayAtt || []).filter(a => a.status === 'absent').length;
+      
+      if (absentToday > 0) {
+        const rate = totalStudents > 0 ? ((absentToday / totalStudents) * 100).toFixed(1) : 0;
+        insights.push(`วันนี้มีนักเรียนขาดเรียน <strong>${absentToday} คน (${rate}%)</strong>`);
+      }
+      
+      const { data: grades } = await supabaseClient.from('student_grades').select('letter_grade');
+      const failGrades = (grades || []).filter(g => g.letter_grade === 'F').length;
+      
+      if (failGrades > 0) {
+        insights.push(`มีนักเรียน <strong>${failGrades} วิชา</strong> ที่ได้เกรด F — ควรพิจารณาการสอนซ่อมเสริม`);
+      }
+      
+      const { data: pendingApps } = await supabaseClient.from('applications').select('id').eq('status', 'pending');
+      if ((pendingApps || []).length > 0) {
+        insights.push(`มีใบสมัคร <strong>${pendingApps.length} ใบ</strong> รอการตรวจสอบ — ควรพิจารณาภายใน 7 วัน`);
+      }
+      
+      if (insights.length === 0) {
+        insights.push('🎉 ทุกอย่างเรียบร้อย ไม่มีรายการที่ต้องดำเนินการเร่งด่วน!');
+      }
+      
+      document.getElementById('insightsList').innerHTML = insights.map(i => `<li>${i}</li>`).join('');
+    }
+    
+    init();
+  </script>
+</body>
+</html>

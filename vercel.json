@@ -1,6 +1,21 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://panyaschoolkit.com/:path*",
+      "has": [{ "type": "host", "value": "www.panyaschoolkit.com" }],
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/panyaschoolkit-marketing",
+      "has": [{ "type": "host", "value": "panyaschoolkit.com" }]
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

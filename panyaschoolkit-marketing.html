@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SchoolKit by Panya Ventures — ระบบจัดการโรงเรียนครบวงจร</title>
+  <meta name="description" content="SchoolKit — ระบบ SaaS ครบวงจรสำหรับโรงเรียนไทย: รับสมัครออนไลน์ จัดการนักเรียน เก็บเงิน เกรด ใบประกาศ ในที่เดียว" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', 'Sarabun', sans-serif;
+      color: #1E3A5F;
+      line-height: 1.6;
+      background: #fff;
+    }
+    a { color: #5BB8E0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ============= HEADER ============= */
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #E5E7EB;
+      z-index: 100;
+    }
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #1E3A5F;
+    }
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 20px;
+    }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: #4B5563; font-weight: 500; font-size: 14px; }
+    .btn-login {
+      padding: 8px 18px;
+      border-radius: 100px;
+      border: 2px solid #5BB8E0;
+      color: #5BB8E0 !important;
+      background: white;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .btn-login:hover { background: #5BB8E0; color: white !important; text-decoration: none; }
+
+    /* ============= HERO ============= */
+    .hero {
+      background: linear-gradient(135deg, #E0F2FE 0%, #DCFCE7 100%);
+      padding: 80px 24px 100px;
+      text-align: center;
+    }
+    .hero-inner { max-width: 900px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: white;
+      border: 1px solid #BAE6FD;
+      border-radius: 100px;
+      color: #0369A1;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin: 0 0 20px 0;
+      color: #1E3A5F;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 18px;
+      color: #4B5563;
+      max-width: 640px;
+      margin: 0 auto 36px;
+    }
+    .hero-cta { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      color: white !important;
+      border: none;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(124, 179, 66, 0.3);
+      text-decoration: none;
+    }
+    .btn-secondary {
+      padding: 14px 28px;
+      background: white;
+      color: #1E3A5F !important;
+      border: 2px solid #E5E7EB;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-secondary:hover { border-color: #5BB8E0; }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 16px; }
+      .nav-links a:not(.btn-login) { display: none; }
+    }
+
+    /* ============= FEATURES ============= */
+    .section { padding: 80px 24px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      margin: 0 0 16px;
+      color: #1E3A5F;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: #6B7280;
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto 56px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.2s;
+    }
+    .feature-card:hover {
+      border-color: #5BB8E0;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(91, 184, 224, 0.1);
+    }
+    .feature-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin-bottom: 18px;
+    }
+    .feature-icon.green { background: #DCFCE7; }
+    .feature-icon.blue { background: #DBEAFE; }
+    .feature-icon.purple { background: #F3E8FF; }
+    .feature-icon.orange { background: #FED7AA; }
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: #1E3A5F;
+    }
+    .feature-card p { color: #6B7280; font-size: 14px; margin: 0; }
+
+    /* ============= PRICING ============= */
+    .pricing-bg { background: #F9FAFB; }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .pricing-card {
+      background: white;
+      border: 2px solid #E5E7EB;
+      border-radius: 20px;
+      padding: 32px 28px;
+      position: relative;
+    }
+    .pricing-card.popular { border-color: #5BB8E0; box-shadow: 0 20px 40px rgba(91, 184, 224, 0.15); }
+    .popular-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 16px;
+      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      color: white;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .pricing-card h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: #1E3A5F;
+    }
+    .pricing-card .price {
+      font-size: 40px;
+      font-weight: 800;
+      color: #1E3A5F;
+      margin: 12px 0;
+    }
+    .pricing-card .price small { font-size: 14px; font-weight: 500; color: #6B7280; }
+    .pricing-card .price-yearly {
+      font-size: 12px;
+      color: #16A34A;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .pricing-card .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 24px 0;
+    }
+    .pricing-card .feature-list li {
+      padding: 8px 0;
+      font-size: 14px;
+      color: #374151;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .pricing-card .feature-list li::before {
+      content: '✓';
+      color: #16A34A;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .pricing-card .feature-list li.disabled { color: #9CA3AF; }
+    .pricing-card .feature-list li.disabled::before { content: '✗'; color: #D1D5DB; }
+    .pricing-card .btn-primary, .pricing-card .btn-secondary {
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ============= SIGNUP ============= */
+    .signup-bg {
+      background: linear-gradient(135deg, #1E3A5F 0%, #0F172A 100%);
+      color: white;
+    }
+    .signup-bg .section-title, .signup-bg p { color: white; }
+    .signup-bg .section-subtitle { color: #CBD5E1; }
+    .signup-card {
+      background: white;
+      color: #1E3A5F;
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 580px;
+      margin: 0 auto;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    .form-group label .hint { font-weight: 400; color: #9CA3AF; font-size: 11px; }
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #E5E7EB;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-group input:focus { border-color: #5BB8E0; box-shadow: 0 0 0 4px rgba(91,184,224,0.1); }
+    .slug-preview {
+      font-size: 12px;
+      color: #5BB8E0;
+      margin-top: 4px;
+      font-family: 'Poppins', monospace;
+    }
+    .slug-status { font-size: 12px; margin-top: 4px; }
+    .slug-status.ok { color: #16A34A; }
+    .slug-status.err { color: #DC2626; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .signup-form .btn-primary {
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px;
+    }
+    .alert {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert.error { background: #FEE2E2; color: #991B1B; border-left: 4px solid #EF4444; }
+    .alert.success { background: #DCFCE7; color: #166534; border-left: 4px solid #16A34A; }
+    .signup-note {
+      text-align: center;
+      font-size: 12px;
+      color: #6B7280;
+      margin-top: 16px;
+    }
+
+    /* ============= FOOTER ============= */
+    footer {
+      background: #0F172A;
+      color: #94A3B8;
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 13px;
+    }
+    footer a { color: #CBD5E1; }
+    footer p { margin: 4px 0; }
+    .footer-brand {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      color: white;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    /* Loading state */
+    .btn-primary:disabled, .btn-secondary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- ============= HEADER ============= -->
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-mark">🎓</div>
+        <span>SchoolKit</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="https://www.suansonkk.com/login.html" class="btn-login">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============= HERO ============= -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="hero-badge">🚀 ลองใช้ฟรี 14 วัน ไม่ต้องใส่บัตร</span>
+      <h1>ระบบจัดการโรงเรียน<br/><span>ครบวงจรในที่เดียว</span></h1>
+      <p>ตั้งแต่รับสมัครออนไลน์ จัดการนักเรียน เช็คชื่อ เก็บเงินค่าเทอม ออกใบเสร็จ ใบเกรด ใบประกาศ ครบในระบบเดียว — ออกแบบสำหรับโรงเรียนไทย</p>
+      <div class="hero-cta">
+        <a href="#signup" class="btn-primary">เริ่มทดลองฟรี →</a>
+        <a href="#pricing" class="btn-secondary">ดูราคา</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= FEATURES ============= -->
+  <section class="section" id="features">
+    <div class="container">
+      <h2 class="section-title">ฟีเจอร์ครบทุกที่โรงเรียนต้องใช้</h2>
+      <p class="section-subtitle">ไม่ต้องใช้หลายระบบให้ปวดหัว — SchoolKit รวมทุกอย่างในที่เดียว</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon green">🏫</div>
+          <h3>เว็บไซต์โรงเรียน</h3>
+          <p>เว็บไซต์ประชาสัมพันธ์โรงเรียน พร้อมหน้าสมัครเรียนออนไลน์ — ไม่ต้องจ้างคนทำเว็บ</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon blue">👨‍🎓</div>
+          <h3>จัดการนักเรียน</h3>
+          <p>ทะเบียนนักเรียน ห้องเรียน เช็คชื่อ พร้อมระบบสำหรับผู้ปกครองดูข้อมูลลูก</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon purple">💰</div>
+          <h3>การเงิน + รับเงิน</h3>
+          <p>ออกใบแจ้งหนี้ รับเงินผ่าน PromptPay/บัตรเครดิต รายงานการเงินสมบูรณ์</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon orange">📜</div>
+          <h3>เกรด + ใบประกาศ</h3>
+          <p>บันทึกเกรด ออกใบรายงานผลการเรียน ใบประกาศนียบัตร พร้อม QR Code ตรวจสอบ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= PRICING ============= -->
+  <section class="section pricing-bg" id="pricing">
+    <div class="container">
+      <h2 class="section-title">ราคาโปร่งใส ไม่มีค่าซ่อนเร้น</h2>
+      <p class="section-subtitle">เลือกแพ็คเกจตามขนาดโรงเรียน • ทดลองฟรี 14 วัน • ลด 20% เมื่อจ่ายรายปี</p>
+
+      <div class="pricing-grid">
+        <!-- Starter -->
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <p style="color:#6B7280;font-size:13px;margin:0;">โรงเรียนขนาดเล็ก</p>
+          <div class="price">฿1,990 <small>/เดือน</small></div>
+          <div class="price-yearly">หรือ ฿19,104/ปี (ประหยัด ฿4,776)</div>
+          <ul class="feature-list">
+            <li>นักเรียน ≤100 คน</li>
+            <li>ครู ≤10 คน</li>
+            <li>เว็บไซต์ + รับสมัครออนไลน์</li>
+            <li>เช็คชื่อ + จัดการห้อง</li>
+            <li>การเงินพื้นฐาน</li>
+            <li class="disabled">เกรด + ใบประกาศ</li>
+            <li class="disabled">LINE Notify</li>
+            <li class="disabled">Custom Domain</li>
+          </ul>
+          <a href="#signup" class="btn-secondary">เริ่มทดลอง</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card popular">
+          <div class="popular-badge">⭐ POPULAR</div>
+          <h3>Pro</h3>
+          <p style="color:#6B7280;font-size:13px;margin:0;">โรงเรียนขนาดกลาง</p>
+          <div class="price">฿3,990 <small>/เดือน</small></div>
+          <div class="price-yearly">หรือ ฿38,304/ปี (ประหยัด ฿9,576)</div>
+          <ul class="feature-list">
+            <li>นักเรียน ≤500 คน</li>
+            <li>ครู ≤30 คน</li>
+            <li>ทุกอย่างใน Starter</li>
+            <li><b>เกรด + ใบประกาศ</b></li>
+            <li><b>LINE Notify</b></li>
+            <li><b>Custom Domain</b></li>
+            <li><b>Daily Backup</b></li>
+            <li>Email support</li>
+          </ul>
+          <a href="#signup" class="btn-primary">เริ่มทดลอง 14 วัน →</a>
+        </div>
+
+        <!-- Premium -->
+        <div class="pricing-card">
+          <h3>Premium</h3>
+          <p style="color:#6B7280;font-size:13px;margin:0;">โรงเรียนขนาดใหญ่</p>
+          <div class="price">฿7,990 <small>/เดือน</small></div>
+          <div class="price-yearly">หรือ ฿76,704/ปี (ประหยัด ฿19,176)</div>
+          <ul class="feature-list">
+            <li>นักเรียนไม่จำกัด</li>
+            <li>ครูไม่จำกัด</li>
+            <li>ทุกอย่างใน Pro</li>
+            <li><b>Custom Tables</b></li>
+            <li><b>API Access</b></li>
+            <li><b>ผ่อนจ่าย</b></li>
+            <li>Priority Support</li>
+            <li>White-label option</li>
+          </ul>
+          <a href="#signup" class="btn-secondary">เริ่มทดลอง</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SIGNUP ============= -->
+  <section class="section signup-bg" id="signup">
+    <div class="container">
+      <h2 class="section-title">เริ่มทดลองใช้ฟรี 14 วัน</h2>
+      <p class="section-subtitle">ไม่ต้องใส่บัตรเครดิต ยกเลิกได้ตลอดเวลา</p>
+
+      <div class="signup-card">
+        <div class="alert" id="alertBox"></div>
+
+        <form class="signup-form" id="signupForm" onsubmit="handleSignup(event)">
+          <h3 style="margin:0 0 18px;font-size:18px;color:#1E3A5F;">🏫 ข้อมูลโรงเรียน</h3>
+
+          <div class="form-group">
+            <label>ชื่อโรงเรียน (ภาษาไทย) *</label>
+            <input type="text" id="schoolName" required placeholder="โรงเรียนสุภาพศึกษา" />
+          </div>
+
+          <div class="form-group">
+            <label>School Name (English) <span class="hint">— optional</span></label>
+            <input type="text" id="schoolNameEn" placeholder="Supahb Sueksa School" />
+          </div>
+
+          <div class="form-group">
+            <label>Subdomain (URL ของโรงเรียน) *</label>
+            <input type="text" id="schoolSlug" required placeholder="supahb" maxlength="50" pattern="[a-z0-9-]{2,50}" />
+            <div class="slug-preview" id="slugPreview">URL: <strong>supahb</strong>.panyaschoolkit.com</div>
+            <div class="slug-status" id="slugStatus"></div>
+          </div>
+
+          <h3 style="margin:24px 0 18px;font-size:18px;color:#1E3A5F;">👤 บัญชีผู้ดูแล (Owner)</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>ชื่อจริง *</label>
+              <input type="text" id="firstName" required placeholder="สมชาย" />
+            </div>
+            <div class="form-group">
+              <label>นามสกุล *</label>
+              <input type="text" id="lastName" required placeholder="ใจดี" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="email" required placeholder="admin@school.com" autocomplete="email" />
+          </div>
+
+          <div class="form-group">
+            <label>Password * <span class="hint">— อย่างน้อย 8 ตัว</span></label>
+            <input type="password" id="password" required minlength="8" placeholder="••••••••" autocomplete="new-password" />
+          </div>
+
+          <button type="submit" class="btn-primary" id="signupBtn">
+            สร้างบัญชีและเริ่มทดลอง 14 วัน →
+          </button>
+
+          <p class="signup-note">
+            กดสมัคร = ยอมรับ <a href="#" style="color:#5BB8E0">ข้อตกลงการใช้งาน</a> และ <a href="#" style="color:#5BB8E0">นโยบายความเป็นส่วนตัว</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= FOOTER ============= -->
+  <footer>
+    <div class="footer-brand">🎓 SchoolKit</div>
+    <p>by <strong style="color:white">Panya Ventures Co., Ltd.</strong></p>
+    <p>© 2026 Panya Ventures. All rights reserved.</p>
+    <p style="margin-top:14px;font-size:11px;">
+      <a href="#">Terms</a> · <a href="#">Privacy</a> · <a href="mailto:hello@panyaschoolkit.com">Contact</a>
+    </p>
+  </footer>
+
+  <!-- ============= SUPABASE + JS ============= -->
+  <script>
+    // Supabase client (anon key — safe to expose)
+    const SUPABASE_URL = 'https://nuzhkhchimemuetoewzn.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_prRghlKfBE1VqrpJDZmmSA_1XifObOJ';
+    const { createClient } = window.supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    // ============= SLUG AUTO-SUGGEST + VALIDATION =============
+    let slugCheckTimer = null;
+    let slugStatus = null;  // 'ok' | 'err' | null
+
+    function autoSlug(thaiName) {
+      // Convert Thai/spaces to URL-safe slug (rough — better with Romanization library)
+      return thaiName
+        .toLowerCase()
+        .replace(/[^a-z0-9฀-๿\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[฀-๿]/g, '')  // strip Thai (user types own)
+        .replace(/-+/g, '-')
+        .slice(0, 50);
+    }
+
+    document.getElementById('schoolName').addEventListener('input', (e) => {
+      const slugField = document.getElementById('schoolSlug');
+      if (!slugField.value || slugField.dataset.autoFilled === '1') {
+        const suggestion = autoSlug(e.target.value);
+        if (suggestion) {
+          slugField.value = suggestion;
+          slugField.dataset.autoFilled = '1';
+          updateSlugPreview();
+          checkSlug();
+        }
+      }
+    });
+
+    document.getElementById('schoolSlug').addEventListener('input', (e) => {
+      e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+      e.target.dataset.autoFilled = '0';
+      updateSlugPreview();
+      if (slugCheckTimer) clearTimeout(slugCheckTimer);
+      slugCheckTimer = setTimeout(checkSlug, 500);
+    });
+
+    function updateSlugPreview() {
+      const v = document.getElementById('schoolSlug').value || '...';
+      document.getElementById('slugPreview').innerHTML = `URL: <strong>${v}</strong>.panyaschoolkit.com`;
+    }
+
+    async function checkSlug() {
+      const slug = document.getElementById('schoolSlug').value;
+      const statusEl = document.getElementById('slugStatus');
+
+      if (!slug || slug.length < 2) {
+        statusEl.textContent = '';
+        slugStatus = null;
+        return;
+      }
+
+      statusEl.textContent = '⏳ ตรวจสอบ...';
+      statusEl.className = 'slug-status';
+
+      try {
+        const { data, error } = await sb.rpc('check_slug_available', { p_slug: slug });
+        if (error) throw error;
+        if (data.available) {
+          statusEl.textContent = '✅ subdomain นี้ใช้ได้';
+          statusEl.className = 'slug-status ok';
+          slugStatus = 'ok';
+        } else {
+          statusEl.textContent = '❌ ' + data.error;
+          statusEl.className = 'slug-status err';
+          slugStatus = 'err';
+        }
+      } catch (err) {
+        statusEl.textContent = '⚠️ ตรวจสอบไม่ได้ — ลองใหม่';
+        statusEl.className = 'slug-status err';
+        slugStatus = 'err';
+      }
+    }
+
+    // ============= ALERT HELPER =============
+    function showAlert(msg, type = 'error') {
+      const a = document.getElementById('alertBox');
+      a.className = 'alert show ' + type;
+      a.innerHTML = msg;
+      window.scrollTo({ top: a.offsetTop - 100, behavior: 'smooth' });
+    }
+    function hideAlert() { document.getElementById('alertBox').className = 'alert'; }
+
+    // ============= SIGNUP FLOW =============
+    async function handleSignup(event) {
+      event.preventDefault();
+      hideAlert();
+
+      const schoolName = document.getElementById('schoolName').value.trim();
+      const schoolNameEn = document.getElementById('schoolNameEn').value.trim();
+      const slug = document.getElementById('schoolSlug').value.trim().toLowerCase();
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('signupBtn');
+
+      // Validation
+      if (!schoolName || !slug || !firstName || !lastName || !email || !password) {
+        return showAlert('❌ กรุณากรอกข้อมูลให้ครบ', 'error');
+      }
+      if (password.length < 8) {
+        return showAlert('❌ Password ต้องอย่างน้อย 8 ตัวอักษร', 'error');
+      }
+      if (slugStatus === 'err') {
+        return showAlert('❌ Subdomain นี้ใช้ไม่ได้ — เลือกใหม่', 'error');
+      }
+
+      btn.disabled = true;
+      btn.textContent = '⏳ กำลังสร้างบัญชี...';
+
+      try {
+        // Step 1: Create school record
+        btn.textContent = '⏳ สร้างโรงเรียน...';
+        const { data: schoolData, error: schoolErr } = await sb.rpc('provision_school', {
+          p_school_name: schoolName,
+          p_school_slug: slug,
+          p_contact_email: email,
+          p_school_name_en: schoolNameEn || null
+        });
+
+        if (schoolErr) throw new Error('สร้างโรงเรียนไม่สำเร็จ: ' + schoolErr.message);
+        if (!schoolData.success) throw new Error(schoolData.error);
+
+        const schoolId = schoolData.school_id;
+
+        // Step 2: Sign up owner with school_id
+        btn.textContent = '⏳ สร้างบัญชี Owner...';
+        const { data: authData, error: authErr } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              role: 'owner',
+              school_id: schoolId
+            }
+          }
+        });
+
+        if (authErr) throw new Error('สมัครบัญชีไม่สำเร็จ: ' + authErr.message);
+
+        // Success
+        showAlert(
+          `🎉 สมัครสำเร็จ! โรงเรียน <b>${schoolName}</b> สร้างแล้ว<br/>
+           📧 กรุณาตรวจอีเมล <b>${email}</b> เพื่อยืนยันบัญชี<br/>
+           🌐 URL ของคุณคือ <b>${slug}.panyaschoolkit.com</b> (พร้อมใช้หลัง deploy)<br/>
+           ⏳ ระบบจะพาไป login ใน 5 วินาที...`,
+          'success'
+        );
+
+        // Disable form
+        document.getElementById('signupForm').querySelectorAll('input').forEach(i => i.disabled = true);
+
+        setTimeout(() => {
+          window.location.href = 'https://www.suansonkk.com/login.html';
+        }, 5000);
+
+      } catch (err) {
+        showAlert('❌ ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'สร้างบัญชีและเริ่มทดลอง 14 วัน →';
+      }
+    }
+  </script>
+</body>
+</html>

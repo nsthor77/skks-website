@@ -27,3 +27,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 window.supabaseClient = supabaseClient;
 
 console.log('✅ Supabase client initialized');
+// Current tenant school_id — for single-tenant SKKS deployment
+// TODO Sprint 3.2: detect from subdomain for multi-tenant
+const CURRENT_SCHOOL_ID = 'b410af1d-ea8b-43b9-9ca8-26c4b4b46e3b'; // SKKS
+window.CURRENT_SCHOOL_ID = CURRENT_SCHOOL_ID;

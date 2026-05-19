@@ -7,13 +7,12 @@
       "destination": "https://panyaschoolkit.com/:path*",
       "has": [{ "type": "host", "value": "www.panyaschoolkit.com" }],
       "permanent": true
-    }
-  ],
-  "rewrites": [
+    },
     {
-      "source": "/(.*)",
+      "source": "/",
       "destination": "/panyaschoolkit-marketing",
-      "has": [{ "type": "host", "value": "panyaschoolkit.com" }]
+      "has": [{ "type": "host", "value": "panyaschoolkit.com" }],
+      "permanent": false
     }
   ],
   "headers": [

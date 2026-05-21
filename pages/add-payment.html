@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Payment Method — SchoolKit</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+
+  <!-- Supabase + Omise.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.omise.co/omise.js.gz"></script>
+
+  <style>
+    .billing-wrap {
+      max-width: 720px;
+      margin: 32px auto;
+      padding: 0 16px;
+      font-family: 'Sarabun', 'Prompt', sans-serif;
+    }
+    .billing-header {
+      margin-bottom: 24px;
+    }
+    .billing-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 4px;
+      color: #1a1a1a;
+    }
+    .billing-header p {
+      color: #666;
+      margin: 0;
+      font-size: 14px;
+    }
+    .billing-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .school-info {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: #374151;
+    }
+    .school-info strong { color: #111; }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: border-color .15s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    .pci-notice {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      color: #075985;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .pci-notice .icon {
+      font-size: 16px;
+      line-height: 1;
+    }
+    .btn-submit {
+      width: 100%;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+    .btn-submit:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .alert-success {
+      background: #d1fae5;
+      border: 1px solid #6ee7b7;
+      color: #065f46;
+    }
+    .alert-error {
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+    }
+    .alert-info {
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+    .saved-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f3f4f6;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .saved-card .brand {
+      background: #1f2937;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .test-card-hint {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #78350f;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .test-card-hint code {
+      background: rgba(0,0,0,.08);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin-right: 8px;
+      vertical-align: -2px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar (simplified — no full nav since this is billing flow) -->
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SchoolKit" />
+        <h1>SchoolKit</h1>
+      </a>
+    </div>
+    <div class="admin-topbar-right">
+      <div class="user-chip">
+        <span id="userName">Loading...</span>
+        <div class="avatar" id="userAvatar">?</div>
+      </div>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="billing-wrap">
+
+    <div class="billing-header">
+      <h1>💳 เพิ่มวิธีชำระเงิน</h1>
+      <p>เพิ่มบัตรเครดิต/เดบิตเพื่อต่ออายุ subscription หลังหมดช่วง trial 14 วัน</p>
+    </div>
+
+    <div class="billing-card">
+
+      <div class="school-info" id="schoolInfo">
+        กำลังโหลดข้อมูลโรงเรียน...
+      </div>
+
+      <div class="pci-notice">
+        <span class="icon">🔒</span>
+        <span>ข้อมูลบัตรของคุณจะถูกส่งตรงไปยัง <strong>Omise</strong> (ผู้ให้บริการรับชำระเงินที่ได้รับการรับรอง PCI DSS Level 1) — ข้อมูลบัตรไม่ผ่าน server ของเราเลย</span>
+      </div>
+
+      <div class="test-card-hint" id="testCardHint">
+        <strong>🧪 Test Mode</strong> — ตอนนี้ระบบอยู่ในโหมดทดสอบ ใช้บัตรทดสอบของ Omise:<br>
+        เลขบัตร: <code>4242 4242 4242 4242</code> &nbsp;|&nbsp;
+        วันหมดอายุ: <code>12/29</code> &nbsp;|&nbsp;
+        CVC: <code>123</code> &nbsp;|&nbsp;
+        ชื่อ: ใดก็ได้
+      </div>
+
+      <!-- Alert messages -->
+      <div id="alertBox" style="display:none"></div>
+
+      <!-- Existing card (shown if user already has a card on file) -->
+      <div id="existingCardBlock" style="display:none">
+        <div class="saved-card">
+          <span class="brand" id="cardBrand">VISA</span>
+          <span>•••• •••• •••• <strong id="cardLast4">0000</strong></span>
+          <span style="margin-left:auto;color:#6b7280;font-size:13px">หมดอายุ <span id="cardExpiry">--/--</span></span>
+        </div>
+        <p style="font-size:14px;color:#4b5563;margin:0 0 16px">ต้องการเปลี่ยนบัตรใหม่? กรอกข้อมูลด้านล่าง:</p>
+      </div>
+
+      <!-- Card form -->
+      <form id="cardForm">
+        <div class="form-group">
+          <label for="cardName">ชื่อบนบัตร</label>
+          <input type="text" id="cardName" placeholder="JOHN DOE" autocomplete="cc-name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="cardNumber">เลขบัตร</label>
+          <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" inputmode="numeric" autocomplete="cc-number" maxlength="19" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cardMonth">เดือนหมดอายุ</label>
+            <input type="text" id="cardMonth" placeholder="MM" inputmode="numeric" maxlength="2" autocomplete="cc-exp-month" required />
+          </div>
+          <div class="form-group">
+            <label for="cardYear">ปีหมดอายุ</label>
+            <input type="text" id="cardYear" placeholder="YYYY" inputmode="numeric" maxlength="4" autocomplete="cc-exp-year" required />
+          </div>
+          <div class="form-group">
+            <label for="cardCVC">CVC</label>
+            <input type="text" id="cardCVC" placeholder="123" inputmode="numeric" maxlength="4" autocomplete="cc-csc" required />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span id="submitText">บันทึกบัตร</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Core scripts (load AFTER body so DOM is ready) -->
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+  // ============================================================
+  // add-payment.html logic
+  // ============================================================
+
+  // Omise.js public key — set after tenant resolved
+  const OMISE_PUBLIC_KEY = 'pkey_test_67r5iyyfhyniu28zqw2';
+
+  let currentUser = null;
+  let currentSchool = null;
+  let currentSession = null;
+
+  // ---------- Init ----------
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Require owner role
+    const session = await roleGuard.requireRole(['owner']);
+    if (!session) return; // role-guard handles redirect
+
+    currentSession = session;
+    currentUser = session.user;
+
+    // 2. Wait for tenant resolution (supabase-client.js fires 'tenant-resolved' event)
+    if (window.CURRENT_SCHOOL_ID) {
+      await loadSchoolInfo();
+    } else {
+      window.addEventListener('tenant-resolved', loadSchoolInfo, { once: true });
+    }
+
+    // 3. Initialize Omise.js
+    if (window.Omise) {
+      Omise.setPublicKey(OMISE_PUBLIC_KEY);
+    } else {
+      showAlert('error', 'ไม่สามารถโหลด Omise.js ได้ — กรุณา refresh หน้า');
+    }
+
+    // 4. Format card number input (add spaces every 4 digits)
+    document.getElementById('cardNumber').addEventListener('input', (e) => {
+      let v = e.target.value.replace(/\s/g, '').replace(/[^\d]/g, '');
+      v = v.match(/.{1,4}/g)?.join(' ') || v;
+      e.target.value = v;
+    });
+
+    // 5. Form submit handler
+    document.getElementById('cardForm').addEventListener('submit', handleSubmit);
+  });
+
+  // ---------- Load school info + existing card ----------
+  async function loadSchoolInfo() {
+    const schoolId = window.CURRENT_SCHOOL_ID;
+    if (!schoolId) {
+      showAlert('error', 'ไม่พบข้อมูลโรงเรียน — กรุณา refresh หน้า');
+      return;
+    }
+
+    const { data: school, error } = await supabaseClient
+      .from('schools')
+      .select('id, name, contact_email, omise_customer_id, status, trial_ends_at')
+      .eq('id', schoolId)
+      .single();
+
+    if (error || !school) {
+      showAlert('error', 'โหลดข้อมูลโรงเรียนไม่สำเร็จ: ' + (error?.message || 'unknown'));
+      return;
+    }
+
+    currentSchool = school;
+
+    document.getElementById('schoolInfo').innerHTML = `
+      <strong>${school.name}</strong> · ${school.contact_email}<br>
+      สถานะ: <strong>${school.status}</strong>
+      ${school.trial_ends_at ? ` · Trial หมด: ${new Date(school.trial_ends_at).toLocaleDateString('th-TH')}` : ''}
+    `;
+
+    // Load existing card if any
+    if (school.omise_customer_id) {
+      const { data: card } = await supabaseClient
+        .from('payment_methods')
+        .select('card_brand, card_last4, card_exp_month, card_exp_year')
+        .eq('school_id', schoolId)
+        .eq('is_default', true)
+        .maybeSingle();
+
+      if (card) {
+        document.getElementById('existingCardBlock').style.display = 'block';
+        document.getElementById('cardBrand').textContent = (card.card_brand || 'CARD').toUpperCase();
+        document.getElementById('cardLast4').textContent = card.card_last4 || '0000';
+        document.getElementById('cardExpiry').textContent =
+          `${String(card.card_exp_month).padStart(2,'0')}/${String(card.card_exp_year).slice(-2)}`;
+        document.getElementById('submitText').textContent = 'อัปเดตบัตรใหม่';
+      }
+    }
+  }
+
+  // ---------- Form submit ----------
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    submitBtn.disabled = true;
+    submitText.innerHTML = '<span class="loading-spinner"></span>กำลัง tokenize บัตร...';
+    clearAlert();
+
+    const cardData = {
+      name: document.getElementById('cardName').value.trim(),
+      number: document.getElementById('cardNumber').value.replace(/\s/g, ''),
+      expiration_month: parseInt(document.getElementById('cardMonth').value, 10),
+      expiration_year: parseInt(document.getElementById('cardYear').value, 10),
+      security_code: document.getElementById('cardCVC').value.trim()
+    };
+
+    // Step 1: Tokenize via Omise.js (card data goes DIRECTLY to Omise, not our server)
+    Omise.createToken('card', cardData, async (statusCode, response) => {
+      if (statusCode !== 200) {
+        submitBtn.disabled = false;
+        submitText.textContent = 'บันทึกบัตร';
+        showAlert('error', `Tokenize ไม่สำเร็จ: ${response.message || response.code || 'unknown error'}`);
+        return;
+      }
+
+      const token = response.id;
+      submitText.innerHTML = '<span class="loading-spinner"></span>กำลังบันทึกข้อมูล...';
+
+      // Step 2: Send token + school_id + JWT to our API
+      try {
+        const res = await fetch('/api/omise/create-customer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentSession.access_token}`
+          },
+          body: JSON.stringify({
+            token: token,
+            school_id: currentSchool.id
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Unknown server error');
+        }
+
+        // Success!
+        showAlert('success',
+          `✅ บันทึกบัตรสำเร็จ! ${data.card?.brand || ''} •••• ${data.card?.last4 || ''} — ` +
+          `ระบบจะเรียกเก็บเงินอัตโนมัติหลังหมด trial`
+        );
+
+        // Refresh card display
+        setTimeout(() => loadSchoolInfo(), 500);
+        document.getElementById('cardForm').reset();
+        submitBtn.disabled = false;
+        submitText.textContent = 'อัปเดตบัตรใหม่';
+
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitText.textContent = 'บันทึกบัตร';
+        showAlert('error', `บันทึกไม่สำเร็จ: ${err.message}`);
+      }
+    });
+  }
+
+  // ---------- Alert helpers ----------
+  function showAlert(type, message) {
+    const box = document.getElementById('alertBox');
+    box.className = `alert alert-${type}`;
+    box.textContent = message;
+    box.style.display = 'block';
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function clearAlert() {
+    const box = document.getElementById('alertBox');
+    box.style.display = 'none';
+    box.textContent = '';
+  }
+  </script>
+
+</body>
+</html>

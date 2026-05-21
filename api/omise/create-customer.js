@@ -40,15 +40,22 @@ module.exports = async (req, res) => {
     if (!school_id) return res.status(400).json({ error: 'Missing school_id' });
     if (!userJwt) return res.status(401).json({ error: 'Missing Authorization header' });
 
-    // ---- 2. Verify user identity (using THEIR JWT, not service key) ----
+    // ---- 2. Verify user identity by passing JWT directly to getUser() ----
+    // (Don't try to set it via createClient headers — that doesn't work for getUser())
     const supabaseAuth = createClient(
       process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY,
-      { global: { headers: { Authorization: `Bearer ${userJwt}` } } }
+      process.env.SUPABASE_ANON_KEY
     );
-    const { data: { user }, error: userErr } = await supabaseAuth.auth.getUser();
+    const { data: { user }, error: userErr } = await supabaseAuth.auth.getUser(userJwt);
     if (userErr || !user) {
-      return res.status(401).json({ error: 'Invalid or expired session' });
+      console.error('[omise/create-customer] auth.getUser failed', {
+        err: userErr?.message,
+        jwt_length: userJwt?.length
+      });
+      return res.status(401).json({
+        error: 'Invalid or expired session',
+        detail: userErr?.message || 'no user returned'
+      });
     }
 
     // ---- 3. Service-role client (bypass RLS for trusted operations) ----

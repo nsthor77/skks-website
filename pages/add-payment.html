@@ -302,7 +302,7 @@
   // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', async () => {
     // 1. Require owner role
-    const session = await roleGuard.requireRole(['owner']);
+   const session = await roleGuard.requireRole(['owner', 'developer']);
     if (!session) return; // role-guard handles redirect
 
     currentSession = session;

@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    // ---- 4. Authorization: user must be owner of this school ----
+    // ---- 4. Authorization: user must be owner of this school (or developer = platform admin) ----
     const { data: profile, error: profileErr } = await supabaseAdmin
       .from('profiles')
       .select('school_id, role')
@@ -68,11 +68,17 @@ module.exports = async (req, res) => {
     if (profileErr || !profile) {
       return res.status(403).json({ error: 'Profile not found' });
     }
-    if (profile.school_id !== school_id) {
-      return res.status(403).json({ error: 'You do not belong to this school' });
-    }
-    if (profile.role !== 'owner') {
-      return res.status(403).json({ error: 'Only the school owner can add payment methods' });
+
+    const isDeveloper = profile.role === 'developer';
+
+    // Developers bypass school + role checks (they manage all tenants)
+    if (!isDeveloper) {
+      if (profile.school_id !== school_id) {
+        return res.status(403).json({ error: 'You do not belong to this school' });
+      }
+      if (profile.role !== 'owner') {
+        return res.status(403).json({ error: 'Only the school owner can add payment methods' });
+      }
     }
 
     // ---- 5. Load school details ----

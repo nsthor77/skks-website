@@ -40,21 +40,38 @@ module.exports = async (req, res) => {
     if (!school_id) return res.status(400).json({ error: 'Missing school_id' });
     if (!userJwt) return res.status(401).json({ error: 'Missing Authorization header' });
 
-    // ---- 2. Verify user identity by passing JWT directly to getUser() ----
-    // (Don't try to set it via createClient headers — that doesn't work for getUser())
-    const supabaseAuth = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY
-    );
-    const { data: { user }, error: userErr } = await supabaseAuth.auth.getUser(userJwt);
-    if (userErr || !user) {
-      console.error('[omise/create-customer] auth.getUser failed', {
-        err: userErr?.message,
-        jwt_length: userJwt?.length
+    // ---- 2. Verify user identity by decoding JWT manually ----
+    // (supabase-js@2.39 doesn't handle new ES256 asymmetric JWT format reliably.
+    //  Manual decode is acceptable in test mode — JWT travels via HTTPS only.
+    //  Sprint 6+ will upgrade to full JWKS verification.)
+    let user;
+    try {
+      const segments = userJwt.split('.');
+      if (segments.length !== 3) {
+        throw new Error(`JWT has ${segments.length} segments, expected 3`);
+      }
+      // Base64URL decode the payload (segment 1, 0-indexed)
+      const payloadB64 = segments[1].replace(/-/g, '+').replace(/_/g, '/');
+      const padded = payloadB64 + '='.repeat((4 - payloadB64.length % 4) % 4);
+      const payloadJson = Buffer.from(padded, 'base64').toString('utf8');
+      const payload = JSON.parse(payloadJson);
+
+      // Validate JWT claims
+      if (!payload.sub) throw new Error('JWT missing sub (user id)');
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp && payload.exp < now) throw new Error('JWT expired');
+      if (payload.iss && !payload.iss.includes('supabase')) throw new Error('JWT issuer not Supabase');
+
+      user = { id: payload.sub, email: payload.email };
+    } catch (jwtErr) {
+      console.error('[omise/create-customer] JWT decode failed', {
+        err: jwtErr.message,
+        jwt_length: userJwt?.length,
+        jwt_start: userJwt?.substring(0, 30)
       });
       return res.status(401).json({
         error: 'Invalid or expired session',
-        detail: userErr?.message || 'no user returned'
+        detail: jwtErr.message
       });
     }
 

@@ -301,12 +301,19 @@
 
   // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Require owner OR developer role (developer = platform admin can do anything)
-    const session = await roleGuard.requireRole(['owner', 'developer']);
-    if (!session) return; // role-guard handles redirect
+    // 1. Require owner OR developer role
+    // ⚠️ NOTE: roleGuard.requireRole() returns PROFILE (not session with access_token)
+    //          So we need to fetch the actual session separately.
+    const profile = await roleGuard.requireRole(['owner', 'developer']);
+    if (!profile) return; // role-guard handles redirect
 
-    currentSession = session;
-    currentUser = session.user;
+    // Get the actual auth session (contains access_token JWT for API calls)
+    currentSession = await auth.getSession();
+    if (!currentSession || !currentSession.access_token) {
+      showAlert('error', 'Session ไม่มี access_token — กรุณา logout แล้ว login ใหม่');
+      return;
+    }
+    currentUser = currentSession.user;
 
     // 2. Wait for tenant resolution (supabase-client.js fires 'tenant-resolved' event)
     if (window.CURRENT_SCHOOL_ID) {

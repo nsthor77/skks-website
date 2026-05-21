@@ -145,20 +145,33 @@ module.exports = async (req, res) => {
         .eq('id', school_id);
     }
 
-    // ---- 8. Save card details to payment_methods (idempotent: dedupe by omise_card_id) ----
-    const cards = (customer.cards && customer.cards.data) || [];
+    // ---- 8. Re-fetch customer to get latest cards (update response may not include cards) ----
+    const freshCustomer = await omise.customers.retrieve(customer.id);
+    const cards = (freshCustomer.cards && freshCustomer.cards.data) || [];
     const defaultCard =
-      cards.find(c => c.id === customer.default_card) || cards[cards.length - 1];
+      cards.find(c => c.id === freshCustomer.default_card) ||
+      cards[cards.length - 1];
+
+    console.log('[omise/create-customer] customer card status', {
+      customer_id: freshCustomer.id,
+      cards_count: cards.length,
+      default_card_id: freshCustomer.default_card,
+      picked_card_id: defaultCard?.id
+    });
 
     if (defaultCard) {
-      // Set all existing methods to non-default
-      await supabaseAdmin
+      // Unset previous default
+      const { error: updateErr } = await supabaseAdmin
         .from('payment_methods')
         .update({ is_default: false })
         .eq('school_id', school_id);
 
-      // Upsert this card
-      await supabaseAdmin
+      if (updateErr) {
+        console.error('[omise/create-customer] failed to unset default', updateErr);
+      }
+
+      // Upsert this card (omise_card_id has UNIQUE constraint)
+      const { error: upsertErr, data: upsertData } = await supabaseAdmin
         .from('payment_methods')
         .upsert(
           {
@@ -172,7 +185,26 @@ module.exports = async (req, res) => {
             is_default: true
           },
           { onConflict: 'omise_card_id' }
-        );
+        )
+        .select();
+
+      if (upsertErr) {
+        console.error('[omise/create-customer] payment_methods upsert FAILED', {
+          err: upsertErr.message,
+          code: upsertErr.code,
+          details: upsertErr.details,
+          hint: upsertErr.hint
+        });
+      } else {
+        console.log('[omise/create-customer] payment_methods upserted', {
+          rows: upsertData?.length
+        });
+      }
+    } else {
+      console.warn('[omise/create-customer] no card found on customer', {
+        customer_id: freshCustomer.id,
+        cards_raw: freshCustomer.cards
+      });
     }
 
     // ---- 9. Success ----

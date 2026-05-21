@@ -301,8 +301,8 @@
 
   // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Require owner role
-   const session = await roleGuard.requireRole(['owner', 'developer']);
+    // 1. Require owner OR developer role (developer = platform admin can do anything)
+    const session = await roleGuard.requireRole(['owner', 'developer']);
     if (!session) return; // role-guard handles redirect
 
     currentSession = session;
@@ -427,7 +427,9 @@
         const data = await res.json();
 
         if (!res.ok || !data.success) {
-          throw new Error(data.error || 'Unknown server error');
+          // Show both error + detail (detail explains the actual cause)
+          const detail = data.detail ? ` [${data.detail}]` : '';
+          throw new Error((data.error || 'Unknown server error') + detail);
         }
 
         // Success!

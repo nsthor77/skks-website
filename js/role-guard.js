@@ -70,10 +70,9 @@ const roleGuard = {
 
       // If school is in pending_payment state → force to add-payment page
       if (school.status === 'pending_payment') {
-        console.log('[roleGuard] School in pending_payment — redirecting to /add-payment');
-        // Determine path prefix based on current location
-        const prefix = currentPath.startsWith('/pages/') ? '' : '/pages';
-        window.location.href = `${prefix}/add-payment.html`;
+        console.log('[roleGuard] School in pending_payment — redirecting to /pages/add-payment.html');
+        // Always use absolute path from origin (works from any page)
+        window.location.href = '/pages/add-payment.html';
         return;
       }
 

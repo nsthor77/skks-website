@@ -207,7 +207,26 @@ module.exports = async (req, res) => {
       });
     }
 
-    // ---- 9. Success ----
+    // ---- 9. Activate trial if school is in pending_payment state ----
+    // Sprint 5.5 (card-upfront): transitions status pending_payment → trialing
+    // + sets trial_end = NOW() + 14 days
+    // Idempotent: returns already_active:true if school already activated
+    let trialActivation = null;
+    try {
+      const { data: activationResult, error: activationErr } = await supabaseAdmin
+        .rpc('activate_school_trial', { p_school_id: school_id });
+
+      if (activationErr) {
+        console.error('[omise/create-customer] activate_school_trial RPC failed', activationErr);
+      } else {
+        trialActivation = activationResult;
+        console.log('[omise/create-customer] trial activation result', activationResult);
+      }
+    } catch (err) {
+      console.error('[omise/create-customer] activate_school_trial exception', err);
+    }
+
+    // ---- 10. Success ----
     return res.status(200).json({
       success: true,
       customer_id: customer.id,
@@ -217,6 +236,14 @@ module.exports = async (req, res) => {
             last4: defaultCard.last_digits,
             exp_month: defaultCard.expiration_month,
             exp_year: defaultCard.expiration_year
+          }
+        : null,
+      trial: trialActivation
+        ? {
+            activated: !!trialActivation.success,
+            already_active: !!trialActivation.already_active,
+            status: trialActivation.status,
+            trial_end: trialActivation.trial_end
           }
         : null
     });

@@ -440,16 +440,31 @@
         }
 
         // Success!
-        showAlert('success',
-          `✅ บันทึกบัตรสำเร็จ! ${data.card?.brand || ''} •••• ${data.card?.last4 || ''} — ` +
-          `ระบบจะเรียกเก็บเงินอัตโนมัติหลังหมด trial`
-        );
+        const cardInfo = `${data.card?.brand || ''} •••• ${data.card?.last4 || ''}`;
+        const trialJustActivated = data.trial?.activated && !data.trial?.already_active;
 
-        // Refresh card display
-        setTimeout(() => loadSchoolInfo(), 500);
-        document.getElementById('cardForm').reset();
-        submitBtn.disabled = false;
-        submitText.textContent = 'อัปเดตบัตรใหม่';
+        if (trialJustActivated) {
+          // FIRST card add — trial just started → show celebration + redirect to dashboard
+          showAlert('success',
+            `🎉 บันทึกบัตรสำเร็จ! ${cardInfo} — Trial 14 วันเริ่มแล้ว! ` +
+            `กำลังพาคุณไปยัง dashboard...`
+          );
+          // Redirect to dashboard after 2 seconds
+          setTimeout(() => {
+            window.location.href = '/pages/dashboard.html';
+          }, 2000);
+        } else {
+          // Updating existing card (trial already active)
+          showAlert('success',
+            `✅ อัปเดตบัตรสำเร็จ! ${cardInfo} — ระบบจะเรียกเก็บเงินอัตโนมัติหลังหมด trial`
+          );
+
+          // Refresh card display
+          setTimeout(() => loadSchoolInfo(), 500);
+          document.getElementById('cardForm').reset();
+          submitBtn.disabled = false;
+          submitText.textContent = 'อัปเดตบัตรใหม่';
+        }
 
       } catch (err) {
         submitBtn.disabled = false;

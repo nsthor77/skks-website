@@ -471,7 +471,10 @@
       
       if (result.success) {
         const profile = result.data.profile;
-        const redirect = roleGuard.getRedirectAfterLogin(profile?.role || 'student');
+        // Sprint 5.5: Honor ?next= query param (for redirecting to /add-payment after signup)
+        const params = new URLSearchParams(window.location.search);
+        const nextParam = params.get('next');
+        const redirect = nextParam || roleGuard.getRedirectAfterLogin(profile?.role || 'student');
         window.location.href = redirect;
       } else {
         showAlert('❌ ' + result.error, 'error');

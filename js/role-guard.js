@@ -22,15 +22,70 @@ const roleGuard = {
    */
   async requireAuth() {
     const session = await auth.getSession();
-    
+
     if (!session) {
       // Save intended destination
       sessionStorage.setItem('skks_redirect_after_login', window.location.pathname);
       window.location.href = '/login.html';
       return null;
     }
-    
+
+    // Sprint 5.5: Check if school is in pending_payment state
+    // If so, force redirect to /pages/add-payment.html (unless already there)
+    await this.checkSchoolStatus();
+
     return session;
+  },
+
+  /**
+   * Check school subscription status and redirect to /add-payment if pending_payment
+   * Idempotent — safe to call on every page load
+   */
+  async checkSchoolStatus() {
+    // Skip check if already on add-payment page (don't infinite-redirect)
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/add-payment')) {
+      return;
+    }
+
+    // Skip check if no tenant context yet (will run again after tenant-resolved)
+    const schoolId = window.CURRENT_SCHOOL_ID;
+    if (!schoolId) {
+      // Try again when tenant is resolved
+      window.addEventListener('tenant-resolved', () => this.checkSchoolStatus(), { once: true });
+      return;
+    }
+
+    try {
+      const { data: school, error } = await supabaseClient
+        .from('schools')
+        .select('id, status')
+        .eq('id', schoolId)
+        .single();
+
+      if (error || !school) {
+        console.warn('[roleGuard] Could not fetch school status', error);
+        return;
+      }
+
+      // If school is in pending_payment state → force to add-payment page
+      if (school.status === 'pending_payment') {
+        console.log('[roleGuard] School in pending_payment — redirecting to /add-payment');
+        // Determine path prefix based on current location
+        const prefix = currentPath.startsWith('/pages/') ? '' : '/pages';
+        window.location.href = `${prefix}/add-payment.html`;
+        return;
+      }
+
+      // If school is suspended/cancelled, also block
+      if (school.status === 'suspended' || school.status === 'cancelled') {
+        console.warn('[roleGuard] School suspended/cancelled');
+        // Could redirect to a "suspended" page in the future
+        // For now just log — let the user see what they can
+      }
+    } catch (err) {
+      console.error('[roleGuard] checkSchoolStatus failed', err);
+    }
   },
   
   /**

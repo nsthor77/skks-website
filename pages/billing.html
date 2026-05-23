@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Billing & Subscription — SchoolKit</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* Sarabun for body */
+    body { font-family: 'Sarabun', 'Prompt', sans-serif; background: #F8FAFC; }
+
+    .billing-wrap {
+      max-width: 960px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 26px; font-weight: 700; margin: 0 0 4px; color: #111; }
+    .page-header p { color: #666; margin: 0; font-size: 14px; }
+
+    /* Grid for top cards */
+    .top-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 760px) { .top-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .card h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin: 0 0 12px;
+    }
+
+    /* Subscription card */
+    .sub-plan {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .sub-plan-name {
+      font-size: 32px;
+      font-weight: 700;
+      color: #111;
+    }
+    .sub-cycle {
+      color: #6B7280;
+      font-size: 14px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+    .status-trialing { background: #FEF3C7; color: #92400E; }
+    .status-active { background: #D1FAE5; color: #065F46; }
+    .status-past_due { background: #FEE2E2; color: #991B1B; }
+    .status-pending_payment { background: #DBEAFE; color: #1E40AF; }
+    .status-suspended { background: #F3F4F6; color: #374151; }
+    .status-cancelled { background: #F3F4F6; color: #6B7280; }
+
+    .sub-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-top: 1px solid #F3F4F6;
+      font-size: 14px;
+    }
+    .sub-row .label { color: #6B7280; }
+    .sub-row .value { color: #111; font-weight: 500; }
+
+    /* Card on file */
+    .saved-card-display {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
+      border-radius: 10px;
+      color: #fff;
+    }
+    .saved-card-display .brand {
+      background: rgba(255,255,255,.15);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 12px;
+    }
+    .saved-card-display .number {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      font-size: 16px;
+    }
+    .saved-card-display .expiry {
+      margin-left: auto;
+      font-size: 12px;
+      color: rgba(255,255,255,.7);
+    }
+    .no-card {
+      padding: 24px;
+      text-align: center;
+      background: #FFFBEB;
+      border: 1px dashed #FCD34D;
+      border-radius: 8px;
+      color: #92400E;
+      font-size: 14px;
+    }
+
+    /* Trial countdown alert */
+    .trial-alert {
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      border: 1px solid #FCD34D;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #78350F;
+    }
+    .trial-alert .icon { font-size: 24px; }
+    .trial-alert strong { font-weight: 700; }
+
+    /* Past due alert */
+    .past-due-alert {
+      background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+      border: 1px solid #FCA5A5;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      color: #7F1D1D;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .btn-primary {
+      background: #2563EB;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #1D4ED8; }
+    .btn-secondary {
+      background: #F3F4F6;
+      color: #374151;
+      border: 1px solid #E5E7EB;
+    }
+    .btn-secondary:hover { background: #E5E7EB; }
+    .btn-danger-text {
+      background: transparent;
+      color: #DC2626;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Invoice table */
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .invoice-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #F9FAFB;
+      color: #6B7280;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    .invoice-table td {
+      padding: 12px;
+      border-bottom: 1px solid #F3F4F6;
+      color: #111;
+    }
+    .invoice-table tr:last-child td { border-bottom: none; }
+    .invoice-empty {
+      text-align: center;
+      padding: 32px;
+      color: #9CA3AF;
+      font-size: 14px;
+    }
+    .invoice-status-paid { color: #065F46; }
+    .invoice-status-failed { color: #991B1B; }
+    .invoice-status-pending { color: #92400E; }
+
+    .section-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .section-header-row h2 { margin: 0; }
+    .view-all-link {
+      color: #2563EB;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .view-all-link:hover { text-decoration: underline; }
+
+    .loading { color: #9CA3AF; text-align: center; padding: 24px; }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar (admin style) -->
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SchoolKit" />
+        <h1>SchoolKit</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="billing.html" class="active">💳 Billing</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <div class="user-chip">
+        <span id="userName">Loading...</span>
+        <div class="avatar" id="userAvatar">?</div>
+      </div>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="billing-wrap">
+
+    <div class="page-header">
+      <h1>💳 Billing & Subscription</h1>
+      <p>จัดการแพ็คเกจ บัตรเครดิต และดูประวัติการเรียกเก็บเงิน</p>
+    </div>
+
+    <!-- Status alerts (trial countdown, past_due warning) -->
+    <div id="statusAlerts"></div>
+
+    <!-- Top grid: subscription + card -->
+    <div class="top-grid">
+
+      <!-- Subscription -->
+      <div class="card">
+        <h2>📦 Subscription</h2>
+        <div id="subscriptionBlock">
+          <div class="loading">กำลังโหลด...</div>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="card">
+        <h2>💳 Payment Method</h2>
+        <div id="cardBlock">
+          <div class="loading">กำลังโหลด...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recent Invoices -->
+    <div class="card">
+      <div class="section-header-row">
+        <h2>🧾 Recent Invoices</h2>
+        <a href="invoices.html" class="view-all-link">ดูทั้งหมด →</a>
+      </div>
+      <div id="invoicesBlock">
+        <div class="loading">กำลังโหลด...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+  let currentSchool = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Require owner or developer
+    const profile = await roleGuard.requireRole(['owner', 'developer']);
+    if (!profile) return;
+
+    document.getElementById('userName').textContent = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.email;
+    document.getElementById('userAvatar').textContent = (profile.first_name || profile.email || '?')[0].toUpperCase();
+
+    // Wait for tenant
+    if (window.CURRENT_SCHOOL_ID) {
+      loadBillingData();
+    } else {
+      window.addEventListener('tenant-resolved', loadBillingData, { once: true });
+    }
+  });
+
+  async function loadBillingData() {
+    const schoolId = window.CURRENT_SCHOOL_ID;
+    if (!schoolId) return;
+
+    // 1) Load school
+    const { data: school, error: schoolErr } = await supabaseClient
+      .from('schools')
+      .select('id, name, status, trial_ends_at, omise_customer_id')
+      .eq('id', schoolId)
+      .single();
+    if (schoolErr || !school) {
+      showError('โหลดข้อมูลโรงเรียนไม่สำเร็จ');
+      return;
+    }
+    currentSchool = school;
+
+    // 2) Load subscription
+    const { data: subscription } = await supabaseClient
+      .from('subscriptions')
+      .select('id, plan_id, billing_cycle, status, current_period_start, current_period_end, trial_end, omise_schedule_id')
+      .eq('school_id', schoolId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // 3) Load payment method
+    const { data: paymentMethod } = await supabaseClient
+      .from('payment_methods')
+      .select('card_brand, card_last4, card_exp_month, card_exp_year, is_default')
+      .eq('school_id', schoolId)
+      .eq('is_default', true)
+      .maybeSingle();
+
+    // 4) Load recent invoices (5 latest)
+    const { data: invoices } = await supabaseClient
+      .from('invoices')
+      .select('id, invoice_number, amount, total_amount, status, due_date, paid_at, created_at')
+      .eq('school_id', schoolId)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    // Render
+    renderAlerts(school, subscription);
+    renderSubscription(school, subscription);
+    renderPaymentMethod(paymentMethod);
+    renderInvoices(invoices || []);
+  }
+
+  function renderAlerts(school, sub) {
+    const box = document.getElementById('statusAlerts');
+    box.innerHTML = '';
+
+    // Trial countdown
+    if (school.status === 'trialing' && school.trial_ends_at) {
+      const trialEnd = new Date(school.trial_ends_at);
+      const now = new Date();
+      const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+
+      if (daysLeft > 0) {
+        box.innerHTML = `
+          <div class="trial-alert">
+            <span class="icon">⏳</span>
+            <div>
+              <strong>คุณอยู่ในช่วง Trial</strong> — เหลืออีก <strong>${daysLeft} วัน</strong>
+              (หมดวันที่ ${trialEnd.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })})<br/>
+              <span style="font-size:13px;">ระบบจะเรียกเก็บเงินอัตโนมัติเมื่อหมด trial — ยกเลิกได้ก่อนวันที่ ${trialEnd.toLocaleDateString('th-TH')}</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Past due warning
+    if (school.status === 'past_due' || sub?.status === 'past_due') {
+      box.innerHTML += `
+        <div class="past-due-alert">
+          <strong>⚠️ การชำระเงินล้มเหลว</strong> — กรุณาอัปเดตบัตรเครดิตใหม่<br/>
+          <span style="font-size:13px;">ระบบจะลองเรียกเก็บอีกครั้งภายใน 24 ชั่วโมง</span>
+          <a href="add-payment.html" class="btn btn-primary" style="margin-top:10px;display:inline-block;">อัปเดตบัตรเครดิต →</a>
+        </div>
+      `;
+    }
+  }
+
+  function renderSubscription(school, sub) {
+    const block = document.getElementById('subscriptionBlock');
+    if (!sub) {
+      block.innerHTML = `<p style="color:#9CA3AF;">ยังไม่มี subscription</p>`;
+      return;
+    }
+
+    const planNames = { starter: 'Starter', pro: 'Pro', premium: 'Premium' };
+    const cycleNames = { monthly: 'รายเดือน', yearly: 'รายปี' };
+    const statusLabel = {
+      trialing: 'Trial',
+      active: 'Active',
+      past_due: 'Past Due',
+      pending_payment: 'รอชำระเงิน',
+      suspended: 'Suspended',
+      cancelled: 'Cancelled'
+    }[sub.status] || sub.status;
+
+    const nextBilling = sub.current_period_end
+      ? new Date(sub.current_period_end).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })
+      : '—';
+
+    const planPrices = {
+      starter: { monthly: 1990, yearly: 19104 },
+      pro: { monthly: 3990, yearly: 38304 },
+      premium: { monthly: 7990, yearly: 76704 }
+    };
+    const price = planPrices[sub.plan_id]?.[sub.billing_cycle] || 0;
+    const priceLabel = sub.billing_cycle === 'yearly' ? '/ปี' : '/เดือน';
+
+    block.innerHTML = `
+      <div class="sub-plan">
+        <div>
+          <div class="sub-plan-name">${planNames[sub.plan_id] || sub.plan_id}</div>
+          <div class="sub-cycle">${cycleNames[sub.billing_cycle]} — ฿${price.toLocaleString()}${priceLabel}</div>
+        </div>
+        <div style="margin-left:auto;">
+          <span class="status-badge status-${sub.status}">${statusLabel}</span>
+        </div>
+      </div>
+
+      <div class="sub-row">
+        <span class="label">เริ่ม period</span>
+        <span class="value">${sub.current_period_start ? new Date(sub.current_period_start).toLocaleDateString('th-TH') : '—'}</span>
+      </div>
+      <div class="sub-row">
+        <span class="label">${sub.status === 'trialing' ? 'หมด trial' : 'เรียกเก็บครั้งต่อไป'}</span>
+        <span class="value">${nextBilling}</span>
+      </div>
+      <div class="sub-row">
+        <span class="label">Auto-charge</span>
+        <span class="value">${sub.omise_schedule_id ? '✅ Active' : '❌ Not set'}</span>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn btn-secondary" onclick="alert('Change plan — coming in Sprint 6.5')">เปลี่ยนแพ็คเกจ</button>
+        <button class="btn btn-danger-text" onclick="alert('Cancel — coming in Sprint 6.5')">ยกเลิกการสมัคร</button>
+      </div>
+    `;
+  }
+
+  function renderPaymentMethod(pm) {
+    const block = document.getElementById('cardBlock');
+    if (!pm || !pm.card_last4) {
+      block.innerHTML = `
+        <div class="no-card">
+          ยังไม่มีบัตรเครดิต<br/>
+          <a href="add-payment.html" class="btn btn-primary" style="margin-top:12px;display:inline-block;">เพิ่มบัตรเครดิต →</a>
+        </div>
+      `;
+      return;
+    }
+
+    block.innerHTML = `
+      <div class="saved-card-display">
+        <span class="brand">${(pm.card_brand || 'CARD').toUpperCase()}</span>
+        <span class="number">•••• ${pm.card_last4}</span>
+        <span class="expiry">${String(pm.card_exp_month).padStart(2,'0')}/${String(pm.card_exp_year).slice(-2)}</span>
+      </div>
+      <div class="actions-row">
+        <a href="add-payment.html" class="btn btn-secondary">เปลี่ยนบัตร</a>
+      </div>
+    `;
+  }
+
+  function renderInvoices(invoices) {
+    const block = document.getElementById('invoicesBlock');
+    if (!invoices || invoices.length === 0) {
+      block.innerHTML = `
+        <div class="invoice-empty">
+          ยังไม่มีรายการ invoice<br/>
+          <span style="font-size:13px;">Invoice แรกจะออกเมื่อหมด trial</span>
+        </div>
+      `;
+      return;
+    }
+
+    const statusLabel = {
+      paid: { th: 'ชำระแล้ว', cls: 'invoice-status-paid' },
+      failed: { th: 'ล้มเหลว', cls: 'invoice-status-failed' },
+      pending: { th: 'รอชำระ', cls: 'invoice-status-pending' }
+    };
+
+    block.innerHTML = `
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>เลขที่</th>
+            <th>จำนวนเงิน</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${invoices.map(inv => {
+            const date = new Date(inv.created_at).toLocaleDateString('th-TH');
+            const st = statusLabel[inv.status] || { th: inv.status, cls: '' };
+            return `
+              <tr>
+                <td>${date}</td>
+                <td><code style="font-size:12px;">${inv.invoice_number}</code></td>
+                <td>฿${(inv.total_amount || inv.amount || 0).toLocaleString()}</td>
+                <td class="${st.cls}">${st.th}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function showError(msg) {
+    document.getElementById('statusAlerts').innerHTML = `
+      <div class="past-due-alert">${msg}</div>
+    `;
+  }
+  </script>
+
+</body>
+</html>

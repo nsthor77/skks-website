@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoices — SchoolKit</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body { font-family: 'Sarabun', 'Prompt', sans-serif; background: #F8FAFC; }
+
+    .wrap { max-width: 960px; margin: 32px auto; padding: 0 16px; }
+    .page-header { margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+    .page-header h1 { font-size: 26px; font-weight: 700; margin: 0; color: #111; }
+    .back-link {
+      color: #2563EB;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 14px;
+      border-radius: 20px;
+      background: #F3F4F6;
+      color: #374151;
+      border: 1px solid #E5E7EB;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .filter-btn:hover { background: #E5E7EB; }
+    .filter-btn.active {
+      background: #1F2937;
+      color: #fff;
+      border-color: #1F2937;
+    }
+    .filter-count {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 7px;
+      background: rgba(0,0,0,.1);
+      border-radius: 10px;
+      font-size: 11px;
+    }
+    .filter-btn.active .filter-count { background: rgba(255,255,255,.2); }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .invoice-table th {
+      text-align: left;
+      padding: 12px;
+      background: #F9FAFB;
+      color: #6B7280;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    .invoice-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #F3F4F6;
+      color: #111;
+    }
+    .invoice-table tbody tr:hover { background: #F9FAFB; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-paid { background: #D1FAE5; color: #065F46; }
+    .status-failed { background: #FEE2E2; color: #991B1B; }
+    .status-pending { background: #FEF3C7; color: #92400E; }
+    .status-refunded { background: #E0E7FF; color: #3730A3; }
+
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 12px;
+      background: #F3F4F6;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      color: #374151;
+      text-decoration: none;
+    }
+    .btn-small:hover { background: #E5E7EB; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9CA3AF;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    .loading { text-align: center; padding: 60px; color: #9CA3AF; }
+
+    .summary-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 720px) { .summary-bar { grid-template-columns: 1fr 1fr; } }
+    .summary-tile {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .summary-tile .label {
+      font-size: 11px;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 4px;
+    }
+    .summary-tile .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    /* Detail modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      max-width: 540px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .modal h3 { margin: 0 0 16px; font-size: 18px; }
+    .modal-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #F3F4F6;
+      font-size: 14px;
+    }
+    .modal-row .label { color: #6B7280; }
+    .modal-row .value { color: #111; font-weight: 500; }
+    .modal-close {
+      float: right;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6B7280;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="SchoolKit" />
+        <h1>SchoolKit</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="billing.html">💳 Billing</a>
+        <a href="invoices.html" class="active">🧾 Invoices</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <div class="user-chip">
+        <span id="userName">Loading...</span>
+        <div class="avatar" id="userAvatar">?</div>
+      </div>
+      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="page-header">
+      <h1>🧾 Invoice History</h1>
+      <a href="billing.html" class="back-link">← กลับไปหน้า Billing</a>
+    </div>
+
+    <!-- Summary tiles -->
+    <div class="summary-bar" id="summaryBar">
+      <div class="summary-tile"><div class="label">รวมทั้งหมด</div><div class="value" id="totalInvoices">—</div></div>
+      <div class="summary-tile"><div class="label">ชำระแล้ว</div><div class="value" id="paidCount">—</div></div>
+      <div class="summary-tile"><div class="label">ล้มเหลว</div><div class="value" id="failedCount">—</div></div>
+      <div class="summary-tile"><div class="label">ยอดรวมที่จ่าย</div><div class="value" id="totalPaid">฿0</div></div>
+    </div>
+
+    <div class="card">
+
+      <div class="filters">
+        <button class="filter-btn active" data-status="all" onclick="setFilter('all')">ทั้งหมด <span class="filter-count" id="count-all">0</span></button>
+        <button class="filter-btn" data-status="paid" onclick="setFilter('paid')">ชำระแล้ว <span class="filter-count" id="count-paid">0</span></button>
+        <button class="filter-btn" data-status="failed" onclick="setFilter('failed')">ล้มเหลว <span class="filter-count" id="count-failed">0</span></button>
+        <button class="filter-btn" data-status="pending" onclick="setFilter('pending')">รอชำระ <span class="filter-count" id="count-pending">0</span></button>
+      </div>
+
+      <div id="invoicesList">
+        <div class="loading">กำลังโหลด...</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Invoice detail modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+  let allInvoices = [];
+  let currentFilter = 'all';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const profile = await roleGuard.requireRole(['owner', 'developer']);
+    if (!profile) return;
+
+    document.getElementById('userName').textContent = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.email;
+    document.getElementById('userAvatar').textContent = (profile.first_name || profile.email || '?')[0].toUpperCase();
+
+    if (window.CURRENT_SCHOOL_ID) {
+      loadInvoices();
+    } else {
+      window.addEventListener('tenant-resolved', loadInvoices, { once: true });
+    }
+  });
+
+  async function loadInvoices() {
+    const schoolId = window.CURRENT_SCHOOL_ID;
+    if (!schoolId) return;
+
+    const { data, error } = await supabaseClient
+      .from('invoices')
+      .select('*')
+      .eq('school_id', schoolId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      document.getElementById('invoicesList').innerHTML = `<p style="color:#DC2626;">โหลดไม่สำเร็จ: ${error.message}</p>`;
+      return;
+    }
+
+    allInvoices = data || [];
+    updateSummary();
+    updateFilterCounts();
+    render();
+  }
+
+  function setFilter(status) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-status="${status}"]`).classList.add('active');
+    render();
+  }
+
+  function updateSummary() {
+    const total = allInvoices.length;
+    const paid = allInvoices.filter(i => i.status === 'paid');
+    const failed = allInvoices.filter(i => i.status === 'failed');
+    const totalPaid = paid.reduce((sum, i) => sum + (i.total_amount || i.amount || 0), 0);
+
+    document.getElementById('totalInvoices').textContent = total;
+    document.getElementById('paidCount').textContent = paid.length;
+    document.getElementById('failedCount').textContent = failed.length;
+    document.getElementById('totalPaid').textContent = `฿${totalPaid.toLocaleString()}`;
+  }
+
+  function updateFilterCounts() {
+    document.getElementById('count-all').textContent = allInvoices.length;
+    document.getElementById('count-paid').textContent = allInvoices.filter(i => i.status === 'paid').length;
+    document.getElementById('count-failed').textContent = allInvoices.filter(i => i.status === 'failed').length;
+    document.getElementById('count-pending').textContent = allInvoices.filter(i => i.status === 'pending').length;
+  }
+
+  function render() {
+    const list = document.getElementById('invoicesList');
+    const filtered = currentFilter === 'all'
+      ? allInvoices
+      : allInvoices.filter(i => i.status === currentFilter);
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">📭</div>
+          <p>ไม่มี invoice ในหมวดนี้</p>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = `
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>เลขที่ Invoice</th>
+            <th>รายการ</th>
+            <th>จำนวนเงิน</th>
+            <th>สถานะ</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(inv => {
+            const date = new Date(inv.created_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            const items = inv.line_items;
+            const desc = (Array.isArray(items) && items.length > 0) ? items[0].description : '—';
+            const amount = inv.total_amount || inv.amount || 0;
+            return `
+              <tr>
+                <td>${date}</td>
+                <td><code style="font-size:12px;">${inv.invoice_number}</code></td>
+                <td style="color:#6B7280;font-size:13px;">${desc}</td>
+                <td><strong>฿${amount.toLocaleString()}</strong></td>
+                <td><span class="status-pill status-${inv.status}">${statusLabel(inv.status)}</span></td>
+                <td><button class="btn-small" onclick='showDetail(${JSON.stringify(inv).replace(/'/g, "\\'")})'>ดูรายละเอียด</button></td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function statusLabel(s) {
+    return { paid: 'ชำระแล้ว', failed: 'ล้มเหลว', pending: 'รอชำระ', refunded: 'คืนเงิน' }[s] || s;
+  }
+
+  function showDetail(inv) {
+    const items = inv.line_items || [];
+    const itemRows = items.map(it => `
+      <div class="modal-row">
+        <span class="label">${it.description}</span>
+        <span class="value">฿${(it.amount || 0).toLocaleString()} × ${it.quantity || 1}</span>
+      </div>
+    `).join('');
+
+    document.getElementById('modalContent').innerHTML = `
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <h3>🧾 Invoice ${inv.invoice_number}</h3>
+
+      <div class="modal-row">
+        <span class="label">วันที่ออก</span>
+        <span class="value">${new Date(inv.created_at).toLocaleString('th-TH')}</span>
+      </div>
+      <div class="modal-row">
+        <span class="label">วันที่ชำระ</span>
+        <span class="value">${inv.paid_at ? new Date(inv.paid_at).toLocaleString('th-TH') : '—'}</span>
+      </div>
+      <div class="modal-row">
+        <span class="label">สถานะ</span>
+        <span class="value"><span class="status-pill status-${inv.status}">${statusLabel(inv.status)}</span></span>
+      </div>
+      <div class="modal-row">
+        <span class="label">Omise Charge ID</span>
+        <span class="value"><code style="font-size:11px;">${inv.omise_charge_id || '—'}</code></span>
+      </div>
+
+      <h4 style="margin:20px 0 8px;font-size:14px;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">รายการ</h4>
+      ${itemRows || '<p style="color:#9CA3AF;font-size:13px;">ไม่มีรายการ</p>'}
+
+      <div class="modal-row" style="border-top:2px solid #111;margin-top:12px;padding-top:14px;">
+        <span class="label" style="color:#111;font-weight:600;">ยอดรวม</span>
+        <span class="value" style="font-size:18px;font-weight:700;">฿${(inv.total_amount || inv.amount || 0).toLocaleString()}</span>
+      </div>
+
+      ${inv.status === 'paid' ? `
+        <button class="btn-small" style="margin-top:16px;padding:8px 14px;" onclick="alert('PDF download — Sprint 8')">📄 Download PDF Receipt</button>
+      ` : ''}
+    `;
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+  }
+  </script>
+
+</body>
+</html>

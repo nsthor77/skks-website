@@ -48,6 +48,11 @@ const roleGuard = {
       return;
     }
 
+    // Skip check for /admin/* pages — admin pages have different context (platform-wide)
+    if (currentPath.includes('/admin/')) {
+      return;
+    }
+
     // Skip check if no tenant context yet (will run again after tenant-resolved)
     const schoolId = window.CURRENT_SCHOOL_ID;
     if (!schoolId) {

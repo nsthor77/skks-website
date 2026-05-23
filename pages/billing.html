@@ -313,6 +313,11 @@
 
   </div>
 
+  <!-- ============= MODALS ============= -->
+  <div id="modalOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;">
+    <div id="modalContent" style="background:#fff;border-radius:12px;max-width:520px;width:90%;padding:28px;max-height:90vh;overflow-y:auto;"></div>
+  </div>
+
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
@@ -355,7 +360,7 @@
     // 2) Load subscription
     const { data: subscription } = await supabaseClient
       .from('subscriptions')
-      .select('id, plan_id, billing_cycle, status, current_period_start, current_period_end, trial_end, omise_schedule_id')
+      .select('id, plan_id, billing_cycle, status, current_period_start, current_period_end, trial_end, omise_schedule_id, cancel_at_period_end, cancelled_at')
       .eq('school_id', schoolId)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -475,9 +480,18 @@
       </div>
 
       <div class="actions-row">
-        <button class="btn btn-secondary" onclick="alert('Change plan — coming in Sprint 6.5')">เปลี่ยนแพ็คเกจ</button>
-        <button class="btn btn-danger-text" onclick="alert('Cancel — coming in Sprint 6.5')">ยกเลิกการสมัคร</button>
+        <button class="btn btn-secondary" onclick="openChangePlanModal()">เปลี่ยนแพ็คเกจ</button>
+        ${sub.cancel_at_period_end
+          ? `<button class="btn btn-secondary" onclick="resumeSubscription()" style="color:#065F46;border-color:#10B981;">↩️ เปลี่ยนใจ — ยกเลิกการยกเลิก</button>`
+          : `<button class="btn btn-danger-text" onclick="openCancelModal()">ยกเลิกการสมัคร</button>`
+        }
       </div>
+      ${sub.cancel_at_period_end
+        ? `<div style="margin-top:12px;padding:10px 14px;background:#FEE2E2;border-radius:8px;font-size:13px;color:#991B1B;">
+             ⏰ การสมัครจะสิ้นสุดวันที่ <strong>${new Date(sub.current_period_end).toLocaleDateString('th-TH')}</strong>
+           </div>`
+        : ''
+      }
     `;
   }
 
@@ -555,6 +569,220 @@
     document.getElementById('statusAlerts').innerHTML = `
       <div class="past-due-alert">${msg}</div>
     `;
+  }
+
+  // ============= MODAL HELPERS =============
+  function openModal(html) {
+    document.getElementById('modalContent').innerHTML = html;
+    const overlay = document.getElementById('modalOverlay');
+    overlay.style.display = 'flex';
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').style.display = 'none';
+  }
+  // Click outside to close
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modalOverlay') closeModal();
+  });
+
+  // ============= CANCEL SUBSCRIPTION =============
+  function openCancelModal() {
+    if (!currentSchool) return;
+    openModal(`
+      <h2 style="font-size:20px;margin:0 0 8px;color:#991B1B;">⚠️ ยืนยันการยกเลิก subscription</h2>
+      <p style="color:#374151;font-size:14px;line-height:1.6;margin:0 0 18px;">
+        เมื่อยกเลิก:<br/>
+        • ระบบจะ <strong>ไม่เรียกเก็บเงินครั้งต่อไป</strong><br/>
+        • คุณยังใช้งานได้ <strong>ถึงวันสิ้นสุด period ปัจจุบัน</strong><br/>
+        • หลังจากนั้น account จะถูกปิด (ข้อมูลเก็บไว้ 90 วัน)<br/>
+        • <strong>ยกเลิกการยกเลิกได้ตลอดเวลา</strong>ก่อนหมด period
+      </p>
+      <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:12px;margin-bottom:18px;font-size:13px;color:#78350F;">
+        💡 หรือลอง <strong>เปลี่ยนแพ็คเกจเป็น Starter</strong> ก่อน? ราคาถูกลงเหลือ ฿1,990/เดือน
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" onclick="closeModal()" style="flex:1;">เก็บไว้ก่อน</button>
+        <button class="btn btn-primary" onclick="confirmCancel()" style="flex:1;background:#DC2626;">ยืนยันยกเลิก</button>
+      </div>
+    `);
+  }
+
+  async function confirmCancel() {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'กำลังยกเลิก...';
+
+    try {
+      const session = (await supabaseClient.auth.getSession()).data.session;
+      const res = await fetch('/api/billing/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ school_id: currentSchool.id })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Cancel failed');
+      }
+      closeModal();
+      openModal(`
+        <h2 style="font-size:20px;margin:0 0 12px;color:#065F46;">✅ ยกเลิกแล้ว</h2>
+        <p style="color:#374151;font-size:14px;line-height:1.6;">${data.message}</p>
+        <button class="btn btn-primary" onclick="closeModal();loadBillingData();" style="margin-top:16px;">ตกลง</button>
+      `);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'ยืนยันยกเลิก';
+      alert('ยกเลิกไม่สำเร็จ: ' + err.message);
+    }
+  }
+
+  // ============= RESUME SUBSCRIPTION =============
+  async function resumeSubscription() {
+    if (!confirm('ต้องการยกเลิกการยกเลิก subscription หรือไม่?')) return;
+    try {
+      const session = (await supabaseClient.auth.getSession()).data.session;
+      const { data, error } = await supabaseClient.rpc('resume_subscription', {
+        p_school_id: currentSchool.id
+      });
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error);
+      alert('✅ ' + (data.message || 'Subscription resumed'));
+      loadBillingData();
+    } catch (err) {
+      alert('ไม่สำเร็จ: ' + err.message);
+    }
+  }
+
+  // ============= CHANGE PLAN =============
+  let selectedNewPlan = null;
+  let selectedNewCycle = null;
+
+  function openChangePlanModal() {
+    if (!currentSchool) return;
+    const planPrices = {
+      starter: { monthly: 1990, yearly: 19104 },
+      pro: { monthly: 3990, yearly: 38304 },
+      premium: { monthly: 7990, yearly: 76704 }
+    };
+    selectedNewPlan = null;
+    selectedNewCycle = null;
+
+    const planCard = (id, name) => `
+      <div data-plan="${id}" onclick="selectPlan('${id}')" style="border:2px solid #E5E7EB;border-radius:10px;padding:14px;cursor:pointer;text-align:center;transition:all .15s;">
+        <div style="font-size:13px;color:#6B7280;font-weight:600;text-transform:uppercase;">${name}</div>
+        <div class="price-monthly" style="font-size:18px;font-weight:700;margin-top:4px;">฿${planPrices[id].monthly.toLocaleString()}<small style="font-size:11px;color:#6B7280;">/เดือน</small></div>
+        <div class="price-yearly" style="font-size:18px;font-weight:700;margin-top:4px;display:none;">฿${planPrices[id].yearly.toLocaleString()}<small style="font-size:11px;color:#6B7280;">/ปี</small></div>
+      </div>
+    `;
+
+    openModal(`
+      <h2 style="font-size:20px;margin:0 0 8px;">📦 เปลี่ยนแพ็คเกจ</h2>
+      <p style="color:#6B7280;font-size:14px;margin:0 0 18px;">ราคาใหม่จะคิดในรอบบิลครั้งต่อไป</p>
+
+      <div style="display:flex;gap:6px;margin-bottom:14px;background:#F3F4F6;padding:4px;border-radius:8px;">
+        <button id="cycleMonthlyBtn" type="button" onclick="setCycle('monthly')" class="cycle-btn" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fff;font-weight:600;cursor:pointer;">รายเดือน</button>
+        <button id="cycleYearlyBtn" type="button" onclick="setCycle('yearly')" class="cycle-btn" style="flex:1;padding:8px;border:none;border-radius:6px;background:transparent;font-weight:600;cursor:pointer;color:#6B7280;">รายปี <span style="background:#10B981;color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;">-20%</span></button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px;">
+        ${planCard('starter', 'Starter')}
+        ${planCard('pro', 'Pro')}
+        ${planCard('premium', 'Premium')}
+      </div>
+
+      <div id="changePlanError" style="color:#DC2626;font-size:13px;margin-bottom:10px;display:none;"></div>
+
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" onclick="closeModal()" style="flex:1;">ยกเลิก</button>
+        <button id="confirmChangePlanBtn" class="btn btn-primary" onclick="confirmChangePlan()" style="flex:1;" disabled>เลือกแพ็คเกจก่อน</button>
+      </div>
+    `);
+
+    // Default to monthly
+    setCycle('monthly');
+  }
+
+  function setCycle(cycle) {
+    selectedNewCycle = cycle;
+    document.querySelectorAll('.price-monthly').forEach(el => el.style.display = cycle === 'monthly' ? 'block' : 'none');
+    document.querySelectorAll('.price-yearly').forEach(el => el.style.display = cycle === 'yearly' ? 'block' : 'none');
+    document.getElementById('cycleMonthlyBtn').style.background = cycle === 'monthly' ? '#fff' : 'transparent';
+    document.getElementById('cycleMonthlyBtn').style.color = cycle === 'monthly' ? '#111' : '#6B7280';
+    document.getElementById('cycleYearlyBtn').style.background = cycle === 'yearly' ? '#fff' : 'transparent';
+    document.getElementById('cycleYearlyBtn').style.color = cycle === 'yearly' ? '#111' : '#6B7280';
+    updateConfirmButton();
+  }
+
+  function selectPlan(plan) {
+    selectedNewPlan = plan;
+    document.querySelectorAll('[data-plan]').forEach(el => {
+      const isSelected = el.dataset.plan === plan;
+      el.style.borderColor = isSelected ? '#2563EB' : '#E5E7EB';
+      el.style.background = isSelected ? '#EFF6FF' : '#fff';
+    });
+    updateConfirmButton();
+  }
+
+  function updateConfirmButton() {
+    const btn = document.getElementById('confirmChangePlanBtn');
+    if (!btn) return;
+    if (selectedNewPlan && selectedNewCycle) {
+      btn.disabled = false;
+      btn.textContent = `ยืนยันเปลี่ยนเป็น ${selectedNewPlan} (${selectedNewCycle === 'yearly' ? 'รายปี' : 'รายเดือน'})`;
+    } else {
+      btn.disabled = true;
+      btn.textContent = 'เลือกแพ็คเกจก่อน';
+    }
+  }
+
+  async function confirmChangePlan() {
+    if (!selectedNewPlan || !selectedNewCycle) return;
+    const btn = document.getElementById('confirmChangePlanBtn');
+    const errBox = document.getElementById('changePlanError');
+    errBox.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'กำลังเปลี่ยน...';
+
+    try {
+      const session = (await supabaseClient.auth.getSession()).data.session;
+      const res = await fetch('/api/billing/change-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          school_id: currentSchool.id,
+          new_plan_id: selectedNewPlan,
+          new_billing_cycle: selectedNewCycle
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Change failed');
+      }
+      closeModal();
+      openModal(`
+        <h2 style="font-size:20px;margin:0 0 12px;color:#065F46;">✅ เปลี่ยนแพ็คเกจสำเร็จ!</h2>
+        <p style="color:#374151;font-size:14px;line-height:1.6;">
+          จาก <strong>${data.old.plan_id} ${data.old.billing_cycle}</strong> →
+          <strong>${data.new.plan_id} ${data.new.billing_cycle}</strong><br/>
+          ${data.message}
+        </p>
+        <p style="color:#6B7280;font-size:13px;margin-top:10px;">
+          ราคาใหม่: <strong>฿${(data.new.amount_satang / 100).toLocaleString()}</strong>${data.new.billing_cycle === 'yearly' ? '/ปี' : '/เดือน'}
+        </p>
+        <button class="btn btn-primary" onclick="closeModal();loadBillingData();" style="margin-top:16px;">ตกลง</button>
+      `);
+    } catch (err) {
+      errBox.textContent = err.message;
+      errBox.style.display = 'block';
+      btn.disabled = false;
+      updateConfirmButton();
+    }
   }
   </script>
 

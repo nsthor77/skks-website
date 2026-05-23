@@ -5,6 +5,7 @@
   "description": "SchoolKit multi-tenant app (serves SKKS + other school tenants)",
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
-    "omise": "^0.10.1"
+    "omise": "^0.10.1",
+    "resend": "^4.0.0"
   }
 }

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — SchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Sarabun', sans-serif;
+      background: #F9FAFB;
+      color: #111;
+    }
+
+    /* Admin shell */
+    .admin-shell { display: flex; min-height: 100vh; }
+    .admin-sidebar {
+      width: 240px;
+      background: #1F2937;
+      color: #fff;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid #374151;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logo .text { font-weight: 700; font-size: 16px; }
+    .sidebar-logo .badge { font-size: 10px; background: #FBBF24; color: #1F2937; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+    .sidebar-nav { padding: 16px 0; }
+    .sidebar-nav a {
+      display: block;
+      padding: 10px 20px;
+      color: #D1D5DB;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all .15s;
+    }
+    .sidebar-nav a:hover { background: #374151; color: #fff; }
+    .sidebar-nav a.active { background: #2563EB; color: #fff; font-weight: 600; }
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid #374151;
+      position: absolute;
+      bottom: 0;
+      width: 240px;
+    }
+    .sidebar-footer .user { font-size: 13px; color: #9CA3AF; }
+    .sidebar-footer button {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #D1D5DB;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .sidebar-footer button:hover { background: #374151; }
+
+    /* Main */
+    .admin-main { flex: 1; padding: 30px; max-width: 1200px; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 24px; margin: 0 0 4px; }
+    .page-header p { color: #6B7280; margin: 0; font-size: 14px; }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: #111;
+      line-height: 1.2;
+    }
+    .stat-meta {
+      font-size: 12px;
+      color: #6B7280;
+      margin-top: 4px;
+    }
+
+    /* Highlight cards */
+    .stat-mrr { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); color: #fff; }
+    .stat-mrr .stat-label, .stat-mrr .stat-meta { color: #BFDBFE; }
+    .stat-mrr .stat-value { color: #fff; }
+    .stat-arr { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #fff; }
+    .stat-arr .stat-label, .stat-arr .stat-meta { color: #A7F3D0; }
+    .stat-arr .stat-value { color: #fff; }
+
+    /* Sections */
+    .section {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin: 0 0 14px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* Status breakdown */
+    .status-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: #F3F4F6;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-trialing { background: #FBBF24; }
+    .dot-active { background: #10B981; }
+    .dot-past_due { background: #EF4444; }
+    .dot-suspended { background: #6B7280; }
+    .dot-cancelled { background: #9CA3AF; }
+    .dot-pending_payment { background: #3B82F6; }
+
+    .loading { color: #9CA3AF; text-align: center; padding: 40px; }
+    .error { color: #DC2626; padding: 20px; background: #FEE2E2; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-shell">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="text">SchoolKit</span>
+        <span class="badge">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="active">📊 Dashboard</a>
+        <a href="tenants.html">🏫 Tenants</a>
+        <a href="tenant-detail.html">📋 Tenant Detail</a>
+        <a href="../pages/dashboard.html">↩️ Back to App</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user" id="adminUser">Loading...</div>
+        <button onclick="auth.logout()">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin-main">
+      <div class="page-header">
+        <h1>📊 Platform Dashboard</h1>
+        <p>Overview ของระบบ SchoolKit ทั้งหมด</p>
+      </div>
+
+      <div id="content">
+        <div class="loading">กำลังโหลด stats...</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Require developer role
+    const profile = await roleGuard.requireRole(['developer']);
+    if (!profile) return;
+
+    document.getElementById('adminUser').textContent = profile.email || (profile.first_name + ' ' + profile.last_name).trim();
+
+    loadStats();
+  });
+
+  async function loadStats() {
+    const { data, error } = await supabaseClient.rpc('get_admin_dashboard_stats');
+
+    if (error) {
+      document.getElementById('content').innerHTML = `<div class="error">โหลดไม่สำเร็จ: ${error.message}</div>`;
+      return;
+    }
+    if (data?.error) {
+      document.getElementById('content').innerHTML = `<div class="error">${data.error}</div>`;
+      return;
+    }
+
+    renderDashboard(data);
+  }
+
+  function renderDashboard(stats) {
+    const statusLabels = {
+      trialing: 'Trial',
+      active: 'Active',
+      past_due: 'Past Due',
+      suspended: 'Suspended',
+      cancelled: 'Cancelled',
+      pending_payment: 'รอชำระ'
+    };
+
+    const statusBadges = Object.entries(stats.by_status || {})
+      .map(([status, count]) => `
+        <div class="status-item">
+          <span class="status-dot dot-${status}"></span>
+          <span>${statusLabels[status] || status}: <strong>${count}</strong></span>
+        </div>
+      `).join('');
+
+    document.getElementById('content').innerHTML = `
+      <!-- Stats grid -->
+      <div class="stats-grid">
+        <div class="stat-card stat-mrr">
+          <div class="stat-label">MRR (Monthly Revenue)</div>
+          <div class="stat-value">฿${stats.mrr_baht.toLocaleString()}</div>
+          <div class="stat-meta">Active + Trialing subscriptions</div>
+        </div>
+        <div class="stat-card stat-arr">
+          <div class="stat-label">ARR (Annual)</div>
+          <div class="stat-value">฿${stats.arr_baht.toLocaleString()}</div>
+          <div class="stat-meta">MRR × 12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Schools</div>
+          <div class="stat-value">${stats.total_schools}</div>
+          <div class="stat-meta">+${stats.signups_7d} this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Revenue (30d)</div>
+          <div class="stat-value">฿${(stats.invoices_30d?.total_baht || 0).toLocaleString()}</div>
+          <div class="stat-meta">${stats.invoices_30d?.paid_count || 0} paid, ${stats.invoices_30d?.failed_count || 0} failed</div>
+        </div>
+      </div>
+
+      <!-- Status breakdown -->
+      <div class="section">
+        <h3 class="section-title">Schools by Status</h3>
+        <div class="status-list">
+          ${statusBadges || '<span style="color:#9CA3AF;font-size:13px;">No data</span>'}
+        </div>
+      </div>
+
+      <!-- Growth + Cancellations -->
+      <div class="section">
+        <h3 class="section-title">Growth & Health</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <div>
+            <div style="font-size:12px;color:#6B7280;">Signups last 7 days</div>
+            <div style="font-size:22px;font-weight:700;">${stats.signups_7d}</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#6B7280;">Signups last 30 days</div>
+            <div style="font-size:22px;font-weight:700;">${stats.signups_30d}</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#6B7280;">Pending cancellations</div>
+            <div style="font-size:22px;font-weight:700;color:${stats.pending_cancellations > 0 ? '#DC2626' : '#111'};">${stats.pending_cancellations}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3 class="section-title">Quick Links</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="tenants.html" style="padding:10px 16px;background:#2563EB;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">🏫 ดูทุก Tenants →</a>
+          <a href="https://dashboard.omise.co/test/dashboard" target="_blank" style="padding:10px 16px;background:#F3F4F6;color:#374151;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;border:1px solid #E5E7EB;">💳 Omise Dashboard →</a>
+          <a href="https://supabase.com/dashboard/project/nuzhkhchimemuetoewzn" target="_blank" style="padding:10px 16px;background:#F3F4F6;color:#374151;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;border:1px solid #E5E7EB;">🗄️ Supabase →</a>
+          <a href="https://vercel.com/nsthor77s-projects/skks-website" target="_blank" style="padding:10px 16px;background:#F3F4F6;color:#374151;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;border:1px solid #E5E7EB;">🚀 Vercel →</a>
+        </div>
+      </div>
+
+      <div style="text-align:right;font-size:11px;color:#9CA3AF;margin-top:20px;">
+        Generated: ${new Date(stats.generated_at).toLocaleString('th-TH')}
+      </div>
+    `;
+  }
+  </script>
+
+</body>
+</html>

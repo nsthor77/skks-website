@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tenants — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', 'Sarabun', sans-serif; background: #F9FAFB; color: #111; }
+
+    .admin-shell { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: 240px; background: #1F2937; color: #fff; padding: 20px 0; flex-shrink: 0; position: relative; }
+    .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid #374151; display: flex; align-items: center; gap: 10px; }
+    .sidebar-logo .text { font-weight: 700; font-size: 16px; }
+    .sidebar-logo .badge { font-size: 10px; background: #FBBF24; color: #1F2937; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+    .sidebar-nav { padding: 16px 0; }
+    .sidebar-nav a { display: block; padding: 10px 20px; color: #D1D5DB; text-decoration: none; font-size: 14px; transition: all .15s; }
+    .sidebar-nav a:hover { background: #374151; color: #fff; }
+    .sidebar-nav a.active { background: #2563EB; color: #fff; font-weight: 600; }
+    .sidebar-footer { padding: 20px; border-top: 1px solid #374151; position: absolute; bottom: 0; width: 240px; }
+    .sidebar-footer .user { font-size: 13px; color: #9CA3AF; }
+    .sidebar-footer button { background: transparent; border: 1px solid #374151; color: #D1D5DB; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 8px; }
+
+    .admin-main { flex: 1; padding: 30px; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 24px; margin: 0 0 4px; }
+    .page-header p { color: #6B7280; margin: 0; font-size: 14px; }
+
+    .toolbar {
+      display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+    }
+    .search-box {
+      flex: 1;
+      max-width: 400px;
+      padding: 10px 14px;
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-pill {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: #F3F4F6;
+      border: 1px solid #E5E7EB;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .filter-pill:hover { background: #E5E7EB; }
+    .filter-pill.active { background: #1F2937; color: #fff; border-color: #1F2937; }
+
+    .tenants-table-wrap {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 10px;
+      overflow: auto;
+    }
+    .tenants-table { width: 100%; border-collapse: collapse; }
+    .tenants-table thead {
+      background: #F9FAFB;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    .tenants-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      font-weight: 600;
+    }
+    .tenants-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #F3F4F6;
+      font-size: 14px;
+    }
+    .tenants-table tbody tr { cursor: pointer; transition: background .15s; }
+    .tenants-table tbody tr:hover { background: #F9FAFB; }
+    .tenants-table tbody tr:last-child td { border-bottom: none; }
+
+    .school-name { font-weight: 600; color: #111; }
+    .school-slug { color: #6B7280; font-size: 12px; font-family: 'Courier New', monospace; }
+    .school-email { color: #6B7280; font-size: 13px; }
+
+    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .status-trialing { background: #FEF3C7; color: #92400E; }
+    .status-active { background: #D1FAE5; color: #065F46; }
+    .status-past_due { background: #FEE2E2; color: #991B1B; }
+    .status-suspended { background: #F3F4F6; color: #374151; }
+    .status-cancelled { background: #F3F4F6; color: #9CA3AF; }
+    .status-pending_payment { background: #DBEAFE; color: #1E40AF; }
+
+    .plan-pill { display: inline-block; padding: 2px 8px; background: #EFF6FF; color: #1E40AF; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+
+    .loading { text-align: center; padding: 60px; color: #9CA3AF; }
+    .empty { text-align: center; padding: 60px; color: #9CA3AF; }
+    .error { color: #DC2626; padding: 20px; background: #FEE2E2; border-radius: 8px; }
+
+    .stats-row {
+      display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .mini-stat {
+      flex: 1; min-width: 140px;
+      background: #fff; border: 1px solid #E5E7EB; border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .mini-stat-label { font-size: 11px; color: #6B7280; text-transform: uppercase; font-weight: 600; }
+    .mini-stat-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="text">SchoolKit</span>
+        <span class="badge">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="tenants.html" class="active">🏫 Tenants</a>
+        <a href="../pages/dashboard.html">↩️ Back to App</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user" id="adminUser">Loading...</div>
+        <button onclick="auth.logout()">Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="page-header">
+        <h1>🏫 All Tenants</h1>
+        <p>โรงเรียนทั้งหมดในระบบ — คลิกเพื่อดูรายละเอียด</p>
+      </div>
+
+      <div class="stats-row" id="statsRow"></div>
+
+      <div class="toolbar">
+        <input type="search" id="searchBox" class="search-box" placeholder="🔍 ค้นหา name / slug / email..." oninput="onSearchChange()" />
+        <div class="filter-pills">
+          <button class="filter-pill active" data-status="" onclick="setStatusFilter('')">All</button>
+          <button class="filter-pill" data-status="trialing" onclick="setStatusFilter('trialing')">Trialing</button>
+          <button class="filter-pill" data-status="active" onclick="setStatusFilter('active')">Active</button>
+          <button class="filter-pill" data-status="past_due" onclick="setStatusFilter('past_due')">Past Due</button>
+          <button class="filter-pill" data-status="pending_payment" onclick="setStatusFilter('pending_payment')">รอชำระ</button>
+          <button class="filter-pill" data-status="suspended" onclick="setStatusFilter('suspended')">Suspended</button>
+        </div>
+      </div>
+
+      <div id="tableWrap" class="tenants-table-wrap">
+        <div class="loading">กำลังโหลด...</div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+  let currentSearch = '';
+  let currentStatus = '';
+  let allTenants = [];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const profile = await roleGuard.requireRole(['developer']);
+    if (!profile) return;
+    document.getElementById('adminUser').textContent = profile.email || (profile.first_name + ' ' + profile.last_name).trim();
+    loadTenants();
+  });
+
+  let searchTimeout;
+  function onSearchChange() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      currentSearch = document.getElementById('searchBox').value.trim();
+      loadTenants();
+    }, 300);
+  }
+
+  function setStatusFilter(status) {
+    currentStatus = status;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.filter-pill[data-status="${status}"]`).classList.add('active');
+    loadTenants();
+  }
+
+  async function loadTenants() {
+    document.getElementById('tableWrap').innerHTML = '<div class="loading">กำลังโหลด...</div>';
+
+    const { data, error } = await supabaseClient.rpc('get_all_tenants_admin', {
+      p_search: currentSearch || null,
+      p_status_filter: currentStatus || null,
+      p_limit: 100
+    });
+
+    if (error) {
+      document.getElementById('tableWrap').innerHTML = `<div class="error">${error.message}</div>`;
+      return;
+    }
+    if (data?.error) {
+      document.getElementById('tableWrap').innerHTML = `<div class="error">${data.error}</div>`;
+      return;
+    }
+
+    allTenants = data || [];
+    renderStats();
+    renderTable(allTenants);
+  }
+
+  function renderStats() {
+    const total = allTenants.length;
+    const active = allTenants.filter(t => t.status === 'active').length;
+    const trialing = allTenants.filter(t => t.status === 'trialing').length;
+    const totalRevenue = allTenants.reduce((sum, t) => sum + (t.total_revenue_baht || 0), 0);
+
+    document.getElementById('statsRow').innerHTML = `
+      <div class="mini-stat"><div class="mini-stat-label">Total Tenants</div><div class="mini-stat-value">${total}</div></div>
+      <div class="mini-stat"><div class="mini-stat-label">Active</div><div class="mini-stat-value" style="color:#065F46;">${active}</div></div>
+      <div class="mini-stat"><div class="mini-stat-label">Trialing</div><div class="mini-stat-value" style="color:#92400E;">${trialing}</div></div>
+      <div class="mini-stat"><div class="mini-stat-label">Total Revenue</div><div class="mini-stat-value">฿${totalRevenue.toLocaleString()}</div></div>
+    `;
+  }
+
+  function renderTable(tenants) {
+    if (tenants.length === 0) {
+      document.getElementById('tableWrap').innerHTML = '<div class="empty">ไม่พบ tenant</div>';
+      return;
+    }
+
+    const planLabel = (p) => p ? `<span class="plan-pill">${p}</span>` : '<span style="color:#9CA3AF;">—</span>';
+    const cycleLabel = (c) => c === 'yearly' ? '/yr' : c === 'monthly' ? '/mo' : '';
+
+    document.getElementById('tableWrap').innerHTML = `
+      <table class="tenants-table">
+        <thead>
+          <tr>
+            <th>School</th>
+            <th>Status</th>
+            <th>Plan</th>
+            <th>Users</th>
+            <th>Revenue</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tenants.map(t => `
+            <tr onclick="goToDetail('${t.id}')">
+              <td>
+                <div class="school-name">${t.name}</div>
+                <div class="school-slug">${t.slug}.panyaschoolkit.com</div>
+                <div class="school-email">${t.contact_email || ''}</div>
+              </td>
+              <td><span class="status-pill status-${t.status}">${t.status}</span></td>
+              <td>
+                ${planLabel(t.plan_id)}
+                <span style="font-size:11px;color:#6B7280;">${cycleLabel(t.billing_cycle)}</span>
+                ${t.cancel_at_period_end ? '<div style="font-size:10px;color:#DC2626;margin-top:2px;">⏰ Cancelling</div>' : ''}
+              </td>
+              <td>${t.user_count || 0}</td>
+              <td>฿${(t.total_revenue_baht || 0).toLocaleString()}<div style="font-size:11px;color:#9CA3AF;">${t.paid_invoices || 0} invoices</div></td>
+              <td>${new Date(t.created_at).toLocaleDateString('th-TH')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function goToDetail(schoolId) {
+    window.location.href = `tenant-detail.html?id=${schoolId}`;
+  }
+  </script>
+
+</body>
+</html>

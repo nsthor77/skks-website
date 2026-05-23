@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tenant Detail — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', 'Sarabun', sans-serif; background: #F9FAFB; color: #111; }
+
+    .admin-shell { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: 240px; background: #1F2937; color: #fff; padding: 20px 0; flex-shrink: 0; position: relative; }
+    .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid #374151; display: flex; align-items: center; gap: 10px; }
+    .sidebar-logo .text { font-weight: 700; font-size: 16px; }
+    .sidebar-logo .badge { font-size: 10px; background: #FBBF24; color: #1F2937; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+    .sidebar-nav { padding: 16px 0; }
+    .sidebar-nav a { display: block; padding: 10px 20px; color: #D1D5DB; text-decoration: none; font-size: 14px; transition: all .15s; }
+    .sidebar-nav a:hover { background: #374151; color: #fff; }
+    .sidebar-nav a.active { background: #2563EB; color: #fff; font-weight: 600; }
+    .sidebar-footer { padding: 20px; border-top: 1px solid #374151; position: absolute; bottom: 0; width: 240px; }
+    .sidebar-footer .user { font-size: 13px; color: #9CA3AF; }
+    .sidebar-footer button { background: transparent; border: 1px solid #374151; color: #D1D5DB; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 8px; }
+
+    .admin-main { flex: 1; padding: 30px; max-width: 1100px; }
+
+    .back-link { color: #2563EB; text-decoration: none; font-size: 14px; }
+    .back-link:hover { text-decoration: underline; }
+
+    .page-header {
+      background: #fff; border: 1px solid #E5E7EB; border-radius: 10px;
+      padding: 24px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .school-title h1 { margin: 0 0 4px; font-size: 24px; }
+    .school-title .subtitle { color: #6B7280; font-size: 14px; }
+    .school-title .slug-link { color: #2563EB; text-decoration: none; font-family: 'Courier New', monospace; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; text-decoration: none; display: inline-block; }
+    .btn-primary { background: #2563EB; color: #fff; }
+    .btn-secondary { background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB; }
+    .btn-danger { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    .btn-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 20px; }
+    .card h3 { margin: 0 0 14px; font-size: 13px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: .5px; }
+
+    .data-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F3F4F6; font-size: 14px; }
+    .data-row:last-child { border-bottom: none; }
+    .data-row .label { color: #6B7280; }
+    .data-row .value { color: #111; font-weight: 500; max-width: 60%; text-align: right; word-break: break-all; }
+    .data-row code { font-size: 12px; background: #F3F4F6; padding: 2px 6px; border-radius: 3px; }
+
+    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .status-trialing { background: #FEF3C7; color: #92400E; }
+    .status-active { background: #D1FAE5; color: #065F46; }
+    .status-past_due { background: #FEE2E2; color: #991B1B; }
+    .status-pending_payment { background: #DBEAFE; color: #1E40AF; }
+    .status-cancelled { background: #F3F4F6; color: #9CA3AF; }
+    .status-suspended { background: #F3F4F6; color: #374151; }
+
+    /* Tables */
+    .mini-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .mini-table th { text-align: left; padding: 8px 10px; background: #F9FAFB; font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; border-bottom: 1px solid #E5E7EB; }
+    .mini-table td { padding: 10px; border-bottom: 1px solid #F3F4F6; }
+    .mini-table tr:last-child td { border-bottom: none; }
+
+    .role-pill { display: inline-block; padding: 2px 8px; background: #EFF6FF; color: #1E40AF; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .role-developer { background: #FEE2E2; color: #991B1B; }
+    .role-owner { background: #FEF3C7; color: #92400E; }
+    .role-staff { background: #DBEAFE; color: #1E40AF; }
+
+    .loading { text-align: center; padding: 60px; color: #9CA3AF; }
+    .error { color: #DC2626; padding: 20px; background: #FEE2E2; border-radius: 8px; }
+
+    /* Card on file display */
+    .saved-card-mini {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+    }
+    .saved-card-mini .brand { background: rgba(255,255,255,.15); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 11px; letter-spacing: 1px; }
+    .saved-card-mini .num { font-family: 'Courier New', monospace; letter-spacing: 1px; }
+
+    /* Audit logs */
+    .audit-item {
+      padding: 10px; border-bottom: 1px solid #F3F4F6; font-size: 13px;
+    }
+    .audit-item:last-child { border-bottom: none; }
+    .audit-action { font-weight: 600; color: #111; }
+    .audit-time { color: #9CA3AF; font-size: 11px; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="text">SchoolKit</span>
+        <span class="badge">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="tenants.html" class="active">🏫 Tenants</a>
+        <a href="../pages/dashboard.html">↩️ Back to App</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user" id="adminUser">Loading...</div>
+        <button onclick="auth.logout()">Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <a href="tenants.html" class="back-link">← กลับไปรายการ tenants</a>
+      <div id="content" style="margin-top:16px;">
+        <div class="loading">กำลังโหลด...</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+  let currentTenant = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const profile = await roleGuard.requireRole(['developer']);
+    if (!profile) return;
+    document.getElementById('adminUser').textContent = profile.email || (profile.first_name + ' ' + profile.last_name).trim();
+
+    const params = new URLSearchParams(window.location.search);
+    const schoolId = params.get('id');
+    if (!schoolId) {
+      document.getElementById('content').innerHTML = '<div class="error">ไม่ระบุ school ID — กลับไปเลือกจากหน้า tenants</div>';
+      return;
+    }
+    loadTenant(schoolId);
+  });
+
+  async function loadTenant(schoolId) {
+    const { data, error } = await supabaseClient.rpc('get_tenant_detail_admin', { p_school_id: schoolId });
+    if (error) {
+      document.getElementById('content').innerHTML = `<div class="error">${error.message}</div>`;
+      return;
+    }
+    if (data?.error) {
+      document.getElementById('content').innerHTML = `<div class="error">${data.error}</div>`;
+      return;
+    }
+    if (!data.school) {
+      document.getElementById('content').innerHTML = '<div class="error">ไม่พบ school</div>';
+      return;
+    }
+
+    currentTenant = data;
+    render(data);
+  }
+
+  function render(d) {
+    const s = d.school;
+    const sub = d.subscription;
+    const card = (d.payment_methods || []).find(pm => pm.is_default) || (d.payment_methods || [])[0];
+    const invoices = d.invoices || [];
+    const users = d.users || [];
+    const auditLogs = d.audit_logs_recent || [];
+
+    const tenantUrl = s.custom_domain
+      ? `https://${s.custom_domain}`
+      : `https://${s.slug}.panyaschoolkit.com`;
+
+    document.getElementById('content').innerHTML = `
+      <!-- Header -->
+      <div class="page-header">
+        <div class="school-title">
+          <h1>${s.name}</h1>
+          <div class="subtitle">
+            <a href="${tenantUrl}" target="_blank" class="slug-link">${s.custom_domain || s.slug + '.panyaschoolkit.com'}</a>
+            · ${s.contact_email || '—'}
+          </div>
+          <div style="margin-top:8px;"><span class="status-pill status-${s.status}">${s.status}</span></div>
+        </div>
+        <div class="actions">
+          <a href="${tenantUrl}" target="_blank" class="btn btn-secondary">🌐 เปิดเว็บ tenant</a>
+          ${s.status === 'suspended'
+            ? '<button class="btn btn-success" onclick="toggleSuspend(false)">▶️ Restore</button>'
+            : '<button class="btn btn-danger" onclick="toggleSuspend(true)">⏸️ Suspend</button>'
+          }
+        </div>
+      </div>
+
+      <!-- School + Subscription grid -->
+      <div class="grid-2">
+        <!-- School info -->
+        <div class="card">
+          <h3>🏫 School Info</h3>
+          <div class="data-row"><span class="label">ID</span><span class="value"><code>${s.id.slice(0,8)}…</code></span></div>
+          <div class="data-row"><span class="label">Slug</span><span class="value">${s.slug}</span></div>
+          <div class="data-row"><span class="label">Custom domain</span><span class="value">${s.custom_domain || '—'}</span></div>
+          <div class="data-row"><span class="label">Status</span><span class="value"><span class="status-pill status-${s.status}">${s.status}</span></span></div>
+          <div class="data-row"><span class="label">Trial ends</span><span class="value">${s.trial_ends_at ? new Date(s.trial_ends_at).toLocaleString('th-TH') : '—'}</span></div>
+          <div class="data-row"><span class="label">Created</span><span class="value">${new Date(s.created_at).toLocaleString('th-TH')}</span></div>
+          <div class="data-row"><span class="label">Omise customer</span><span class="value"><code>${s.omise_customer_id || '—'}</code></span></div>
+        </div>
+
+        <!-- Subscription -->
+        <div class="card">
+          <h3>📦 Subscription</h3>
+          ${sub ? `
+            <div class="data-row"><span class="label">Plan</span><span class="value"><strong style="text-transform:uppercase;">${sub.plan_id}</strong></span></div>
+            <div class="data-row"><span class="label">Billing cycle</span><span class="value">${sub.billing_cycle}</span></div>
+            <div class="data-row"><span class="label">Status</span><span class="value"><span class="status-pill status-${sub.status}">${sub.status}</span></span></div>
+            <div class="data-row"><span class="label">Period start</span><span class="value">${sub.current_period_start ? new Date(sub.current_period_start).toLocaleDateString('th-TH') : '—'}</span></div>
+            <div class="data-row"><span class="label">Period end</span><span class="value">${sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString('th-TH') : '—'}</span></div>
+            <div class="data-row"><span class="label">Cancel at period end</span><span class="value">${sub.cancel_at_period_end ? '⚠️ Yes' : 'No'}</span></div>
+            <div class="data-row"><span class="label">Omise schedule</span><span class="value"><code>${sub.omise_schedule_id || '—'}</code></span></div>
+          ` : '<p style="color:#9CA3AF;">ไม่มี subscription</p>'}
+        </div>
+      </div>
+
+      <!-- Payment + Card -->
+      <div class="card" style="margin-bottom:20px;">
+        <h3>💳 Payment Method</h3>
+        ${card ? `
+          <div class="saved-card-mini">
+            <span class="brand">${(card.card_brand || 'CARD').toUpperCase()}</span>
+            <span class="num">•••• ${card.card_last4 || '0000'}</span>
+            <span style="margin-left:auto;color:rgba(255,255,255,.6);">${String(card.card_exp_month || '').padStart(2,'0')}/${String(card.card_exp_year || '').slice(-2)}</span>
+          </div>
+        ` : '<p style="color:#9CA3AF;">ยังไม่มีบัตรเครดิต</p>'}
+      </div>
+
+      <!-- Invoices -->
+      <div class="card" style="margin-bottom:20px;">
+        <h3>🧾 Invoices (${invoices.length})</h3>
+        ${invoices.length > 0 ? `
+          <table class="mini-table">
+            <thead><tr><th>Number</th><th>Amount</th><th>Status</th><th>Paid at</th></tr></thead>
+            <tbody>
+              ${invoices.map(inv => `
+                <tr>
+                  <td><code>${inv.invoice_number}</code></td>
+                  <td><strong>฿${(inv.total_amount || inv.amount || 0).toLocaleString()}</strong></td>
+                  <td><span class="status-pill status-${inv.status === 'paid' ? 'active' : (inv.status === 'failed' ? 'past_due' : 'cancelled')}">${inv.status}</span></td>
+                  <td>${inv.paid_at ? new Date(inv.paid_at).toLocaleDateString('th-TH') : '—'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : '<p style="color:#9CA3AF;">ยังไม่มี invoice</p>'}
+      </div>
+
+      <!-- Users -->
+      <div class="card" style="margin-bottom:20px;">
+        <h3>👥 Users (${users.length})</h3>
+        ${users.length > 0 ? `
+          <table class="mini-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+            <tbody>
+              ${users.map(u => `
+                <tr>
+                  <td>${(u.first_name || '') + ' ' + (u.last_name || '')}</td>
+                  <td>${u.email || '—'}</td>
+                  <td><span class="role-pill role-${u.role}">${u.role}</span></td>
+                  <td>${new Date(u.created_at).toLocaleDateString('th-TH')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : '<p style="color:#9CA3AF;">ยังไม่มี users</p>'}
+      </div>
+
+      <!-- Audit logs -->
+      <div class="card">
+        <h3>📜 Recent Activity (${auditLogs.length})</h3>
+        ${auditLogs.length > 0 ? auditLogs.map(log => `
+          <div class="audit-item">
+            <div class="audit-action">${log.action}</div>
+            <div class="audit-time">${new Date(log.created_at).toLocaleString('th-TH')}</div>
+          </div>
+        `).join('') : '<p style="color:#9CA3AF;">ไม่มี activity</p>'}
+      </div>
+    `;
+  }
+
+  async function toggleSuspend(suspend) {
+    if (!currentTenant?.school) return;
+    const action = suspend ? 'ระงับ' : 'คืนค่า';
+    if (!confirm(`ต้องการ${action} tenant นี้หรือไม่?`)) return;
+
+    const { error } = await supabaseClient
+      .from('schools')
+      .update({ status: suspend ? 'suspended' : 'active' })
+      .eq('id', currentTenant.school.id);
+
+    if (error) {
+      alert(`${action}ไม่สำเร็จ: ${error.message}`);
+      return;
+    }
+    alert(`✅ ${action}สำเร็จ`);
+    loadTenant(currentTenant.school.id);
+  }
+  </script>
+
+</body>
+</html>

@@ -482,13 +482,14 @@
       <div class="actions-row">
         <button class="btn btn-secondary" onclick="openChangePlanModal()">เปลี่ยนแพ็คเกจ</button>
         ${sub.cancel_at_period_end
-          ? `<button class="btn btn-secondary" onclick="resumeSubscription()" style="color:#065F46;border-color:#10B981;">↩️ เปลี่ยนใจ — ยกเลิกการยกเลิก</button>`
+          ? `<button class="btn btn-secondary" onclick="resumeSubscription()" style="color:#065F46;border-color:#10B981;font-weight:600;">↩️ ใช้งานต่อ</button>`
           : `<button class="btn btn-danger-text" onclick="openCancelModal()">ยกเลิกการสมัคร</button>`
         }
       </div>
       ${sub.cancel_at_period_end
-        ? `<div style="margin-top:12px;padding:10px 14px;background:#FEE2E2;border-radius:8px;font-size:13px;color:#991B1B;">
-             ⏰ การสมัครจะสิ้นสุดวันที่ <strong>${new Date(sub.current_period_end).toLocaleDateString('th-TH')}</strong>
+        ? `<div style="margin-top:12px;padding:12px 14px;background:#FEE2E2;border-radius:8px;font-size:13px;color:#991B1B;line-height:1.5;">
+             ⏰ <strong>กำหนดสิ้นสุดการใช้งาน: ${new Date(sub.current_period_end).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</strong><br/>
+             <span style="font-size:12px;">หลังจากนั้นจะไม่ถูกเรียกเก็บเงินอีก กดปุ่ม "ใช้งานต่อ" หากเปลี่ยนใจ</span>
            </div>`
         : ''
       }
@@ -590,12 +591,12 @@
     if (!currentSchool) return;
     openModal(`
       <h2 style="font-size:20px;margin:0 0 8px;color:#991B1B;">⚠️ ยืนยันการยกเลิก subscription</h2>
-      <p style="color:#374151;font-size:14px;line-height:1.6;margin:0 0 18px;">
+      <p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 18px;">
         เมื่อยกเลิก:<br/>
-        • ระบบจะ <strong>ไม่เรียกเก็บเงินครั้งต่อไป</strong><br/>
-        • คุณยังใช้งานได้ <strong>ถึงวันสิ้นสุด period ปัจจุบัน</strong><br/>
-        • หลังจากนั้น account จะถูกปิด (ข้อมูลเก็บไว้ 90 วัน)<br/>
-        • <strong>ยกเลิกการยกเลิกได้ตลอดเวลา</strong>ก่อนหมด period
+        • ระบบจะ <strong>หยุดเรียกเก็บเงิน</strong>ในรอบบิลถัดไป<br/>
+        • คุณยังใช้งานได้ <strong>ถึงวันสิ้นสุดรอบบิลปัจจุบัน</strong><br/>
+        • หลังจากนั้น account จะถูกระงับ (ข้อมูลเก็บไว้ 90 วัน)<br/>
+        • <strong>เปลี่ยนใจได้ตลอดเวลา</strong> — กดปุ่ม "ใช้งานต่อ" ก่อนสิ้นรอบบิล
       </p>
       <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:12px;margin-bottom:18px;font-size:13px;color:#78350F;">
         💡 หรือลอง <strong>เปลี่ยนแพ็คเกจเป็น Starter</strong> ก่อน? ราคาถูกลงเหลือ ฿1,990/เดือน
@@ -627,10 +628,19 @@
         throw new Error(data.error || 'Cancel failed');
       }
       closeModal();
+      const endDateThai = data.current_period_end
+        ? new Date(data.current_period_end).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })
+        : 'วันสิ้นสุด period ปัจจุบัน';
       openModal(`
-        <h2 style="font-size:20px;margin:0 0 12px;color:#065F46;">✅ ยกเลิกแล้ว</h2>
-        <p style="color:#374151;font-size:14px;line-height:1.6;">${data.message}</p>
-        <button class="btn btn-primary" onclick="closeModal();loadBillingData();" style="margin-top:16px;">ตกลง</button>
+        <h2 style="font-size:20px;margin:0 0 12px;color:#065F46;">✅ ดำเนินการเรียบร้อย</h2>
+        <p style="color:#374151;font-size:14px;line-height:1.7;margin-bottom:8px;">
+          subscription จะสิ้นสุดวันที่ <strong>${endDateThai}</strong><br/>
+          คุณยังใช้งานได้ปกติจนถึงวันนั้น และจะไม่ถูกเรียกเก็บเงินเพิ่ม
+        </p>
+        <p style="color:#6B7280;font-size:13px;background:#F3F4F6;padding:10px;border-radius:6px;">
+          💡 เปลี่ยนใจได้ตลอด — กดปุ่ม <strong>"ใช้งานต่อ"</strong> ที่หน้า Billing
+        </p>
+        <button class="btn btn-primary" onclick="closeModal();loadBillingData();" style="margin-top:16px;width:100%;">ตกลง</button>
       `);
     } catch (err) {
       btn.disabled = false;
@@ -641,15 +651,14 @@
 
   // ============= RESUME SUBSCRIPTION =============
   async function resumeSubscription() {
-    if (!confirm('ต้องการยกเลิกการยกเลิก subscription หรือไม่?')) return;
+    if (!confirm('ต้องการใช้งาน subscription ต่อหรือไม่?\n\nระบบจะเรียกเก็บเงินตามรอบบิลปกติ')) return;
     try {
-      const session = (await supabaseClient.auth.getSession()).data.session;
       const { data, error } = await supabaseClient.rpc('resume_subscription', {
         p_school_id: currentSchool.id
       });
       if (error) throw error;
       if (!data.success) throw new Error(data.error);
-      alert('✅ ' + (data.message || 'Subscription resumed'));
+      alert('✅ subscription ใช้งานต่อแล้ว — ระบบจะเรียกเก็บเงินตามรอบบิลปกติ');
       loadBillingData();
     } catch (err) {
       alert('ไม่สำเร็จ: ' + err.message);

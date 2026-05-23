@@ -226,6 +226,106 @@ module.exports = async (req, res) => {
       console.error('[omise/create-customer] activate_school_trial exception', err);
     }
 
+    // ---- 9.5 Create Omise Schedule for auto-charge (Sprint 6.B) ----
+    // Only create schedule if:
+    //   - Trial was just activated (not already_active)
+    //   - No existing schedule on this subscription
+    // This auto-charges the customer when trial ends + every billing cycle thereafter
+    let scheduleResult = null;
+    if (trialActivation?.success && !trialActivation?.already_active && trialActivation?.trial_end) {
+      try {
+        // Get subscription info (plan_id + billing_cycle)
+        const { data: subscription, error: subErr } = await supabaseAdmin
+          .from('subscriptions')
+          .select('id, plan_id, billing_cycle, omise_schedule_id')
+          .eq('school_id', school_id)
+          .single();
+
+        if (subErr || !subscription) {
+          console.error('[omise/create-customer] could not load subscription for schedule', subErr);
+        } else if (subscription.omise_schedule_id) {
+          console.log('[omise/create-customer] schedule already exists', subscription.omise_schedule_id);
+        } else {
+          // Get plan amount in satang
+          const { data: amountSatang, error: amountErr } = await supabaseAdmin
+            .rpc('get_plan_amount_satang', {
+              p_plan_id: subscription.plan_id,
+              p_billing_cycle: subscription.billing_cycle
+            });
+
+          if (amountErr) {
+            console.error('[omise/create-customer] get_plan_amount_satang failed', amountErr);
+          } else {
+            // Calculate schedule params
+            const trialEnd = new Date(trialActivation.trial_end);
+            const startDate = trialEnd.toISOString().split('T')[0]; // YYYY-MM-DD
+            const endDate = new Date(trialEnd);
+            endDate.setFullYear(endDate.getFullYear() + 4); // Omise max 4 years
+            const endDateStr = endDate.toISOString().split('T')[0];
+            const dayOfMonth = trialEnd.getUTCDate();
+
+            // Cycle config:
+            //   monthly → every 1 month
+            //   yearly  → every 12 months (= 1 year)
+            const everyN = subscription.billing_cycle === 'yearly' ? 12 : 1;
+
+            console.log('[omise/create-customer] creating schedule', {
+              start_date: startDate,
+              end_date: endDateStr,
+              every: everyN,
+              period: 'month',
+              day_of_month: dayOfMonth,
+              amount_satang: amountSatang,
+              customer_id: customer.id
+            });
+
+            try {
+              const schedule = await omise.schedules.create({
+                every: everyN,
+                period: 'month',
+                start_date: startDate,
+                end_date: endDateStr,
+                on: {
+                  days_of_month: [dayOfMonth]
+                },
+                charge: {
+                  customer: customer.id,
+                  amount: amountSatang,
+                  description: `SchoolKit ${subscription.plan_id} ${subscription.billing_cycle}`
+                }
+              });
+
+              // Save schedule_id to subscription
+              await supabaseAdmin
+                .from('subscriptions')
+                .update({
+                  omise_schedule_id: schedule.id,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', subscription.id);
+
+              scheduleResult = {
+                created: true,
+                schedule_id: schedule.id,
+                start_date: startDate,
+                amount_satang: amountSatang
+              };
+              console.log('[omise/create-customer] schedule created', schedule.id);
+            } catch (omiseErr) {
+              console.error('[omise/create-customer] omise.schedules.create failed', {
+                err: omiseErr.message,
+                code: omiseErr.code,
+                object: omiseErr.object
+              });
+              scheduleResult = { created: false, error: omiseErr.message };
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[omise/create-customer] schedule creation exception', err);
+      }
+    }
+
     // ---- 10. Success ----
     return res.status(200).json({
       success: true,
@@ -245,7 +345,8 @@ module.exports = async (req, res) => {
             status: trialActivation.status,
             trial_end: trialActivation.trial_end
           }
-        : null
+        : null,
+      schedule: scheduleResult
     });
 
   } catch (err) {

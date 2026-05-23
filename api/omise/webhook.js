@@ -117,9 +117,19 @@ module.exports = async (req, res) => {
     });
 
     // ---- 4. Handle charge events (Sprint 6) ----
+    // Note: Omise fires different event types depending on capture mode:
+    //   - capture=true (immediate) → fires 'charge.create' with paid=true, status='successful'
+    //   - capture=false (authorize) → fires 'charge.create' then later 'charge.capture'/'charge.complete'
+    // We treat any successful charge (regardless of event name) as a paid invoice.
     let actionResult = null;
+    const isSuccessfulCharge =
+      (eventKey === 'charge.complete' || eventKey === 'charge.capture' ||
+       (eventKey === 'charge.create' && data.paid === true && data.status === 'successful'));
+    const isFailedCharge =
+      (eventKey === 'charge.failed' ||
+       (eventKey === 'charge.create' && data.paid === false && data.status === 'failed'));
 
-    if (eventKey === 'charge.complete' && schoolId) {
+    if (isSuccessfulCharge && schoolId) {
       // Successful charge → insert invoice + activate subscription
       try {
         // Get subscription info for plan/cycle context
@@ -181,7 +191,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    else if (eventKey === 'charge.failed' && schoolId) {
+    else if (isFailedCharge && schoolId) {
       // Failed charge → mark subscription past_due + insert failed invoice
       try {
         // Insert failed invoice record (uses insert_paid_invoice + then patch status)

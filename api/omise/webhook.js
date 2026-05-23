@@ -67,7 +67,15 @@ module.exports = async (req, res) => {
 
     const data = verifiedEvent.data || {};
     let schoolId = null;
-    const customerId = data.customer || (data.card && data.card.customer);
+    // Different events have customer_id in different places:
+    //   - customer.* events:  data.id (the customer itself)
+    //   - charge.* events:    data.customer
+    //   - schedule.* events:  data.charge.customer (nested)
+    const customerId =
+      (data.object === 'customer' ? data.id : null) ||
+      data.customer ||
+      (data.card && data.card.customer) ||
+      (data.charge && data.charge.customer);
 
     if (customerId) {
       const { data: school } = await supabase
@@ -100,8 +108,6 @@ module.exports = async (req, res) => {
       // Don't fail the webhook — log error and continue
     }
 
-    // ---- 4. Sprint 5: log specific event types but don't act on them yet ----
-    // (Sprint 6 will add subscription/invoice updates here)
     console.log('[omise/webhook] received', {
       event_id: eventId,
       event_key: eventKey,
@@ -110,12 +116,131 @@ module.exports = async (req, res) => {
       customer_id: customerId
     });
 
+    // ---- 4. Handle charge events (Sprint 6) ----
+    let actionResult = null;
+
+    if (eventKey === 'charge.complete' && schoolId) {
+      // Successful charge → insert invoice + activate subscription
+      try {
+        // Get subscription info for plan/cycle context
+        const { data: sub } = await supabase
+          .from('subscriptions')
+          .select('id, plan_id, billing_cycle, billing_cycle')
+          .eq('school_id', schoolId)
+          .single();
+
+        // Insert paid invoice via RPC (auto-generates invoice number)
+        const { data: invoiceResult, error: invoiceErr } = await supabase.rpc('insert_paid_invoice', {
+          p_school_id: schoolId,
+          p_omise_charge_id: data.id,
+          p_amount_satang: data.amount,
+          p_plan_id: sub?.plan_id || null,
+          p_billing_cycle: sub?.billing_cycle || null
+        });
+
+        if (invoiceErr) {
+          console.error('[omise/webhook] insert_paid_invoice failed', invoiceErr);
+        } else {
+          console.log('[omise/webhook] invoice created', invoiceResult);
+        }
+
+        // Update subscription status to active + extend period
+        // (For monthly: +1 month; for yearly: +12 months. Compute from current_period_end)
+        const cycleMonths = sub?.billing_cycle === 'yearly' ? 12 : 1;
+        const now = new Date();
+        const newPeriodEnd = new Date(now);
+        newPeriodEnd.setMonth(newPeriodEnd.getMonth() + cycleMonths);
+
+        const { error: subUpdateErr } = await supabase
+          .from('subscriptions')
+          .update({
+            status: 'active',
+            current_period_start: now.toISOString(),
+            current_period_end: newPeriodEnd.toISOString(),
+            updated_at: now.toISOString()
+          })
+          .eq('school_id', schoolId);
+
+        if (subUpdateErr) {
+          console.error('[omise/webhook] subscription update failed', subUpdateErr);
+        }
+
+        // Update school status
+        await supabase
+          .from('schools')
+          .update({ status: 'active' })
+          .eq('id', schoolId);
+
+        actionResult = {
+          type: 'charge.complete',
+          invoice: invoiceResult,
+          new_period_end: newPeriodEnd.toISOString()
+        };
+      } catch (err) {
+        console.error('[omise/webhook] charge.complete handler exception', err);
+      }
+    }
+
+    else if (eventKey === 'charge.failed' && schoolId) {
+      // Failed charge → mark subscription past_due + insert failed invoice
+      try {
+        // Insert failed invoice record (uses insert_paid_invoice + then patch status)
+        const { data: invoiceResult } = await supabase.rpc('insert_paid_invoice', {
+          p_school_id: schoolId,
+          p_omise_charge_id: data.id,
+          p_amount_satang: data.amount,
+          p_plan_id: null,
+          p_billing_cycle: null
+        });
+
+        if (invoiceResult?.invoice_id) {
+          await supabase
+            .from('invoices')
+            .update({
+              status: 'failed',
+              paid_at: null,
+              metadata: {
+                ...invoiceResult.metadata,
+                failure_message: data.failure_message || data.failure_code || 'unknown',
+                failed_at: new Date().toISOString()
+              }
+            })
+            .eq('id', invoiceResult.invoice_id);
+        }
+
+        // Mark subscription past_due (grace period handling in Sprint 6.5)
+        await supabase
+          .from('subscriptions')
+          .update({
+            status: 'past_due',
+            updated_at: new Date().toISOString()
+          })
+          .eq('school_id', schoolId);
+
+        await supabase
+          .from('schools')
+          .update({ status: 'past_due' })
+          .eq('id', schoolId);
+
+        actionResult = {
+          type: 'charge.failed',
+          failure_message: data.failure_message,
+          invoice_id: invoiceResult?.invoice_id
+        };
+
+        console.log('[omise/webhook] charge.failed handled', actionResult);
+      } catch (err) {
+        console.error('[omise/webhook] charge.failed handler exception', err);
+      }
+    }
+
     // ---- 5. Always return 200 OK fast ----
     return res.status(200).json({
       received: true,
       event_id: eventId,
       event_key: eventKey,
-      school_id: schoolId
+      school_id: schoolId,
+      action: actionResult
     });
 
   } catch (err) {

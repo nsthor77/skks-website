@@ -20,6 +20,7 @@
 
 const Omise = require('omise');
 const { createClient } = require('@supabase/supabase-js');
+const { sendEmail, emailTemplates } = require('../../lib/email');
 
 module.exports = async (req, res) => {
   // ---- CORS (loose for now — tighten after we know the final domains) ----
@@ -108,7 +109,7 @@ module.exports = async (req, res) => {
     // ---- 5. Load school details ----
     const { data: school, error: schoolErr } = await supabaseAdmin
       .from('schools')
-      .select('id, name, contact_email, omise_customer_id')
+      .select('id, name, slug, contact_email, custom_domain, omise_customer_id')
       .eq('id', school_id)
       .single();
 
@@ -323,6 +324,28 @@ module.exports = async (req, res) => {
         }
       } catch (err) {
         console.error('[omise/create-customer] schedule creation exception', err);
+      }
+    }
+
+    // ---- 9.7 Send welcome email (only on first trial activation) ----
+    if (trialActivation?.success && !trialActivation?.already_active) {
+      try {
+        const { data: subInfo } = await supabaseAdmin
+          .from('subscriptions')
+          .select('plan_id, billing_cycle')
+          .eq('school_id', school_id)
+          .single();
+
+        const email = emailTemplates.welcomeTrial({
+          schoolName: school.name,
+          trialEnd: trialActivation.trial_end,
+          planId: subInfo?.plan_id || 'starter',
+          billingCycle: subInfo?.billing_cycle || 'monthly',
+          billingUrl: `https://${school.custom_domain || (school.slug + '.panyaschoolkit.com')}/pages/billing.html`
+        });
+        await sendEmail({ to: school.contact_email, ...email });
+      } catch (emailErr) {
+        console.error('[create-customer] welcome email failed', emailErr);
       }
     }
 

@@ -27,6 +27,7 @@
 
 const Omise = require('omise');
 const { createClient } = require('@supabase/supabase-js');
+const { sendEmail, emailTemplates } = require('../../lib/email');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -186,6 +187,31 @@ module.exports = async (req, res) => {
           invoice: invoiceResult,
           new_period_end: newPeriodEnd.toISOString()
         };
+
+        // Send chargeSucceeded email
+        try {
+          const { data: schoolForEmail } = await supabase
+            .from('schools')
+            .select('name, slug, contact_email, custom_domain')
+            .eq('id', schoolId)
+            .single();
+
+          if (schoolForEmail?.contact_email) {
+            const email = emailTemplates.chargeSucceeded({
+              schoolName: schoolForEmail.name,
+              amountBaht: data.amount / 100,
+              planId: sub?.plan_id || 'unknown',
+              billingCycle: sub?.billing_cycle || 'monthly',
+              invoiceNumber: invoiceResult?.invoice_number || '—',
+              nextBillingDate: newPeriodEnd.toISOString(),
+              billingUrl: `https://${schoolForEmail.custom_domain || (schoolForEmail.slug + '.panyaschoolkit.com')}/pages/invoices.html`
+            });
+            await sendEmail({ to: schoolForEmail.contact_email, ...email });
+          }
+        } catch (emailErr) {
+          console.error('[webhook] chargeSucceeded email failed', emailErr);
+        }
+
       } catch (err) {
         console.error('[omise/webhook] charge.complete handler exception', err);
       }
@@ -239,6 +265,28 @@ module.exports = async (req, res) => {
         };
 
         console.log('[omise/webhook] charge.failed handled', actionResult);
+
+        // Send chargeFailed email
+        try {
+          const { data: schoolForEmail } = await supabase
+            .from('schools')
+            .select('name, slug, contact_email, custom_domain')
+            .eq('id', schoolId)
+            .single();
+
+          if (schoolForEmail?.contact_email) {
+            const email = emailTemplates.chargeFailed({
+              schoolName: schoolForEmail.name,
+              amountBaht: (data.amount || 0) / 100,
+              reason: data.failure_message || data.failure_code || 'unknown',
+              billingUrl: `https://${schoolForEmail.custom_domain || (schoolForEmail.slug + '.panyaschoolkit.com')}/pages/add-payment.html`
+            });
+            await sendEmail({ to: schoolForEmail.contact_email, ...email });
+          }
+        } catch (emailErr) {
+          console.error('[webhook] chargeFailed email failed', emailErr);
+        }
+
       } catch (err) {
         console.error('[omise/webhook] charge.failed handler exception', err);
       }

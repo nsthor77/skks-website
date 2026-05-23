@@ -8,6 +8,7 @@
 
 const Omise = require('omise');
 const { createClient } = require('@supabase/supabase-js');
+const { sendEmail, emailTemplates } = require('../../lib/email');
 
 module.exports = async (req, res) => {
   // CORS
@@ -99,6 +100,25 @@ module.exports = async (req, res) => {
     if (rpcErr) {
       console.error('[billing/cancel] cancel_subscription RPC failed', rpcErr);
       return res.status(500).json({ error: 'Failed to cancel subscription', detail: rpcErr.message });
+    }
+
+    // Send cancellation email
+    try {
+      const { data: school } = await supabaseAdmin
+        .from('schools')
+        .select('name, slug, contact_email, custom_domain')
+        .eq('id', schoolId)
+        .single();
+      if (school?.contact_email) {
+        const email = emailTemplates.subscriptionCancelled({
+          schoolName: school.name,
+          currentPeriodEnd: result.current_period_end,
+          billingUrl: `https://${school.custom_domain || (school.slug + '.panyaschoolkit.com')}/pages/billing.html`
+        });
+        await sendEmail({ to: school.contact_email, ...email });
+      }
+    } catch (emailErr) {
+      console.error('[cancel] email failed', emailErr);
     }
 
     return res.status(200).json({

@@ -15,6 +15,7 @@
 
 const Omise = require('omise');
 const { createClient } = require('@supabase/supabase-js');
+const { sendEmail, emailTemplates } = require('../../lib/email');
 
 module.exports = async (req, res) => {
   // CORS
@@ -83,7 +84,7 @@ module.exports = async (req, res) => {
     // ---- Get school + customer info ----
     const { data: school } = await supabaseAdmin
       .from('schools')
-      .select('id, name, omise_customer_id, trial_ends_at')
+      .select('id, name, slug, contact_email, custom_domain, omise_customer_id, trial_ends_at')
       .eq('id', schoolId)
       .single();
 
@@ -180,6 +181,24 @@ module.exports = async (req, res) => {
     } catch (err) {
       console.error('[billing/change-plan] omise.schedules.create failed', err);
       newScheduleResult = { error: err.message };
+    }
+
+    // Send plan changed email
+    try {
+      if (school?.contact_email) {
+        const email = emailTemplates.planChanged({
+          schoolName: school.name,
+          oldPlanId: result.old_plan_id,
+          oldCycle: result.old_billing_cycle,
+          newPlanId: result.new_plan_id,
+          newCycle: result.new_billing_cycle,
+          newAmountBaht: result.new_amount_satang / 100,
+          billingUrl: `https://${school.custom_domain || (school.slug + '.panyaschoolkit.com')}/pages/billing.html`
+        });
+        await sendEmail({ to: school.contact_email, ...email });
+      }
+    } catch (emailErr) {
+      console.error('[change-plan] email failed', emailErr);
     }
 
     return res.status(200).json({

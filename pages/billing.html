@@ -244,6 +244,64 @@
     .view-all-link:hover { text-decoration: underline; }
 
     .loading { color: #9CA3AF; text-align: center; padding: 24px; }
+
+    /* ============= Billing Information Form ============= */
+    .billinginfo-card { margin-bottom: 24px; }
+    .billinginfo-header-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 6px;
+    }
+    .billinginfo-header-row h2 { margin: 0; }
+    .billinginfo-subtitle {
+      font-size: 13px; color: #6B7280; margin: 0 0 18px;
+    }
+    .billinginfo-display {
+      background: #F9FAFB; border-left: 3px solid #2563EB;
+      padding: 16px 20px; border-radius: 6px;
+      font-size: 14px; color: #111; line-height: 1.7;
+    }
+    .billinginfo-display .row { display: flex; gap: 12px; }
+    .billinginfo-display .row .lbl {
+      min-width: 130px; color: #6B7280; font-size: 13px;
+    }
+    .billinginfo-display .row .val { color: #111; font-weight: 500; flex: 1; }
+    .billinginfo-display .row .val.empty { color: #DC2626; font-style: italic; font-weight: 400; }
+
+    .billinginfo-form { display: grid; gap: 14px; }
+    .billinginfo-form .form-row { display: grid; gap: 6px; }
+    .billinginfo-form label {
+      font-size: 13px; font-weight: 600; color: #374151;
+    }
+    .billinginfo-form label .req { color: #DC2626; }
+    .billinginfo-form input,
+    .billinginfo-form textarea {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid #D1D5DB; border-radius: 8px;
+      font-size: 14px; font-family: inherit;
+      background: #fff; color: #111;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .billinginfo-form input:focus,
+    .billinginfo-form textarea:focus {
+      outline: none; border-color: #2563EB;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .billinginfo-form textarea { min-height: 70px; resize: vertical; }
+    .billinginfo-form .help {
+      font-size: 12px; color: #6B7280;
+    }
+    .billinginfo-form .err {
+      font-size: 12px; color: #DC2626; display: none;
+    }
+    .billinginfo-form .err.show { display: block; }
+    .billinginfo-actions {
+      display: flex; gap: 10px; margin-top: 6px;
+    }
+    .billinginfo-empty-hint {
+      background: #FEF3C7; border: 1px solid #FCD34D;
+      color: #78350F; padding: 12px 16px; border-radius: 8px;
+      font-size: 13px; margin-bottom: 14px;
+    }
   </style>
 </head>
 <body>
@@ -300,6 +358,18 @@
 
     </div>
 
+    <!-- Billing Information (สำหรับออกใบเสร็จ) -->
+    <div class="card billinginfo-card">
+      <div class="billinginfo-header-row">
+        <h2>🧾 ข้อมูลสำหรับออกใบเสร็จ</h2>
+        <button id="editBillingInfoBtn" class="btn btn-secondary" onclick="toggleBillingInfoEdit(true)" style="display:none;">✏️ แก้ไข</button>
+      </div>
+      <p class="billinginfo-subtitle">ข้อมูลนี้จะแสดงในใบเสร็จรับเงินที่ออกให้คุณ (ผู้รับใบเสร็จ / Bill to)</p>
+      <div id="billingInfoBlock">
+        <div class="loading">กำลังโหลด...</div>
+      </div>
+    </div>
+
     <!-- Recent Invoices -->
     <div class="card">
       <div class="section-header-row">
@@ -348,7 +418,7 @@
     // 1) Load school
     const { data: school, error: schoolErr } = await supabaseClient
       .from('schools')
-      .select('id, name, status, trial_ends_at, omise_customer_id')
+      .select('id, name, status, trial_ends_at, omise_customer_id, billing_info, contact_email')
       .eq('id', schoolId)
       .single();
     if (schoolErr || !school) {
@@ -386,7 +456,153 @@
     renderAlerts(school, subscription);
     renderSubscription(school, subscription);
     renderPaymentMethod(paymentMethod);
+    renderBillingInfo(school);
     renderInvoices(invoices || []);
+  }
+
+  // ============= Billing Information (for receipt Bill to) =============
+  function renderBillingInfo(school) {
+    const block = document.getElementById('billingInfoBlock');
+    const editBtn = document.getElementById('editBillingInfoBtn');
+    const info = school.billing_info || {};
+    const hasInfo = !!(info.legal_name || info.tax_id || info.billing_address);
+
+    if (hasInfo) {
+      // Show display mode
+      editBtn.style.display = 'inline-block';
+      block.innerHTML = `
+        <div class="billinginfo-display">
+          <div class="row">
+            <div class="lbl">ชื่อนิติบุคคล</div>
+            <div class="val ${info.legal_name ? '' : 'empty'}">${info.legal_name || '— ยังไม่ได้กรอก —'}</div>
+          </div>
+          <div class="row">
+            <div class="lbl">เลขผู้เสียภาษี</div>
+            <div class="val ${info.tax_id ? '' : 'empty'}">${info.tax_id || '— ยังไม่ได้กรอก —'}</div>
+          </div>
+          <div class="row">
+            <div class="lbl">ที่อยู่</div>
+            <div class="val ${info.billing_address ? '' : 'empty'}" style="white-space:pre-line;">${info.billing_address || '— ยังไม่ได้กรอก —'}</div>
+          </div>
+          <div class="row">
+            <div class="lbl">อีเมลรับใบเสร็จ</div>
+            <div class="val ${info.billing_email ? '' : 'empty'}">${info.billing_email || school.contact_email || '— ใช้อีเมลหลัก —'}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Show form by default (empty state)
+      editBtn.style.display = 'none';
+      block.innerHTML = `
+        <div class="billinginfo-empty-hint">
+          ⚠️ <strong>ยังไม่ได้กรอกข้อมูล</strong> — กรอกข้อมูลด้านล่างเพื่อให้ใบเสร็จที่ออกให้คุณมีรายละเอียดครบถ้วน (จำเป็นสำหรับยื่นภาษี)
+        </div>
+        ${renderBillingInfoForm(info)}
+      `;
+    }
+  }
+
+  function renderBillingInfoForm(info) {
+    return `
+      <form class="billinginfo-form" onsubmit="saveBillingInfo(event)">
+        <div class="form-row">
+          <label>ชื่อนิติบุคคล <span class="req">*</span></label>
+          <input type="text" id="bi_legal_name" value="${info.legal_name || ''}"
+                 placeholder="เช่น โรงเรียนสวนสนขอนแก่น" required maxlength="200" />
+          <div class="help">ชื่อเต็มตามที่จดทะเบียน (จะแสดงเป็น "ผู้รับใบเสร็จ" ใน PDF)</div>
+        </div>
+
+        <div class="form-row">
+          <label>เลขประจำตัวผู้เสียภาษี <span class="req">*</span></label>
+          <input type="text" id="bi_tax_id" value="${info.tax_id || ''}"
+                 placeholder="0000000000000 (13 หลัก)" required pattern="[0-9]{13}" maxlength="13" />
+          <div class="help">เลขผู้เสียภาษี 13 หลัก (ใส่เฉพาะตัวเลข ไม่ต้องมีขีดคั่น)</div>
+          <div class="err" id="bi_tax_id_err">เลขผู้เสียภาษีต้องเป็นตัวเลข 13 หลัก</div>
+        </div>
+
+        <div class="form-row">
+          <label>ที่อยู่ตามใบทะเบียน <span class="req">*</span></label>
+          <textarea id="bi_billing_address" placeholder="เลขที่ / หมู่ / ถนน / ตำบล / อำเภอ / จังหวัด / รหัสไปรษณีย์"
+                    required maxlength="500">${info.billing_address || ''}</textarea>
+          <div class="help">ที่อยู่ที่จะแสดงในใบเสร็จ (สามารถเว้นบรรทัดได้)</div>
+        </div>
+
+        <div class="form-row">
+          <label>อีเมลสำหรับรับใบเสร็จ <span style="color:#9CA3AF;font-weight:400;">(ไม่จำเป็น)</span></label>
+          <input type="email" id="bi_billing_email" value="${info.billing_email || ''}"
+                 placeholder="ปล่อยว่างเพื่อใช้อีเมลหลัก" maxlength="200" />
+          <div class="help">หากต้องการให้ส่งใบเสร็จไปอีเมลอื่น (เช่น ฝ่ายบัญชี)</div>
+        </div>
+
+        <div class="billinginfo-actions">
+          <button type="submit" id="saveBillingInfoBtn" class="btn btn-primary">💾 บันทึก</button>
+          <button type="button" class="btn btn-secondary" onclick="toggleBillingInfoEdit(false)">ยกเลิก</button>
+        </div>
+      </form>
+    `;
+  }
+
+  function toggleBillingInfoEdit(edit) {
+    const block = document.getElementById('billingInfoBlock');
+    const editBtn = document.getElementById('editBillingInfoBtn');
+    if (edit) {
+      const info = currentSchool?.billing_info || {};
+      block.innerHTML = renderBillingInfoForm(info);
+      editBtn.style.display = 'none';
+    } else {
+      renderBillingInfo(currentSchool);
+    }
+  }
+
+  async function saveBillingInfo(ev) {
+    ev.preventDefault();
+    const btn = document.getElementById('saveBillingInfoBtn');
+    const taxIdErr = document.getElementById('bi_tax_id_err');
+
+    const legal_name = document.getElementById('bi_legal_name').value.trim();
+    const tax_id = document.getElementById('bi_tax_id').value.trim();
+    const billing_address = document.getElementById('bi_billing_address').value.trim();
+    const billing_email = document.getElementById('bi_billing_email').value.trim();
+
+    // Validate tax_id
+    taxIdErr.classList.remove('show');
+    if (!/^[0-9]{13}$/.test(tax_id)) {
+      taxIdErr.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ กำลังบันทึก...';
+
+    try {
+      const newBillingInfo = {
+        ...(currentSchool.billing_info || {}),
+        legal_name,
+        tax_id,
+        billing_address,
+        billing_email: billing_email || null,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from('schools')
+        .update({ billing_info: newBillingInfo })
+        .eq('id', currentSchool.id);
+
+      if (error) throw error;
+
+      // Update local cache + rerender
+      currentSchool.billing_info = newBillingInfo;
+      renderBillingInfo(currentSchool);
+
+      btn.disabled = false;
+      btn.textContent = '✅ บันทึกแล้ว';
+    } catch (err) {
+      console.error('[saveBillingInfo] error', err);
+      btn.disabled = false;
+      btn.textContent = '💾 บันทึก';
+      alert('บันทึกไม่สำเร็จ: ' + (err.message || 'unknown error'));
+    }
   }
 
   function renderAlerts(school, sub) {

@@ -12,6 +12,8 @@
   <link rel="icon" type="image/png" href="../images/logo.png" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Sprint 7.C: PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     body { font-family: 'Sarabun', 'Prompt', sans-serif; background: #F8FAFC; }
@@ -190,6 +192,188 @@
       cursor: pointer;
       color: #6B7280;
     }
+
+    /* ===== Sprint 7.C: Invoice PDF Template ===== */
+    .pdf-template {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 794px; /* A4 width at 96dpi */
+      padding: 48px;
+      background: #fff;
+      font-family: 'Sarabun', sans-serif;
+      color: #111;
+      box-sizing: border-box;
+    }
+    .pdf-template * { box-sizing: border-box; }
+
+    .pdf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      padding-bottom: 24px;
+      border-bottom: 3px solid #2563EB;
+      margin-bottom: 32px;
+    }
+    .pdf-brand h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1F2937;
+      margin: 0 0 6px;
+    }
+    .pdf-brand p {
+      font-size: 12px;
+      color: #6B7280;
+      margin: 2px 0;
+      line-height: 1.5;
+    }
+    .pdf-doc-title {
+      text-align: right;
+    }
+    .pdf-doc-title h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #2563EB;
+      margin: 0 0 8px;
+      letter-spacing: 1px;
+    }
+    .pdf-doc-title .invoice-num {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      color: #374151;
+      margin: 2px 0;
+    }
+    .pdf-doc-title .pdf-date {
+      font-size: 12px;
+      color: #6B7280;
+      margin: 4px 0;
+    }
+    .pdf-doc-title .pdf-status {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 12px;
+      background: #D1FAE5;
+      color: #065F46;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .pdf-status.failed { background: #FEE2E2; color: #991B1B; }
+
+    .pdf-billto {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .pdf-billto-block {
+      background: #F9FAFB;
+      padding: 16px 20px;
+      border-left: 3px solid #E5E7EB;
+    }
+    .pdf-billto-block .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #6B7280;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .pdf-billto-block .name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 4px;
+    }
+    .pdf-billto-block .detail {
+      font-size: 11px;
+      color: #4B5563;
+      margin: 2px 0;
+      line-height: 1.5;
+    }
+
+    .pdf-items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    .pdf-items th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #1F2937;
+      color: #fff;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .pdf-items th.right { text-align: right; }
+    .pdf-items th.center { text-align: center; }
+    .pdf-items td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #E5E7EB;
+      font-size: 13px;
+      color: #111;
+    }
+    .pdf-items td.right { text-align: right; }
+    .pdf-items td.center { text-align: center; }
+    .pdf-items .description { font-weight: 500; }
+    .pdf-items .description-sub {
+      font-size: 11px;
+      color: #6B7280;
+      margin-top: 2px;
+    }
+
+    .pdf-totals {
+      width: 100%;
+      max-width: 320px;
+      margin-left: auto;
+      margin-bottom: 32px;
+    }
+    .pdf-totals .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .pdf-totals .row.subtotal { color: #4B5563; }
+    .pdf-totals .row.grand {
+      border-top: 2px solid #1F2937;
+      margin-top: 4px;
+      padding-top: 12px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #1F2937;
+    }
+
+    .pdf-paymentinfo {
+      background: #EFF6FF;
+      border-left: 3px solid #2563EB;
+      padding: 12px 16px;
+      margin-bottom: 32px;
+      font-size: 12px;
+      color: #1E40AF;
+    }
+    .pdf-paymentinfo .label {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .pdf-paymentinfo .val {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #1E3A8A;
+    }
+
+    .pdf-footer {
+      border-top: 1px solid #E5E7EB;
+      padding-top: 16px;
+      font-size: 10px;
+      color: #9CA3AF;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .pdf-footer strong { color: #4B5563; }
   </style>
 </head>
 <body>
@@ -251,6 +435,9 @@
   <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
     <div class="modal" id="modalContent"></div>
   </div>
+
+  <!-- ===== Sprint 7.C: Hidden PDF Template ===== -->
+  <div id="pdfTemplate" class="pdf-template"></div>
 
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
@@ -414,7 +601,7 @@
       </div>
 
       ${inv.status === 'paid' ? `
-        <button class="btn-small" style="margin-top:16px;padding:8px 14px;" onclick="alert('PDF download — Sprint 8')">📄 Download PDF Receipt</button>
+        <button class="btn-small" style="margin-top:16px;padding:10px 18px;background:#2563EB;color:#fff;border-color:#2563EB;font-weight:600;" onclick='downloadInvoicePDF(${JSON.stringify(inv).replace(/'/g, "\\'")})'>📄 Download Receipt PDF</button>
       ` : ''}
     `;
     document.getElementById('modalOverlay').classList.add('show');
@@ -422,6 +609,168 @@
 
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('show');
+  }
+
+  // ====================================================================
+  // Sprint 7.C: Generate Invoice PDF Receipt
+  // ====================================================================
+  async function downloadInvoicePDF(inv) {
+    if (!inv || !inv.id) return;
+    const btn = event?.target;
+    const originalText = btn?.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังสร้าง PDF...'; }
+
+    try {
+      // Load school + billing_info for receipt header
+      const schoolId = window.CURRENT_SCHOOL_ID;
+      const { data: school } = await supabaseClient
+        .from('schools')
+        .select('id, name, name_en, contact_email, custom_domain, billing_info')
+        .eq('id', schoolId)
+        .single();
+
+      const billing = school?.billing_info || {};
+      const issueDate = new Date(inv.created_at).toLocaleDateString('th-TH', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+      const paidDate = inv.paid_at ? new Date(inv.paid_at).toLocaleDateString('th-TH', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      }) : '—';
+
+      const items = inv.line_items || [];
+      const itemRows = items.map(it => `
+        <tr>
+          <td>
+            <div class="description">${it.description || '—'}</div>
+          </td>
+          <td class="center">${it.quantity || 1}</td>
+          <td class="right">฿${(it.amount || 0).toLocaleString()}</td>
+          <td class="right">฿${((it.amount || 0) * (it.quantity || 1)).toLocaleString()}</td>
+        </tr>
+      `).join('');
+
+      const subtotal = items.reduce((sum, it) => sum + ((it.amount || 0) * (it.quantity || 1)), 0);
+      const total = inv.total_amount || inv.amount || subtotal;
+
+      // Build the PDF HTML
+      const tpl = document.getElementById('pdfTemplate');
+      tpl.innerHTML = `
+        <div class="pdf-header">
+          <div class="pdf-brand">
+            <h1>PanyaSchoolKit</h1>
+            <p><strong>บริษัท ปัญญา เวนเจอร์ส จำกัด</strong></p>
+            <p>Panya Ventures Co., Ltd.</p>
+            <p>เลขประจำตัวผู้เสียภาษี: <strong>0405569004587</strong></p>
+            <p>panyaschoolkit.com · support@panyaschoolkit.com</p>
+          </div>
+          <div class="pdf-doc-title">
+            <h2>ใบเสร็จรับเงิน</h2>
+            <p style="margin:2px 0;font-size:12px;color:#6B7280;">RECEIPT</p>
+            <p class="invoice-num">${inv.invoice_number}</p>
+            <p class="pdf-date">วันที่ออก: ${issueDate}</p>
+            <span class="pdf-status ${inv.status === 'paid' ? '' : 'failed'}">
+              ${inv.status === 'paid' ? 'ชำระแล้ว' : inv.status.toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        <div class="pdf-billto">
+          <div class="pdf-billto-block">
+            <div class="label">ผู้ออกใบเสร็จ (From)</div>
+            <div class="name">บริษัท ปัญญา เวนเจอร์ส จำกัด</div>
+            <div class="detail">Panya Ventures Co., Ltd.</div>
+            <div class="detail">เลขผู้เสียภาษี: 0405569004587</div>
+            <div class="detail">458/31 ถนนกลางเมือง ตำบลในเมือง</div>
+            <div class="detail">อำเภอเมืองขอนแก่น จังหวัดขอนแก่น</div>
+            <div class="detail">support@panyaschoolkit.com</div>
+          </div>
+          <div class="pdf-billto-block">
+            <div class="label">ผู้รับใบเสร็จ (Bill to)</div>
+            <div class="name">${billing.legal_name || school?.name || '—'}</div>
+            ${billing.tax_id ? `<div class="detail">เลขผู้เสียภาษี: ${billing.tax_id}</div>` : ''}
+            ${billing.billing_address ? `<div class="detail">${billing.billing_address}</div>` : ''}
+            <div class="detail">${school?.contact_email || ''}</div>
+          </div>
+        </div>
+
+        <table class="pdf-items">
+          <thead>
+            <tr>
+              <th>รายการ (Description)</th>
+              <th class="center">จำนวน</th>
+              <th class="right">ราคา/หน่วย</th>
+              <th class="right">รวม (บาท)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemRows || `<tr><td colspan="4" style="text-align:center;color:#9CA3AF;">ไม่มีรายการ</td></tr>`}
+          </tbody>
+        </table>
+
+        <div class="pdf-totals">
+          <div class="row subtotal">
+            <span>ยอดรวม (Subtotal)</span>
+            <span>฿${subtotal.toLocaleString()}</span>
+          </div>
+          <div class="row subtotal">
+            <span>ภาษีมูลค่าเพิ่ม (VAT 0%)</span>
+            <span>฿0</span>
+          </div>
+          <div class="row grand">
+            <span>ยอดสุทธิ (Total)</span>
+            <span>฿${total.toLocaleString()}</span>
+          </div>
+        </div>
+
+        ${inv.status === 'paid' && inv.omise_charge_id ? `
+          <div class="pdf-paymentinfo">
+            <div class="label">ข้อมูลการชำระเงิน (Payment Information)</div>
+            <div>วันที่ชำระ: ${paidDate}</div>
+            <div>ช่องทาง: บัตรเครดิต/เดบิต (ผ่าน Omise)</div>
+            <div class="val">Charge ID: ${inv.omise_charge_id}</div>
+          </div>
+        ` : ''}
+
+        <div class="pdf-footer">
+          <p><strong>หมายเหตุ:</strong> ใบเสร็จรับเงินนี้ออกในนามของ บริษัท ปัญญา เวนเจอร์ส จำกัด</p>
+          <p>เอกสารฉบับนี้ใช้แทนใบเสร็จรับเงินอย่างเป็นทางการ — เก็บไว้เพื่อการตรวจสอบบัญชี</p>
+          <p style="margin-top:8px;">หากมีข้อสงสัย ติดต่อ <strong>support@panyaschoolkit.com</strong></p>
+        </div>
+      `;
+
+      // Generate PDF
+      const filename = `${inv.invoice_number}.pdf`;
+      const options = {
+        margin: 0,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: {
+          unit: 'px',
+          format: [794, 1123], // A4 size at 96dpi
+          orientation: 'portrait',
+          hotfixes: ['px_scaling']
+        }
+      };
+
+      await html2pdf().set(options).from(tpl).save();
+
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '✅ ดาวน์โหลดแล้ว';
+        setTimeout(() => { if (btn) btn.textContent = originalText; }, 2000);
+      }
+
+    } catch (err) {
+      console.error('[downloadInvoicePDF]', err);
+      alert('ดาวน์โหลด PDF ไม่สำเร็จ: ' + (err.message || 'unknown'));
+      if (btn) { btn.disabled = false; btn.textContent = originalText; }
+    }
   }
   </script>
 

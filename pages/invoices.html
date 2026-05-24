@@ -194,26 +194,26 @@
     }
 
     /* ===== Sprint 7.C: Invoice PDF Template =====
-       Note: must be in viewport (not left:-9999px) for html2canvas to render properly.
-       Use opacity:0 + z-index:-1 to make invisible but still rendered. */
+       Always rendered with full dimensions; just moved off-screen via transform.
+       This way html2canvas can always capture it properly. */
     .pdf-template {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
-      width: 794px; /* A4 width at 96dpi */
+      width: 794px;
       padding: 48px;
       background: #fff;
       font-family: 'Sarabun', sans-serif;
       color: #111;
       box-sizing: border-box;
-      opacity: 0;
-      pointer-events: none;
+      transform: translateX(-200vw); /* off-screen but still rendered */
       z-index: -1;
-      visibility: hidden;
+      pointer-events: none;
     }
     .pdf-template.rendering {
-      visibility: visible;
-      opacity: 1;
+      transform: translateX(0);
+      z-index: 99999;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
     }
     .pdf-template * { box-sizing: border-box; }
 
@@ -771,21 +771,38 @@
         }
       };
 
-      // Make template visible for html2canvas to render
-      tpl.classList.add('rendering');
+      // Move template into viewport using inline styles (avoid class clash with html2pdf clone)
+      const originalStyle = tpl.getAttribute('style') || '';
+      tpl.setAttribute('style', `
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 794px !important;
+        padding: 48px !important;
+        background: #ffffff !important;
+        font-family: 'Sarabun', sans-serif !important;
+        color: #111111 !important;
+        z-index: 999999 !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+        box-sizing: border-box !important;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.2) !important;
+      `);
 
       // Wait for Sarabun font to load (important for Thai)
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
-      // Small delay for layout to settle
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for layout + image rendering
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       try {
         await html2pdf().set(options).from(tpl).save();
       } finally {
-        // Always hide template again
-        tpl.classList.remove('rendering');
+        // Always restore template style
+        tpl.setAttribute('style', originalStyle);
       }
 
       if (btn) {

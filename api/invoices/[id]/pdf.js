@@ -10,14 +10,70 @@
 //   - Industry standard (Stripe, GitHub receipts use similar)
 // ==========================================================================
 
+const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const { createClient } = require('@supabase/supabase-js');
 
-// Font paths (bundled in repo)
-const FONT_REGULAR = path.join(process.cwd(), 'lib/fonts/Sarabun-Regular.ttf');
-const FONT_BOLD    = path.join(process.cwd(), 'lib/fonts/Sarabun-Bold.ttf');
-const FONT_MEDIUM  = path.join(process.cwd(), 'lib/fonts/Sarabun-Medium.ttf');
+// ---- Font loading strategy ----
+// Try bundled files first (lib/fonts/), fall back to CDN download with /tmp cache.
+// This makes the function resilient regardless of Vercel includeFiles config.
+
+const FONT_URLS = {
+  regular: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sarabun/Sarabun-Regular.ttf',
+  bold:    'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sarabun/Sarabun-Bold.ttf',
+  medium:  'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sarabun/Sarabun-Medium.ttf'
+};
+
+const FONT_LOCAL_PATHS = {
+  regular: path.join(process.cwd(), 'lib/fonts/Sarabun-Regular.ttf'),
+  bold:    path.join(process.cwd(), 'lib/fonts/Sarabun-Bold.ttf'),
+  medium:  path.join(process.cwd(), 'lib/fonts/Sarabun-Medium.ttf')
+};
+
+// Module-level memory cache (survives warm invocations)
+const fontMemoryCache = {};
+
+async function loadFont(name) {
+  // 1. Memory cache (fastest)
+  if (fontMemoryCache[name]) return fontMemoryCache[name];
+
+  // 2. Try bundled file
+  try {
+    if (fs.existsSync(FONT_LOCAL_PATHS[name])) {
+      const buf = fs.readFileSync(FONT_LOCAL_PATHS[name]);
+      fontMemoryCache[name] = buf;
+      return buf;
+    }
+  } catch (err) {
+    console.warn('[pdf] local font read failed', name, err.message);
+  }
+
+  // 3. Try /tmp cache (survives between warm invocations)
+  const tmpPath = `/tmp/sarabun-${name}.ttf`;
+  try {
+    if (fs.existsSync(tmpPath)) {
+      const buf = fs.readFileSync(tmpPath);
+      fontMemoryCache[name] = buf;
+      return buf;
+    }
+  } catch {}
+
+  // 4. Download from CDN
+  console.log('[pdf] downloading font from CDN:', name);
+  const res = await fetch(FONT_URLS[name]);
+  if (!res.ok) throw new Error(`Font download failed: ${name} (HTTP ${res.status})`);
+  const arrayBuffer = await res.arrayBuffer();
+  const buf = Buffer.from(arrayBuffer);
+
+  // Cache in memory + /tmp
+  fontMemoryCache[name] = buf;
+  try { fs.writeFileSync(tmpPath, buf); } catch (err) {
+    console.warn('[pdf] /tmp cache write failed', err.message);
+  }
+
+  return buf;
+}
 
 // Palette
 const COLOR = {
@@ -52,10 +108,15 @@ const formatThaiDate = (iso) => {
 
 const baht = (n) => '฿' + Number(n || 0).toLocaleString('en-US');
 
-function setupFonts(doc) {
-  doc.registerFont('Sarabun', FONT_REGULAR);
-  doc.registerFont('Sarabun-Bold', FONT_BOLD);
-  doc.registerFont('Sarabun-Medium', FONT_MEDIUM);
+async function setupFonts(doc) {
+  const [regular, bold, medium] = await Promise.all([
+    loadFont('regular'),
+    loadFont('bold'),
+    loadFont('medium')
+  ]);
+  doc.registerFont('Sarabun', regular);
+  doc.registerFont('Sarabun-Bold', bold);
+  doc.registerFont('Sarabun-Medium', medium);
 }
 
 // Draw a colored pill/badge with text
@@ -73,7 +134,7 @@ function drawBadge(doc, text, x, y, bg, fg) {
 // ============================================================
 // Main PDF builder
 // ============================================================
-function buildPDF({ invoice, school, billing, res }) {
+async function buildPDF({ invoice, school, billing, res }) {
   const doc = new PDFDocument({
     size: 'A4',
     margin: PAGE.margin,
@@ -84,7 +145,9 @@ function buildPDF({ invoice, school, billing, res }) {
       Creator: 'PanyaSchoolKit'
     }
   });
-  setupFonts(doc);
+
+  // Load fonts (memory cache → bundle → /tmp → CDN)
+  await setupFonts(doc);
   doc.font('Sarabun');
 
   doc.pipe(res);
@@ -379,7 +442,7 @@ module.exports = async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
 
     // Generate + stream PDF directly to response
-    buildPDF({ invoice, school, billing, res });
+    await buildPDF({ invoice, school, billing, res });
 
   } catch (err) {
     console.error('[invoices/pdf] error', err);

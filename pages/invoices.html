@@ -622,13 +622,14 @@
   }
 
   // ====================================================================
-  // Sprint 7.C: Generate Invoice PDF Receipt
+  // Sprint 7.C: Generate Invoice PDF Receipt via window.print()
+  // (Switched from html2pdf to print() — more reliable for Thai content)
   // ====================================================================
   async function downloadInvoicePDF(inv) {
     if (!inv || !inv.id) return;
     const btn = event?.target;
     const originalText = btn?.textContent;
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังสร้าง PDF...'; }
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังเปิดหน้าพิมพ์...'; }
 
     try {
       // Load school + billing_info for receipt header
@@ -662,9 +663,8 @@
       const subtotal = items.reduce((sum, it) => sum + ((it.amount || 0) * (it.quantity || 1)), 0);
       const total = inv.total_amount || inv.amount || subtotal;
 
-      // Build the PDF HTML
-      const tpl = document.getElementById('pdfTemplate');
-      tpl.innerHTML = `
+      // Build the receipt HTML
+      const receiptHtml = `
         <div class="pdf-header">
           <div class="pdf-brand">
             <h1>PanyaSchoolKit</h1>
@@ -748,72 +748,118 @@
         </div>
       `;
 
-      // Generate PDF
-      const filename = `${inv.invoice_number}.pdf`;
-      const options = {
-        margin: 0,
-        filename: filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          letterRendering: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-          windowWidth: 794,
-          windowHeight: 1123
-        },
-        jsPDF: {
-          unit: 'px',
-          format: [794, 1123], // A4 size at 96dpi
-          orientation: 'portrait',
-          hotfixes: ['px_scaling']
-        }
-      };
+      // Open new window with receipt + auto-trigger print dialog
+      const printWindow = window.open('', '_blank', 'width=900,height=1100');
+      if (!printWindow) {
+        alert('Browser block popup window — กรุณาอนุญาต popup สำหรับเว็บนี้แล้วลองอีกครั้ง');
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
+        return;
+      }
 
-      // Move template into viewport using inline styles (avoid class clash with html2pdf clone)
-      const originalStyle = tpl.getAttribute('style') || '';
-      tpl.setAttribute('style', `
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 794px !important;
-        padding: 48px !important;
-        background: #ffffff !important;
-        font-family: 'Sarabun', sans-serif !important;
-        color: #111111 !important;
-        z-index: 999999 !important;
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        transform: none !important;
-        box-sizing: border-box !important;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.2) !important;
-      `);
-
-      // Wait for Sarabun font to load (important for Thai)
+      printWindow.document.write(`<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>${inv.invoice_number} — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 40px;
+      font-family: 'Sarabun', sans-serif;
+      color: #111;
+      background: #f3f4f6;
+    }
+    .receipt-container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 48px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    .pdf-header { display: flex; justify-content: space-between; align-items: start; padding-bottom: 24px; border-bottom: 3px solid #2563EB; margin-bottom: 32px; }
+    .pdf-brand h1 { font-size: 28px; font-weight: 800; color: #1F2937; margin: 0 0 6px; }
+    .pdf-brand p { font-size: 12px; color: #6B7280; margin: 2px 0; line-height: 1.5; }
+    .pdf-doc-title { text-align: right; }
+    .pdf-doc-title h2 { font-size: 26px; font-weight: 700; color: #2563EB; margin: 0 0 8px; }
+    .invoice-num { font-family: 'Courier New', monospace; font-size: 14px; color: #374151; }
+    .pdf-date { font-size: 12px; color: #6B7280; margin: 4px 0; }
+    .pdf-status { display: inline-block; margin-top: 8px; padding: 4px 12px; background: #D1FAE5; color: #065F46; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+    .pdf-status.failed { background: #FEE2E2; color: #991B1B; }
+    .pdf-billto { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    .pdf-billto-block { background: #F9FAFB; padding: 16px 20px; border-left: 3px solid #E5E7EB; }
+    .pdf-billto-block .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #6B7280; margin-bottom: 8px; font-weight: 600; }
+    .pdf-billto-block .name { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .pdf-billto-block .detail { font-size: 11px; color: #4B5563; margin: 2px 0; line-height: 1.5; }
+    .pdf-items { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    .pdf-items th { text-align: left; padding: 10px 12px; background: #1F2937; color: #fff; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .pdf-items th.right { text-align: right; }
+    .pdf-items th.center { text-align: center; }
+    .pdf-items td { padding: 14px 12px; border-bottom: 1px solid #E5E7EB; font-size: 13px; color: #111; }
+    .pdf-items td.right { text-align: right; }
+    .pdf-items td.center { text-align: center; }
+    .pdf-items .description { font-weight: 500; }
+    .pdf-totals { width: 100%; max-width: 320px; margin-left: auto; margin-bottom: 32px; }
+    .pdf-totals .row { display: flex; justify-content: space-between; padding: 8px 12px; font-size: 13px; }
+    .pdf-totals .row.subtotal { color: #4B5563; }
+    .pdf-totals .row.grand { border-top: 2px solid #1F2937; margin-top: 4px; padding-top: 12px; font-size: 18px; font-weight: 800; color: #1F2937; }
+    .pdf-paymentinfo { background: #EFF6FF; border-left: 3px solid #2563EB; padding: 12px 16px; margin-bottom: 32px; font-size: 12px; color: #1E40AF; }
+    .pdf-paymentinfo .label { font-weight: 700; margin-bottom: 4px; }
+    .pdf-paymentinfo .val { font-family: 'Courier New', monospace; font-size: 11px; color: #1E3A8A; }
+    .pdf-footer { border-top: 1px solid #E5E7EB; padding-top: 16px; font-size: 10px; color: #9CA3AF; text-align: center; line-height: 1.6; }
+    .pdf-footer strong { color: #4B5563; }
+    .print-instruction {
+      max-width: 720px; margin: 0 auto 20px; padding: 14px 20px;
+      background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px;
+      color: #78350F; font-size: 13px; line-height: 1.6;
+    }
+    .print-instruction strong { color: #92400E; }
+    @media print {
+      body { padding: 0; background: #fff; }
+      .receipt-container { max-width: 100%; box-shadow: none; padding: 30px; }
+      .print-instruction { display: none; }
+      @page { margin: 0.5cm; size: A4; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-instruction">
+    <strong>💡 วิธีบันทึก PDF:</strong> กด <kbd>Ctrl+P</kbd> (หรือคลิกไอคอน Print) →
+    เลือก <strong>"Save as PDF"</strong> เป็นเครื่องพิมพ์ → กด <strong>Save</strong> →
+    ตั้งชื่อไฟล์เป็น <code>${inv.invoice_number}</code>
+  </div>
+  <div class="receipt-container">
+    ${receiptHtml}
+  </div>
+  <script>
+    // Auto-open print dialog after fonts loaded
+    window.addEventListener('load', () => {
       if (document.fonts && document.fonts.ready) {
-        await document.fonts.ready;
+        document.fonts.ready.then(() => {
+          setTimeout(() => window.print(), 300);
+        });
+      } else {
+        setTimeout(() => window.print(), 500);
       }
-      // Wait for layout + image rendering
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      try {
-        await html2pdf().set(options).from(tpl).save();
-      } finally {
-        // Always restore template style
-        tpl.setAttribute('style', originalStyle);
-      }
+    });
+  <\/script>
+</body>
+</html>`);
+      printWindow.document.close();
 
       if (btn) {
         btn.disabled = false;
-        btn.textContent = '✅ ดาวน์โหลดแล้ว';
+        btn.textContent = '✅ เปิดหน้าพิมพ์แล้ว';
         setTimeout(() => { if (btn) btn.textContent = originalText; }, 2000);
       }
 
     } catch (err) {
       console.error('[downloadInvoicePDF]', err);
-      alert('ดาวน์โหลด PDF ไม่สำเร็จ: ' + (err.message || 'unknown'));
+      alert('เปิดหน้าพิมพ์ไม่สำเร็จ: ' + (err.message || 'unknown'));
       if (btn) { btn.disabled = false; btn.textContent = originalText; }
     }
   }

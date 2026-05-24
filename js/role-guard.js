@@ -81,11 +81,20 @@ const roleGuard = {
         return;
       }
 
-      // If school is suspended/cancelled, also block
-      if (school.status === 'suspended' || school.status === 'cancelled') {
-        console.warn('[roleGuard] School suspended/cancelled');
-        // Could redirect to a "suspended" page in the future
-        // For now just log — let the user see what they can
+      // Sprint 7.D: If school is suspended (due to long past_due) → block + show recovery screen
+      if (school.status === 'suspended') {
+        // Allow access to /pages/add-payment.html (so user can recover) and /pages/billing.html (info)
+        if (currentPath.includes('/add-payment') || currentPath.includes('/billing')) {
+          return;
+        }
+        console.warn('[roleGuard] School suspended — showing recovery screen');
+        this.showSuspendedScreen(school);
+        return;
+      }
+
+      // Cancelled — just log for now (no auto-redirect, user might be viewing read-only)
+      if (school.status === 'cancelled') {
+        console.warn('[roleGuard] School cancelled');
       }
     } catch (err) {
       console.error('[roleGuard] checkSchoolStatus failed', err);
@@ -193,6 +202,102 @@ const roleGuard = {
     `;
   },
   
+  /**
+   * Sprint 7.D — Show "Account Suspended" screen with recovery CTA
+   */
+  showSuspendedScreen(school) {
+    document.body.innerHTML = `
+      <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 40px 24px;
+        text-align: center;
+        font-family: 'Sarabun', 'Prompt', sans-serif;
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+      ">
+        <div style="
+          background: #fff;
+          border-radius: 16px;
+          padding: 48px 40px;
+          max-width: 560px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        ">
+          <div style="font-size: 72px; margin-bottom: 16px;">🚫</div>
+          <h1 style="color: #991B1B; margin: 0 0 12px; font-size: 28px; font-weight: 700;">
+            บัญชีถูกระงับ
+          </h1>
+          <p style="color: #7F1D1D; margin: 0 0 8px; font-size: 16px; line-height: 1.6;">
+            บัญชีของ <strong>${school.name || 'โรงเรียนของคุณ'}</strong> ถูกระงับชั่วคราว
+          </p>
+          <p style="color: #6B7280; margin: 0 0 32px; font-size: 14px; line-height: 1.6;">
+            เนื่องจากระบบเรียกเก็บเงินไม่สำเร็จเป็นเวลานานเกินช่วงผ่อนผัน
+          </p>
+
+          <div style="
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            text-align: left;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 28px;
+          ">
+            <p style="margin: 0 0 8px; font-weight: 700; color: #92400E; font-size: 14px;">
+              💡 วิธีกู้คืนบัญชี
+            </p>
+            <ol style="margin: 0; padding-left: 22px; color: #78350F; font-size: 13px; line-height: 1.8;">
+              <li>กดปุ่ม "อัปเดตบัตรเครดิต" ด้านล่าง</li>
+              <li>กรอกข้อมูลบัตรใหม่ → ยืนยัน</li>
+              <li>ระบบจะเรียกเก็บยอดค้างชำระ + เปิดบัญชีอัตโนมัติ</li>
+            </ol>
+          </div>
+
+          <a href="/pages/add-payment.html" style="
+            display: inline-block;
+            padding: 14px 32px;
+            background: #2563EB;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 15px;
+            margin-right: 8px;
+          ">💳 อัปเดตบัตรเครดิต</a>
+
+          <a href="/pages/billing.html" style="
+            display: inline-block;
+            padding: 14px 24px;
+            background: transparent;
+            color: #6B7280;
+            text-decoration: none;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid #D1D5DB;
+          ">ดูข้อมูล Billing</a>
+
+          <p style="margin: 28px 0 0; font-size: 12px; color: #9CA3AF;">
+            มีคำถาม? ติดต่อ <a href="mailto:support@panyaschoolkit.com" style="color: #2563EB;">support@panyaschoolkit.com</a>
+          </p>
+
+          <button onclick="auth.logout()" style="
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: transparent;
+            color: #DC2626;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: underline;
+            font-family: inherit;
+          ">Sign Out</button>
+        </div>
+      </div>
+    `;
+  },
+
   /**
    * Get redirect URL after login based on role
    */

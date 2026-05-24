@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ข้อกำหนดและเงื่อนไขการใช้บริการ — PanyaSchoolKit</title>
+  <meta name="description" content="Terms of Service for PanyaSchoolKit — multi-tenant school management SaaS by Panya Ventures Co., Ltd." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Sarabun', 'Prompt', sans-serif;
+      color: #1F2937;
+      background: #F8FAFC;
+      line-height: 1.7;
+    }
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #E5E7EB;
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-inner {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #1F2937;
+    }
+    .brand img { width: 32px; height: 32px; }
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      font-family: 'Prompt', sans-serif;
+    }
+    .lang-toggle {
+      display: inline-flex;
+      background: #F3F4F6;
+      border-radius: 100px;
+      padding: 4px;
+      gap: 2px;
+    }
+    .lang-toggle button {
+      padding: 6px 16px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6B7280;
+      transition: all 0.15s;
+    }
+    .lang-toggle button.active {
+      background: #2563EB;
+      color: #fff;
+    }
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: #111827;
+    }
+    .page-meta {
+      color: #6B7280;
+      font-size: 14px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #E5E7EB;
+      padding-bottom: 20px;
+    }
+    .page-meta strong { color: #374151; }
+    .doc h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1F2937;
+      margin: 36px 0 12px;
+      padding-top: 8px;
+    }
+    .doc h2:first-of-type { margin-top: 8px; }
+    .doc h2 .num {
+      color: #2563EB;
+      margin-right: 8px;
+    }
+    .doc h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin: 20px 0 8px;
+    }
+    .doc p { margin: 0 0 12px; color: #374151; }
+    .doc ul, .doc ol {
+      padding-left: 24px;
+      margin: 0 0 12px;
+      color: #374151;
+    }
+    .doc li { margin-bottom: 6px; }
+    .doc strong { color: #111827; }
+    .doc a { color: #2563EB; }
+    .callout {
+      background: #EFF6FF;
+      border-left: 4px solid #2563EB;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: #1E40AF;
+    }
+    .doc-en { display: none; }
+    body.lang-en .doc-th { display: none; }
+    body.lang-en .doc-en { display: block; }
+    .toc {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+    .toc h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6B7280;
+    }
+    .toc ol {
+      margin: 0;
+      padding-left: 20px;
+      columns: 2;
+      column-gap: 32px;
+    }
+    .toc a {
+      color: #374151;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .toc a:hover { color: #2563EB; text-decoration: underline; }
+    @media (max-width: 640px) {
+      .toc ol { columns: 1; }
+      .page-title { font-size: 26px; }
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 40px;
+      color: #2563EB;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-inner">
+      <a href="../index.html" class="brand">
+        <img src="../images/logo.png" alt="PanyaSchoolKit" />
+        <h1>PanyaSchoolKit</h1>
+      </a>
+      <div class="lang-toggle">
+        <button id="btnTh" class="active" onclick="setLang('th')">🇹🇭 ไทย</button>
+        <button id="btnEn" onclick="setLang('en')">🇬🇧 English</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- ========================= THAI ========================= -->
+    <div class="doc doc-th">
+      <h1 class="page-title">ข้อกำหนดและเงื่อนไขการใช้บริการ</h1>
+      <p class="page-meta">
+        <strong>ผู้ให้บริการ:</strong> บริษัท ปัญญา เวนเจอร์ส จำกัด (Panya Ventures Co., Ltd.)<br/>
+        <strong>เลขทะเบียนนิติบุคคล:</strong> 0405569004587<br/>
+        <strong>มีผลบังคับใช้:</strong> 24 พฤษภาคม 2569 &nbsp;·&nbsp; <strong>เวอร์ชัน:</strong> 1.0
+      </p>
+
+      <div class="toc">
+        <h4>สารบัญ</h4>
+        <ol>
+          <li><a href="#th-1">การยอมรับข้อตกลง</a></li>
+          <li><a href="#th-2">นิยามและคำจำกัดความ</a></li>
+          <li><a href="#th-3">บริการ</a></li>
+          <li><a href="#th-4">การสมัครและบัญชีผู้ใช้</a></li>
+          <li><a href="#th-5">การชำระเงินและแพ็คเกจ</a></li>
+          <li><a href="#th-6">การยกเลิกและการคืนเงิน</a></li>
+          <li><a href="#th-7">หน้าที่ของผู้ใช้</a></li>
+          <li><a href="#th-8">ทรัพย์สินทางปัญญา</a></li>
+          <li><a href="#th-9">ความเป็นส่วนตัว</a></li>
+          <li><a href="#th-10">ข้อจำกัดความรับผิด</a></li>
+          <li><a href="#th-11">การยุติบริการ</a></li>
+          <li><a href="#th-12">การเปลี่ยนแปลงข้อตกลง</a></li>
+          <li><a href="#th-13">กฎหมายที่บังคับใช้</a></li>
+          <li><a href="#th-14">ติดต่อ</a></li>
+        </ol>
+      </div>
+
+      <h2 id="th-1"><span class="num">1.</span> การยอมรับข้อตกลง</h2>
+      <p>การลงทะเบียนใช้บริการ <strong>PanyaSchoolKit</strong> (ต่อไปนี้เรียก "บริการ") ถือว่าท่านได้อ่าน เข้าใจ และยอมรับข้อกำหนดและเงื่อนไขฉบับนี้แล้ว หากไม่ยอมรับ กรุณาหยุดใช้บริการ</p>
+      <p>ผู้ลงทะเบียนต้องเป็นผู้มีอำนาจกระทำการแทนสถานศึกษา (เช่น ผู้อำนวยการ ผู้ก่อตั้ง เจ้าของ) หรือได้รับมอบอำนาจอย่างถูกต้อง</p>
+
+      <h2 id="th-2"><span class="num">2.</span> นิยามและคำจำกัดความ</h2>
+      <ul>
+        <li><strong>"บริษัท"</strong> หมายถึง บริษัท ปัญญา เวนเจอร์ส จำกัด</li>
+        <li><strong>"บริการ"</strong> หมายถึง ระบบจัดการโรงเรียนแบบครบวงจร PanyaSchoolKit ที่ให้บริการผ่านเว็บไซต์ panyaschoolkit.com</li>
+        <li><strong>"โรงเรียน" หรือ "ลูกค้า"</strong> หมายถึง สถานศึกษาที่สมัครใช้บริการ</li>
+        <li><strong>"ผู้ใช้"</strong> หมายถึง บุคคลที่ใช้งานระบบ (เช่น เจ้าของ ครู ผู้ปกครอง นักเรียน)</li>
+        <li><strong>"แพ็คเกจ"</strong> หมายถึง รูปแบบบริการที่บริษัทเสนอ ได้แก่ Starter, Pro, Premium</li>
+      </ul>
+
+      <h2 id="th-3"><span class="num">3.</span> บริการ</h2>
+      <p>บริษัทให้บริการระบบจัดการโรงเรียนแบบหลายผู้เช่า (multi-tenant SaaS) ซึ่งครอบคลุม:</p>
+      <ul>
+        <li>การจัดการข้อมูลนักเรียน ครู ผู้ปกครอง</li>
+        <li>การจัดการชั้นเรียนและตารางเรียน</li>
+        <li>การติดต่อสื่อสารภายในโรงเรียน</li>
+        <li>การเก็บข้อมูลและสร้างรายงาน</li>
+      </ul>
+      <p>บริษัทขอสงวนสิทธิ์ในการ <strong>เพิ่ม ลด หรือเปลี่ยนแปลงคุณสมบัติ</strong> ของบริการได้ตามความเหมาะสม โดยจะแจ้งให้ทราบล่วงหน้าหากเป็นการเปลี่ยนแปลงสำคัญ</p>
+
+      <h2 id="th-4"><span class="num">4.</span> การสมัครและบัญชีผู้ใช้</h2>
+      <p>การสมัครใช้บริการต้องกรอกข้อมูลที่ถูกต้องและเป็นปัจจุบัน รวมถึงอีเมล ชื่อโรงเรียน และข้อมูลบัตรเครดิตที่ใช้ได้</p>
+      <p>ผู้ใช้มีหน้าที่ <strong>รักษาความลับของบัญชี รหัสผ่าน และข้อมูลเข้าระบบ</strong> และรับผิดชอบต่อกิจกรรมทั้งหมดที่เกิดขึ้นผ่านบัญชีของตน</p>
+
+      <h2 id="th-5"><span class="num">5.</span> การชำระเงินและแพ็คเกจ</h2>
+
+      <h3>5.1 ค่าบริการและรอบบิล</h3>
+      <p>ค่าบริการเรียกเก็บล่วงหน้าเป็นรายเดือนหรือรายปี ตามแพ็คเกจที่เลือก ราคาแสดงเป็นบาทไทย (THB) และยังไม่รวมภาษีมูลค่าเพิ่ม (หากบริษัทยังไม่ได้จดทะเบียนภาษีมูลค่าเพิ่ม)</p>
+
+      <h3>5.2 ช่วงทดลองใช้ฟรี (Trial)</h3>
+      <p>ลูกค้าใหม่จะได้รับช่วงทดลองใช้ฟรี <strong>14 วัน</strong> โดยต้องผูกบัตรเครดิตตั้งแต่วันแรก ระบบจะเริ่มเรียกเก็บเงินอัตโนมัติเมื่อสิ้นสุด trial</p>
+
+      <h3>5.3 การต่ออายุอัตโนมัติ</h3>
+      <p>บริการต่ออายุอัตโนมัติทุกรอบ ลูกค้าสามารถยกเลิกได้ตลอดเวลาผ่านหน้า Billing</p>
+
+      <h3>5.4 การชำระเงินล้มเหลว</h3>
+      <p>หากระบบเรียกเก็บไม่สำเร็จ บัญชีจะเข้าสู่สถานะ <strong>"past_due"</strong> และมีระยะผ่อนผัน <strong>7 วัน</strong> ก่อนถูกระงับ (suspended)</p>
+
+      <h2 id="th-6"><span class="num">6.</span> การยกเลิกและการคืนเงิน</h2>
+      <p>ลูกค้าสามารถยกเลิกการสมัครได้ตลอดเวลา การยกเลิกจะมีผลเมื่อสิ้นสุดรอบบิลปัจจุบัน — ลูกค้ายังคงเข้าใช้งานได้จนถึงวันหมดอายุ</p>
+      <div class="callout">
+        <strong>นโยบายการคืนเงิน:</strong> โดยทั่วไปบริษัทไม่คืนเงินสำหรับรอบที่ชำระไปแล้ว เว้นแต่กรณีพิเศษที่บริษัทพิจารณาเป็นกรณีๆ ไป
+      </div>
+
+      <h2 id="th-7"><span class="num">7.</span> หน้าที่ของผู้ใช้</h2>
+      <p>ผู้ใช้ตกลงที่จะ:</p>
+      <ul>
+        <li>ใช้บริการเพื่อวัตถุประสงค์ที่ถูกกฎหมายเท่านั้น</li>
+        <li>ไม่เข้าถึงระบบโดยไม่ได้รับอนุญาต ไม่พยายาม hack หรือ reverse engineer</li>
+        <li>ไม่อัปโหลดเนื้อหาที่ผิดกฎหมาย ลามกอนาจาร หรือละเมิดลิขสิทธิ์ผู้อื่น</li>
+        <li>ไม่ส่ง spam ไม่ใช้ระบบเพื่อ phishing หรือหลอกลวง</li>
+        <li>เคารพความเป็นส่วนตัวของผู้เรียนและผู้ปกครอง ตามกฎหมาย PDPA</li>
+      </ul>
+
+      <h2 id="th-8"><span class="num">8.</span> ทรัพย์สินทางปัญญา</h2>
+      <p>ซอฟต์แวร์ โลโก้ ชื่อ "PanyaSchoolKit" และทรัพย์สินทางปัญญาทั้งหมดของบริการเป็น <strong>ทรัพย์สินของบริษัท</strong></p>
+      <p>ข้อมูลที่ลูกค้าใส่เข้าสู่ระบบ (เช่น รายชื่อนักเรียน เนื้อหาการเรียน) <strong>ยังคงเป็นของลูกค้า</strong> บริษัทเป็นเพียงผู้เก็บรักษาและให้บริการเท่านั้น</p>
+
+      <h2 id="th-9"><span class="num">9.</span> ความเป็นส่วนตัว</h2>
+      <p>การประมวลผลข้อมูลส่วนบุคคลเป็นไปตาม <a href="/pages/privacy.html">นโยบายความเป็นส่วนตัว</a> ซึ่งสอดคล้องกับ <strong>พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)</strong></p>
+
+      <h2 id="th-10"><span class="num">10.</span> ข้อจำกัดความรับผิด</h2>
+      <p>บริการให้บริการแบบ <strong>"as-is"</strong> โดยไม่มีการรับประกันใดๆ ทั้งสิ้น</p>
+      <p>ภายใต้ขอบเขตที่กฎหมายอนุญาต บริษัทไม่รับผิดชอบต่อความเสียหายทางอ้อม การสูญเสียกำไร หรือการสูญเสียข้อมูล ทั้งนี้ความรับผิดสูงสุดของบริษัทจำกัดที่ <strong>ค่าบริการที่ลูกค้าจ่ายมาในรอบบิลปัจจุบัน</strong></p>
+
+      <h2 id="th-11"><span class="num">11.</span> การยุติบริการ</h2>
+      <p>บริษัทขอสงวนสิทธิ์ในการระงับหรือยุติบริการของบัญชีที่:</p>
+      <ul>
+        <li>ละเมิดข้อตกลงฉบับนี้</li>
+        <li>ค้างชำระเงินเกินกว่าระยะผ่อนผัน</li>
+        <li>ใช้งานในทางที่อาจเป็นอันตรายต่อระบบหรือผู้ใช้อื่น</li>
+      </ul>
+      <p>หลังจากยกเลิกบัญชี ข้อมูลจะถูกเก็บไว้เป็นเวลา <strong>90 วัน</strong> ก่อนถูกลบถาวร (ลูกค้าสามารถกู้คืนหรือ export ข้อมูลได้ในช่วงเวลานี้)</p>
+
+      <h2 id="th-12"><span class="num">12.</span> การเปลี่ยนแปลงข้อตกลง</h2>
+      <p>บริษัทอาจปรับปรุงข้อตกลงฉบับนี้ได้ทุกเมื่อ การเปลี่ยนแปลงสำคัญจะแจ้งให้ทราบทางอีเมลล่วงหน้าอย่างน้อย <strong>30 วัน</strong></p>
+
+      <h2 id="th-13"><span class="num">13.</span> กฎหมายที่บังคับใช้</h2>
+      <p>ข้อตกลงฉบับนี้อยู่ภายใต้ <strong>กฎหมายไทย</strong> ข้อพิพาทใดๆ จะอยู่ภายใต้เขตอำนาจศาลของจังหวัดขอนแก่น</p>
+
+      <h2 id="th-14"><span class="num">14.</span> ติดต่อ</h2>
+      <p>หากมีคำถามเกี่ยวกับข้อตกลงนี้ ติดต่อได้ที่:</p>
+      <ul>
+        <li><strong>อีเมล:</strong> <a href="mailto:support@panyaschoolkit.com">support@panyaschoolkit.com</a></li>
+        <li><strong>เว็บไซต์:</strong> <a href="https://panyaschoolkit.com">panyaschoolkit.com</a></li>
+        <li><strong>ที่อยู่:</strong> 458/31 ถนนกลางเมือง ตำบลในเมือง อำเภอเมืองขอนแก่น จังหวัดขอนแก่น</li>
+      </ul>
+
+      <a href="../index.html" class="back-link">← กลับไปหน้าหลัก</a>
+    </div>
+
+    <!-- ========================= ENGLISH ========================= -->
+    <div class="doc doc-en">
+      <h1 class="page-title">Terms of Service</h1>
+      <p class="page-meta">
+        <strong>Provider:</strong> Panya Ventures Co., Ltd.<br/>
+        <strong>Tax ID:</strong> 0405569004587<br/>
+        <strong>Effective Date:</strong> May 24, 2026 &nbsp;·&nbsp; <strong>Version:</strong> 1.0
+      </p>
+
+      <div class="toc">
+        <h4>Table of Contents</h4>
+        <ol>
+          <li><a href="#en-1">Acceptance of Terms</a></li>
+          <li><a href="#en-2">Definitions</a></li>
+          <li><a href="#en-3">Service Description</a></li>
+          <li><a href="#en-4">Account Registration</a></li>
+          <li><a href="#en-5">Payment & Subscription</a></li>
+          <li><a href="#en-6">Cancellation & Refunds</a></li>
+          <li><a href="#en-7">User Obligations</a></li>
+          <li><a href="#en-8">Intellectual Property</a></li>
+          <li><a href="#en-9">Privacy</a></li>
+          <li><a href="#en-10">Limitation of Liability</a></li>
+          <li><a href="#en-11">Termination</a></li>
+          <li><a href="#en-12">Changes to Terms</a></li>
+          <li><a href="#en-13">Governing Law</a></li>
+          <li><a href="#en-14">Contact</a></li>
+        </ol>
+      </div>
+
+      <h2 id="en-1"><span class="num">1.</span> Acceptance of Terms</h2>
+      <p>By registering for and using <strong>PanyaSchoolKit</strong> (the "Service"), you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. If you do not agree, please discontinue use of the Service.</p>
+      <p>The person registering must be authorized to act on behalf of the educational institution (e.g., principal, founder, owner) or hold valid power of attorney.</p>
+
+      <h2 id="en-2"><span class="num">2.</span> Definitions</h2>
+      <ul>
+        <li><strong>"Company"</strong> means Panya Ventures Co., Ltd.</li>
+        <li><strong>"Service"</strong> means the PanyaSchoolKit school management SaaS platform accessed via panyaschoolkit.com</li>
+        <li><strong>"School" or "Customer"</strong> means the educational institution subscribing to the Service</li>
+        <li><strong>"User"</strong> means any person using the system (owner, teacher, parent, student)</li>
+        <li><strong>"Plan"</strong> means a service tier offered: Starter, Pro, or Premium</li>
+      </ul>
+
+      <h2 id="en-3"><span class="num">3.</span> Service Description</h2>
+      <p>The Company provides a multi-tenant SaaS platform for school management, including:</p>
+      <ul>
+        <li>Student, teacher, and parent data management</li>
+        <li>Class and schedule management</li>
+        <li>Internal school communications</li>
+        <li>Data storage and reporting</li>
+      </ul>
+      <p>The Company reserves the right to <strong>add, modify, or remove features</strong> of the Service. Material changes will be communicated in advance.</p>
+
+      <h2 id="en-4"><span class="num">4.</span> Account Registration</h2>
+      <p>You must provide accurate and current information during registration, including email, school name, and a valid payment method.</p>
+      <p>Users are responsible for <strong>maintaining the confidentiality</strong> of their account credentials and all activities conducted under their account.</p>
+
+      <h2 id="en-5"><span class="num">5.</span> Payment & Subscription</h2>
+
+      <h3>5.1 Fees and Billing Cycle</h3>
+      <p>Service fees are charged in advance on a monthly or annual basis based on the selected Plan. Prices are quoted in Thai Baht (THB), exclusive of VAT (if applicable).</p>
+
+      <h3>5.2 Free Trial</h3>
+      <p>New customers receive a <strong>14-day free trial</strong> with a credit card on file from day one. Automatic billing begins at trial end unless canceled.</p>
+
+      <h3>5.3 Auto-Renewal</h3>
+      <p>Subscriptions auto-renew at the end of each billing cycle. Customers may cancel at any time via the Billing page.</p>
+
+      <h3>5.4 Failed Payments</h3>
+      <p>If a charge fails, the account enters <strong>"past_due"</strong> status with a <strong>7-day grace period</strong> before suspension.</p>
+
+      <h2 id="en-6"><span class="num">6.</span> Cancellation & Refunds</h2>
+      <p>You may cancel anytime. Cancellation takes effect at the end of the current billing cycle — access is retained until expiration.</p>
+      <div class="callout">
+        <strong>Refund Policy:</strong> The Company generally does not refund pre-paid fees, except in exceptional cases evaluated individually.
+      </div>
+
+      <h2 id="en-7"><span class="num">7.</span> User Obligations</h2>
+      <p>You agree to:</p>
+      <ul>
+        <li>Use the Service only for lawful purposes</li>
+        <li>Not attempt unauthorized access, hacking, or reverse engineering</li>
+        <li>Not upload illegal, obscene, or copyright-infringing content</li>
+        <li>Not send spam, phishing, or fraudulent communications</li>
+        <li>Respect student and parent privacy per Thai PDPA law</li>
+      </ul>
+
+      <h2 id="en-8"><span class="num">8.</span> Intellectual Property</h2>
+      <p>The software, logo, "PanyaSchoolKit" trademark, and all related intellectual property remain <strong>the property of the Company</strong>.</p>
+      <p>Data uploaded by Customers (e.g., student records, lesson content) <strong>remains the property of the Customer</strong>. The Company acts solely as a custodian and service provider.</p>
+
+      <h2 id="en-9"><span class="num">9.</span> Privacy</h2>
+      <p>Personal data processing is governed by our <a href="/pages/privacy.html">Privacy Policy</a>, compliant with the <strong>Thailand Personal Data Protection Act B.E. 2562 (PDPA)</strong>.</p>
+
+      <h2 id="en-10"><span class="num">10.</span> Limitation of Liability</h2>
+      <p>The Service is provided <strong>"as-is"</strong> without warranties of any kind.</p>
+      <p>To the maximum extent permitted by law, the Company is not liable for indirect damages, lost profits, or data loss. Maximum liability is limited to <strong>fees paid in the current billing cycle</strong>.</p>
+
+      <h2 id="en-11"><span class="num">11.</span> Termination</h2>
+      <p>The Company reserves the right to suspend or terminate accounts that:</p>
+      <ul>
+        <li>Violate these Terms</li>
+        <li>Have unpaid balances exceeding the grace period</li>
+        <li>Engage in activity harmful to the system or other users</li>
+      </ul>
+      <p>After termination, data is retained for <strong>90 days</strong> before permanent deletion. Customers may recover or export data during this window.</p>
+
+      <h2 id="en-12"><span class="num">12.</span> Changes to Terms</h2>
+      <p>The Company may update these Terms at any time. Material changes will be notified via email at least <strong>30 days</strong> in advance.</p>
+
+      <h2 id="en-13"><span class="num">13.</span> Governing Law</h2>
+      <p>These Terms are governed by <strong>the laws of Thailand</strong>. Disputes fall under the jurisdiction of Khon Kaen Province courts.</p>
+
+      <h2 id="en-14"><span class="num">14.</span> Contact</h2>
+      <p>For questions about these Terms, contact:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:support@panyaschoolkit.com">support@panyaschoolkit.com</a></li>
+        <li><strong>Website:</strong> <a href="https://panyaschoolkit.com">panyaschoolkit.com</a></li>
+        <li><strong>Address:</strong> 458/31 Klangmueang Road, Naimueang, Mueang Khon Kaen, Khon Kaen Province, Thailand</li>
+      </ul>
+
+      <a href="../index.html" class="back-link">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    function setLang(lang) {
+      document.body.classList.toggle('lang-en', lang === 'en');
+      document.getElementById('btnTh').classList.toggle('active', lang === 'th');
+      document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+      try { localStorage.setItem('skks_lang', lang); } catch {}
+    }
+    // Restore preference
+    try {
+      const saved = localStorage.getItem('skks_lang');
+      if (saved === 'en') setLang('en');
+    } catch {}
+  </script>
+</body>
+</html>

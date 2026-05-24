@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>นโยบายความเป็นส่วนตัว — PanyaSchoolKit</title>
+  <meta name="description" content="Privacy Policy for PanyaSchoolKit — PDPA-compliant data handling by Panya Ventures Co., Ltd." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Sarabun', 'Prompt', sans-serif;
+      color: #1F2937;
+      background: #F8FAFC;
+      line-height: 1.7;
+    }
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #E5E7EB;
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-inner {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #1F2937;
+    }
+    .brand img { width: 32px; height: 32px; }
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      font-family: 'Prompt', sans-serif;
+    }
+    .lang-toggle {
+      display: inline-flex;
+      background: #F3F4F6;
+      border-radius: 100px;
+      padding: 4px;
+      gap: 2px;
+    }
+    .lang-toggle button {
+      padding: 6px 16px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6B7280;
+      transition: all 0.15s;
+    }
+    .lang-toggle button.active {
+      background: #2563EB;
+      color: #fff;
+    }
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: #111827;
+    }
+    .page-meta {
+      color: #6B7280;
+      font-size: 14px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid #E5E7EB;
+      padding-bottom: 20px;
+    }
+    .page-meta strong { color: #374151; }
+    .doc h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1F2937;
+      margin: 36px 0 12px;
+      padding-top: 8px;
+    }
+    .doc h2:first-of-type { margin-top: 8px; }
+    .doc h2 .num {
+      color: #2563EB;
+      margin-right: 8px;
+    }
+    .doc h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin: 20px 0 8px;
+    }
+    .doc p { margin: 0 0 12px; color: #374151; }
+    .doc ul, .doc ol {
+      padding-left: 24px;
+      margin: 0 0 12px;
+      color: #374151;
+    }
+    .doc li { margin-bottom: 6px; }
+    .doc strong { color: #111827; }
+    .doc a { color: #2563EB; }
+    .callout {
+      background: #EFF6FF;
+      border-left: 4px solid #2563EB;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: #1E40AF;
+    }
+    .callout.warn {
+      background: #FEF3C7;
+      border-left-color: #F59E0B;
+      color: #78350F;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .data-table th, .data-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    .data-table th {
+      background: #F9FAFB;
+      font-weight: 600;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 11px;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .doc-en { display: none; }
+    body.lang-en .doc-th { display: none; }
+    body.lang-en .doc-en { display: block; }
+    .toc {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+    .toc h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6B7280;
+    }
+    .toc ol {
+      margin: 0;
+      padding-left: 20px;
+      columns: 2;
+      column-gap: 32px;
+    }
+    .toc a {
+      color: #374151;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .toc a:hover { color: #2563EB; text-decoration: underline; }
+    @media (max-width: 640px) {
+      .toc ol { columns: 1; }
+      .page-title { font-size: 26px; }
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 40px;
+      color: #2563EB;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-inner">
+      <a href="../index.html" class="brand">
+        <img src="../images/logo.png" alt="PanyaSchoolKit" />
+        <h1>PanyaSchoolKit</h1>
+      </a>
+      <div class="lang-toggle">
+        <button id="btnTh" class="active" onclick="setLang('th')">🇹🇭 ไทย</button>
+        <button id="btnEn" onclick="setLang('en')">🇬🇧 English</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- ========================= THAI ========================= -->
+    <div class="doc doc-th">
+      <h1 class="page-title">นโยบายความเป็นส่วนตัว</h1>
+      <p class="page-meta">
+        <strong>ผู้ควบคุมข้อมูลส่วนบุคคล:</strong> บริษัท ปัญญา เวนเจอร์ส จำกัด (Panya Ventures Co., Ltd.)<br/>
+        <strong>เลขทะเบียนนิติบุคคล:</strong> 0405569004587<br/>
+        <strong>มีผลบังคับใช้:</strong> 24 พฤษภาคม 2569 &nbsp;·&nbsp; <strong>เวอร์ชัน:</strong> 1.0
+      </p>
+
+      <div class="callout">
+        นโยบายฉบับนี้สอดคล้องกับ <strong>พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)</strong> และอธิบายวิธีที่เราเก็บ ใช้ และคุ้มครองข้อมูลของท่าน
+      </div>
+
+      <div class="toc">
+        <h4>สารบัญ</h4>
+        <ol>
+          <li><a href="#th-1">ผู้ควบคุมข้อมูล</a></li>
+          <li><a href="#th-2">ข้อมูลที่เก็บรวบรวม</a></li>
+          <li><a href="#th-3">วัตถุประสงค์การใช้ข้อมูล</a></li>
+          <li><a href="#th-4">การแบ่งปันข้อมูล</a></li>
+          <li><a href="#th-5">การเก็บรักษาข้อมูล</a></li>
+          <li><a href="#th-6">สิทธิของเจ้าของข้อมูล</a></li>
+          <li><a href="#th-7">การรักษาความปลอดภัย</a></li>
+          <li><a href="#th-8">Cookies และการติดตาม</a></li>
+          <li><a href="#th-9">ข้อมูลเด็กและเยาวชน</a></li>
+          <li><a href="#th-10">การโอนข้อมูลข้ามประเทศ</a></li>
+          <li><a href="#th-11">การเปลี่ยนแปลงนโยบาย</a></li>
+          <li><a href="#th-12">ติดต่อ DPO</a></li>
+        </ol>
+      </div>
+
+      <h2 id="th-1"><span class="num">1.</span> ผู้ควบคุมข้อมูล</h2>
+      <p><strong>บริษัท ปัญญา เวนเจอร์ส จำกัด</strong> เป็นผู้ควบคุมข้อมูลส่วนบุคคล (Data Controller) ของบริการ PanyaSchoolKit</p>
+      <ul>
+        <li>ที่อยู่: 458/31 ถนนกลางเมือง ตำบลในเมือง อำเภอเมืองขอนแก่น จังหวัดขอนแก่น</li>
+        <li>อีเมล: support@panyaschoolkit.com</li>
+      </ul>
+
+      <h2 id="th-2"><span class="num">2.</span> ข้อมูลที่เก็บรวบรวม</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ประเภทข้อมูล</th>
+            <th>ตัวอย่าง</th>
+            <th>เก็บอย่างไร</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ข้อมูลบัญชี</strong></td>
+            <td>ชื่อ-สกุล อีเมล ชื่อโรงเรียน เบอร์โทร</td>
+            <td>จากการสมัครใช้บริการ</td>
+          </tr>
+          <tr>
+            <td><strong>ข้อมูลการชำระเงิน</strong></td>
+            <td>เลข 4 หลักท้ายบัตร วันหมดอายุ (ไม่เก็บเลขบัตรเต็ม)</td>
+            <td>ผ่านระบบ Omise (PCI-DSS Level 1)</td>
+          </tr>
+          <tr>
+            <td><strong>ข้อมูลโรงเรียน</strong></td>
+            <td>รายชื่อนักเรียน ครู ผู้ปกครอง ผลการเรียน</td>
+            <td>ลูกค้าใส่เข้าระบบเอง</td>
+          </tr>
+          <tr>
+            <td><strong>ข้อมูลการใช้งาน</strong></td>
+            <td>IP, browser, เวลาเข้าใช้, audit logs</td>
+            <td>เก็บอัตโนมัติเพื่อความปลอดภัย</td>
+          </tr>
+          <tr>
+            <td><strong>ข้อมูลภาษี</strong></td>
+            <td>ชื่อนิติบุคคล เลขผู้เสียภาษี ที่อยู่ใบเสร็จ</td>
+            <td>ลูกค้ากรอกในหน้า Billing</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="th-3"><span class="num">3.</span> วัตถุประสงค์การใช้ข้อมูล</h2>
+      <p>เราใช้ข้อมูลเพื่อ:</p>
+      <ul>
+        <li><strong>ให้บริการ:</strong> ดำเนินการระบบ ส่งอีเมลแจ้งเตือน ออกใบเสร็จ</li>
+        <li><strong>เรียกเก็บเงิน:</strong> ประมวลผลการชำระผ่าน Omise</li>
+        <li><strong>ความปลอดภัย:</strong> ตรวจจับและป้องกันการใช้งานในทางที่ผิด</li>
+        <li><strong>ปรับปรุงบริการ:</strong> วิเคราะห์การใช้งาน (โดยไม่ระบุตัวบุคคล)</li>
+        <li><strong>ปฏิบัติตามกฎหมาย:</strong> รักษาข้อมูลตามที่กฎหมายกำหนด เช่น ภาษี</li>
+      </ul>
+      <p><strong>ฐานทางกฎหมาย:</strong> สัญญาบริการ (contractual basis) และการปฏิบัติตามกฎหมาย (legal obligation)</p>
+
+      <h2 id="th-4"><span class="num">4.</span> การแบ่งปันข้อมูล</h2>
+      <p>เราใช้บริการจากผู้ให้บริการภายนอก (third-party processors) ดังนี้:</p>
+      <table class="data-table">
+        <thead>
+          <tr><th>ผู้ให้บริการ</th><th>วัตถุประสงค์</th><th>ข้อมูลที่แบ่งปัน</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Supabase</strong> (USA)</td>
+            <td>เก็บฐานข้อมูล + Authentication</td>
+            <td>ข้อมูลบัญชี + ข้อมูลโรงเรียน</td>
+          </tr>
+          <tr>
+            <td><strong>Vercel</strong> (USA)</td>
+            <td>Web hosting + Serverless functions</td>
+            <td>Logs ระดับ HTTP</td>
+          </tr>
+          <tr>
+            <td><strong>Omise</strong> (Thailand/Singapore)</td>
+            <td>ประมวลผลชำระเงิน</td>
+            <td>ข้อมูลบัตรเครดิต (PCI-DSS)</td>
+          </tr>
+          <tr>
+            <td><strong>Resend</strong> (USA)</td>
+            <td>ส่งอีเมล transactional</td>
+            <td>อีเมล + เนื้อหาอีเมล</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>เราไม่ขายข้อมูลของท่านให้บุคคลที่ 3 ไม่ว่ากรณีใดๆ</p>
+
+      <h2 id="th-5"><span class="num">5.</span> การเก็บรักษาข้อมูล</h2>
+      <ul>
+        <li><strong>บัญชีที่ใช้งาน:</strong> เก็บตลอดระยะเวลาที่ใช้บริการ</li>
+        <li><strong>หลังยกเลิกบริการ:</strong> เก็บไว้ <strong>90 วัน</strong> เพื่อให้กู้คืนได้ จากนั้นลบถาวร</li>
+        <li><strong>ข้อมูลภาษี/บัญชี:</strong> เก็บอย่างน้อย <strong>5 ปี</strong> ตามกฎหมายภาษี</li>
+        <li><strong>Audit logs:</strong> เก็บ 2 ปี เพื่อความปลอดภัย</li>
+      </ul>
+
+      <h2 id="th-6"><span class="num">6.</span> สิทธิของเจ้าของข้อมูล (ตาม PDPA)</h2>
+      <p>ท่านมีสิทธิดังต่อไปนี้:</p>
+      <ul>
+        <li><strong>สิทธิเข้าถึงข้อมูล</strong> — ขอดูข้อมูลที่เราเก็บไว้</li>
+        <li><strong>สิทธิแก้ไข</strong> — ขอแก้ไขข้อมูลที่ไม่ถูกต้อง</li>
+        <li><strong>สิทธิลบ</strong> — ขอให้ลบข้อมูล (right to be forgotten)</li>
+        <li><strong>สิทธิคัดค้าน</strong> — ปฏิเสธการประมวลผลบางส่วน</li>
+        <li><strong>สิทธิระงับการใช้</strong> — ขอให้หยุดประมวลผลชั่วคราว</li>
+        <li><strong>สิทธิโอนย้ายข้อมูล</strong> — ขอ export ข้อมูลในรูปแบบที่อ่านได้</li>
+        <li><strong>สิทธิร้องเรียน</strong> — ร้องเรียนต่อ สำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคล (สคส.)</li>
+      </ul>
+      <div class="callout">
+        ส่งคำขอใช้สิทธิได้ที่ <a href="mailto:support@panyaschoolkit.com">support@panyaschoolkit.com</a> — เราจะตอบกลับภายใน <strong>30 วัน</strong>
+      </div>
+
+      <h2 id="th-7"><span class="num">7.</span> การรักษาความปลอดภัย</h2>
+      <ul>
+        <li>เข้ารหัสข้อมูลขณะส่ง (HTTPS/TLS 1.3)</li>
+        <li>เข้ารหัสฐานข้อมูลขณะเก็บ (encryption at rest)</li>
+        <li>Row-level security (RLS) แยก tenant แต่ละโรงเรียน</li>
+        <li>ตรวจสอบ access ด้วย audit logs</li>
+        <li>การชำระเงินผ่าน Omise — มาตรฐาน PCI-DSS Level 1 (ไม่เก็บเลขบัตรในระบบเรา)</li>
+      </ul>
+      <div class="callout warn">
+        แม้เราจะมีมาตรการรักษาความปลอดภัยอย่างเข้มงวด ไม่มีระบบใดปลอดภัย 100% โปรดใช้รหัสผ่านที่แข็งแกร่งและไม่บอกใคร
+      </div>
+
+      <h2 id="th-8"><span class="num">8.</span> Cookies และการติดตาม</h2>
+      <p>เราใช้ cookies เพื่อ:</p>
+      <ul>
+        <li><strong>จำเป็น (Essential):</strong> ระบบ login, session, security</li>
+        <li><strong>การตั้งค่า (Preferences):</strong> เช่น ภาษาที่เลือก</li>
+      </ul>
+      <p>เราไม่ใช้ cookies จาก third-party advertisers หรือ tracking pixels</p>
+
+      <h2 id="th-9"><span class="num">9.</span> ข้อมูลเด็กและเยาวชน</h2>
+      <p>บริการของเรามีข้อมูลของนักเรียนผู้เยาว์ — โรงเรียนที่ใช้บริการ <strong>เป็นผู้ควบคุมข้อมูลของนักเรียน</strong> ในฐานะที่ได้รับมอบหมายจากผู้ปกครอง</p>
+      <p>เรา (PanyaSchoolKit) ทำหน้าที่เป็น <strong>ผู้ประมวลผลข้อมูล (Data Processor)</strong> ตามคำสั่งของโรงเรียน</p>
+
+      <h2 id="th-10"><span class="num">10.</span> การโอนข้อมูลข้ามประเทศ</h2>
+      <p>ข้อมูลบางส่วนถูกเก็บที่ data centers ในต่างประเทศ (USA, Singapore) ผ่านผู้ให้บริการที่มี:</p>
+      <ul>
+        <li>มาตรฐานการคุ้มครองข้อมูลเทียบเท่าหรือสูงกว่า PDPA</li>
+        <li>ข้อตกลงประมวลผลข้อมูล (Data Processing Agreement)</li>
+      </ul>
+
+      <h2 id="th-11"><span class="num">11.</span> การเปลี่ยนแปลงนโยบาย</h2>
+      <p>เราอาจปรับปรุงนโยบายฉบับนี้ได้ การเปลี่ยนแปลงสำคัญจะแจ้งทางอีเมลล่วงหน้าอย่างน้อย <strong>30 วัน</strong></p>
+
+      <h2 id="th-12"><span class="num">12.</span> ติดต่อ DPO (Data Protection Officer)</h2>
+      <p>หากมีข้อสงสัยเรื่องข้อมูลส่วนบุคคล ติดต่อได้ที่:</p>
+      <ul>
+        <li><strong>อีเมล:</strong> <a href="mailto:support@panyaschoolkit.com">support@panyaschoolkit.com</a></li>
+        <li><strong>หัวข้ออีเมล:</strong> "PDPA - [คำขอที่ต้องการ]"</li>
+        <li><strong>ที่อยู่:</strong> 458/31 ถนนกลางเมือง ตำบลในเมือง อำเภอเมืองขอนแก่น จังหวัดขอนแก่น</li>
+      </ul>
+
+      <a href="../index.html" class="back-link">← กลับไปหน้าหลัก</a>
+    </div>
+
+    <!-- ========================= ENGLISH ========================= -->
+    <div class="doc doc-en">
+      <h1 class="page-title">Privacy Policy</h1>
+      <p class="page-meta">
+        <strong>Data Controller:</strong> Panya Ventures Co., Ltd.<br/>
+        <strong>Tax ID:</strong> 0405569004587<br/>
+        <strong>Effective Date:</strong> May 24, 2026 &nbsp;·&nbsp; <strong>Version:</strong> 1.0
+      </p>
+
+      <div class="callout">
+        This policy complies with the <strong>Thailand Personal Data Protection Act B.E. 2562 (PDPA)</strong> and explains how we collect, use, and protect your data.
+      </div>
+
+      <div class="toc">
+        <h4>Table of Contents</h4>
+        <ol>
+          <li><a href="#en-1">Data Controller</a></li>
+          <li><a href="#en-2">Information We Collect</a></li>
+          <li><a href="#en-3">Purpose of Use</a></li>
+          <li><a href="#en-4">Data Sharing</a></li>
+          <li><a href="#en-5">Data Retention</a></li>
+          <li><a href="#en-6">Your Rights (PDPA)</a></li>
+          <li><a href="#en-7">Security</a></li>
+          <li><a href="#en-8">Cookies & Tracking</a></li>
+          <li><a href="#en-9">Children's Data</a></li>
+          <li><a href="#en-10">Cross-Border Transfers</a></li>
+          <li><a href="#en-11">Changes to Policy</a></li>
+          <li><a href="#en-12">Contact DPO</a></li>
+        </ol>
+      </div>
+
+      <h2 id="en-1"><span class="num">1.</span> Data Controller</h2>
+      <p><strong>Panya Ventures Co., Ltd.</strong> is the Data Controller for the PanyaSchoolKit service.</p>
+      <ul>
+        <li>Address: 458/31 Klangmueang Road, Naimueang, Mueang Khon Kaen, Khon Kaen, Thailand</li>
+        <li>Email: support@panyaschoolkit.com</li>
+      </ul>
+
+      <h2 id="en-2"><span class="num">2.</span> Information We Collect</h2>
+      <table class="data-table">
+        <thead>
+          <tr><th>Data Type</th><th>Examples</th><th>How Collected</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Account</strong></td>
+            <td>Name, email, school name, phone</td>
+            <td>Registration</td>
+          </tr>
+          <tr>
+            <td><strong>Payment</strong></td>
+            <td>Last 4 digits, expiry (no full card number)</td>
+            <td>Via Omise (PCI-DSS Level 1)</td>
+          </tr>
+          <tr>
+            <td><strong>School Records</strong></td>
+            <td>Student lists, teacher info, grades</td>
+            <td>Uploaded by customer</td>
+          </tr>
+          <tr>
+            <td><strong>Usage</strong></td>
+            <td>IP, browser, access time, audit logs</td>
+            <td>Automatic (for security)</td>
+          </tr>
+          <tr>
+            <td><strong>Tax</strong></td>
+            <td>Legal entity name, tax ID, billing address</td>
+            <td>Billing form</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="en-3"><span class="num">3.</span> Purpose of Use</h2>
+      <p>We use your data to:</p>
+      <ul>
+        <li><strong>Provide service:</strong> Run the platform, send notifications, issue receipts</li>
+        <li><strong>Process payments:</strong> Via Omise</li>
+        <li><strong>Security:</strong> Detect and prevent abuse</li>
+        <li><strong>Improve service:</strong> Aggregate analytics (non-identifying)</li>
+        <li><strong>Legal compliance:</strong> Retain records as required by law</li>
+      </ul>
+      <p><strong>Legal basis:</strong> Service contract and legal obligations</p>
+
+      <h2 id="en-4"><span class="num">4.</span> Data Sharing</h2>
+      <p>We use the following third-party processors:</p>
+      <table class="data-table">
+        <thead>
+          <tr><th>Provider</th><th>Purpose</th><th>Data Shared</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Supabase</strong> (USA)</td><td>Database + Auth</td><td>Account + school data</td></tr>
+          <tr><td><strong>Vercel</strong> (USA)</td><td>Hosting + Functions</td><td>HTTP-level logs</td></tr>
+          <tr><td><strong>Omise</strong> (TH/SG)</td><td>Payment processing</td><td>Credit card (PCI-DSS)</td></tr>
+          <tr><td><strong>Resend</strong> (USA)</td><td>Transactional emails</td><td>Email + content</td></tr>
+        </tbody>
+      </table>
+      <p>We <strong>never sell</strong> your data to third parties.</p>
+
+      <h2 id="en-5"><span class="num">5.</span> Data Retention</h2>
+      <ul>
+        <li><strong>Active accounts:</strong> Retained while service is active</li>
+        <li><strong>After cancellation:</strong> <strong>90 days</strong> for recovery, then permanently deleted</li>
+        <li><strong>Tax/accounting records:</strong> Minimum <strong>5 years</strong> per tax law</li>
+        <li><strong>Audit logs:</strong> 2 years for security</li>
+      </ul>
+
+      <h2 id="en-6"><span class="num">6.</span> Your Rights (PDPA)</h2>
+      <p>You have the right to:</p>
+      <ul>
+        <li><strong>Access</strong> — Request a copy of your data</li>
+        <li><strong>Rectify</strong> — Correct inaccurate data</li>
+        <li><strong>Erase</strong> — Request deletion (right to be forgotten)</li>
+        <li><strong>Object</strong> — Refuse certain processing</li>
+        <li><strong>Restrict</strong> — Temporarily pause processing</li>
+        <li><strong>Portability</strong> — Export data in machine-readable format</li>
+        <li><strong>Complain</strong> — File complaints with the Thailand PDPC</li>
+      </ul>
+      <div class="callout">
+        Submit requests to <a href="mailto:support@panyaschoolkit.com">support@panyaschoolkit.com</a> — we respond within <strong>30 days</strong>.
+      </div>
+
+      <h2 id="en-7"><span class="num">7.</span> Security</h2>
+      <ul>
+        <li>HTTPS/TLS 1.3 encryption in transit</li>
+        <li>Encryption at rest for databases</li>
+        <li>Row-level security (RLS) per tenant</li>
+        <li>Audit logging</li>
+        <li>Omise PCI-DSS Level 1 for payments (no card data stored on our servers)</li>
+      </ul>
+      <div class="callout warn">
+        While we use strong security measures, no system is 100% secure. Use a strong password and don't share it.
+      </div>
+
+      <h2 id="en-8"><span class="num">8.</span> Cookies & Tracking</h2>
+      <p>We use cookies for:</p>
+      <ul>
+        <li><strong>Essential:</strong> Login, session, security</li>
+        <li><strong>Preferences:</strong> Language selection</li>
+      </ul>
+      <p>We do <strong>not</strong> use third-party advertising cookies or tracking pixels.</p>
+
+      <h2 id="en-9"><span class="num">9.</span> Children's Data</h2>
+      <p>Our service handles minor student data — schools using the service act as the <strong>Data Controller for student records</strong> on behalf of parents/guardians.</p>
+      <p>PanyaSchoolKit acts as a <strong>Data Processor</strong> under the school's instruction.</p>
+
+      <h2 id="en-10"><span class="num">10.</span> Cross-Border Data Transfers</h2>
+      <p>Some data is stored in data centers outside Thailand (USA, Singapore) via providers that maintain:</p>
+      <ul>
+        <li>Data protection standards equal to or exceeding PDPA</li>
+        <li>Data Processing Agreements (DPAs)</li>
+      </ul>
+
+      <h2 id="en-11"><span class="num">11.</span> Changes to Policy</h2>
+      <p>We may update this policy. Material changes will be emailed at least <strong>30 days</strong> in advance.</p>
+
+      <h2 id="en-12"><span class="num">12.</span> Contact DPO</h2>
+      <p>For privacy questions, contact:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:support@panyaschoolkit.com">support@panyaschoolkit.com</a></li>
+        <li><strong>Subject:</strong> "PDPA - [your request]"</li>
+        <li><strong>Address:</strong> 458/31 Klangmueang Road, Naimueang, Mueang Khon Kaen, Khon Kaen, Thailand</li>
+      </ul>
+
+      <a href="../index.html" class="back-link">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    function setLang(lang) {
+      document.body.classList.toggle('lang-en', lang === 'en');
+      document.getElementById('btnTh').classList.toggle('active', lang === 'th');
+      document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+      try { localStorage.setItem('skks_lang', lang); } catch {}
+    }
+    try {
+      const saved = localStorage.getItem('skks_lang');
+      if (saved === 'en') setLang('en');
+    } catch {}
+  </script>
+</body>
+</html>

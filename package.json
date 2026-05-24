@@ -4,10 +4,9 @@
   "private": true,
   "description": "SchoolKit multi-tenant app (serves SKKS + other school tenants)",
   "dependencies": {
-    "@sparticuz/chromium": "^131.0.1",
     "@supabase/supabase-js": "^2.50.0",
     "omise": "^0.10.1",
-    "puppeteer-core": "^23.10.4",
+    "pdfkit": "^0.15.1",
     "resend": "^4.0.0"
   }
 }

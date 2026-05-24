@@ -3,8 +3,7 @@
   "trailingSlash": false,
   "functions": {
     "api/invoices/[id]/pdf.js": {
-      "memory": 1024,
-      "maxDuration": 30
+      "includeFiles": "lib/fonts/**"
     }
   },
   "redirects": [

@@ -193,17 +193,27 @@
       color: #6B7280;
     }
 
-    /* ===== Sprint 7.C: Invoice PDF Template ===== */
+    /* ===== Sprint 7.C: Invoice PDF Template =====
+       Note: must be in viewport (not left:-9999px) for html2canvas to render properly.
+       Use opacity:0 + z-index:-1 to make invisible but still rendered. */
     .pdf-template {
-      position: absolute;
-      left: -9999px;
+      position: fixed;
       top: 0;
+      left: 0;
       width: 794px; /* A4 width at 96dpi */
       padding: 48px;
       background: #fff;
       font-family: 'Sarabun', sans-serif;
       color: #111;
       box-sizing: border-box;
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+      visibility: hidden;
+    }
+    .pdf-template.rendering {
+      visibility: visible;
+      opacity: 1;
     }
     .pdf-template * { box-sizing: border-box; }
 
@@ -748,7 +758,10 @@
           scale: 2,
           useCORS: true,
           letterRendering: true,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          logging: false,
+          windowWidth: 794,
+          windowHeight: 1123
         },
         jsPDF: {
           unit: 'px',
@@ -758,7 +771,22 @@
         }
       };
 
-      await html2pdf().set(options).from(tpl).save();
+      // Make template visible for html2canvas to render
+      tpl.classList.add('rendering');
+
+      // Wait for Sarabun font to load (important for Thai)
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+      // Small delay for layout to settle
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      try {
+        await html2pdf().set(options).from(tpl).save();
+      } finally {
+        // Always hide template again
+        tpl.classList.remove('rendering');
+      }
 
       if (btn) {
         btn.disabled = false;

@@ -3,177 +3,211 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add Payment Method — PanyaSchoolKit</title>
+  <title>เพิ่มวิธีชำระเงิน — PanyaSchoolKit</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/admin.css" />
-  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <link rel="stylesheet" href="../css/brand.css" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
 
-  <!-- Supabase + Omise.js -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.omise.co/omise.js.gz"></script>
 
   <style>
-    .billing-wrap {
+    body { margin: 0; padding: 0; }
+
+    /* Topbar */
+    .topbar {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--pk-border);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .topbar-logo img { height: 30px; width: auto; display: block; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .user-chip {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 5px 6px 5px 14px;
+      background: var(--pk-paper);
+      border: 1px solid var(--pk-border);
+      border-radius: 100px;
+      font-size: 13px; color: var(--pk-ink);
+    }
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--pk-blue-800); color: white;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Inter', sans-serif; font-weight: 700; font-size: 12px;
+    }
+    .btn-logout {
+      padding: 7px 14px; background: var(--pk-paper);
+      border: 1px solid var(--pk-border);
+      border-radius: 100px;
+      color: var(--pk-danger); font-weight: 600; font-size: 13px;
+      cursor: pointer; font-family: inherit;
+    }
+    .btn-logout:hover { background: var(--pk-danger-bg); }
+
+    /* Page */
+    .wrap {
       max-width: 720px;
       margin: 32px auto;
       padding: 0 16px;
-      font-family: 'Sarabun', 'Prompt', sans-serif;
     }
-    .billing-header {
-      margin-bottom: 24px;
+
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 {
+      font-size: 26px; font-weight: 700; margin: 0 0 6px;
+      color: var(--pk-ink); letter-spacing: -0.015em;
     }
-    .billing-header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0 0 4px;
-      color: #1a1a1a;
+    .page-header p { color: var(--pk-ash); margin: 0; font-size: 15px; }
+
+    .card {
+      background: var(--pk-paper);
+      border: 1px solid var(--pk-border);
+      border-radius: 16px;
+      padding: 32px;
     }
-    .billing-header p {
-      color: #666;
-      margin: 0;
-      font-size: 14px;
-    }
-    .billing-card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 28px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.04);
-    }
+
     .school-info {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 12px 16px;
+      background: var(--pk-blue-50);
+      border: 1px solid var(--pk-blue-100);
+      border-radius: 10px;
+      padding: 14px 18px;
       margin-bottom: 24px;
       font-size: 14px;
-      color: #374151;
+      color: var(--pk-ink-soft);
+      line-height: 1.6;
     }
-    .school-info strong { color: #111; }
-    .form-group {
-      margin-bottom: 18px;
+    .school-info strong { color: var(--pk-ink); }
+
+    .pci-notice {
+      background: var(--pk-success-bg);
+      border: 1px solid #BBF7D0;
+      color: var(--pk-success);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.55;
     }
+    .pci-notice .icon { font-size: 16px; line-height: 1; }
+
+    .test-card-hint {
+      background: var(--pk-gold-100);
+      border: 1px solid var(--pk-gold-300);
+      color: var(--pk-gold-700);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .test-card-hint strong { color: var(--pk-ink); }
+    .test-card-hint code {
+      background: rgba(255,255,255,0.6);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'Inter', monospace;
+      font-size: 12px;
+      color: var(--pk-ink);
+    }
+
+    .form-group { margin-bottom: 16px; }
     .form-group label {
       display: block;
       font-size: 13px;
       font-weight: 600;
-      color: #374151;
+      color: var(--pk-ink-soft);
       margin-bottom: 6px;
     }
     .form-group input {
       width: 100%;
-      padding: 10px 14px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
+      padding: 11px 14px;
+      border: 1px solid var(--pk-border);
+      border-radius: 10px;
       font-size: 15px;
       font-family: inherit;
-      box-sizing: border-box;
-      transition: border-color .15s;
+      color: var(--pk-ink);
+      background: var(--pk-paper);
+      outline: none;
+      transition: all 0.15s;
     }
     .form-group input:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+      border-color: var(--pk-blue-600);
+      box-shadow: 0 0 0 3px var(--pk-blue-100);
     }
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
     }
-    .pci-notice {
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
-      color: #075985;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-    }
-    .pci-notice .icon {
-      font-size: 16px;
-      line-height: 1;
-    }
+
     .btn-submit {
       width: 100%;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
+      background: var(--pk-blue-800);
+      color: white;
+      border: 1px solid var(--pk-blue-800);
+      padding: 13px 24px;
+      border-radius: 100px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       font-family: inherit;
-      transition: background .15s;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(30,64,175,0.18);
+      margin-top: 8px;
     }
     .btn-submit:hover:not(:disabled) {
-      background: #1d4ed8;
+      background: var(--pk-blue-900);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(30,64,175,0.25);
     }
     .btn-submit:disabled {
-      background: #9ca3af;
+      opacity: 0.6;
       cursor: not-allowed;
     }
+
     .alert {
       padding: 12px 16px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 14px;
       margin-bottom: 16px;
+      border: 1px solid;
+      line-height: 1.5;
     }
-    .alert-success {
-      background: #d1fae5;
-      border: 1px solid #6ee7b7;
-      color: #065f46;
-    }
-    .alert-error {
-      background: #fee2e2;
-      border: 1px solid #fca5a5;
-      color: #991b1b;
-    }
-    .alert-info {
-      background: #dbeafe;
-      border: 1px solid #93c5fd;
-      color: #1e40af;
-    }
+    .alert-success { background: var(--pk-success-bg); border-color: #BBF7D0; color: var(--pk-success); }
+    .alert-error { background: var(--pk-danger-bg); border-color: #FECACA; color: var(--pk-danger); }
+    .alert-info { background: var(--pk-blue-50); border-color: var(--pk-blue-100); color: var(--pk-blue-800); }
+
     .saved-card {
       display: flex;
       align-items: center;
       gap: 12px;
-      background: #f3f4f6;
-      padding: 16px;
-      border-radius: 8px;
+      background: var(--pk-mist);
+      border: 1px solid var(--pk-border);
+      padding: 14px 16px;
+      border-radius: 10px;
       margin-bottom: 16px;
     }
     .saved-card .brand {
-      background: #1f2937;
+      background: var(--pk-ink);
       color: #fff;
       padding: 4px 10px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 0.08em;
+      font-family: 'Inter', sans-serif;
     }
-    .test-card-hint {
-      background: #fef3c7;
-      border: 1px solid #fcd34d;
-      color: #78350f;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 13px;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    .test-card-hint code {
-      background: rgba(0,0,0,.08);
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-    }
+
     .loading-spinner {
       display: inline-block;
       width: 14px;
@@ -186,36 +220,57 @@
       vertical-align: -2px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer-legal {
+      text-align: center;
+      padding: 24px 16px 16px;
+      font-size: 12px;
+      color: var(--pk-mist-text);
+    }
+    .footer-legal a { color: var(--pk-ash); margin: 0 6px; text-decoration: none; font-weight: 500; }
+    .footer-legal a:hover { color: var(--pk-blue-800); }
+
+    /* Body background */
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      color: var(--pk-ink-soft);
+      background:
+        radial-gradient(ellipse 80% 50% at 90% 0%, rgba(212, 165, 116, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 60% at 10% 5%, rgba(30, 64, 175, 0.08) 0%, transparent 50%),
+        var(--pk-canvas);
+      background-attachment: fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Topbar (simplified — no full nav since this is billing flow) -->
-  <div class="admin-topbar">
-    <div class="admin-topbar-left">
-      <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SchoolKit" />
-        <h1>PanyaSchoolKit</h1>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a href="../index.html" class="topbar-logo">
+        <img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" />
       </a>
-    </div>
-    <div class="admin-topbar-right">
-      <div class="user-chip">
-        <span id="userName">Loading...</span>
-        <div class="avatar" id="userAvatar">?</div>
+      <div class="topbar-right">
+        <div class="user-chip">
+          <span id="userName">Loading...</span>
+          <div class="avatar" id="userAvatar">?</div>
+        </div>
+        <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
       </div>
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
     </div>
   </div>
 
   <!-- Main content -->
-  <div class="billing-wrap">
+  <div class="wrap">
 
-    <div class="billing-header">
-      <h1>💳 เพิ่มวิธีชำระเงิน</h1>
+    <div class="page-header">
+      <h1>เพิ่มวิธีชำระเงิน</h1>
       <p>เพิ่มบัตรเครดิต/เดบิตเพื่อต่ออายุ subscription หลังหมดช่วง trial 14 วัน</p>
     </div>
 
-    <div class="billing-card">
+    <div class="card">
 
       <div class="school-info" id="schoolInfo">
         กำลังโหลดข้อมูลโรงเรียน...
@@ -227,24 +282,23 @@
       </div>
 
       <div class="test-card-hint" id="testCardHint">
-        <strong>🧪 Test Mode</strong> — ตอนนี้ระบบอยู่ในโหมดทดสอบ ใช้บัตรทดสอบของ Omise:<br>
+        <strong>🧪 Test Mode</strong> — ตอนนี้ระบบอยู่ในโหมดทดสอบ ใช้บัตรทดสอบของ Omise:<br/>
         เลขบัตร: <code>4242 4242 4242 4242</code> &nbsp;|&nbsp;
         วันหมดอายุ: <code>12/29</code> &nbsp;|&nbsp;
         CVC: <code>123</code> &nbsp;|&nbsp;
-        ชื่อ: ใดก็ได้
+        ชื่อ: อะไรก็ได้
       </div>
 
-      <!-- Alert messages -->
       <div id="alertBox" style="display:none"></div>
 
-      <!-- Existing card (shown if user already has a card on file) -->
+      <!-- Existing card -->
       <div id="existingCardBlock" style="display:none">
         <div class="saved-card">
           <span class="brand" id="cardBrand">VISA</span>
           <span>•••• •••• •••• <strong id="cardLast4">0000</strong></span>
-          <span style="margin-left:auto;color:#6b7280;font-size:13px">หมดอายุ <span id="cardExpiry">--/--</span></span>
+          <span style="margin-left:auto;color:var(--pk-ash);font-size:13px">หมดอายุ <span id="cardExpiry">--/--</span></span>
         </div>
-        <p style="font-size:14px;color:#4b5563;margin:0 0 16px">ต้องการเปลี่ยนบัตรใหม่? กรอกข้อมูลด้านล่าง:</p>
+        <p style="font-size:14px;color:var(--pk-ash);margin:0 0 16px">ต้องการเปลี่ยนบัตรใหม่? กรอกข้อมูลด้านล่าง:</p>
       </div>
 
       <!-- Card form -->
@@ -282,32 +336,33 @@
     </div>
   </div>
 
-  <!-- Core scripts (load AFTER body so DOM is ready) -->
+  <!-- Legal footer -->
+  <div class="footer-legal">
+    การสมัครใช้บริการถือว่ายอมรับ
+    <a href="/pages/terms.html">ข้อกำหนดและเงื่อนไข</a> และ
+    <a href="/pages/privacy.html">นโยบายความเป็นส่วนตัว</a>
+  </div>
+
+  <!-- Core scripts -->
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
 
   <script>
   // ============================================================
-  // add-payment.html logic
+  // add-payment.html — same logic as before, new brand UI
   // ============================================================
 
-  // Omise.js public key — set after tenant resolved
   const OMISE_PUBLIC_KEY = 'pkey_test_67r5iyyfhyniu28zqw2';
 
   let currentUser = null;
   let currentSchool = null;
   let currentSession = null;
 
-  // ---------- Init ----------
   document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Require owner OR developer role
-    // ⚠️ NOTE: roleGuard.requireRole() returns PROFILE (not session with access_token)
-    //          So we need to fetch the actual session separately.
     const profile = await roleGuard.requireRole(['owner', 'developer']);
-    if (!profile) return; // role-guard handles redirect
+    if (!profile) return;
 
-    // Get the actual auth session (contains access_token JWT for API calls)
     currentSession = await auth.getSession();
     if (!currentSession || !currentSession.access_token) {
       showAlert('error', 'Session ไม่มี access_token — กรุณา logout แล้ว login ใหม่');
@@ -315,32 +370,32 @@
     }
     currentUser = currentSession.user;
 
-    // 2. Wait for tenant resolution (supabase-client.js fires 'tenant-resolved' event)
+    // Update user chip
+    const name = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.email || 'User';
+    document.getElementById('userName').textContent = name;
+    document.getElementById('userAvatar').textContent = (profile.first_name || profile.email || '?')[0].toUpperCase();
+
     if (window.CURRENT_SCHOOL_ID) {
       await loadSchoolInfo();
     } else {
       window.addEventListener('tenant-resolved', loadSchoolInfo, { once: true });
     }
 
-    // 3. Initialize Omise.js
     if (window.Omise) {
       Omise.setPublicKey(OMISE_PUBLIC_KEY);
     } else {
       showAlert('error', 'ไม่สามารถโหลด Omise.js ได้ — กรุณา refresh หน้า');
     }
 
-    // 4. Format card number input (add spaces every 4 digits)
     document.getElementById('cardNumber').addEventListener('input', (e) => {
       let v = e.target.value.replace(/\s/g, '').replace(/[^\d]/g, '');
       v = v.match(/.{1,4}/g)?.join(' ') || v;
       e.target.value = v;
     });
 
-    // 5. Form submit handler
     document.getElementById('cardForm').addEventListener('submit', handleSubmit);
   });
 
-  // ---------- Load school info + existing card ----------
   async function loadSchoolInfo() {
     const schoolId = window.CURRENT_SCHOOL_ID;
     if (!schoolId) {
@@ -362,12 +417,11 @@
     currentSchool = school;
 
     document.getElementById('schoolInfo').innerHTML = `
-      <strong>${school.name}</strong> · ${school.contact_email}<br>
+      <strong>${school.name}</strong> · ${school.contact_email}<br/>
       สถานะ: <strong>${school.status}</strong>
       ${school.trial_ends_at ? ` · Trial หมด: ${new Date(school.trial_ends_at).toLocaleDateString('th-TH')}` : ''}
     `;
 
-    // Load existing card if any
     if (school.omise_customer_id) {
       const { data: card } = await supabaseClient
         .from('payment_methods')
@@ -387,10 +441,8 @@
     }
   }
 
-  // ---------- Form submit ----------
   async function handleSubmit(e) {
     e.preventDefault();
-
     const submitBtn = document.getElementById('submitBtn');
     const submitText = document.getElementById('submitText');
     submitBtn.disabled = true;
@@ -405,7 +457,6 @@
       security_code: document.getElementById('cardCVC').value.trim()
     };
 
-    // Step 1: Tokenize via Omise.js (card data goes DIRECTLY to Omise, not our server)
     Omise.createToken('card', cardData, async (statusCode, response) => {
       if (statusCode !== 200) {
         submitBtn.disabled = false;
@@ -417,7 +468,6 @@
       const token = response.id;
       submitText.innerHTML = '<span class="loading-spinner"></span>กำลังบันทึกข้อมูล...';
 
-      // Step 2: Send token + school_id + JWT to our API
       try {
         const res = await fetch('/api/omise/create-customer', {
           method: 'POST',
@@ -425,41 +475,28 @@
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${currentSession.access_token}`
           },
-          body: JSON.stringify({
-            token: token,
-            school_id: currentSchool.id
-          })
+          body: JSON.stringify({ token, school_id: currentSchool.id })
         });
 
         const data = await res.json();
 
         if (!res.ok || !data.success) {
-          // Show both error + detail (detail explains the actual cause)
           const detail = data.detail ? ` [${data.detail}]` : '';
           throw new Error((data.error || 'Unknown server error') + detail);
         }
 
-        // Success!
         const cardInfo = `${data.card?.brand || ''} •••• ${data.card?.last4 || ''}`;
         const trialJustActivated = data.trial?.activated && !data.trial?.already_active;
 
         if (trialJustActivated) {
-          // FIRST card add — trial just started → show celebration + redirect to dashboard
           showAlert('success',
-            `🎉 บันทึกบัตรสำเร็จ! ${cardInfo} — Trial 14 วันเริ่มแล้ว! ` +
-            `กำลังพาคุณไปยัง dashboard...`
+            `🎉 บันทึกบัตรสำเร็จ! ${cardInfo} — Trial 14 วันเริ่มแล้ว! กำลังพาคุณไปยัง dashboard...`
           );
-          // Redirect to dashboard after 2 seconds
-          setTimeout(() => {
-            window.location.href = '/pages/dashboard.html';
-          }, 2000);
+          setTimeout(() => { window.location.href = '/pages/dashboard.html'; }, 2000);
         } else {
-          // Updating existing card (trial already active)
           showAlert('success',
             `✅ อัปเดตบัตรสำเร็จ! ${cardInfo} — ระบบจะเรียกเก็บเงินอัตโนมัติหลังหมด trial`
           );
-
-          // Refresh card display
           setTimeout(() => loadSchoolInfo(), 500);
           document.getElementById('cardForm').reset();
           submitBtn.disabled = false;
@@ -474,7 +511,6 @@
     });
   }
 
-  // ---------- Alert helpers ----------
   function showAlert(type, message) {
     const box = document.getElementById('alertBox');
     box.className = `alert alert-${type}`;
@@ -482,20 +518,12 @@
     box.style.display = 'block';
     box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-
   function clearAlert() {
     const box = document.getElementById('alertBox');
     box.style.display = 'none';
     box.textContent = '';
   }
   </script>
-
-  <!-- Legal footer -->
-  <div style="text-align:center;padding:24px 16px 16px;font-size:11px;color:#9CA3AF;font-family:'Sarabun',sans-serif;">
-    การสมัครใช้บริการถือว่ายอมรับ
-    <a href="/pages/terms.html" style="color:#6B7280;">ข้อกำหนดและเงื่อนไข</a> และ
-    <a href="/pages/privacy.html" style="color:#6B7280;">นโยบายความเป็นส่วนตัว</a>
-  </div>
 
   <!-- Cookie consent banner -->
   <script src="/js/cookie-consent.js" defer></script>

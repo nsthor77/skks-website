@@ -4,19 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — SKKS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/brand.css" />
   <link rel="stylesheet" href="../css/admin.css" />
-  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif !important;
+      color: var(--pk-ink-soft);
+      background:
+        radial-gradient(ellipse 80% 50% at 90% 0%, rgba(212, 165, 116, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 60% at 10% 5%, rgba(30, 64, 175, 0.08) 0%, transparent 50%),
+        var(--pk-canvas) !important;
+      background-attachment: fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .admin-topbar .admin-logo img { height: 30px !important; width: auto !important; }
+    .admin-topbar .admin-logo h1 { display: none; }
+    .card, .stat-card { border-color: var(--pk-border) !important; box-shadow: none !important; }
+    .admin-container h1, .admin-container h2, .admin-container h3 { color: var(--pk-ink); }
+  </style>
 </head>
 <body>
   <div class="admin-topbar">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" />
       </a>
       <nav class="admin-nav">
         <a href="dashboard.html" class="active">📊 Dashboard</a>

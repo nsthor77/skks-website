@@ -5,17 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Billing & Subscription — PanyaSchoolKit</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/brand.css" />
   <link rel="stylesheet" href="../css/admin.css" />
-  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    /* Sarabun for body */
-    body { font-family: 'Sarabun', 'Prompt', sans-serif; background: #F8FAFC; }
+    /* New brand body */
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      color: var(--pk-ink-soft);
+      background:
+        radial-gradient(ellipse 80% 50% at 90% 0%, rgba(212, 165, 116, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 60% at 10% 5%, rgba(30, 64, 175, 0.08) 0%, transparent 50%),
+        var(--pk-canvas);
+      background-attachment: fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .billing-wrap h1, .billing-wrap h2, .billing-wrap h3 { color: var(--pk-ink); }
+    .card { border-color: var(--pk-border) !important; box-shadow: none !important; }
+    /* Override topbar logo size for image */
+    .admin-topbar .admin-logo img { height: 30px !important; width: auto !important; }
+    .admin-topbar .admin-logo h1 { display: none; }
 
     .billing-wrap {
       max-width: 960px;
@@ -310,8 +323,7 @@
   <div class="admin-topbar">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SchoolKit" />
-        <h1>PanyaSchoolKit</h1>
+        <img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" />
       </a>
       <nav class="admin-nav">
         <a href="dashboard.html">📊 Dashboard</a>

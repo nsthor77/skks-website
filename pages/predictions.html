@@ -100,9 +100,11 @@
     </div>
   </div>
 
+  <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
+  <script>document.addEventListener("langchange", () => location.reload());</script>
   <script src="../js/data-helpers.js"></script>
   <script>
     async function init() {

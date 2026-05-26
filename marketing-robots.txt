@@ -1,0 +1,8 @@
+# robots.txt for panyaschoolkit.com
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://panyaschoolkit.com/sitemap.xml

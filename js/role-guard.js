@@ -64,7 +64,7 @@ const roleGuard = {
     try {
       const { data: school, error } = await supabaseClient
         .from('schools')
-        .select('id, status')
+        .select('id, status, name')
         .eq('id', schoolId)
         .single();
 

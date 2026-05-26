@@ -51,10 +51,7 @@
       </nav>
     </div>
     <div class="admin-topbar-right">
-      <div class="lang-toggle">
-        <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
-        <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
-      </div>
+      <!-- Old lang-toggle removed — i18n.js injects a new one automatically -->
       <div class="user-chip">
         <span id="userName">Loading...</span>
         <div class="avatar" id="userAvatar">?</div>
@@ -163,6 +160,7 @@
     </div>
   </div>
   
+  <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
@@ -238,19 +236,23 @@
       }
     };
     
-    function getLang() { return localStorage.getItem('skks_lang') || 'en'; }
+    // Sprint 10.6: Use shared pk_lang (synced with i18n.js)
+    function getLang() {
+      return localStorage.getItem('pk_lang') || localStorage.getItem('skks_lang') || 'en';
+    }
     function setLang(lang) {
-      localStorage.setItem('skks_lang', lang);
+      localStorage.setItem('pk_lang', lang);
       document.documentElement.lang = lang;
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (t[lang][key]) el.innerHTML = t[lang][key];
-      });
-      document.querySelectorAll('.lang-toggle a').forEach(a => {
-        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+        if (t[lang] && t[lang][key]) el.innerHTML = t[lang][key];
       });
     }
-    function getText(key) { return t[getLang()][key] || key; }
+    function getText(key) { return (t[getLang()] || t.en)[key] || key; }
+    // Re-apply on language change from shared toggle
+    document.addEventListener('langchange', (e) => setLang(e.detail.lang));
+    // Apply current language on load
+    document.addEventListener('DOMContentLoaded', () => setLang(getLang()));
     
     let currentProfile = null;
     

@@ -7,11 +7,8 @@ const auth = {
   /**
    * Sign up new user
    */
-  async signup({ email, password, firstName, lastName, role = 'student', schoolId = null }) {
+  async signup({ email, password, firstName, lastName, role = 'student' }) {
     try {
-      // Use provided schoolId, fallback to current tenant (SKKS for now)
-      const finalSchoolId = schoolId || window.CURRENT_SCHOOL_ID;
-      
       const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
@@ -19,8 +16,7 @@ const auth = {
           data: {
             first_name: firstName,
             last_name: lastName,
-            role: role,
-            school_id: finalSchoolId
+            role: role
           }
         }
       });

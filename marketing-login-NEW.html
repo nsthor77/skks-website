@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าสู่ระบบ — Panya SchoolKit</title>
+  <meta name="description" content="เข้าสู่ระบบ Panya SchoolKit — ระบบจัดการโรงเรียนครบวงจร" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="images/panya-mark.png" />
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A;
+      --pk-blue-800: #1E40AF;
+      --pk-blue-600: #2563EB;
+      --pk-blue-500: #3B82F6;
+      --pk-blue-200: #BFD0FB;
+      --pk-blue-100: #DBE5FF;
+      --pk-blue-50:  #EEF3FF;
+      --pk-gold-500: #D4A574;
+      --pk-gold-100: #FAF3E6;
+      --pk-canvas:   #EBF0FA;
+      --pk-paper:    #FFFFFF;
+      --pk-ink:      #0F1A36;
+      --pk-ink-soft: #1F2A4E;
+      --pk-ash:      #4B5670;
+      --pk-mist-text:#7B8497;
+      --pk-border:   #D8DEE9;
+      --pk-border-em:#A8B2C4;
+      --pk-warning:  #B45309;
+      --pk-warning-bg: #FFFBEB;
+      --pk-danger:   #B91C1C;
+      --pk-danger-bg: #FEF2F2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      color: var(--pk-ink-soft);
+      background:
+        radial-gradient(ellipse 80% 60% at 90% 0%, rgba(212, 165, 116, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 70% at 10% 100%, rgba(30, 64, 175, 0.10) 0%, transparent 50%),
+        var(--pk-canvas);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .brand-top {
+      margin-bottom: 28px;
+    }
+    .brand-top img {
+      height: 36px;
+      width: auto;
+      display: block;
+    }
+
+    .login-card {
+      background: var(--pk-paper);
+      border-radius: 18px;
+      padding: 40px 36px;
+      max-width: 460px;
+      width: 100%;
+      border: 1px solid var(--pk-border);
+      box-shadow: 0 20px 50px -12px rgba(15, 26, 54, 0.15);
+    }
+
+    .login-card h1 {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--pk-ink);
+      margin: 0 0 6px;
+      text-align: center;
+      letter-spacing: -0.015em;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--pk-ash);
+      font-size: 14.5px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pk-ink-soft);
+      margin-bottom: 6px;
+    }
+
+    .subdomain-input-wrap {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--pk-border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.15s;
+      background: var(--pk-paper);
+    }
+    .subdomain-input-wrap:focus-within {
+      border-color: var(--pk-blue-600);
+      box-shadow: 0 0 0 3px var(--pk-blue-100);
+    }
+    .subdomain-input-wrap input {
+      flex: 1;
+      padding: 13px 16px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--pk-ink);
+      font-weight: 600;
+      background: transparent;
+    }
+    .subdomain-input-wrap .suffix {
+      background: var(--pk-canvas);
+      padding: 13px 16px;
+      color: var(--pk-ash);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      border-left: 1px solid var(--pk-border);
+      font-family: 'Inter', sans-serif;
+    }
+    .form-help {
+      font-size: 12.5px;
+      color: var(--pk-ash);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+    .form-help strong { color: var(--pk-ink); }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px 22px;
+      background: var(--pk-blue-800);
+      color: var(--pk-paper);
+      border: 1px solid var(--pk-blue-800);
+      border-radius: 100px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14.5px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(30,64,175,0.18);
+    }
+    .btn-primary:hover {
+      background: var(--pk-blue-900);
+      border-color: var(--pk-blue-900);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(30,64,175,0.25);
+    }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .divider {
+      text-align: center;
+      margin: 22px 0;
+      color: var(--pk-mist-text);
+      font-size: 12px;
+      position: relative;
+      font-weight: 500;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: var(--pk-border);
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+
+    .help-box {
+      background: var(--pk-gold-100);
+      border: 1px solid #E8C896;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #78350F;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+    .help-box strong { color: #92400E; }
+    .help-box a { color: var(--pk-blue-600); font-weight: 500; }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--pk-ash);
+    }
+    .signup-link a {
+      color: var(--pk-blue-600);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .signup-link a:hover { text-decoration: underline; }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+      border: 1px solid;
+    }
+    .alert.show { display: block; }
+    .alert.error { background: var(--pk-danger-bg); color: var(--pk-danger); border-color: #FECACA; }
+
+    .footer-mini {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--pk-mist-text);
+      line-height: 1.7;
+    }
+    .footer-mini a { color: var(--pk-ash); margin: 0 8px; text-decoration: none; font-weight: 500; }
+    .footer-mini a:hover { color: var(--pk-blue-800); }
+
+    /* Mobile polish */
+    @media (max-width: 540px) {
+      body { padding: 16px; }
+      .brand-top { margin-bottom: 22px; }
+      .brand-top img { height: 30px; }
+      .login-card { padding: 28px 22px; border-radius: 16px; }
+      .login-card h1 { font-size: 20px; }
+      .subtitle { font-size: 13.5px; margin-bottom: 22px; }
+      .subdomain-input-wrap input { padding: 12px 14px; font-size: 16px; }
+      .subdomain-input-wrap .suffix { padding: 12px 12px; font-size: 12.5px; }
+      .btn-primary { padding: 13px 18px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="brand-top">
+    <img src="images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" />
+  </a>
+
+  <div class="login-card">
+    <h1>เข้าสู่ระบบ</h1>
+    <p class="subtitle">ใส่ subdomain ของโรงเรียนคุณเพื่อเข้าใช้งาน</p>
+
+    <div class="alert" id="alertBox"></div>
+
+    <form onsubmit="handleGoLogin(event)">
+      <div class="form-group">
+        <label>Subdomain ของโรงเรียน</label>
+        <div class="subdomain-input-wrap">
+          <input
+            type="text"
+            id="subdomain"
+            placeholder="myschool"
+            pattern="[a-z0-9-]{2,50}"
+            maxlength="50"
+            autocomplete="organization"
+            required
+            autofocus
+          />
+          <div class="suffix">.panyaschoolkit.com</div>
+        </div>
+        <div class="form-help">
+          เช่น <strong>myschool</strong>.panyaschoolkit.com → พิมพ์ <strong>myschool</strong>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="goBtn">
+        ไปหน้า Login ของโรงเรียน →
+      </button>
+    </form>
+
+    <div class="divider">หรือ</div>
+
+    <div class="help-box">
+      <strong>💡 ใช้ custom domain?</strong><br/>
+      ถ้าโรงเรียนคุณใช้ domain ของตัวเอง (เช่น myschool.com) — เข้าผ่าน domain นั้นได้เลย เช่น
+      <strong>myschool.com/login.html</strong>
+    </div>
+
+    <div class="signup-link">
+      ยังไม่มีบัญชี? <a href="/#signup">สมัครใช้บริการ →</a>
+    </div>
+  </div>
+
+  <div class="footer-mini">
+    <a href="/pages/terms.html">Terms</a>·
+    <a href="/pages/privacy.html">Privacy</a>·
+    <a href="mailto:support@panyaschoolkit.com">Contact</a><br/>
+    © 2026 บริษัท ปัญญา เวนเจอร์ส จำกัด · เลขทะเบียน 0405569004587
+  </div>
+
+  <script src="/js/cookie-consent.js" defer></script>
+
+  <script>
+    function showAlert(msg) {
+      const a = document.getElementById('alertBox');
+      a.className = 'alert show error';
+      a.textContent = msg;
+    }
+
+    function handleGoLogin(ev) {
+      ev.preventDefault();
+      const raw = document.getElementById('subdomain').value.trim().toLowerCase();
+      const slug = raw.replace(/[^a-z0-9-]/g, '');
+
+      if (!slug || slug.length < 2) {
+        showAlert('❌ กรุณาใส่ subdomain อย่างน้อย 2 ตัวอักษร');
+        return;
+      }
+
+      const reserved = ['www', 'api', 'admin', 'app', 'login', 'auth', 'mail', 'support'];
+      if (reserved.includes(slug)) {
+        showAlert('❌ subdomain นี้สงวนไว้ — ใส่ subdomain ของโรงเรียนคุณ');
+        return;
+      }
+
+      const btn = document.getElementById('goBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ กำลังไปหน้า login...';
+
+      window.location.href = `https://${slug}.panyaschoolkit.com/login.html`;
+    }
+
+    document.getElementById('subdomain').addEventListener('input', (e) => {
+      e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    });
+  </script>
+</body>
+</html>

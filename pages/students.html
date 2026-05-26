@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>นักเรียน — PanyaSchoolKit</title>
+  <title>Students — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -414,17 +414,17 @@
         <img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" />
       </a>
       <nav class="nav-links">
-        <a href="dashboard.html">แดชบอร์ด</a>
-        <a href="students.html" class="active">นักเรียน</a>
-        <a href="applications.html">ใบสมัคร</a>
-        <a href="attendance.html">เช็คชื่อ</a>
-        <a href="finance.html" class="owner-only" style="display:none">การเงิน</a>
-        <a href="billing.html" class="owner-only" style="display:none">บิล</a>
+        <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+        <a href="students.html" class="active" data-i18n="nav.students">Students</a>
+        <a href="applications.html" data-i18n="nav.applications">Applications</a>
+        <a href="attendance.html" data-i18n="nav.attendance">Attendance</a>
+        <a href="finance.html" class="owner-only" style="display:none" data-i18n="nav.finance">Finance</a>
+        <a href="billing.html" class="owner-only" style="display:none" data-i18n="nav.billing">Billing</a>
       </nav>
     </div>
     <div class="topbar-right">
-      <span class="user-info" id="userInfo">โหลด...</span>
-      <button class="btn-out" onclick="signOut()">ออกจากระบบ</button>
+      <span class="user-info" id="userInfo">...</span>
+      <button class="btn-out" onclick="signOut()" data-i18n="common.signOut">Sign Out</button>
     </div>
   </div>
 
@@ -433,60 +433,60 @@
     <!-- Page Header -->
     <div class="page-header">
       <div class="page-title">
-        <h1>🎓 นักเรียน</h1>
-        <p>จัดการข้อมูลนักเรียนของโรงเรียน</p>
+        <h1 data-i18n="students.title">🎓 Students</h1>
+        <p data-i18n="students.subtitle">Manage student records</p>
       </div>
       <div class="page-actions">
-        <a href="student-fields-config.html" class="btn btn-secondary owner-only" style="display:none; text-decoration:none;">⚙️ ตั้งค่าฟิลด์</a>
-        <button class="btn btn-secondary" onclick="openImportModal()">📥 นำเข้า CSV</button>
-        <button class="btn btn-secondary" onclick="exportCsv()">📤 Export CSV</button>
-        <button class="btn btn-primary" onclick="openCreateModal()">➕ เพิ่มนักเรียน</button>
+        <a href="student-fields-config.html" class="btn btn-secondary owner-only" style="display:none; text-decoration:none;" data-i18n="students.configFields">⚙️ Configure Fields</a>
+        <button class="btn btn-secondary" onclick="openImportModal()" data-i18n="students.importCsv">📥 Import CSV</button>
+        <button class="btn btn-secondary" onclick="exportCsv()" data-i18n="students.exportCsv">📤 Export CSV</button>
+        <button class="btn btn-primary" onclick="openCreateModal()" data-i18n="students.addStudent">➕ Add Student</button>
       </div>
     </div>
 
     <!-- Stats -->
     <div class="stats-row" id="statsRow">
       <div class="stat-card accent">
-        <div class="stat-label">ทั้งหมด</div>
+        <div class="stat-label" data-i18n="students.statTotal">Total</div>
         <div class="stat-value" id="statTotal">—</div>
       </div>
       <div class="stat-card success">
-        <div class="stat-label">กำลังเรียน</div>
+        <div class="stat-label" data-i18n="students.statActive">Studying</div>
         <div class="stat-value" id="statActive">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">ชาย</div>
+        <div class="stat-label" data-i18n="students.statMale">Male</div>
         <div class="stat-value" id="statMale">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">หญิง</div>
+        <div class="stat-label" data-i18n="students.statFemale">Female</div>
         <div class="stat-value" id="statFemale">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">จบการศึกษา</div>
+        <div class="stat-label" data-i18n="students.statGraduated">Graduated</div>
         <div class="stat-value" id="statGraduated">—</div>
       </div>
     </div>
 
     <!-- Toolbar -->
     <div class="toolbar">
-      <input type="search" id="searchBox" placeholder="🔍 ค้นหาชื่อ / รหัสนักเรียน / ชื่อเล่น" />
+      <input type="search" id="searchBox" data-i18n-attr="placeholder:students.searchPlaceholder" placeholder="🔍 Search by name / ID / nickname" />
       <select id="filterStatus">
-        <option value="">ทุกสถานะ</option>
-        <option value="active">กำลังเรียน</option>
-        <option value="inactive">หยุดเรียน</option>
-        <option value="graduated">จบการศึกษา</option>
-        <option value="transferred">ย้ายโรงเรียน</option>
+        <option value="" data-i18n="students.filterStatus">All statuses</option>
+        <option value="active" data-i18n="students.statusActive">Studying</option>
+        <option value="inactive" data-i18n="students.statusInactive">Suspended</option>
+        <option value="graduated" data-i18n="students.statusGraduated">Graduated</option>
+        <option value="transferred" data-i18n="students.statusTransferred">Transferred</option>
       </select>
       <select id="filterProgram">
-        <option value="">ทุกหลักสูตร</option>
-        <option value="prek">เตรียมอนุบาล</option>
-        <option value="k">อนุบาล</option>
+        <option value="" data-i18n="students.filterProgram">All programs</option>
+        <option value="prek" data-i18n="students.programPrek">Pre-K</option>
+        <option value="k" data-i18n="students.programK">Kindergarten</option>
         <option value="ep">EP</option>
         <option value="mep">MEP</option>
       </select>
-      <input type="text" id="filterGrade" placeholder="ระดับชั้น" style="min-width: 100px; flex: 0;" />
-      <input type="text" id="filterClassroom" placeholder="ห้อง" style="min-width: 80px; flex: 0;" />
+      <input type="text" id="filterGrade" data-i18n-attr="placeholder:students.filterGrade" placeholder="Grade" style="min-width: 100px; flex: 0;" />
+      <input type="text" id="filterClassroom" data-i18n-attr="placeholder:students.filterClassroom" placeholder="Class" style="min-width: 80px; flex: 0;" />
       <span class="spacer"></span>
       <span class="count-info" id="countInfo"></span>
     </div>
@@ -497,19 +497,19 @@
         <table>
           <thead>
             <tr>
-              <th>รหัสนักเรียน</th>
-              <th>ชื่อ - นามสกุล</th>
-              <th>หลักสูตร</th>
-              <th>ชั้น</th>
-              <th>ห้อง</th>
-              <th>เพศ</th>
-              <th>เบอร์ผู้ปกครอง</th>
-              <th>สถานะ</th>
-              <th style="text-align:right;">ดำเนินการ</th>
+              <th data-i18n="students.colStudentNumber">Student ID</th>
+              <th data-i18n="students.colName">Name</th>
+              <th data-i18n="students.colProgram">Program</th>
+              <th data-i18n="students.colGrade">Grade</th>
+              <th data-i18n="students.colClassroom">Class</th>
+              <th data-i18n="students.colGender">Gender</th>
+              <th data-i18n="students.colParentPhone">Parent Phone</th>
+              <th data-i18n="students.colStatus">Status</th>
+              <th style="text-align:right;" data-i18n="students.colActions">Actions</th>
             </tr>
           </thead>
           <tbody id="tbody">
-            <tr><td colspan="9"><div class="loading-state">⏳ กำลังโหลด...</div></td></tr>
+            <tr><td colspan="9"><div class="loading-state">⏳ Loading...</div></td></tr>
           </tbody>
         </table>
       </div>
@@ -536,7 +536,7 @@
           <input type="hidden" id="fId" />
 
           <div class="form-section">
-            <h4>ข้อมูลทั่วไป</h4>
+            <h4 data-i18n="students.sectionGeneral">General Info</h4>
             <div class="form-grid">
               <div class="form-group">
                 <label>รหัสนักเรียน <span class="req">*</span></label>
@@ -799,6 +799,7 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
@@ -831,6 +832,11 @@
       loadCustomFieldDefs();
       loadStats();
       loadStudents();
+
+      // Re-render table when language changes
+      document.addEventListener('langchange', () => {
+        if (allRows.length) render();
+      });
     });
 
     // ============ Sprint 10.5: Custom Field Definitions ============
@@ -971,14 +977,14 @@
     function render() {
       const tbody = document.getElementById('tbody');
       if (!allRows.length) {
-        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">🎓</div><h4>ยังไม่มีนักเรียน</h4><p>กดปุ่ม "เพิ่มนักเรียน" หรือ "นำเข้า CSV" เพื่อเริ่ม</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">🎓</div><h4>${t('students.empty')}</h4><p>${t('students.emptyDesc')}</p></div></td></tr>`;
         document.getElementById('pagination').style.display = 'none';
         document.getElementById('countInfo').textContent = '';
         return;
       }
 
-      const programLabels = { prek:'เตรียมอนุบาล', k:'อนุบาล', ep:'EP', mep:'MEP', thai:'ปกติ' };
-      const genderLabels = { male:'♂ ชาย', female:'♀ หญิง', other:'อื่นๆ' };
+      const programLabels = { prek: t('students.programPrek'), k: t('students.programK'), ep: t('students.programEp'), mep: t('students.programMep'), thai: t('students.programThai') };
+      const genderLabels = { male: t('students.genderMale'), female: t('students.genderFemale'), other: t('students.genderOther') };
 
       tbody.innerHTML = allRows.map(s => {
         const fullName = ((s.first_name_th || '') + ' ' + (s.last_name_th || '')).trim() || '—';
@@ -1013,7 +1019,12 @@
       document.getElementById('btnPrev').disabled = currentPage === 1;
       document.getElementById('btnNext').disabled = currentPage === totalPages;
       document.getElementById('btnLast').disabled = currentPage === totalPages;
-      document.getElementById('countInfo').textContent = `แสดง ${(currentPage-1)*pageSize + 1}–${Math.min(currentPage*pageSize, totalRows)} จาก ${totalRows.toLocaleString()} คน`;
+      document.getElementById('countInfo').textContent = t('students.countInfo', {
+        start: (currentPage-1)*pageSize + 1,
+        end: Math.min(currentPage*pageSize, totalRows),
+        total: totalRows.toLocaleString()
+      });
+      document.getElementById('pageInfo').textContent = t('students.pageOf', { current: currentPage, total: totalPages });
     }
 
     function goToPage(p) {
@@ -1023,7 +1034,8 @@
     }
 
     function statusLabel(s) {
-      return { active:'กำลังเรียน', inactive:'หยุดเรียน', graduated:'จบ', transferred:'ย้าย' }[s] || s || 'active';
+      const key = 'students.status' + (s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Active');
+      return t(key);
     }
 
     function esc(s) {

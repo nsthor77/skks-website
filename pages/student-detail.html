@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>รายละเอียดนักเรียน — PanyaSchoolKit</title>
+  <title>Student Details — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -150,7 +150,7 @@
   <div class="topbar">
     <div class="topbar-left">
       <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
-      <a href="students.html" class="back-link">← กลับไปรายชื่อนักเรียน</a>
+      <a href="students.html" class="back-link" data-i18n="students.detailBack">← Back to Students</a>
     </div>
   </div>
 
@@ -158,6 +158,7 @@
     <div id="content"><div class="loading">⏳ กำลังโหลด...</div></div>
   </div>
 
+  <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
@@ -180,6 +181,9 @@
       if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--;
       return a + ' ปี';
     }
+
+    // Re-render when language changes
+    document.addEventListener('langchange', () => location.reload());
 
     document.addEventListener('DOMContentLoaded', async () => {
       const profile = await roleGuard.requireStaff();

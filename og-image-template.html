@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>OG Image — PanyaSchoolKit (screenshot at 1200x630)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1F2937;
+      font-family: 'Sarabun', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px;
+    }
+    .instructions {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      background: #FEF3C7;
+      color: #78350F;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border-left: 4px solid #F59E0B;
+      font-size: 14px;
+      line-height: 1.6;
+      z-index: 99;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+    .instructions h2 {
+      color: #92400E;
+      font-size: 18px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .instructions code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #DC2626;
+      font-weight: 600;
+    }
+
+    /* THE OG IMAGE — exactly 1200x630 */
+    .og {
+      width: 1200px;
+      height: 630px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #E0F2FE 0%, #DCFCE7 100%);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border-radius: 0;
+      margin-top: 100px;
+    }
+    /* Decorative blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.55;
+    }
+    .blob-1 { width: 500px; height: 500px; background: #7CB342; top: -120px; right: -120px; }
+    .blob-2 { width: 400px; height: 400px; background: #5BB8E0; bottom: -100px; left: -100px; }
+    .blob-3 { width: 300px; height: 300px; background: #F59E0B; top: 50%; right: 30%; opacity: 0.25; }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      padding: 80px 80px 60px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-mark {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 36px;
+      box-shadow: 0 8px 24px rgba(91, 184, 224, 0.3);
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      color: #1F2937;
+      letter-spacing: -0.5px;
+    }
+
+    .main-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 24px;
+    }
+    h1 {
+      font-family: 'Poppins', 'Sarabun', sans-serif;
+      font-size: 68px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #1F2937;
+      margin-bottom: 24px;
+      letter-spacing: -1.5px;
+    }
+    h1 .accent {
+      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 26px;
+      color: #4B5563;
+      line-height: 1.4;
+      max-width: 900px;
+      font-weight: 500;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .features {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1F2937;
+      border: 1px solid rgba(255,255,255,0.6);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .url-tag {
+      font-family: 'Poppins', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1E40AF;
+      background: rgba(255,255,255,0.85);
+      padding: 12px 22px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="instructions">
+    <h2>📸 วิธีบันทึก OG Image</h2>
+    <strong>Windows:</strong> กด <code>Windows + Shift + S</code> → ลากเลือกเฉพาะกล่องรูปด้านล่าง (1200×630) → กด Save<br/>
+    หรือ <strong>Chrome DevTools:</strong> F12 → กดไอคอน 📱 → ตั้ง Custom 1200×630 → Right-click element <code>.og</code> → "Capture node screenshot"<br/>
+    <strong>บันทึกเป็น:</strong> <code>og-image.png</code> → upload เข้า marketing repo path <code>/og-image.png</code>
+  </div>
+
+  <!-- THE OG IMAGE (1200x630) -->
+  <div class="og">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="content">
+
+      <div class="header-row">
+        <div class="logo-mark">🎓</div>
+        <div class="brand-name">PanyaSchoolKit</div>
+      </div>
+
+      <div class="main-text">
+        <h1>ระบบจัดการโรงเรียน<br/><span class="accent">ครบวงจรในที่เดียว</span></h1>
+        <p class="subtitle">รับสมัคร · นักเรียน · เก็บเงิน · เกรด · ใบประกาศ — สำหรับโรงเรียนไทย</p>
+      </div>
+
+      <div class="footer-row">
+        <div class="features">
+          <div class="pill">✅ ทดลองฟรี 14 วัน</div>
+          <div class="pill">💳 ไม่ตัดเงินก่อน</div>
+          <div class="pill">🇹🇭 ออกแบบสำหรับโรงเรียนไทย</div>
+        </div>
+        <div class="url-tag">panyaschoolkit.com</div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

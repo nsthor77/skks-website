@@ -46,8 +46,19 @@ module.exports = async (req, res) => {
       return res.status(429).json({ error: 'rate_limited', message: 'Too many requests. Try again in 1 minute.' });
     }
 
-    // ---- Parse body ----
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    // ---- Parse body (works for application/json, text/plain, or raw string) ----
+    let body;
+    try {
+      if (typeof req.body === 'string') {
+        body = JSON.parse(req.body);
+      } else if (Buffer.isBuffer(req.body)) {
+        body = JSON.parse(req.body.toString('utf8'));
+      } else {
+        body = req.body || {};
+      }
+    } catch (e) {
+      return res.status(400).json({ error: 'invalid_json', detail: e.message });
+    }
     const {
       email,
       school_name,

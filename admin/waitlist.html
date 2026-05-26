@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waitlist — Admin · PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      background: #EBF0FA;
+      color: #0F1A36;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .admin-shell { display: flex; min-height: 100vh; }
+    .admin-sidebar {
+      width: 240px;
+      background: #1F2937;
+      color: #fff;
+      padding: 20px 0;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid #374151;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logo .badge { font-size: 10px; background: #FBBF24; color: #1F2937; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+    .sidebar-nav { padding: 16px 0; }
+    .sidebar-nav a {
+      display: block;
+      padding: 10px 20px;
+      color: #D1D5DB;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all .15s;
+    }
+    .sidebar-nav a:hover { background: #374151; color: #fff; }
+    .sidebar-nav a.active { background: #2563EB; color: #fff; font-weight: 600; }
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid #374151;
+      position: absolute;
+      bottom: 0;
+      width: 240px;
+    }
+    .sidebar-footer .user { font-size: 13px; color: #9CA3AF; }
+    .sidebar-footer button {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #D1D5DB;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .admin-main { flex: 1; padding: 30px; max-width: 1400px; }
+    .page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .page-header h1 { font-size: 24px; margin: 0 0 4px; }
+    .page-header p { color: #6B7280; margin: 0; font-size: 14px; }
+
+    .actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 9px 16px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 600; font-family: inherit;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: #2563EB; color: #fff; }
+    .btn-primary:hover { background: #1D4ED8; }
+    .btn-secondary { background: #fff; color: #374151; border: 1px solid #E5E7EB; }
+    .btn-secondary:hover { background: #F3F4F6; }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #fff;
+      padding: 18px 20px;
+      border-radius: 12px;
+      border: 1px solid #E5E7EB;
+    }
+    .stat-card .label {
+      font-size: 11px;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: #0F1A36;
+      font-family: 'Inter', sans-serif;
+    }
+    .stat-card.accent .value { color: #2563EB; }
+
+    /* Table */
+    .table-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #E5E7EB;
+      overflow: hidden;
+    }
+    .table-toolbar {
+      padding: 14px 18px;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex; gap: 10px; align-items: center;
+      flex-wrap: wrap;
+    }
+    .table-toolbar input, .table-toolbar select {
+      padding: 7px 10px;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .table-toolbar .spacer { flex: 1; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: #F9FAFB; }
+    th { text-align: left; padding: 11px 14px; font-weight: 600; color: #6B7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #E5E7EB; }
+    td { padding: 12px 14px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+    tr:hover td { background: #FAFBFC; }
+    tr:last-child td { border-bottom: none; }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .status-pending { background: #FEF3C7; color: #92400E; }
+    .status-contacted { background: #DBEAFE; color: #1E40AF; }
+    .status-converted { background: #D1FAE5; color: #065F46; }
+    .status-rejected { background: #FEE2E2; color: #991B1B; }
+
+    .size-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      background: #F3F4F6;
+      color: #374151;
+    }
+    .size-large { background: #DBEAFE; color: #1E40AF; }
+    .size-medium { background: #E0E7FF; color: #3730A3; }
+    .size-small { background: #F3F4F6; color: #374151; }
+
+    .ts { color: #6B7280; font-size: 12px; white-space: nowrap; }
+    .email-link { color: #2563EB; text-decoration: none; font-weight: 500; }
+    .notes-cell { max-width: 280px; color: #4B5563; font-size: 12px; line-height: 1.5; }
+
+    .empty { text-align: center; padding: 60px 20px; color: #6B7280; }
+    .loading { padding: 30px; text-align: center; color: #6B7280; }
+    .err { padding: 20px; background: #FEE2E2; color: #991B1B; border-radius: 8px; margin: 20px; }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <img src="../images/panya-schoolkit-lockup-inverse.png" alt="Panya SchoolKit" style="height:24px;width:auto;" />
+        <span class="badge">ADMIN</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="tenants.html">🏫 Tenants</a>
+        <a href="waitlist.html" class="active">📥 Waitlist</a>
+        <a href="../pages/dashboard.html">↩️ Back to App</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user" id="adminUser">Loading...</div>
+        <button onclick="signOut()">Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="page-header">
+        <div>
+          <h1>📥 Waitlist</h1>
+          <p>รายชื่อโรงเรียนที่จองคิว Early Access</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="loadWaitlist()">🔄 Refresh</button>
+          <button class="btn btn-primary" onclick="exportCsv()">📥 Export CSV</button>
+        </div>
+      </div>
+
+      <div id="statsRow" class="stats-grid">
+        <div class="stat-card accent">
+          <div class="label">Total</div>
+          <div class="value" id="statTotal">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Pending</div>
+          <div class="value" id="statPending">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Contacted</div>
+          <div class="value" id="statContacted">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Converted</div>
+          <div class="value" id="statConverted">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Last 7 days</div>
+          <div class="value" id="statLast7">—</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-toolbar">
+          <input type="search" id="searchBox" placeholder="🔍 ค้นหา email / โรงเรียน / ชื่อ..." oninput="filterRows()" />
+          <select id="statusFilter" onchange="filterRows()">
+            <option value="">ทุก status</option>
+            <option value="pending">Pending</option>
+            <option value="contacted">Contacted</option>
+            <option value="converted">Converted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <select id="sizeFilter" onchange="filterRows()">
+            <option value="">ทุกขนาด</option>
+            <option value="small">เล็ก</option>
+            <option value="medium">กลาง</option>
+            <option value="large">ใหญ่</option>
+            <option value="unknown">ไม่ระบุ</option>
+          </select>
+          <span class="spacer"></span>
+          <span id="rowCount" style="color:#6B7280;font-size:13px;"></span>
+        </div>
+
+        <div id="tableContent">
+          <div class="loading">กำลังโหลด...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://nuzhkhchimemuetoewzn.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_prRghlKfBE1VqrpJDZmmSA_1XifObOJ';
+    const { createClient } = window.supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    let allRows = [];
+
+    async function checkAdmin() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = '../login.html?next=/admin/waitlist.html'; return false; }
+      const { data: profile } = await sb.from('profiles').select('role, first_name, last_name').eq('id', session.user.id).single();
+      if (!profile || profile.role !== 'developer') {
+        document.body.innerHTML = '<div class="err" style="margin:60px auto;max-width:500px;">⛔ คุณไม่มีสิทธิ์เข้าถึง — เฉพาะ developer เท่านั้น</div>';
+        return false;
+      }
+      document.getElementById('adminUser').textContent = (profile.first_name || '') + ' ' + (profile.last_name || '') + ' · Dev';
+      return true;
+    }
+
+    async function loadStats() {
+      const { data, error } = await sb.rpc('get_waitlist_stats');
+      if (error || !data || data.error) return;
+      document.getElementById('statTotal').textContent = data.total ?? 0;
+      document.getElementById('statPending').textContent = data.pending ?? 0;
+      document.getElementById('statContacted').textContent = data.contacted ?? 0;
+      document.getElementById('statConverted').textContent = data.converted ?? 0;
+      document.getElementById('statLast7').textContent = data.last_7_days ?? 0;
+    }
+
+    async function loadWaitlist() {
+      document.getElementById('tableContent').innerHTML = '<div class="loading">กำลังโหลด...</div>';
+      const { data, error } = await sb.from('waitlist')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(500);
+      if (error) {
+        document.getElementById('tableContent').innerHTML = '<div class="err">❌ โหลดไม่ได้: ' + error.message + '</div>';
+        return;
+      }
+      allRows = data || [];
+      filterRows();
+      loadStats();
+    }
+
+    function filterRows() {
+      const q = document.getElementById('searchBox').value.toLowerCase().trim();
+      const sf = document.getElementById('statusFilter').value;
+      const zf = document.getElementById('sizeFilter').value;
+
+      const filtered = allRows.filter(r => {
+        if (sf && r.status !== sf) return false;
+        if (zf && r.school_size !== zf) return false;
+        if (q) {
+          const hay = ((r.email || '') + ' ' + (r.school_name || '') + ' ' + (r.contact_name || '')).toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById('rowCount').textContent = `แสดง ${filtered.length} / ${allRows.length} รายการ`;
+      renderTable(filtered);
+    }
+
+    function renderTable(rows) {
+      const c = document.getElementById('tableContent');
+      if (!rows.length) {
+        c.innerHTML = '<div class="empty">📭 ยังไม่มีรายชื่อ — เผยแพร่หน้า marketing เพื่อเริ่มเก็บ leads</div>';
+        return;
+      }
+      const sizeLabel = { small: 'เล็ก', medium: 'กลาง', large: 'ใหญ่', unknown: 'ไม่ระบุ' };
+      const html = [`<table>
+        <thead><tr>
+          <th>Email</th><th>โรงเรียน</th><th>ขนาด</th><th>ผู้ติดต่อ</th><th>เบอร์โทร</th>
+          <th>Notes</th><th>Source</th><th>Status</th><th>วันที่สมัคร</th>
+        </tr></thead><tbody>`];
+      for (const r of rows) {
+        html.push(`<tr>
+          <td><a class="email-link" href="mailto:${esc(r.email)}">${esc(r.email)}</a></td>
+          <td>${esc(r.school_name || '—')}</td>
+          <td><span class="size-badge size-${r.school_size}">${sizeLabel[r.school_size] || r.school_size}</span></td>
+          <td>${esc(r.contact_name || '—')}</td>
+          <td>${esc(r.phone || '—')}</td>
+          <td class="notes-cell">${esc(r.notes || '')}</td>
+          <td>${esc(r.source || 'marketing')}</td>
+          <td><span class="status-badge status-${r.status}">${r.status}</span></td>
+          <td class="ts">${formatDate(r.created_at)}</td>
+        </tr>`);
+      }
+      html.push('</tbody></table>');
+      c.innerHTML = html.join('');
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function formatDate(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })
+        + ' ' + dt.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function exportCsv() {
+      if (!allRows.length) return alert('ไม่มีข้อมูล');
+      const headers = ['email','school_name','school_size','contact_name','phone','notes','source','status','created_at'];
+      const lines = [headers.join(',')];
+      for (const r of allRows) {
+        lines.push(headers.map(h => csvCell(r[h])).join(','));
+      }
+      // Prepend UTF-8 BOM for Excel Thai compatibility
+      const csv = '﻿' + lines.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `waitlist-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(v) {
+      if (v === null || v === undefined) return '';
+      const s = String(v).replace(/"/g, '""');
+      return /[,"\n]/.test(s) ? `"${s}"` : s;
+    }
+
+    async function signOut() {
+      await sb.auth.signOut();
+      window.location.href = '../login.html';
+    }
+
+    (async () => {
+      if (await checkAdmin()) {
+        loadWaitlist();
+      }
+    })();
+  </script>
+</body>
+</html>

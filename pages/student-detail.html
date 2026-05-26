@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายละเอียดนักเรียน — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      background: var(--pk-canvas);
+      color: var(--pk-ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .topbar {
+      background: var(--pk-paper);
+      border-bottom: 1px solid var(--pk-border);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar img { height: 26px; }
+    .back-link {
+      color: var(--pk-ash); text-decoration: none; font-size: 13.5px;
+      padding: 6px 12px; border-radius: 8px;
+    }
+    .back-link:hover { background: var(--pk-canvas); color: var(--pk-ink); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    .profile-header {
+      background: var(--pk-paper);
+      border: 1px solid var(--pk-border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
+    }
+    .photo-circle {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pk-blue-600), var(--pk-blue-900));
+      color: var(--pk-paper);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(30,64,175,0.25);
+    }
+    .profile-info { flex: 1; min-width: 200px; }
+    .profile-info h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .profile-info .eng { color: var(--pk-ash); font-size: 15px; }
+    .profile-info .meta {
+      margin-top: 10px;
+      display: flex; gap: 14px; flex-wrap: wrap;
+      font-size: 13px; color: var(--pk-ash);
+    }
+    .profile-info .meta strong { color: var(--pk-ink); }
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .status-active { background: var(--pk-success-bg); color: var(--pk-success); }
+    .status-inactive { background: var(--pk-warning-bg); color: var(--pk-warning); }
+
+    .actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 9px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; border: none; font-family: inherit; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: var(--pk-blue-800); color: var(--pk-paper); }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--pk-paper);
+      border: 1px solid var(--pk-border);
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .card h3 {
+      font-size: 13px; font-weight: 700;
+      color: var(--pk-blue-800);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--pk-blue-100);
+    }
+    .field {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 14px;
+    }
+    .field .lbl {
+      color: var(--pk-ash);
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    .field .val {
+      color: var(--pk-ink);
+      word-break: break-word;
+    }
+    .field .val.muted { color: var(--pk-mist); font-style: italic; }
+
+    .loading, .err {
+      padding: 60px; text-align: center; color: var(--pk-ash);
+    }
+    .err { color: #991B1B; }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .profile-header { padding: 20px; gap: 16px; }
+      .photo-circle { width: 72px; height: 72px; font-size: 26px; }
+      .profile-info h1 { font-size: 20px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .field { grid-template-columns: 100px 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="students.html" class="back-link">← กลับไปรายชื่อนักเรียน</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="content"><div class="loading">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function v(val, fallback = '—') {
+      return (val === null || val === undefined || val === '') ? `<span class="val muted">${fallback}</span>` : esc(val);
+    }
+    function date(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    function age(birth) {
+      if (!birth) return '—';
+      const b = new Date(birth), n = new Date();
+      let a = n.getFullYear() - b.getFullYear();
+      if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--;
+      return a + ' ปี';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+
+      const id = new URLSearchParams(location.search).get('id');
+      if (!id) {
+        document.getElementById('content').innerHTML = '<div class="err">⚠️ ไม่ได้ระบุ ID นักเรียน</div>';
+        return;
+      }
+
+      const { data: s, error } = await supabaseClient.from('students').select('*').eq('id', id).single();
+      if (error || !s) {
+        document.getElementById('content').innerHTML = '<div class="err">❌ ไม่พบข้อมูลนักเรียน</div>';
+        return;
+      }
+
+      const programLabels = { prek:'เตรียมอนุบาล', k:'อนุบาล', ep:'EP (English Program)', mep:'MEP', thai:'ปกติ' };
+      const genderLabels = { male:'ชาย', female:'หญิง', other:'อื่นๆ' };
+      const relLabels = { father:'บิดา', mother:'มารดา', guardian:'ผู้ปกครอง', grandfather:'ปู่/ตา', grandmother:'ย่า/ยาย', other:'อื่นๆ' };
+      const statusLabels = { active:'กำลังเรียน', inactive:'หยุดเรียน', graduated:'จบการศึกษา', transferred:'ย้ายโรงเรียน' };
+
+      const fullName = ((s.first_name_th || '') + ' ' + (s.last_name_th || '')).trim() || '(ไม่ระบุชื่อ)';
+      const enName = ((s.first_name_en || '') + ' ' + (s.last_name_en || '')).trim();
+      const initial = (s.first_name_th?.[0] || s.first_name_en?.[0] || '?').toUpperCase();
+
+      document.getElementById('content').innerHTML = `
+        <div class="profile-header">
+          <div class="photo-circle">${esc(initial)}</div>
+          <div class="profile-info">
+            <h1>${esc(fullName)}${s.nickname ? ` <span style="color:#7B8497;font-weight:500;font-size:18px;">(${esc(s.nickname)})</span>` : ''}</h1>
+            ${enName ? `<div class="eng">${esc(enName)}</div>` : ''}
+            <div class="meta">
+              <span><strong>รหัส:</strong> ${esc(s.student_number || '—')}</span>
+              <span><strong>หลักสูตร:</strong> ${esc(programLabels[s.program] || s.program || '—')}</span>
+              <span><strong>ชั้น:</strong> ${esc(s.grade || '—')} / ${esc(s.classroom || '—')}</span>
+              <span class="status-badge status-${s.status || 'active'}">${statusLabels[s.status] || s.status || 'กำลังเรียน'}</span>
+            </div>
+          </div>
+          <div class="actions">
+            <a href="students.html" class="btn btn-secondary">← กลับ</a>
+            <a href="students.html#edit-${s.id}" class="btn btn-primary" onclick="event.preventDefault(); window.location.href='students.html'; sessionStorage.setItem('editStudentId', '${s.id}');">✏️ แก้ไข</a>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>ข้อมูลส่วนตัว</h3>
+            <div class="field"><div class="lbl">ชื่อ (ไทย)</div><div class="val">${v(fullName)}</div></div>
+            <div class="field"><div class="lbl">Name (EN)</div><div class="val">${v(enName)}</div></div>
+            <div class="field"><div class="lbl">ชื่อเล่น</div><div class="val">${v(s.nickname)}</div></div>
+            <div class="field"><div class="lbl">เพศ</div><div class="val">${v(genderLabels[s.gender])}</div></div>
+            <div class="field"><div class="lbl">วันเกิด</div><div class="val">${date(s.birth_date)} ${s.birth_date ? `(${age(s.birth_date)})` : ''}</div></div>
+            <div class="field"><div class="lbl">สัญชาติ</div><div class="val">${v(s.nationality)}</div></div>
+            <div class="field"><div class="lbl">เลขบัตร</div><div class="val">${v(s.national_id)}</div></div>
+            <div class="field"><div class="lbl">หมู่เลือด</div><div class="val">${v(s.blood_type)}</div></div>
+            <div class="field"><div class="lbl">ที่อยู่</div><div class="val">${v(s.address)}</div></div>
+            <div class="field"><div class="lbl">เบอร์โทร</div><div class="val">${v(s.phone)}</div></div>
+            <div class="field"><div class="lbl">Email</div><div class="val">${v(s.email)}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>การศึกษา</h3>
+            <div class="field"><div class="lbl">หลักสูตร</div><div class="val">${v(programLabels[s.program])}</div></div>
+            <div class="field"><div class="lbl">ปีการศึกษา</div><div class="val">${v(s.academic_year)}</div></div>
+            <div class="field"><div class="lbl">ระดับชั้น</div><div class="val">${v(s.grade)}</div></div>
+            <div class="field"><div class="lbl">ห้อง</div><div class="val">${v(s.classroom)}</div></div>
+            <div class="field"><div class="lbl">เข้าเรียนวันที่</div><div class="val">${date(s.enrollment_date)}</div></div>
+            <div class="field"><div class="lbl">จบการศึกษา</div><div class="val">${date(s.graduation_date)}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>ผู้ปกครอง #1</h3>
+            <div class="field"><div class="lbl">ชื่อ</div><div class="val">${v(s.parent1_name)}</div></div>
+            <div class="field"><div class="lbl">ความสัมพันธ์</div><div class="val">${v(relLabels[s.parent1_relation])}</div></div>
+            <div class="field"><div class="lbl">เบอร์โทร</div><div class="val">${v(s.parent1_phone)}</div></div>
+            <div class="field"><div class="lbl">Email</div><div class="val">${v(s.parent1_email)}</div></div>
+            <div class="field"><div class="lbl">อาชีพ</div><div class="val">${v(s.parent1_occupation)}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>ผู้ปกครอง #2</h3>
+            <div class="field"><div class="lbl">ชื่อ</div><div class="val">${v(s.parent2_name)}</div></div>
+            <div class="field"><div class="lbl">ความสัมพันธ์</div><div class="val">${v(relLabels[s.parent2_relation])}</div></div>
+            <div class="field"><div class="lbl">เบอร์โทร</div><div class="val">${v(s.parent2_phone)}</div></div>
+            <div class="field"><div class="lbl">Email</div><div class="val">${v(s.parent2_email)}</div></div>
+            <div class="field"><div class="lbl">อาชีพ</div><div class="val">${v(s.parent2_occupation)}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>ฉุกเฉิน</h3>
+            <div class="field"><div class="lbl">ชื่อ</div><div class="val">${v(s.emergency_name)}</div></div>
+            <div class="field"><div class="lbl">ความสัมพันธ์</div><div class="val">${v(s.emergency_relation)}</div></div>
+            <div class="field"><div class="lbl">เบอร์โทร</div><div class="val">${v(s.emergency_phone)}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>สุขภาพ</h3>
+            <div class="field"><div class="lbl">โรคประจำตัว</div><div class="val">${v(s.medical_conditions)}</div></div>
+            <div class="field"><div class="lbl">ภูมิแพ้</div><div class="val">${v(s.allergies)}</div></div>
+            <div class="field"><div class="lbl">ยา</div><div class="val">${v(s.medications)}</div></div>
+            <div class="field"><div class="lbl">หมายเหตุ</div><div class="val">${v(s.notes)}</div></div>
+          </div>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ตั้งค่าฟิลด์นักเรียน — PanyaSchoolKit</title>
+  <title>Custom Student Fields — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -242,6 +242,7 @@
       .option-row .opt-label { display: none; }
     }
   </style>
+  <script src="../js/i18n.js"></script>
 </head>
 <body>
 
@@ -529,7 +530,7 @@
       }
     };
 
-    let currentLang = localStorage.getItem('pk_lang') || 'th';
+    let currentLang = localStorage.getItem('pk_lang') || 'en';
     function t(key) { return (TRANSLATIONS[currentLang] || TRANSLATIONS.th)[key] || key; }
 
     function setLang(lang) {

@@ -292,7 +292,12 @@
 
   function injectToggle(container) {
     let el = typeof container === 'string' ? document.querySelector(container) : container;
-    if (!el) el = document.querySelector('.topbar-right, .admin-topbar-right, #topbar-right');
+    // Try common containers in priority order
+    if (!el) el = document.querySelector(
+      '.topbar-right, .admin-topbar-right, #topbar-right, ' +
+      '.admin-main .page-header .actions, ' +    // admin pages with actions
+      '.admin-main .page-header'                    // admin pages without actions
+    );
     if (!el) return null;
     if (el.querySelector('.pk-lang-toggle')) return el.querySelector('.pk-lang-toggle');
 

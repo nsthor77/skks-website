@@ -676,9 +676,9 @@
       : '—';
 
     const planPrices = {
-      starter: { monthly: 1990, yearly: 19104 },
-      pro: { monthly: 3990, yearly: 38304 },
-      premium: { monthly: 7990, yearly: 76704 }
+      starter: { monthly: 1299, yearly: 12470 },
+      pro: { monthly: 2990, yearly: 28704 },
+      premium: { monthly: 4990, yearly: 47904 }
     };
     const price = planPrices[sub.plan_id]?.[sub.billing_cycle] || 0;
     const priceLabel = sub.billing_cycle === 'yearly' ? '/ปี' : '/เดือน';
@@ -827,7 +827,7 @@
         • <strong>เปลี่ยนใจได้ตลอดเวลา</strong> — กดปุ่ม "ใช้งานต่อ" ก่อนสิ้นรอบบิล
       </p>
       <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:12px;margin-bottom:18px;font-size:13px;color:#78350F;">
-        💡 หรือลอง <strong>เปลี่ยนแพ็คเกจเป็น Starter</strong> ก่อน? ราคาถูกลงเหลือ ฿1,990/เดือน
+        💡 หรือลอง <strong>เปลี่ยนแพ็คเกจเป็น Starter</strong> ก่อน? ราคาถูกลงเหลือ ฿1,299/เดือน
       </div>
       <div style="display:flex;gap:10px;">
         <button class="btn btn-secondary" onclick="closeModal()" style="flex:1;">เก็บไว้ก่อน</button>
@@ -900,9 +900,9 @@
   function openChangePlanModal() {
     if (!currentSchool) return;
     const planPrices = {
-      starter: { monthly: 1990, yearly: 19104 },
-      pro: { monthly: 3990, yearly: 38304 },
-      premium: { monthly: 7990, yearly: 76704 }
+      starter: { monthly: 1299, yearly: 12470 },
+      pro: { monthly: 2990, yearly: 28704 },
+      premium: { monthly: 4990, yearly: 47904 }
     };
     selectedNewPlan = null;
     selectedNewCycle = null;

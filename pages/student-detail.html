@@ -197,6 +197,13 @@
         return;
       }
 
+      // Sprint 10.5: load custom field definitions for labels
+      let customFieldDefs = [];
+      try {
+        const { data: defs } = await supabaseClient.rpc('get_student_field_definitions', { p_include_inactive: false });
+        customFieldDefs = defs || [];
+      } catch (e) { /* custom fields may not be set up yet */ }
+
       const programLabels = { prek:'เตรียมอนุบาล', k:'อนุบาล', ep:'EP (English Program)', mep:'MEP', thai:'ปกติ' };
       const genderLabels = { male:'ชาย', female:'หญิง', other:'อื่นๆ' };
       const relLabels = { father:'บิดา', mother:'มารดา', guardian:'ผู้ปกครอง', grandfather:'ปู่/ตา', grandmother:'ย่า/ยาย', other:'อื่นๆ' };
@@ -283,9 +290,47 @@
             <div class="field"><div class="lbl">ยา</div><div class="val">${v(s.medications)}</div></div>
             <div class="field"><div class="lbl">หมายเหตุ</div><div class="val">${v(s.notes)}</div></div>
           </div>
+
+          ${renderCustomDataCard(s.custom_data || {}, customFieldDefs)}
         </div>
       `;
     });
+
+    // Sprint 10.5: render custom_data using field definitions
+    function renderCustomDataCard(customData, defs) {
+      if (!defs || !defs.length) return '';
+      const renderValue = (val, def) => {
+        if (val === null || val === undefined || val === '') return '<span class="val muted">—</span>';
+        if (def.field_type === 'select') {
+          const opt = (def.options || []).find(o => o.value === val);
+          return opt ? esc(opt.label_th || opt.value) : esc(val);
+        }
+        if (def.field_type === 'multi_select') {
+          if (!Array.isArray(val)) return esc(val);
+          return val.map(v2 => {
+            const opt = (def.options || []).find(o => o.value === v2);
+            return opt ? esc(opt.label_th || opt.value) : esc(v2);
+          }).join(', ') || '<span class="val muted">—</span>';
+        }
+        if (def.field_type === 'checkbox') {
+          return val === true || val === 'true' ? '✓ ใช่' : '✗ ไม่ใช่';
+        }
+        if (def.field_type === 'date' || def.field_type === 'datetime') return date(val);
+        if (def.field_type === 'url') return `<a href="${esc(val)}" target="_blank" style="color:#2563EB;">${esc(val)}</a>`;
+        if (def.field_type === 'email') return `<a href="mailto:${esc(val)}" style="color:#2563EB;">${esc(val)}</a>`;
+        return esc(val);
+      };
+      const items = defs.map(def => `
+        <div class="field">
+          <div class="lbl">${esc(def.label_th)}</div>
+          <div class="val">${renderValue(customData[def.field_key], def)}</div>
+        </div>
+      `).join('');
+      return `<div class="card" style="grid-column: span 2;">
+        <h3>ข้อมูลเพิ่มเติม</h3>
+        ${items}
+      </div>`;
+    }
   </script>
 </body>
 </html>

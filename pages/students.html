@@ -437,6 +437,7 @@
         <p>จัดการข้อมูลนักเรียนของโรงเรียน</p>
       </div>
       <div class="page-actions">
+        <a href="student-fields-config.html" class="btn btn-secondary owner-only" style="display:none; text-decoration:none;">⚙️ ตั้งค่าฟิลด์</a>
         <button class="btn btn-secondary" onclick="openImportModal()">📥 นำเข้า CSV</button>
         <button class="btn btn-secondary" onclick="exportCsv()">📤 Export CSV</button>
         <button class="btn btn-primary" onclick="openCreateModal()">➕ เพิ่มนักเรียน</button>
@@ -750,6 +751,14 @@
               </div>
             </div>
           </div>
+
+          <!-- Sprint 10.5: Custom Fields (rendered dynamically) -->
+          <div class="form-section" id="customFieldsSection" style="display:none;">
+            <h4>ข้อมูลเพิ่มเติม
+              <a href="student-fields-config.html" style="float:right; font-size:11px; font-weight:500; color:var(--pk-blue-600); text-decoration:none; text-transform:none;">⚙️ ตั้งค่าฟิลด์</a>
+            </h4>
+            <div class="form-grid" id="customFieldsGrid"></div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" onclick="closeEditModal()">ยกเลิก</button>
@@ -804,6 +813,7 @@
     let totalPages = 1;
     let searchTimer = null;
     let csvParsedRows = [];
+    let customFieldDefs = []; // Sprint 10.5: school-defined custom fields
 
     // ============ Init ============
     document.addEventListener('DOMContentLoaded', async () => {
@@ -818,9 +828,87 @@
 
       bindFilters();
       bindDragDrop();
+      loadCustomFieldDefs();
       loadStats();
       loadStudents();
     });
+
+    // ============ Sprint 10.5: Custom Field Definitions ============
+    async function loadCustomFieldDefs() {
+      const { data, error } = await supabaseClient.rpc('get_student_field_definitions', { p_include_inactive: false });
+      if (error) {
+        console.warn('Custom fields not available yet:', error.message);
+        return;
+      }
+      customFieldDefs = data || [];
+    }
+
+    function renderCustomFields(values = {}) {
+      const section = document.getElementById('customFieldsSection');
+      const grid = document.getElementById('customFieldsGrid');
+      if (!customFieldDefs.length) {
+        section.style.display = 'none';
+        return;
+      }
+      section.style.display = '';
+      grid.innerHTML = customFieldDefs.map(f => {
+        const val = values[f.field_key] ?? '';
+        const reqMark = f.required ? '<span style="color:#991B1B;">*</span>' : '';
+        const help = f.help_text ? `<div style="font-size:11px;color:#7B8497;margin-top:3px;">${esc(f.help_text)}</div>` : '';
+        const fullClass = ['textarea','multi_select'].includes(f.field_type) ? ' full' : '';
+        const widthAttr = ['select','multi_select'].includes(f.field_type) ? '' : '';
+        const id = 'cf_' + f.field_key;
+        const ph = f.placeholder ? `placeholder="${esc(f.placeholder)}"` : '';
+        const req = f.required ? 'required' : '';
+
+        let inputHtml = '';
+        if (f.field_type === 'textarea') {
+          inputHtml = `<textarea id="${id}" data-fkey="${esc(f.field_key)}" ${ph} ${req} rows="2">${esc(val)}</textarea>`;
+        } else if (f.field_type === 'select') {
+          const opts = (f.options || []).map(o => `<option value="${esc(o.value)}"${o.value === val ? ' selected' : ''}>${esc(o.label_th || o.value)}</option>`).join('');
+          inputHtml = `<select id="${id}" data-fkey="${esc(f.field_key)}" ${req}><option value="">—</option>${opts}</select>`;
+        } else if (f.field_type === 'multi_select') {
+          const selectedSet = new Set(Array.isArray(val) ? val : (val ? [val] : []));
+          const opts = (f.options || []).map(o => `<label style="display:flex;align-items:center;gap:8px;font-weight:400;padding:4px 0;"><input type="checkbox" data-mskey="${esc(f.field_key)}" value="${esc(o.value)}"${selectedSet.has(o.value) ? ' checked' : ''} style="width:16px;height:16px;cursor:pointer;" /> ${esc(o.label_th || o.value)}</label>`).join('');
+          inputHtml = `<div data-fkey="${esc(f.field_key)}" data-multi="1">${opts}</div>`;
+        } else if (f.field_type === 'checkbox') {
+          inputHtml = `<label style="display:flex;align-items:center;gap:8px;font-weight:400;"><input type="checkbox" id="${id}" data-fkey="${esc(f.field_key)}"${val === true || val === 'true' ? ' checked' : ''} style="width:18px;height:18px;cursor:pointer;" /> ${esc(f.label_th)}</label>`;
+        } else {
+          const typeMap = { number: 'number', date: 'date', datetime: 'datetime-local', phone: 'tel', email: 'email', url: 'url' };
+          const inputType = typeMap[f.field_type] || 'text';
+          inputHtml = `<input type="${inputType}" id="${id}" data-fkey="${esc(f.field_key)}" value="${esc(val)}" ${ph} ${req} />`;
+        }
+
+        if (f.field_type === 'checkbox') {
+          // checkbox doesn't need separate label above
+          return `<div class="form-group full">${inputHtml}${help}</div>`;
+        }
+
+        return `<div class="form-group${fullClass}">
+          <label>${esc(f.label_th)} ${reqMark}${f.label_en ? `<span style="color:#7B8497;font-weight:400;"> · ${esc(f.label_en)}</span>` : ''}</label>
+          ${inputHtml}
+          ${help}
+        </div>`;
+      }).join('');
+    }
+
+    function collectCustomData() {
+      const result = {};
+      customFieldDefs.forEach(f => {
+        if (f.field_type === 'multi_select') {
+          const checks = document.querySelectorAll(`input[data-mskey="${f.field_key}"]:checked`);
+          result[f.field_key] = Array.from(checks).map(c => c.value);
+        } else if (f.field_type === 'checkbox') {
+          const cb = document.getElementById('cf_' + f.field_key);
+          result[f.field_key] = cb ? cb.checked : false;
+        } else {
+          const el = document.getElementById('cf_' + f.field_key);
+          const v = el ? el.value.trim() : '';
+          if (v !== '') result[f.field_key] = v;
+        }
+      });
+      return result;
+    }
 
     function bindFilters() {
       const debounce = (fn) => {
@@ -953,6 +1041,8 @@
       const yr = (new Date().getFullYear() + 543).toString().slice(-2);
       const seq = String(totalRows + 1).padStart(4, '0');
       document.getElementById('fStudentNumber').value = `${yr}-${seq}`;
+      // Render custom fields (empty values)
+      renderCustomFields({});
       document.getElementById('editModal').classList.add('show');
     }
 
@@ -966,6 +1056,8 @@
         const el = document.getElementById('f' + f.split('_').map(s => s[0].toUpperCase() + s.slice(1)).join(''));
         if (el) el.value = data[f] ?? '';
       });
+      // Sprint 10.5: load custom_data values
+      renderCustomFields(data.custom_data || {});
       document.getElementById('editModal').classList.add('show');
     }
 
@@ -1021,6 +1113,9 @@
 
       // Empty strings → null for cleanliness
       Object.keys(payload).forEach(k => { if (payload[k] === '') payload[k] = null; });
+
+      // Sprint 10.5: include custom field values
+      payload.custom_data = collectCustomData();
 
       const id = val('fId');
       let result;

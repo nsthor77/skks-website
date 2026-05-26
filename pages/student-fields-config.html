@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ตั้งค่าฟิลด์นักเรียน — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      background: var(--pk-canvas);
+      color: var(--pk-ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .topbar {
+      background: var(--pk-paper);
+      border-bottom: 1px solid var(--pk-border);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .topbar img { height: 26px; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
+    .back-link:hover { background: var(--pk-canvas); color: var(--pk-ink); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    .page-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 22px;
+    }
+    .page-head h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-head p { color: var(--pk-ash); font-size: 14px; max-width: 600px; }
+
+    .btn {
+      padding: 10px 16px; border-radius: 10px;
+      font-family: inherit; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; border: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: var(--pk-blue-800); color: var(--pk-paper); box-shadow: 0 2px 6px rgba(30,64,175,0.2); }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+    .btn-danger { background: var(--pk-danger-bg); color: var(--pk-danger); border: none; }
+    .btn-danger:hover { background: #FECACA; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    /* Field list */
+    .field-list {
+      background: var(--pk-paper);
+      border: 1px solid var(--pk-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto auto auto auto;
+      gap: 14px;
+      padding: 14px 18px;
+      align-items: center;
+      border-bottom: 1px solid #F0F2F7;
+    }
+    .field-row:last-child { border-bottom: none; }
+    .field-row:hover { background: #FAFBFC; }
+
+    .field-handle {
+      cursor: grab; color: var(--pk-mist); font-size: 18px;
+      width: 24px; text-align: center;
+    }
+    .field-info .label-th {
+      font-weight: 600; color: var(--pk-ink); font-size: 14.5px;
+    }
+    .field-info .key {
+      color: var(--pk-mist); font-size: 12px;
+      font-family: 'Inter', monospace;
+      margin-top: 2px;
+    }
+    .field-info .label-en {
+      color: var(--pk-ash); font-size: 12px;
+      font-style: italic;
+    }
+    .field-type-pill {
+      padding: 3px 9px; background: var(--pk-blue-50); color: var(--pk-blue-700);
+      border-radius: 100px; font-size: 11px; font-weight: 600;
+      font-family: 'Inter', sans-serif;
+    }
+    .field-required {
+      color: var(--pk-danger);
+      font-weight: 700; font-size: 12px;
+    }
+    .field-status {
+      color: var(--pk-mist); font-size: 12px;
+    }
+    .field-status.active { color: var(--pk-success); }
+
+    /* Empty */
+    .empty {
+      padding: 60px 20px; text-align: center;
+      color: var(--pk-ash);
+    }
+    .empty .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty h4 { font-size: 17px; font-weight: 600; color: var(--pk-ink); margin-bottom: 6px; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 26, 54, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 1000; display: none;
+      align-items: flex-start; justify-content: center;
+      padding: 40px 16px; overflow-y: auto;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--pk-paper);
+      border-radius: 16px;
+      max-width: 600px; width: 100%;
+      box-shadow: 0 20px 60px -10px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      padding: 18px 24px; border-bottom: 1px solid var(--pk-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 17px; font-weight: 700; }
+    .modal-close { background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--pk-ash); width: 32px; height: 32px; border-radius: 6px; }
+    .modal-close:hover { background: var(--pk-canvas); }
+    .modal-body { padding: 22px 24px; }
+    .modal-footer {
+      padding: 16px 24px; border-top: 1px solid var(--pk-border);
+      display: flex; justify-content: flex-end; gap: 10px;
+      background: #FBFCFD; border-radius: 0 0 16px 16px;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-row.full { grid-template-columns: 1fr; }
+    .form-group label {
+      display: block; font-size: 12.5px; font-weight: 600;
+      color: var(--pk-ink-soft); margin-bottom: 4px;
+    }
+    .form-group label .req { color: var(--pk-danger); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 9px 12px;
+      border: 1px solid var(--pk-border); border-radius: 8px;
+      font-family: inherit; font-size: 14px;
+      color: var(--pk-ink); background: var(--pk-paper);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none; border-color: var(--pk-blue-600);
+      box-shadow: 0 0 0 3px var(--pk-blue-100);
+    }
+    .help-text { font-size: 12px; color: var(--pk-mist); margin-top: 4px; }
+    .check-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+    .check-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+    .check-row label { margin: 0; font-weight: 500; color: var(--pk-ink); cursor: pointer; }
+
+    /* Options editor for select */
+    .options-editor {
+      border: 1px dashed var(--pk-border); border-radius: 8px;
+      padding: 10px; background: #FAFBFC;
+    }
+    .option-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 6px; }
+    .option-row input { padding: 6px 8px; font-size: 13px; }
+    .btn-add-option { background: transparent; border: 1px dashed var(--pk-blue-600); color: var(--pk-blue-700); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 12px; width: 100%; margin-top: 4px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 18px; border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 9999; font-size: 14px; font-weight: 500; display: none;
+    }
+    .toast.show { display: block; }
+    .toast.success { background: var(--pk-success-bg); color: var(--pk-success); }
+    .toast.error { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .toast.info { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+
+    .info-banner {
+      background: var(--pk-blue-50); border: 1px solid var(--pk-blue-100);
+      padding: 14px 18px; border-radius: 10px; margin-bottom: 20px;
+      font-size: 14px; color: var(--pk-ink-soft);
+    }
+    .info-banner strong { color: var(--pk-blue-800); }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .field-row { grid-template-columns: 1fr; gap: 8px; }
+      .form-row { grid-template-columns: 1fr; }
+      input, select, textarea { font-size: 16px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="students.html" class="back-link">← กลับไปนักเรียน</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-head">
+      <div>
+        <h1>⚙️ ตั้งค่าฟิลด์นักเรียน</h1>
+        <p>กำหนดข้อมูลพิเศษที่โรงเรียนคุณต้องเก็บเพิ่มเติมจาก baseline เช่น Passport Number, กลุ่มเลือด, ศาสนา ฯลฯ</p>
+      </div>
+      <button class="btn btn-primary" onclick="openCreateModal()">➕ เพิ่มฟิลด์</button>
+    </div>
+
+    <div class="info-banner">
+      <strong>💡 หมายเหตุ:</strong> ฟิลด์ที่กำหนดที่นี่จะปรากฏใน form เพิ่ม/แก้ไขนักเรียนใต้ section "ข้อมูลเพิ่มเติม" — ลูกค้าทุกคนของโรงเรียนคุณจะเห็นฟิลด์เดียวกัน
+    </div>
+
+    <div class="field-list" id="fieldList">
+      <div class="empty"><div class="icon">⏳</div><h4>กำลังโหลด...</h4></div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">➕ เพิ่มฟิลด์</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <form onsubmit="saveField(event)">
+        <div class="modal-body">
+          <input type="hidden" id="fId" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>ป้ายชื่อ (ไทย) <span class="req">*</span></label>
+              <input type="text" id="fLabelTh" required placeholder="เช่น เลขที่ Passport" />
+            </div>
+            <div class="form-group">
+              <label>Label (English)</label>
+              <input type="text" id="fLabelEn" placeholder="Passport Number" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Field Key <span class="req">*</span></label>
+              <input type="text" id="fFieldKey" required placeholder="passport_number" pattern="[a-z][a-z0-9_]{0,49}" />
+              <div class="help-text">ตัวอักษรเล็ก + ขีดล่าง เท่านั้น (ใช้ภายในระบบ)</div>
+            </div>
+            <div class="form-group">
+              <label>ประเภท <span class="req">*</span></label>
+              <select id="fFieldType" required onchange="toggleOptionsSection()">
+                <option value="text">Text (ข้อความสั้น)</option>
+                <option value="textarea">Textarea (ข้อความยาว)</option>
+                <option value="number">Number (ตัวเลข)</option>
+                <option value="date">Date (วันที่)</option>
+                <option value="datetime">Datetime (วันที่+เวลา)</option>
+                <option value="select">Select (เลือก 1)</option>
+                <option value="multi_select">Multi-select (เลือกหลาย)</option>
+                <option value="checkbox">Checkbox (ใช่/ไม่)</option>
+                <option value="phone">Phone (เบอร์โทร)</option>
+                <option value="email">Email</option>
+                <option value="url">URL</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Placeholder</label>
+              <input type="text" id="fPlaceholder" placeholder="เช่น A12345678" />
+            </div>
+            <div class="form-group">
+              <label>ลำดับ</label>
+              <input type="number" id="fSortOrder" value="100" min="0" max="999" />
+            </div>
+          </div>
+
+          <div class="form-row full">
+            <div class="form-group">
+              <label>ข้อความช่วยอธิบาย</label>
+              <input type="text" id="fHelpText" placeholder="เช่น ใส่เลขจาก passport เล่มที่ใช้ปัจจุบัน" />
+            </div>
+          </div>
+
+          <div class="form-row" id="optionsSection" style="display:none;">
+            <div class="form-group" style="grid-column: span 2;">
+              <label>ตัวเลือก (สำหรับ Select/Multi-select)</label>
+              <div class="options-editor">
+                <div id="optionsContainer"></div>
+                <button type="button" class="btn-add-option" onclick="addOption()">+ เพิ่มตัวเลือก</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="fRequired" />
+            <label for="fRequired">บังคับกรอก (Required)</label>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="fIsActive" checked />
+            <label for="fIsActive">เปิดใช้งาน</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="btnSave">💾 บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    let allFields = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireRole(['owner','developer']);
+      if (!profile) return;
+      loadFields();
+    });
+
+    async function loadFields() {
+      const { data, error } = await supabaseClient.rpc('get_student_field_definitions', { p_include_inactive: true });
+      if (error) return toast('โหลดไม่สำเร็จ: ' + error.message, 'error');
+      allFields = data || [];
+      renderFields();
+    }
+
+    function renderFields() {
+      const list = document.getElementById('fieldList');
+      if (!allFields.length) {
+        list.innerHTML = `<div class="empty">
+          <div class="icon">📋</div>
+          <h4>ยังไม่มีฟิลด์เพิ่มเติม</h4>
+          <p>กดปุ่ม "เพิ่มฟิลด์" เพื่อกำหนดข้อมูลพิเศษที่โรงเรียนต้องเก็บ</p>
+        </div>`;
+        return;
+      }
+
+      const typeLabels = {
+        text:'Text', textarea:'Textarea', number:'Number', date:'Date', datetime:'Datetime',
+        select:'Select', multi_select:'Multi', checkbox:'Checkbox',
+        phone:'Phone', email:'Email', url:'URL'
+      };
+
+      list.innerHTML = allFields.map(f => `
+        <div class="field-row">
+          <div class="field-handle">⋮⋮</div>
+          <div class="field-info">
+            <div class="label-th">${esc(f.label_th)}</div>
+            ${f.label_en ? `<div class="label-en">${esc(f.label_en)}</div>` : ''}
+            <div class="key">${esc(f.field_key)}</div>
+          </div>
+          <span class="field-type-pill">${typeLabels[f.field_type] || f.field_type}</span>
+          ${f.required ? '<span class="field-required">*</span>' : '<span></span>'}
+          <span class="field-status ${f.is_active ? 'active' : ''}">${f.is_active ? '● ใช้งาน' : '○ ปิด'}</span>
+          <button class="btn btn-sm btn-secondary" onclick="editField('${f.id}')">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteField('${f.id}', '${esc(f.label_th)}')">🗑️</button>
+        </div>
+      `).join('');
+    }
+
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = '➕ เพิ่มฟิลด์';
+      document.getElementById('fId').value = '';
+      document.getElementById('fLabelTh').value = '';
+      document.getElementById('fLabelEn').value = '';
+      document.getElementById('fFieldKey').value = '';
+      document.getElementById('fFieldType').value = 'text';
+      document.getElementById('fPlaceholder').value = '';
+      document.getElementById('fHelpText').value = '';
+      document.getElementById('fSortOrder').value = 100 + allFields.length * 10;
+      document.getElementById('fRequired').checked = false;
+      document.getElementById('fIsActive').checked = true;
+      document.getElementById('optionsContainer').innerHTML = '';
+      toggleOptionsSection();
+      // Auto-suggest field_key from label_th
+      document.getElementById('fLabelTh').oninput = (e) => {
+        const fk = document.getElementById('fFieldKey');
+        if (!fk.dataset.manual) {
+          fk.value = e.target.value.toLowerCase()
+            .replace(/[^a-z0-9_\s]/g, '').trim()
+            .replace(/\s+/g, '_').slice(0, 50);
+        }
+      };
+      document.getElementById('fFieldKey').oninput = (e) => { e.target.dataset.manual = '1'; };
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    async function editField(id) {
+      const f = allFields.find(x => x.id === id);
+      if (!f) return;
+      document.getElementById('modalTitle').textContent = '✏️ แก้ไขฟิลด์';
+      document.getElementById('fId').value = f.id;
+      document.getElementById('fLabelTh').value = f.label_th || '';
+      document.getElementById('fLabelEn').value = f.label_en || '';
+      document.getElementById('fFieldKey').value = f.field_key || '';
+      document.getElementById('fFieldKey').dataset.manual = '1';
+      document.getElementById('fFieldType').value = f.field_type || 'text';
+      document.getElementById('fPlaceholder').value = f.placeholder || '';
+      document.getElementById('fHelpText').value = f.help_text || '';
+      document.getElementById('fSortOrder').value = f.sort_order ?? 100;
+      document.getElementById('fRequired').checked = !!f.required;
+      document.getElementById('fIsActive').checked = !!f.is_active;
+      // Load options
+      document.getElementById('optionsContainer').innerHTML = '';
+      if (f.options && Array.isArray(f.options)) {
+        f.options.forEach(o => addOption(o));
+      }
+      toggleOptionsSection();
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('show');
+    }
+
+    function toggleOptionsSection() {
+      const t = document.getElementById('fFieldType').value;
+      const section = document.getElementById('optionsSection');
+      section.style.display = (t === 'select' || t === 'multi_select') ? 'grid' : 'none';
+    }
+
+    function addOption(o = {}) {
+      const container = document.getElementById('optionsContainer');
+      const div = document.createElement('div');
+      div.className = 'option-row';
+      div.innerHTML = `
+        <input type="text" placeholder="value (เช่น halal)" value="${esc(o.value || '')}" />
+        <input type="text" placeholder="ป้ายชื่อ TH" value="${esc(o.label_th || '')}" />
+        <input type="text" placeholder="Label EN" value="${esc(o.label_en || '')}" />
+        <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">×</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function collectOptions() {
+      const rows = document.querySelectorAll('#optionsContainer .option-row');
+      const options = [];
+      rows.forEach(r => {
+        const inputs = r.querySelectorAll('input');
+        const value = inputs[0].value.trim();
+        const label_th = inputs[1].value.trim();
+        const label_en = inputs[2].value.trim();
+        if (value && label_th) {
+          options.push({ value, label_th, label_en: label_en || null });
+        }
+      });
+      return options;
+    }
+
+    async function saveField(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSave');
+      btn.disabled = true;
+      btn.textContent = '⏳ กำลังบันทึก...';
+
+      const fieldType = document.getElementById('fFieldType').value;
+      const needsOptions = (fieldType === 'select' || fieldType === 'multi_select');
+      const options = needsOptions ? collectOptions() : null;
+
+      if (needsOptions && options.length === 0) {
+        btn.disabled = false; btn.textContent = '💾 บันทึก';
+        return toast('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 ตัว', 'error');
+      }
+
+      const params = {
+        p_id: document.getElementById('fId').value || null,
+        p_field_key: document.getElementById('fFieldKey').value.trim(),
+        p_label_th: document.getElementById('fLabelTh').value.trim(),
+        p_label_en: document.getElementById('fLabelEn').value.trim() || null,
+        p_field_type: fieldType,
+        p_required: document.getElementById('fRequired').checked,
+        p_placeholder: document.getElementById('fPlaceholder').value.trim() || null,
+        p_help_text: document.getElementById('fHelpText').value.trim() || null,
+        p_options: options ? JSON.stringify(options) : null,
+        p_default_value: null,
+        p_section: 'custom',
+        p_sort_order: parseInt(document.getElementById('fSortOrder').value) || 100,
+        p_is_active: document.getElementById('fIsActive').checked
+      };
+
+      const { data, error } = await supabaseClient.rpc('upsert_student_field_definition', params);
+      btn.disabled = false;
+      btn.textContent = '💾 บันทึก';
+
+      if (error) return toast('บันทึกไม่สำเร็จ: ' + error.message, 'error');
+      if (!data?.success) return toast(data?.error + (data?.detail ? ': ' + data.detail : ''), 'error');
+
+      toast(params.p_id ? 'อัพเดตสำเร็จ ✓' : 'เพิ่มฟิลด์สำเร็จ ✓', 'success');
+      closeModal();
+      loadFields();
+    }
+
+    async function deleteField(id, label) {
+      if (!confirm(`ลบฟิลด์ "${label}"?\n⚠️ ข้อมูลที่เก็บไว้ใน custom_data ของนักเรียนจะยังอยู่ แต่จะไม่แสดงใน UI`)) return;
+      const { data, error } = await supabaseClient.rpc('delete_student_field_definition', { p_id: id });
+      if (error || !data?.success) return toast('ลบไม่สำเร็จ', 'error');
+      toast('ลบสำเร็จ', 'success');
+      loadFields();
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function toast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      t.className = 'toast show ' + type;
+      t.textContent = msg;
+      setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+  </script>
+</body>
+</html>

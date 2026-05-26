@@ -39,8 +39,36 @@
     }
     .topbar img { height: 26px; }
     .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
     .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
     .back-link:hover { background: var(--pk-canvas); color: var(--pk-ink); }
+
+    /* Language toggle */
+    .lang-toggle {
+      display: inline-flex;
+      background: var(--pk-canvas);
+      border-radius: 100px;
+      padding: 3px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+    }
+    .lang-toggle button {
+      padding: 5px 12px;
+      border: none;
+      background: transparent;
+      color: var(--pk-ash);
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .lang-toggle button.active {
+      background: var(--pk-paper);
+      color: var(--pk-blue-800);
+      box-shadow: 0 1px 3px rgba(15,26,54,0.1);
+    }
 
     .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
 
@@ -65,7 +93,6 @@
     .btn-danger:hover { background: #FECACA; }
     .btn-sm { padding: 6px 10px; font-size: 12px; }
 
-    /* Field list */
     .field-list {
       background: var(--pk-paper);
       border: 1px solid var(--pk-border);
@@ -74,7 +101,7 @@
     }
     .field-row {
       display: grid;
-      grid-template-columns: auto 1fr auto auto auto auto auto;
+      grid-template-columns: 1fr auto auto auto auto auto;
       gap: 14px;
       padding: 14px 18px;
       align-items: center;
@@ -83,10 +110,6 @@
     .field-row:last-child { border-bottom: none; }
     .field-row:hover { background: #FAFBFC; }
 
-    .field-handle {
-      cursor: grab; color: var(--pk-mist); font-size: 18px;
-      width: 24px; text-align: center;
-    }
     .field-info .label-th {
       font-weight: 600; color: var(--pk-ink); font-size: 14.5px;
     }
@@ -104,16 +127,10 @@
       border-radius: 100px; font-size: 11px; font-weight: 600;
       font-family: 'Inter', sans-serif;
     }
-    .field-required {
-      color: var(--pk-danger);
-      font-weight: 700; font-size: 12px;
-    }
-    .field-status {
-      color: var(--pk-mist); font-size: 12px;
-    }
+    .field-required { color: var(--pk-danger); font-weight: 700; font-size: 12px; }
+    .field-status { color: var(--pk-mist); font-size: 12px; }
     .field-status.active { color: var(--pk-success); }
 
-    /* Empty */
     .empty {
       padding: 60px 20px; text-align: center;
       color: var(--pk-ash);
@@ -134,7 +151,7 @@
     .modal {
       background: var(--pk-paper);
       border-radius: 16px;
-      max-width: 600px; width: 100%;
+      max-width: 640px; width: 100%;
       box-shadow: 0 20px 60px -10px rgba(0,0,0,0.3);
     }
     .modal-header {
@@ -151,10 +168,10 @@
       background: #FBFCFD; border-radius: 0 0 16px 16px;
     }
 
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
     .form-row.full { grid-template-columns: 1fr; }
     .form-group label {
-      display: block; font-size: 12.5px; font-weight: 600;
+      display: block; font-size: 13px; font-weight: 600;
       color: var(--pk-ink-soft); margin-bottom: 4px;
     }
     .form-group label .req { color: var(--pk-danger); }
@@ -172,21 +189,30 @@
       outline: none; border-color: var(--pk-blue-600);
       box-shadow: 0 0 0 3px var(--pk-blue-100);
     }
-    .help-text { font-size: 12px; color: var(--pk-mist); margin-top: 4px; }
-    .check-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
-    .check-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-    .check-row label { margin: 0; font-weight: 500; color: var(--pk-ink); cursor: pointer; }
+    .help-text {
+      font-size: 12px; color: var(--pk-mist); margin-top: 5px;
+      line-height: 1.45;
+    }
+    .help-text strong { color: var(--pk-ash); }
+    .check-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; }
+    .check-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; margin-top: 2px; flex-shrink: 0; }
+    .check-row .check-label { flex: 1; }
+    .check-row .check-label .title { font-weight: 600; color: var(--pk-ink); cursor: pointer; }
+    .check-row .check-label .desc { font-size: 12px; color: var(--pk-mist); margin-top: 2px; }
 
-    /* Options editor for select */
     .options-editor {
       border: 1px dashed var(--pk-border); border-radius: 8px;
-      padding: 10px; background: #FAFBFC;
+      padding: 12px; background: #FAFBFC;
     }
-    .option-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 6px; }
-    .option-row input { padding: 6px 8px; font-size: 13px; }
-    .btn-add-option { background: transparent; border: 1px dashed var(--pk-blue-600); color: var(--pk-blue-700); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 12px; width: 100%; margin-top: 4px; }
+    .option-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 6px; align-items: center; }
+    .option-row input { padding: 7px 9px; font-size: 13px; }
+    .option-row .opt-label { font-size: 11px; color: var(--pk-mist); padding: 0 4px; }
+    .btn-add-option {
+      background: transparent; border: 1px dashed var(--pk-blue-600);
+      color: var(--pk-blue-700); padding: 7px 10px; border-radius: 6px;
+      cursor: pointer; font-family: inherit; font-size: 12px; width: 100%; margin-top: 6px;
+    }
 
-    /* Toast */
     .toast {
       position: fixed; bottom: 24px; right: 24px;
       padding: 12px 18px; border-radius: 10px;
@@ -201,15 +227,19 @@
     .info-banner {
       background: var(--pk-blue-50); border: 1px solid var(--pk-blue-100);
       padding: 14px 18px; border-radius: 10px; margin-bottom: 20px;
-      font-size: 14px; color: var(--pk-ink-soft);
+      font-size: 14px; color: var(--pk-ink-soft); line-height: 1.6;
     }
     .info-banner strong { color: var(--pk-blue-800); }
+    .info-banner ul { margin-left: 18px; margin-top: 6px; }
+    .info-banner li { margin: 3px 0; }
 
     @media (max-width: 768px) {
       .container { padding: 16px; }
       .field-row { grid-template-columns: 1fr; gap: 8px; }
       .form-row { grid-template-columns: 1fr; }
       input, select, textarea { font-size: 16px !important; }
+      .option-row { grid-template-columns: 1fr 1fr; }
+      .option-row .opt-label { display: none; }
     }
   </style>
 </head>
@@ -218,25 +248,36 @@
   <div class="topbar">
     <div class="topbar-left">
       <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
-      <a href="students.html" class="back-link">← กลับไปนักเรียน</a>
+      <a href="students.html" class="back-link" data-i18n="back">← กลับไปนักเรียน</a>
+    </div>
+    <div class="topbar-right">
+      <div class="lang-toggle">
+        <button id="langTh" onclick="setLang('th')" class="active">TH</button>
+        <button id="langEn" onclick="setLang('en')">EN</button>
+      </div>
     </div>
   </div>
 
   <div class="container">
     <div class="page-head">
       <div>
-        <h1>⚙️ ตั้งค่าฟิลด์นักเรียน</h1>
-        <p>กำหนดข้อมูลพิเศษที่โรงเรียนคุณต้องเก็บเพิ่มเติมจาก baseline เช่น Passport Number, กลุ่มเลือด, ศาสนา ฯลฯ</p>
+        <h1 data-i18n="pageTitle">⚙️ ตั้งค่าฟิลด์นักเรียน</h1>
+        <p data-i18n="pageDesc">กำหนดข้อมูลพิเศษที่โรงเรียนคุณต้องเก็บเพิ่มเติม เช่น Passport Number, ศาสนา, กีฬาที่เล่น ฯลฯ</p>
       </div>
-      <button class="btn btn-primary" onclick="openCreateModal()">➕ เพิ่มฟิลด์</button>
+      <button class="btn btn-primary" onclick="openCreateModal()" data-i18n="addField">➕ เพิ่มฟิลด์</button>
     </div>
 
     <div class="info-banner">
-      <strong>💡 หมายเหตุ:</strong> ฟิลด์ที่กำหนดที่นี่จะปรากฏใน form เพิ่ม/แก้ไขนักเรียนใต้ section "ข้อมูลเพิ่มเติม" — ลูกค้าทุกคนของโรงเรียนคุณจะเห็นฟิลด์เดียวกัน
+      <strong data-i18n="howItWorks">💡 ระบบนี้ทำงานยังไง:</strong>
+      <ul data-i18n-html="howSteps">
+        <li>คุณกำหนดฟิลด์ที่นี่ครั้งเดียว (เช่น เลข Passport)</li>
+        <li>ฟิลด์จะปรากฏใน form เพิ่ม/แก้ไขนักเรียนใต้ section "ข้อมูลเพิ่มเติม"</li>
+        <li>ทุกครูในโรงเรียนคุณจะเห็นฟิลด์เดียวกัน — ข้อมูลแต่ละโรงเรียนแยกกัน</li>
+      </ul>
     </div>
 
     <div class="field-list" id="fieldList">
-      <div class="empty"><div class="icon">⏳</div><h4>กำลังโหลด...</h4></div>
+      <div class="empty"><div class="icon">⏳</div><h4>...</h4></div>
     </div>
   </div>
 
@@ -244,7 +285,7 @@
   <div class="modal-overlay" id="editModal">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="modalTitle">➕ เพิ่มฟิลด์</h3>
+        <h3 id="modalTitle" data-i18n="modalAddTitle">➕ เพิ่มฟิลด์ใหม่</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       <form onsubmit="saveField(event)">
@@ -253,80 +294,115 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>ป้ายชื่อ (ไทย) <span class="req">*</span></label>
-              <input type="text" id="fLabelTh" required placeholder="เช่น เลขที่ Passport" />
+              <label data-i18n="labelThLabel">ชื่อที่แสดงในฟอร์ม (ไทย) <span class="req">*</span></label>
+              <input type="text" id="fLabelTh" required placeholder="เลขที่ Passport" />
+              <div class="help-text" data-i18n="labelThHelp">
+                <strong>คือชื่อที่ครูเห็น</strong> ตอนกรอกข้อมูลนักเรียน
+              </div>
             </div>
             <div class="form-group">
-              <label>Label (English)</label>
+              <label data-i18n="labelEnLabel">Label (English)</label>
               <input type="text" id="fLabelEn" placeholder="Passport Number" />
+              <div class="help-text" data-i18n="labelEnHelp">
+                แสดงเมื่อสลับเป็น EN — เผื่อครูต่างชาติ
+              </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Field Key <span class="req">*</span></label>
+              <label data-i18n="fieldKeyLabel">รหัสฟิลด์ (ภายในระบบ) <span class="req">*</span></label>
               <input type="text" id="fFieldKey" required placeholder="passport_number" pattern="[a-z][a-z0-9_]{0,49}" />
-              <div class="help-text">ตัวอักษรเล็ก + ขีดล่าง เท่านั้น (ใช้ภายในระบบ)</div>
+              <div class="help-text" data-i18n="fieldKeyHelp">
+                <strong>ใช้ภายในระบบเท่านั้น</strong> — ตัวเล็ก + ขีดล่าง เช่น <code>passport_number</code> (ระบบเติมให้อัตโนมัติ)
+              </div>
             </div>
             <div class="form-group">
-              <label>ประเภท <span class="req">*</span></label>
+              <label data-i18n="typeLabel">ประเภทข้อมูล <span class="req">*</span></label>
               <select id="fFieldType" required onchange="toggleOptionsSection()">
-                <option value="text">Text (ข้อความสั้น)</option>
-                <option value="textarea">Textarea (ข้อความยาว)</option>
-                <option value="number">Number (ตัวเลข)</option>
-                <option value="date">Date (วันที่)</option>
-                <option value="datetime">Datetime (วันที่+เวลา)</option>
-                <option value="select">Select (เลือก 1)</option>
-                <option value="multi_select">Multi-select (เลือกหลาย)</option>
-                <option value="checkbox">Checkbox (ใช่/ไม่)</option>
-                <option value="phone">Phone (เบอร์โทร)</option>
-                <option value="email">Email</option>
-                <option value="url">URL</option>
+                <option value="text" data-i18n-opt="typeText">Text — ข้อความสั้น</option>
+                <option value="textarea" data-i18n-opt="typeTextarea">Textarea — ข้อความยาว</option>
+                <option value="number" data-i18n-opt="typeNumber">Number — ตัวเลข</option>
+                <option value="date" data-i18n-opt="typeDate">Date — วันที่</option>
+                <option value="datetime" data-i18n-opt="typeDatetime">Datetime — วันที่+เวลา</option>
+                <option value="select" data-i18n-opt="typeSelect">Select — เลือก 1 ตัวจาก list</option>
+                <option value="multi_select" data-i18n-opt="typeMulti">Multi-select — เลือกหลายตัว</option>
+                <option value="checkbox" data-i18n-opt="typeCheckbox">Checkbox — ใช่/ไม่ใช่</option>
+                <option value="phone" data-i18n-opt="typePhone">Phone — เบอร์โทร</option>
+                <option value="email" data-i18n-opt="typeEmail">Email</option>
+                <option value="url" data-i18n-opt="typeUrl">URL — ลิงค์เว็บ</option>
               </select>
+              <div class="help-text" data-i18n="typeHelp">
+                เลือก <code>Select</code> ถ้าจะให้เลือกจาก list ที่ตั้งไว้
+              </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Placeholder</label>
-              <input type="text" id="fPlaceholder" placeholder="เช่น A12345678" />
+              <label data-i18n="placeholderLabel">ข้อความแนะนำในช่อง (Placeholder)</label>
+              <input type="text" id="fPlaceholder" placeholder="A12345678" />
+              <div class="help-text" data-i18n="placeholderHelp">
+                เห็นในช่องว่างก่อนกรอก เพื่อบอก format
+              </div>
             </div>
             <div class="form-group">
-              <label>ลำดับ</label>
+              <label data-i18n="sortLabel">ลำดับการแสดง</label>
               <input type="number" id="fSortOrder" value="100" min="0" max="999" />
+              <div class="help-text" data-i18n="sortHelp">
+                เลขน้อย = แสดงก่อน (default 100)
+              </div>
             </div>
           </div>
 
           <div class="form-row full">
             <div class="form-group">
-              <label>ข้อความช่วยอธิบาย</label>
-              <input type="text" id="fHelpText" placeholder="เช่น ใส่เลขจาก passport เล่มที่ใช้ปัจจุบัน" />
+              <label data-i18n="helpLabel">ข้อความช่วยอธิบาย (Help text)</label>
+              <input type="text" id="fHelpText" placeholder="ใส่เลขจาก passport เล่มที่ใช้ปัจจุบัน" />
+              <div class="help-text" data-i18n="helpHelp">
+                แสดงใต้ช่องกรอก — อธิบายให้ครูเข้าใจว่ากรอกอะไร
+              </div>
             </div>
           </div>
 
           <div class="form-row" id="optionsSection" style="display:none;">
             <div class="form-group" style="grid-column: span 2;">
-              <label>ตัวเลือก (สำหรับ Select/Multi-select)</label>
+              <label data-i18n="optionsLabel">ตัวเลือก (สำหรับ Select/Multi-select) <span class="req">*</span></label>
+              <div class="help-text" style="margin-bottom: 8px;" data-i18n="optionsHelp">
+                <strong>value</strong> = เก็บใน DB (ภาษาอังกฤษ) · <strong>ป้ายชื่อ TH/EN</strong> = แสดงให้ user เลือก
+              </div>
               <div class="options-editor">
+                <div class="option-row">
+                  <div class="opt-label" data-i18n="optValue">Value</div>
+                  <div class="opt-label" data-i18n="optLabelTh">ป้าย TH</div>
+                  <div class="opt-label" data-i18n="optLabelEn">Label EN</div>
+                  <div></div>
+                </div>
                 <div id="optionsContainer"></div>
-                <button type="button" class="btn-add-option" onclick="addOption()">+ เพิ่มตัวเลือก</button>
+                <button type="button" class="btn-add-option" onclick="addOption()" data-i18n="addOptionBtn">+ เพิ่มตัวเลือก</button>
               </div>
             </div>
           </div>
 
           <div class="check-row">
             <input type="checkbox" id="fRequired" />
-            <label for="fRequired">บังคับกรอก (Required)</label>
+            <div class="check-label">
+              <label for="fRequired" class="title" data-i18n="requiredTitle">บังคับกรอก</label>
+              <div class="desc" data-i18n="requiredDesc">ครูต้องกรอกฟิลด์นี้ ห้ามเว้นว่าง</div>
+            </div>
           </div>
 
           <div class="check-row">
             <input type="checkbox" id="fIsActive" checked />
-            <label for="fIsActive">เปิดใช้งาน</label>
+            <div class="check-label">
+              <label for="fIsActive" class="title" data-i18n="activeTitle">เปิดใช้งาน</label>
+              <div class="desc" data-i18n="activeDesc">ปิดถ้ายังไม่อยากให้แสดงในฟอร์ม (ข้อมูลเก่าจะไม่ถูกลบ)</div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary" id="btnSave">💾 บันทึก</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()" data-i18n="cancel">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="btnSave" data-i18n="save">💾 บันทึก</button>
         </div>
       </form>
     </div>
@@ -339,9 +415,152 @@
   <script src="../js/role-guard.js"></script>
 
   <script>
+    // ============ i18n ============
+    const TRANSLATIONS = {
+      th: {
+        back: '← กลับไปนักเรียน',
+        pageTitle: '⚙️ ตั้งค่าฟิลด์นักเรียน',
+        pageDesc: 'กำหนดข้อมูลพิเศษที่โรงเรียนคุณต้องเก็บเพิ่มเติม เช่น Passport Number, ศาสนา, กีฬาที่เล่น ฯลฯ',
+        addField: '➕ เพิ่มฟิลด์',
+        howItWorks: '💡 ระบบนี้ทำงานยังไง:',
+        howSteps: '<li>คุณกำหนดฟิลด์ที่นี่ครั้งเดียว (เช่น เลข Passport)</li><li>ฟิลด์จะปรากฏใน form เพิ่ม/แก้ไขนักเรียนใต้ section "ข้อมูลเพิ่มเติม"</li><li>ทุกครูในโรงเรียนคุณจะเห็นฟิลด์เดียวกัน — ข้อมูลแต่ละโรงเรียนแยกกัน</li>',
+        modalAddTitle: '➕ เพิ่มฟิลด์ใหม่',
+        modalEditTitle: '✏️ แก้ไขฟิลด์',
+        labelThLabel: 'ชื่อที่แสดงในฟอร์ม (ไทย)',
+        labelThHelp: '<strong>คือชื่อที่ครูเห็น</strong> ตอนกรอกข้อมูลนักเรียน',
+        labelEnLabel: 'Label (English)',
+        labelEnHelp: 'แสดงเมื่อสลับเป็น EN — เผื่อครูต่างชาติ',
+        fieldKeyLabel: 'รหัสฟิลด์ (ภายในระบบ)',
+        fieldKeyHelp: '<strong>ใช้ภายในระบบเท่านั้น</strong> — ตัวเล็ก + ขีดล่าง เช่น <code>passport_number</code> (ระบบเติมให้อัตโนมัติ)',
+        typeLabel: 'ประเภทข้อมูล',
+        typeText: 'Text — ข้อความสั้น',
+        typeTextarea: 'Textarea — ข้อความยาว',
+        typeNumber: 'Number — ตัวเลข',
+        typeDate: 'Date — วันที่',
+        typeDatetime: 'Datetime — วันที่+เวลา',
+        typeSelect: 'Select — เลือก 1 ตัวจาก list',
+        typeMulti: 'Multi-select — เลือกหลายตัว',
+        typeCheckbox: 'Checkbox — ใช่/ไม่ใช่',
+        typePhone: 'Phone — เบอร์โทร',
+        typeEmail: 'Email',
+        typeUrl: 'URL — ลิงค์เว็บ',
+        typeHelp: 'เลือก <code>Select</code> ถ้าจะให้เลือกจาก list ที่ตั้งไว้',
+        placeholderLabel: 'ข้อความแนะนำในช่อง (Placeholder)',
+        placeholderHelp: 'เห็นในช่องว่างก่อนกรอก เพื่อบอก format',
+        sortLabel: 'ลำดับการแสดง',
+        sortHelp: 'เลขน้อย = แสดงก่อน (default 100)',
+        helpLabel: 'ข้อความช่วยอธิบาย (Help text)',
+        helpHelp: 'แสดงใต้ช่องกรอก — อธิบายให้ครูเข้าใจว่ากรอกอะไร',
+        optionsLabel: 'ตัวเลือก (สำหรับ Select/Multi-select)',
+        optionsHelp: '<strong>value</strong> = เก็บใน DB (ภาษาอังกฤษ) · <strong>ป้ายชื่อ TH/EN</strong> = แสดงให้ user เลือก',
+        optValue: 'Value (DB)',
+        optLabelTh: 'ป้าย TH',
+        optLabelEn: 'Label EN',
+        addOptionBtn: '+ เพิ่มตัวเลือก',
+        requiredTitle: 'บังคับกรอก',
+        requiredDesc: 'ครูต้องกรอกฟิลด์นี้ ห้ามเว้นว่าง',
+        activeTitle: 'เปิดใช้งาน',
+        activeDesc: 'ปิดถ้ายังไม่อยากให้แสดงในฟอร์ม (ข้อมูลเก่าจะไม่ถูกลบ)',
+        cancel: 'ยกเลิก',
+        save: '💾 บันทึก',
+        emptyTitle: 'ยังไม่มีฟิลด์เพิ่มเติม',
+        emptyDesc: 'กดปุ่ม "เพิ่มฟิลด์" เพื่อกำหนดข้อมูลพิเศษที่โรงเรียนต้องเก็บ',
+        confirmDelete: 'ลบฟิลด์ "{label}"?\n⚠️ ข้อมูลที่เก็บไว้ใน custom_data ของนักเรียนจะยังอยู่ แต่จะไม่แสดงใน UI',
+        loadErr: 'โหลดไม่สำเร็จ: ',
+        saveOk: 'บันทึกสำเร็จ ✓',
+        addOk: 'เพิ่มฟิลด์สำเร็จ ✓',
+        deleteOk: 'ลบสำเร็จ',
+        needOption: 'กรุณาเพิ่มตัวเลือกอย่างน้อย 1 ตัว'
+      },
+      en: {
+        back: '← Back to Students',
+        pageTitle: '⚙️ Custom Student Fields',
+        pageDesc: 'Define extra fields your school needs to collect — e.g. Passport Number, Religion, Sport, etc.',
+        addField: '➕ Add Field',
+        howItWorks: '💡 How it works:',
+        howSteps: '<li>Define fields here once (e.g. Passport Number)</li><li>They appear in the Add/Edit Student form under "Additional Info"</li><li>All teachers in your school see the same fields — each school\'s data is isolated</li>',
+        modalAddTitle: '➕ Add New Field',
+        modalEditTitle: '✏️ Edit Field',
+        labelThLabel: 'Form Label (Thai)',
+        labelThHelp: '<strong>This is what teachers see</strong> when entering student data',
+        labelEnLabel: 'Label (English)',
+        labelEnHelp: 'Shown when language is switched to EN — for international teachers',
+        fieldKeyLabel: 'Field ID (internal)',
+        fieldKeyHelp: '<strong>Internal use only</strong> — lowercase + underscores, e.g. <code>passport_number</code> (auto-filled)',
+        typeLabel: 'Field Type',
+        typeText: 'Text — short text',
+        typeTextarea: 'Textarea — long text',
+        typeNumber: 'Number',
+        typeDate: 'Date',
+        typeDatetime: 'Datetime',
+        typeSelect: 'Select — pick 1 from list',
+        typeMulti: 'Multi-select — pick many',
+        typeCheckbox: 'Checkbox — yes/no',
+        typePhone: 'Phone number',
+        typeEmail: 'Email',
+        typeUrl: 'URL — web link',
+        typeHelp: 'Choose <code>Select</code> if you want users to pick from a list',
+        placeholderLabel: 'Placeholder text',
+        placeholderHelp: 'Hint text shown in the empty field — tells the format',
+        sortLabel: 'Display order',
+        sortHelp: 'Lower number = shows first (default 100)',
+        helpLabel: 'Help text',
+        helpHelp: 'Shown under the input — explains what to enter',
+        optionsLabel: 'Options (for Select/Multi-select)',
+        optionsHelp: '<strong>value</strong> = stored in DB (English) · <strong>Label TH/EN</strong> = shown to user',
+        optValue: 'Value (DB)',
+        optLabelTh: 'Label TH',
+        optLabelEn: 'Label EN',
+        addOptionBtn: '+ Add Option',
+        requiredTitle: 'Required field',
+        requiredDesc: 'Teachers must fill this — cannot be empty',
+        activeTitle: 'Active',
+        activeDesc: 'Turn off to hide from form (existing data is kept)',
+        cancel: 'Cancel',
+        save: '💾 Save',
+        emptyTitle: 'No custom fields yet',
+        emptyDesc: 'Click "Add Field" to define extra data your school needs',
+        confirmDelete: 'Delete field "{label}"?\n⚠️ Student data in custom_data stays, but won\'t show in UI',
+        loadErr: 'Load failed: ',
+        saveOk: 'Saved ✓',
+        addOk: 'Field added ✓',
+        deleteOk: 'Deleted',
+        needOption: 'Please add at least 1 option'
+      }
+    };
+
+    let currentLang = localStorage.getItem('pk_lang') || 'th';
+    function t(key) { return (TRANSLATIONS[currentLang] || TRANSLATIONS.th)[key] || key; }
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('pk_lang', lang);
+      document.documentElement.lang = lang;
+      document.getElementById('langTh').classList.toggle('active', lang === 'th');
+      document.getElementById('langEn').classList.toggle('active', lang === 'en');
+      applyTranslations();
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        el.innerHTML = t(key);
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.dataset.i18nHtml;
+        el.innerHTML = t(key);
+      });
+      document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+        const key = el.dataset.i18nOpt;
+        el.textContent = t(key);
+      });
+      renderFields(); // re-render list with new lang
+    }
+
     let allFields = [];
 
     document.addEventListener('DOMContentLoaded', async () => {
+      setLang(currentLang); // apply on load
       const profile = await roleGuard.requireRole(['owner','developer']);
       if (!profile) return;
       loadFields();
@@ -349,7 +568,7 @@
 
     async function loadFields() {
       const { data, error } = await supabaseClient.rpc('get_student_field_definitions', { p_include_inactive: true });
-      if (error) return toast('โหลดไม่สำเร็จ: ' + error.message, 'error');
+      if (error) return toast(t('loadErr') + error.message, 'error');
       allFields = data || [];
       renderFields();
     }
@@ -359,8 +578,8 @@
       if (!allFields.length) {
         list.innerHTML = `<div class="empty">
           <div class="icon">📋</div>
-          <h4>ยังไม่มีฟิลด์เพิ่มเติม</h4>
-          <p>กดปุ่ม "เพิ่มฟิลด์" เพื่อกำหนดข้อมูลพิเศษที่โรงเรียนต้องเก็บ</p>
+          <h4>${t('emptyTitle')}</h4>
+          <p>${t('emptyDesc')}</p>
         </div>`;
         return;
       }
@@ -371,25 +590,26 @@
         phone:'Phone', email:'Email', url:'URL'
       };
 
-      list.innerHTML = allFields.map(f => `
-        <div class="field-row">
-          <div class="field-handle">⋮⋮</div>
+      list.innerHTML = allFields.map(f => {
+        const displayLabel = currentLang === 'en' && f.label_en ? f.label_en : f.label_th;
+        const altLabel = currentLang === 'en' ? f.label_th : (f.label_en || '');
+        return `<div class="field-row">
           <div class="field-info">
-            <div class="label-th">${esc(f.label_th)}</div>
-            ${f.label_en ? `<div class="label-en">${esc(f.label_en)}</div>` : ''}
+            <div class="label-th">${esc(displayLabel)}</div>
+            ${altLabel ? `<div class="label-en">${esc(altLabel)}</div>` : ''}
             <div class="key">${esc(f.field_key)}</div>
           </div>
           <span class="field-type-pill">${typeLabels[f.field_type] || f.field_type}</span>
-          ${f.required ? '<span class="field-required">*</span>' : '<span></span>'}
-          <span class="field-status ${f.is_active ? 'active' : ''}">${f.is_active ? '● ใช้งาน' : '○ ปิด'}</span>
+          ${f.required ? `<span class="field-required" title="${t('requiredTitle')}">*</span>` : '<span></span>'}
+          <span class="field-status ${f.is_active ? 'active' : ''}">${f.is_active ? '● ' + (currentLang === 'en' ? 'Active' : 'ใช้งาน') : '○ ' + (currentLang === 'en' ? 'Off' : 'ปิด')}</span>
           <button class="btn btn-sm btn-secondary" onclick="editField('${f.id}')">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteField('${f.id}', '${esc(f.label_th)}')">🗑️</button>
-        </div>
-      `).join('');
+          <button class="btn btn-sm btn-danger" onclick="deleteField('${f.id}', ${JSON.stringify(displayLabel)})">🗑️</button>
+        </div>`;
+      }).join('');
     }
 
     function openCreateModal() {
-      document.getElementById('modalTitle').textContent = '➕ เพิ่มฟิลด์';
+      document.getElementById('modalTitle').textContent = t('modalAddTitle');
       document.getElementById('fId').value = '';
       document.getElementById('fLabelTh').value = '';
       document.getElementById('fLabelEn').value = '';
@@ -402,10 +622,20 @@
       document.getElementById('fIsActive').checked = true;
       document.getElementById('optionsContainer').innerHTML = '';
       toggleOptionsSection();
-      // Auto-suggest field_key from label_th
       document.getElementById('fLabelTh').oninput = (e) => {
         const fk = document.getElementById('fFieldKey');
         if (!fk.dataset.manual) {
+          // Auto-suggest from label (works for both TH and EN — strips non-ascii)
+          fk.value = e.target.value.toLowerCase()
+            .replace(/[^a-z0-9_\s]/g, '').trim()
+            .replace(/\s+/g, '_').slice(0, 50);
+        }
+      };
+      document.getElementById('fLabelEn').oninput = (e) => {
+        const fk = document.getElementById('fFieldKey');
+        const labelTh = document.getElementById('fLabelTh').value.trim();
+        // If TH label is Thai-only (no ASCII) — use EN to suggest field_key
+        if (!fk.dataset.manual && !/[a-z]/i.test(labelTh)) {
           fk.value = e.target.value.toLowerCase()
             .replace(/[^a-z0-9_\s]/g, '').trim()
             .replace(/\s+/g, '_').slice(0, 50);
@@ -418,7 +648,7 @@
     async function editField(id) {
       const f = allFields.find(x => x.id === id);
       if (!f) return;
-      document.getElementById('modalTitle').textContent = '✏️ แก้ไขฟิลด์';
+      document.getElementById('modalTitle').textContent = t('modalEditTitle');
       document.getElementById('fId').value = f.id;
       document.getElementById('fLabelTh').value = f.label_th || '';
       document.getElementById('fLabelEn').value = f.label_en || '';
@@ -430,7 +660,6 @@
       document.getElementById('fSortOrder').value = f.sort_order ?? 100;
       document.getElementById('fRequired').checked = !!f.required;
       document.getElementById('fIsActive').checked = !!f.is_active;
-      // Load options
       document.getElementById('optionsContainer').innerHTML = '';
       if (f.options && Array.isArray(f.options)) {
         f.options.forEach(o => addOption(o));
@@ -444,9 +673,9 @@
     }
 
     function toggleOptionsSection() {
-      const t = document.getElementById('fFieldType').value;
+      const tp = document.getElementById('fFieldType').value;
       const section = document.getElementById('optionsSection');
-      section.style.display = (t === 'select' || t === 'multi_select') ? 'grid' : 'none';
+      section.style.display = (tp === 'select' || tp === 'multi_select') ? 'grid' : 'none';
     }
 
     function addOption(o = {}) {
@@ -454,9 +683,9 @@
       const div = document.createElement('div');
       div.className = 'option-row';
       div.innerHTML = `
-        <input type="text" placeholder="value (เช่น halal)" value="${esc(o.value || '')}" />
-        <input type="text" placeholder="ป้ายชื่อ TH" value="${esc(o.label_th || '')}" />
-        <input type="text" placeholder="Label EN" value="${esc(o.label_en || '')}" />
+        <input type="text" placeholder="halal" value="${esc(o.value || '')}" />
+        <input type="text" placeholder="ฮาลาล" value="${esc(o.label_th || '')}" />
+        <input type="text" placeholder="Halal" value="${esc(o.label_en || '')}" />
         <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">×</button>
       `;
       container.appendChild(div);
@@ -481,15 +710,15 @@
       e.preventDefault();
       const btn = document.getElementById('btnSave');
       btn.disabled = true;
-      btn.textContent = '⏳ กำลังบันทึก...';
+      btn.textContent = '⏳';
 
       const fieldType = document.getElementById('fFieldType').value;
       const needsOptions = (fieldType === 'select' || fieldType === 'multi_select');
       const options = needsOptions ? collectOptions() : null;
 
       if (needsOptions && options.length === 0) {
-        btn.disabled = false; btn.textContent = '💾 บันทึก';
-        return toast('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 ตัว', 'error');
+        btn.disabled = false; btn.innerHTML = t('save');
+        return toast(t('needOption'), 'error');
       }
 
       const params = {
@@ -510,21 +739,21 @@
 
       const { data, error } = await supabaseClient.rpc('upsert_student_field_definition', params);
       btn.disabled = false;
-      btn.textContent = '💾 บันทึก';
+      btn.innerHTML = t('save');
 
-      if (error) return toast('บันทึกไม่สำเร็จ: ' + error.message, 'error');
+      if (error) return toast(t('loadErr') + error.message, 'error');
       if (!data?.success) return toast(data?.error + (data?.detail ? ': ' + data.detail : ''), 'error');
 
-      toast(params.p_id ? 'อัพเดตสำเร็จ ✓' : 'เพิ่มฟิลด์สำเร็จ ✓', 'success');
+      toast(params.p_id ? t('saveOk') : t('addOk'), 'success');
       closeModal();
       loadFields();
     }
 
     async function deleteField(id, label) {
-      if (!confirm(`ลบฟิลด์ "${label}"?\n⚠️ ข้อมูลที่เก็บไว้ใน custom_data ของนักเรียนจะยังอยู่ แต่จะไม่แสดงใน UI`)) return;
+      if (!confirm(t('confirmDelete').replace('{label}', label))) return;
       const { data, error } = await supabaseClient.rpc('delete_student_field_definition', { p_id: id });
-      if (error || !data?.success) return toast('ลบไม่สำเร็จ', 'error');
-      toast('ลบสำเร็จ', 'success');
+      if (error || !data?.success) return toast('Delete failed', 'error');
+      toast(t('deleteOk'), 'success');
       loadFields();
     }
 
@@ -532,10 +761,10 @@
       return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
     function toast(msg, type = 'info') {
-      const t = document.getElementById('toast');
-      t.className = 'toast show ' + type;
-      t.textContent = msg;
-      setTimeout(() => { t.className = 'toast'; }, 3500);
+      const tt = document.getElementById('toast');
+      tt.className = 'toast show ' + type;
+      tt.textContent = msg;
+      setTimeout(() => { tt.className = 'toast'; }, 3500);
     }
   </script>
 </body>

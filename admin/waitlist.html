@@ -261,28 +261,15 @@
     </main>
   </div>
 
-  <script>
-    const SUPABASE_URL = 'https://nuzhkhchimemuetoewzn.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_prRghlKfBE1VqrpJDZmmSA_1XifObOJ';
-    const { createClient } = window.supabase;
-    const sb = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
 
+  <script>
     let allRows = [];
 
-    async function checkAdmin() {
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) { window.location.href = '../login.html?next=/admin/waitlist.html'; return false; }
-      const { data: profile } = await sb.from('profiles').select('role, first_name, last_name').eq('id', session.user.id).single();
-      if (!profile || profile.role !== 'developer') {
-        document.body.innerHTML = '<div class="err" style="margin:60px auto;max-width:500px;">⛔ คุณไม่มีสิทธิ์เข้าถึง — เฉพาะ developer เท่านั้น</div>';
-        return false;
-      }
-      document.getElementById('adminUser').textContent = (profile.first_name || '') + ' ' + (profile.last_name || '') + ' · Dev';
-      return true;
-    }
-
     async function loadStats() {
-      const { data, error } = await sb.rpc('get_waitlist_stats');
+      const { data, error } = await supabaseClient.rpc('get_waitlist_stats');
       if (error || !data || data.error) return;
       document.getElementById('statTotal').textContent = data.total ?? 0;
       document.getElementById('statPending').textContent = data.pending ?? 0;
@@ -293,7 +280,7 @@
 
     async function loadWaitlist() {
       document.getElementById('tableContent').innerHTML = '<div class="loading">กำลังโหลด...</div>';
-      const { data, error } = await sb.from('waitlist')
+      const { data, error } = await supabaseClient.from('waitlist')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(500);
@@ -390,15 +377,16 @@
     }
 
     async function signOut() {
-      await sb.auth.signOut();
+      await supabaseClient.auth.signOut();
       window.location.href = '../login.html';
     }
 
-    (async () => {
-      if (await checkAdmin()) {
-        loadWaitlist();
-      }
-    })();
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireRole(['developer']);
+      if (!profile) return;
+      document.getElementById('adminUser').textContent = profile.email || ((profile.first_name || '') + ' ' + (profile.last_name || '')).trim() || 'Dev';
+      loadWaitlist();
+    });
   </script>
 </body>
 </html>

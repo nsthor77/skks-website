@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Schedule — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .topbar-left { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .brand-link img { height: 26px; }
+    .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-links a { text-decoration: none; color: var(--pk-ash); font-size: 13.5px; font-weight: 500; padding: 6px 12px; border-radius: 8px; }
+    .nav-links a:hover { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+    .nav-links a.active { background: var(--pk-blue-100); color: var(--pk-blue-800); font-weight: 600; }
+    .admin-topbar-right { display: flex; align-items: center; gap: 12px; }
+    .btn-out { padding: 7px 14px; border-radius: 8px; background: transparent; border: 1px solid var(--pk-border); color: var(--pk-ash); font-size: 13px; cursor: pointer; font-family: inherit; }
+
+    .container { max-width: 1300px; margin: 0 auto; padding: 24px; }
+    .page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 18px; }
+    .page-title h1 { font-size: 24px; font-weight: 700; }
+    .page-title p { color: var(--pk-ash); font-size: 14px; margin-top: 4px; }
+
+    .controls { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .controls label { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .controls input, .controls select { padding: 8px 10px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; min-width: 160px; }
+    .btn { padding: 9px 14px; border-radius: 9px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-primary { background: var(--pk-blue-800); color: #fff; }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .stat { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 10px; padding: 12px 16px; }
+    .stat .l { font-size: 11px; color: var(--pk-ash); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+    .stat .v { font-size: 22px; font-weight: 700; color: var(--pk-blue-800); font-family: 'Inter', sans-serif; margin-top: 4px; }
+
+    .timetable-wrap { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px; overflow-x: auto; }
+    .timetable {
+      display: grid;
+      grid-template-columns: 110px repeat(5, minmax(140px, 1fr));
+      gap: 6px;
+      min-width: 850px;
+    }
+    .tt-header { background: var(--pk-blue-100); color: var(--pk-blue-900); padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; }
+    .tt-header.today { background: var(--pk-blue-700); color: #fff; }
+    .tt-period { background: var(--pk-canvas); padding: 10px; border-radius: 8px; text-align: center; }
+    .tt-period .pnum { font-size: 12px; font-weight: 600; color: var(--pk-ash); }
+    .tt-period .ptime { font-size: 11px; color: var(--pk-mist); font-family: 'Inter', monospace; margin-top: 2px; }
+    .tt-cell { background: #fff; border: 1px solid var(--pk-border); border-radius: 8px; padding: 8px 10px; min-height: 76px; }
+    .tt-cell.empty { background: var(--pk-canvas); border: 1px dashed var(--pk-border); }
+    .tt-cell.empty .empty-hint { color: var(--pk-mist); font-size: 11px; text-align: center; padding-top: 22px; }
+    .tt-cell .classroom { font-weight: 700; font-size: 13px; color: var(--pk-blue-800); }
+    .tt-cell .subj { font-size: 11.5px; color: var(--pk-ink-soft); margin-top: 2px; }
+    .tt-cell .room { font-size: 10px; color: var(--pk-mist); margin-top: 2px; font-family: 'Inter', monospace; }
+    .tt-cell.break { background: #FFF7E6; border: 1px dashed #F59E0B; }
+    .tt-cell.break .break-label { color: #92400E; font-weight: 600; font-size: 11px; text-align: center; padding-top: 22px; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="brand-link" href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <nav class="nav-links">
+        <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+        <a href="teachers.html" data-i18n="nav.teachers">Teachers</a>
+        <a href="schedule-admin.html" data-i18n="nav.schedule">Schedule</a>
+        <a href="teacher-schedule.html" class="active" data-i18n="nav.teacherSchedule">Teacher Schedule</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <span class="user-info" id="userInfo"></span>
+      <button class="btn-out" onclick="signOut()" data-i18n="common.signOut">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="teacherSchedule.title">👨‍🏫 Teacher Schedule</h1>
+        <p data-i18n="teacherSchedule.subtitle">View a teacher's weekly classes — useful for planning + loading checks</p>
+      </div>
+      <div>
+        <button class="btn btn-secondary" onclick="downloadPdf()" data-i18n="mySchedule.downloadPdf">📄 Download PDF</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label data-i18n="grades.year">Year:</label>
+      <input type="text" id="yearInput" placeholder="2569" style="width:90px; min-width:90px;" />
+      <label data-i18n="grades.term">Term:</label>
+      <select id="termSelect" style="min-width:80px;">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="summer" data-i18n="grades.termSummer">Summer</option>
+      </select>
+      <label data-i18n="teacherSchedule.teacher">Teacher:</label>
+      <select id="teacherSelect"><option value="" data-i18n="teacherSchedule.selectTeacher">Select teacher...</option></select>
+      <button class="btn btn-primary" onclick="loadSchedule()" data-i18n="schedule.load">🔄 Load</button>
+    </div>
+
+    <div id="stats" class="stats" style="display:none;"></div>
+    <div id="ttWrap" class="timetable-wrap" style="display:none;">
+      <div id="timetable" class="timetable"></div>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    let teachers = [];
+    let currentData = null;
+    const DAYS = [
+      { n: 1, key: 'mon' }, { n: 2, key: 'tue' }, { n: 3, key: 'wed' },
+      { n: 4, key: 'thu' }, { n: 5, key: 'fri' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      await loadTeachers();
+      const now = new Date();
+      document.getElementById('yearInput').value = (now.getFullYear() + 543).toString();
+    });
+    document.addEventListener('langchange', () => { if (currentData) render(); });
+
+    async function loadTeachers() {
+      try {
+        const { data } = await supabaseClient.rpc('get_teachers', { p_search: null, p_status: 'active' });
+        teachers = data?.rows || data || [];
+        const sel = document.getElementById('teacherSelect');
+        sel.innerHTML = '<option value="">' + t('teacherSchedule.selectTeacher') + '</option>'
+          + teachers.map(tch => {
+            const nameTh = ((tch.first_name_th || '') + ' ' + (tch.last_name_th || '')).trim();
+            const nameEn = ((tch.first_name_en || '') + ' ' + (tch.last_name_en || '')).trim();
+            return `<option value="${tch.id}">${esc(nameTh || nameEn || tch.email)}</option>`;
+          }).join('');
+      } catch {}
+    }
+
+    async function loadSchedule() {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const teacherId = document.getElementById('teacherSelect').value;
+      if (!teacherId || !year) return;
+
+      const { data, error } = await supabaseClient.rpc('get_teacher_timetable', {
+        p_teacher_id: teacherId, p_academic_year: year, p_term: term
+      });
+      if (error) return console.error(error);
+      if (data.error) return;
+      currentData = data;
+      render();
+    }
+
+    function render() {
+      const periods = currentData.periods || [];
+      const slots = currentData.slots || [];
+      const teacher = currentData.teacher || {};
+
+      // Stats: total periods, distinct classes, distinct subjects
+      const classes = new Set(slots.map(s => s.classroom));
+      const subj = new Set(slots.map(s => s.subject_code));
+      document.getElementById('stats').style.display = 'grid';
+      document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="l">${t('teacherSchedule.totalPeriods')}</div><div class="v">${slots.length}</div></div>
+        <div class="stat"><div class="l">${t('teacherSchedule.distinctClasses')}</div><div class="v">${classes.size}</div></div>
+        <div class="stat"><div class="l">${t('teacherSchedule.distinctSubjects')}</div><div class="v">${subj.size}</div></div>
+      `;
+
+      const today = (new Date().getDay() || 7);
+      document.getElementById('ttWrap').style.display = 'block';
+
+      const cells = [];
+      cells.push(`<div class="tt-header"></div>`);
+      for (const d of DAYS) {
+        cells.push(`<div class="tt-header ${d.n === today ? 'today' : ''}">${t('schedule.day_' + d.key)}</div>`);
+      }
+      for (const p of periods) {
+        const label = p.label || (t('schedule.period') + ' ' + p.period_number);
+        cells.push(`
+          <div class="tt-period">
+            <div class="pnum">${esc(label)}</div>
+            <div class="ptime">${(p.start_time||'').slice(0,5)}–${(p.end_time||'').slice(0,5)}</div>
+          </div>
+        `);
+        for (const d of DAYS) {
+          if (p.is_break) {
+            cells.push(`<div class="tt-cell break"><div class="break-label">${esc(label)}</div></div>`);
+            continue;
+          }
+          const slot = slots.find(s => s.day_of_week === d.n && s.period_number === p.period_number);
+          if (slot) {
+            cells.push(`
+              <div class="tt-cell">
+                <div class="classroom">${esc(slot.classroom || '')}</div>
+                <div class="subj">${esc(slot.subject_code || '')} ${esc(slot.subject_name || '')}</div>
+                <div class="room">${slot.room ? '📍 ' + esc(slot.room) : ''}</div>
+              </div>
+            `);
+          } else {
+            cells.push(`<div class="tt-cell empty"><div class="empty-hint">—</div></div>`);
+          }
+        }
+      }
+      document.getElementById('timetable').innerHTML = cells.join('');
+    }
+
+    async function downloadPdf() {
+      if (!currentData?.teacher?.id) return;
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const qs = new URLSearchParams({ teacher_id: currentData.teacher.id, year, term });
+      try {
+        const resp = await fetch('/api/schedule/timetable-pdf?' + qs.toString(), {
+          headers: { 'Authorization': 'Bearer ' + session.access_token }
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `teacher-schedule-${currentData.teacher.id}-${year}-${term}.pdf`;
+        a.click(); URL.revokeObjectURL(url);
+      } catch (e) {
+        alert(t('schedule.pdfFailed') + ': ' + e.message);
+      }
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    async function signOut() { await supabaseClient.auth.signOut(); window.location.href='../login.html'; }
+  </script>
+</body>
+</html>

@@ -56,6 +56,9 @@
       grades:    { en: 'Grades',    th: 'เกรด' },
       myGrades:  { en: 'My Grades', th: 'เกรดของฉัน' },
       myAttendance: { en: 'My Attendance', th: 'การเข้าเรียน' },
+      schedule:    { en: 'Schedule', th: 'ตารางเรียน' },
+      mySchedule:  { en: 'My Schedule', th: 'ตารางเรียนของฉัน' },
+      teacherSchedule: { en: 'Teacher Schedule', th: 'ตารางสอน' },
       finance:   { en: 'Finance',   th: 'การเงิน' },
       billing:   { en: 'Billing',   th: 'บิล' },
       invoices:  { en: 'Invoices',  th: 'ใบแจ้งหนี้' },
@@ -464,6 +467,76 @@
       noAccess: { en: 'You do not have access to this data', th: 'คุณไม่มีสิทธิ์เข้าถึง' },
       selectYearTerm: { en: 'Please select year and term to download report card', th: 'กรุณาเลือกปีและเทอมเพื่อดาวน์โหลดใบรายงาน' },
       pdfFailed: { en: 'PDF download failed', th: 'ดาวน์โหลด PDF ไม่ได้' }
+    },
+
+    // ---------- Schedule (Sprint 14) — Class Timetable ----------
+    schedule: {
+      title: { en: '🗓️ Class Schedule', th: '🗓️ ตารางเรียน' },
+      subtitle: { en: 'Build weekly timetables per class. Click a cell to assign a subject + teacher.', th: 'สร้างตารางเรียนรายห้อง — คลิกช่องเพื่อใส่วิชา + ครู' },
+      class: { en: 'Class', th: 'ห้องเรียน' },
+      selectClass: { en: 'Select class...', th: 'เลือกห้อง...' },
+      load: { en: '🔄 Load', th: '🔄 โหลด' },
+      fillFilters: { en: 'Please select year + class first', th: 'กรุณาเลือกปี + ห้องเรียนก่อน' },
+      managePeriods: { en: '⏰ Manage Periods', th: '⏰ ตั้งคาบเรียน' },
+      setupTitle: { en: 'First time? Set up your school’s class periods', th: 'ใช้ครั้งแรก? ตั้งคาบเรียนก่อน' },
+      setupDesc: { en: 'Define the time slots used in your school day (e.g. Period 1 = 08:30-09:20).', th: 'กำหนดเวลาคาบเรียนของโรงเรียน (เช่น คาบ 1 = 08:30-09:20)' },
+      seedDefault: { en: '⚡ Use Default Template (8 periods)', th: '⚡ ใช้เทมเพลตเริ่มต้น (8 คาบ)' },
+      customPeriods: { en: '✏️ Custom Setup', th: '✏️ ตั้งเอง' },
+      period: { en: 'Period', th: 'คาบ' },
+      periodLabel: { en: 'Label (e.g. Period 1)', th: 'ชื่อ (เช่น คาบ 1)' },
+      break: { en: 'Break', th: 'พัก' },
+      morningBreak: { en: 'Morning Break', th: 'พักเช้า' },
+      lunchBreak: { en: 'Lunch Break', th: 'พักกลางวัน' },
+      addPeriod: { en: '➕ Add Period', th: '➕ เพิ่มคาบ' },
+      periodsTitle: { en: '⏰ Class Periods Configuration', th: '⏰ ตั้งค่าคาบเรียน' },
+      periodsDesc: { en: 'Define each period’s time. Mark recess/lunch as "Break" — they won’t be assignable.', th: 'กำหนดเวลาคาบ ทำเครื่องหมาย "พัก" สำหรับช่วงพัก (จะใส่วิชาไม่ได้)' },
+      periodsSaved: { en: '{n} periods saved', th: 'บันทึก {n} คาบ' },
+      defaultSeeded: { en: '✅ Default periods created', th: '✅ สร้างคาบเริ่มต้นแล้ว' },
+      editSlot: { en: 'Edit Schedule Slot', th: 'แก้ไขช่องตาราง' },
+      subject: { en: 'Subject', th: 'วิชา' },
+      noSubject: { en: 'No subject', th: 'ไม่มีวิชา' },
+      teacher: { en: 'Teacher', th: 'ครูผู้สอน' },
+      noTeacher: { en: 'No teacher assigned', th: 'ยังไม่กำหนด' },
+      room: { en: 'Room', th: 'ห้อง' },
+      notes: { en: 'Notes', th: 'หมายเหตุ' },
+      add: { en: 'Add', th: 'เพิ่ม' },
+      conflictHeader: { en: 'Conflict detected:', th: 'พบข้อขัดแย้ง:' },
+      teacherBusy: { en: 'teacher double-booked', th: 'ครูซ้อนคาบ' },
+      roomBusy: { en: 'room double-booked', th: 'ห้องซ้อนคาบ' },
+      confirmConflict: { en: 'Conflicts exist. Save anyway?', th: 'มีข้อขัดแย้ง บันทึกต่อ?' },
+      hasConflict: { en: 'Conflict exists — please resolve or confirm override', th: 'มีข้อขัดแย้ง — แก้ไขหรือยืนยันการบันทึกทับ' },
+      confirmDelete: { en: 'Delete this slot?', th: 'ลบช่องนี้?' },
+      pdfFailed: { en: 'PDF download failed', th: 'ดาวน์โหลด PDF ไม่ได้' },
+      day_mon: { en: 'Mon', th: 'จันทร์' },
+      day_tue: { en: 'Tue', th: 'อังคาร' },
+      day_wed: { en: 'Wed', th: 'พุธ' },
+      day_thu: { en: 'Thu', th: 'พฤหัสบดี' },
+      day_fri: { en: 'Fri', th: 'ศุกร์' },
+      day_sat: { en: 'Sat', th: 'เสาร์' },
+      day_sun: { en: 'Sun', th: 'อาทิตย์' }
+    },
+
+    // ---------- My Schedule (Sprint 14.3) ----------
+    mySchedule: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '🗓️ My Schedule', th: '🗓️ ตารางเรียนของฉัน' },
+      subtitle: { en: 'Your weekly class timetable', th: 'ตารางเรียนประจำสัปดาห์' },
+      downloadPdf: { en: '📄 Download PDF', th: '📄 ดาวน์โหลด PDF' },
+      emptyTitle: { en: 'No schedule yet', th: 'ยังไม่มีตารางเรียน' },
+      emptyDesc: { en: 'Your class timetable will appear here once your school sets it up.', th: 'ตารางเรียนจะปรากฏเมื่อโรงเรียนกำหนดเรียบร้อย' },
+      nowLabel: { en: 'NOW', th: 'กำลังเรียน' },
+      nextLabel: { en: 'NEXT CLASS', th: 'คาบถัดไป' }
+    },
+
+    // ---------- Teacher Schedule (Sprint 14.4) ----------
+    teacherSchedule: {
+      title: { en: '👨‍🏫 Teacher Schedule', th: '👨‍🏫 ตารางสอนครู' },
+      subtitle: { en: "View a teacher's weekly classes — useful for planning + loading checks", th: 'ดูตารางสอนรายครู — ใช้วางแผน + ตรวจภาระงาน' },
+      teacher: { en: 'Teacher', th: 'ครู' },
+      selectTeacher: { en: 'Select teacher...', th: 'เลือกครู...' },
+      totalPeriods: { en: 'Total Periods', th: 'คาบรวม' },
+      distinctClasses: { en: 'Classes Taught', th: 'จำนวนห้อง' },
+      distinctSubjects: { en: 'Subjects', th: 'จำนวนวิชา' }
     },
 
     // ---------- ปพ. Documents (Sprint 13.7) — Thai Ministry of Education official report formats ----------

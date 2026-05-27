@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Schedule — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar img { height: 26px; }
+    .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
+    .back-link:hover { background: var(--pk-canvas); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+    .page-title h1 { font-size: 24px; font-weight: 700; }
+    .page-title p { color: var(--pk-ash); font-size: 14px; margin-top: 4px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { padding: 9px 14px; border-radius: 9px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+
+    .controls { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .controls label { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .controls input, .controls select { padding: 8px 10px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+
+    .next-class-card {
+      background: linear-gradient(135deg, var(--pk-blue-800), var(--pk-blue-900));
+      color: #fff;
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin-bottom: 16px;
+      display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+    }
+    .next-class-card .label { font-size: 12px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.05em; }
+    .next-class-card .subject { font-size: 22px; font-weight: 700; margin-top: 2px; }
+    .next-class-card .meta { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+    .timetable-wrap { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px; overflow-x: auto; }
+    .timetable {
+      display: grid;
+      grid-template-columns: 110px repeat(5, minmax(140px, 1fr));
+      gap: 6px;
+      min-width: 850px;
+    }
+    .tt-header {
+      background: var(--pk-blue-100); color: var(--pk-blue-900);
+      padding: 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      text-align: center;
+    }
+    .tt-header.today { background: var(--pk-blue-700); color: #fff; }
+    .tt-period {
+      background: var(--pk-canvas); padding: 10px; border-radius: 8px; text-align: center;
+    }
+    .tt-period .pnum { font-size: 12px; font-weight: 600; color: var(--pk-ash); }
+    .tt-period .ptime { font-size: 11px; color: var(--pk-mist); font-family: 'Inter', monospace; margin-top: 2px; }
+    .tt-cell { background: #fff; border: 1px solid var(--pk-border); border-radius: 8px; padding: 8px 10px; min-height: 76px; }
+    .tt-cell.empty { background: var(--pk-canvas); border: 1px dashed var(--pk-border); }
+    .tt-cell.empty .empty-hint { color: var(--pk-mist); font-size: 11px; text-align: center; padding-top: 22px; }
+    .tt-cell .subj { font-weight: 700; font-size: 13px; color: var(--pk-blue-800); }
+    .tt-cell .teacher { font-size: 11px; color: var(--pk-ash); margin-top: 2px; }
+    .tt-cell .room { font-size: 10px; color: var(--pk-mist); font-family: 'Inter', monospace; margin-top: 2px; }
+    .tt-cell.break { background: #FFF7E6; border: 1px dashed #F59E0B; }
+    .tt-cell.break .break-label { color: #92400E; font-weight: 600; font-size: 11px; text-align: center; padding-top: 22px; }
+    .tt-cell.today-now { box-shadow: 0 0 0 2px var(--pk-blue-600); background: var(--pk-blue-50); }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--pk-ash); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" data-i18n="mySchedule.back">← Dashboard</a>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="mySchedule.title">🗓️ My Schedule</h1>
+        <p data-i18n="mySchedule.subtitle">Your weekly class timetable</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="downloadPdf()" data-i18n="mySchedule.downloadPdf">📄 Download PDF</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label data-i18n="grades.year">Year:</label>
+      <input type="text" id="yearInput" placeholder="2569" style="width:90px;" />
+      <label data-i18n="grades.term">Term:</label>
+      <select id="termSelect">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="summer" data-i18n="grades.termSummer">Summer</option>
+      </select>
+      <button class="btn btn-secondary" onclick="loadMySchedule()" data-i18n="schedule.load">🔄 Refresh</button>
+    </div>
+
+    <div id="nextClass"></div>
+
+    <div class="timetable-wrap" id="ttWrap" style="display:none;">
+      <div id="timetable" class="timetable"></div>
+    </div>
+
+    <div id="empty" class="empty-state" style="display:none;">
+      <div class="icon">🗓️</div>
+      <h3 data-i18n="mySchedule.emptyTitle">No schedule yet</h3>
+      <p data-i18n="mySchedule.emptyDesc">Your class timetable will appear here once your school sets it up.</p>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    let data = null;
+    const DAYS = [
+      { n: 1, key: 'mon' }, { n: 2, key: 'tue' }, { n: 3, key: 'wed' },
+      { n: 4, key: 'thu' }, { n: 5, key: 'fri' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      const now = new Date();
+      document.getElementById('yearInput').value = (now.getFullYear() + 543).toString();
+      loadMySchedule();
+    });
+    document.addEventListener('langchange', () => { if (data) render(); });
+
+    async function loadMySchedule() {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const { data: result, error } = await supabaseClient.rpc('get_my_timetable', {
+        p_academic_year: year, p_term: term
+      });
+      if (error) { showEmpty(); return; }
+      if (result.error) { showEmpty(); return; }
+      data = result;
+      render();
+    }
+
+    function showEmpty() {
+      document.getElementById('ttWrap').style.display = 'none';
+      document.getElementById('nextClass').innerHTML = '';
+      document.getElementById('empty').style.display = 'block';
+    }
+
+    function render() {
+      const periods = data.periods || [];
+      const slots = data.slots || [];
+      if (!periods.length) { showEmpty(); return; }
+
+      document.getElementById('empty').style.display = 'none';
+      document.getElementById('ttWrap').style.display = 'block';
+
+      // Today's day-of-week (Mon=1..Sun=7)
+      const today = (new Date().getDay() || 7);  // JS Sun=0 → 7
+      const now = new Date();
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+      // Find current/next class
+      const todaySlots = slots
+        .filter(s => s.day_of_week === today)
+        .sort((a,b) => a.period_number - b.period_number);
+      let nextClass = null;
+      for (const s of todaySlots) {
+        const p = periods.find(p => p.period_number === s.period_number);
+        if (!p) continue;
+        const [eh, em] = (p.end_time || '00:00').split(':').map(Number);
+        if (eh * 60 + em > nowMinutes) { nextClass = { slot: s, period: p }; break; }
+      }
+      if (nextClass) {
+        const isNow = (() => {
+          const [sh, sm] = nextClass.period.start_time.split(':').map(Number);
+          return sh * 60 + sm <= nowMinutes;
+        })();
+        document.getElementById('nextClass').innerHTML = `
+          <div class="next-class-card">
+            <div style="flex:1;">
+              <div class="label">${isNow ? t('mySchedule.nowLabel') : t('mySchedule.nextLabel')}</div>
+              <div class="subject">${esc(nextClass.slot.subject_name || nextClass.slot.subject_code || '—')}</div>
+              <div class="meta">${esc(nextClass.slot.teacher_name || '')} ${nextClass.slot.room ? '· 📍 ' + esc(nextClass.slot.room) : ''}</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="label">${t('schedule.period')} ${nextClass.period.period_number}</div>
+              <div style="font-family:'Inter',monospace; font-size:18px; font-weight:700;">${(nextClass.period.start_time||'').slice(0,5)}–${(nextClass.period.end_time||'').slice(0,5)}</div>
+            </div>
+          </div>
+        `;
+      } else {
+        document.getElementById('nextClass').innerHTML = '';
+      }
+
+      const cells = [];
+      cells.push(`<div class="tt-header"></div>`);
+      for (const d of DAYS) {
+        cells.push(`<div class="tt-header ${d.n === today ? 'today' : ''}">${t('schedule.day_' + d.key)}</div>`);
+      }
+      for (const p of periods) {
+        const label = p.label || (t('schedule.period') + ' ' + p.period_number);
+        cells.push(`
+          <div class="tt-period">
+            <div class="pnum">${esc(label)}</div>
+            <div class="ptime">${(p.start_time||'').slice(0,5)}–${(p.end_time||'').slice(0,5)}</div>
+          </div>
+        `);
+        for (const d of DAYS) {
+          if (p.is_break) {
+            cells.push(`<div class="tt-cell break"><div class="break-label">${esc(label)}</div></div>`);
+            continue;
+          }
+          const slot = slots.find(s => s.day_of_week === d.n && s.period_number === p.period_number);
+          const isCurrent = d.n === today && nextClass && nextClass.slot.id === slot?.id && (() => {
+            const [sh, sm] = p.start_time.split(':').map(Number);
+            return sh * 60 + sm <= nowMinutes;
+          })();
+          if (slot) {
+            cells.push(`
+              <div class="tt-cell ${isCurrent ? 'today-now' : ''}">
+                <div class="subj">${esc(slot.subject_code || '')} ${esc(slot.subject_name || '')}</div>
+                <div class="teacher">${esc(slot.teacher_name || '')}</div>
+                <div class="room">${slot.room ? '📍 ' + esc(slot.room) : ''}</div>
+              </div>
+            `);
+          } else {
+            cells.push(`<div class="tt-cell empty"><div class="empty-hint">—</div></div>`);
+          }
+        }
+      }
+      document.getElementById('timetable').innerHTML = cells.join('');
+    }
+
+    async function downloadPdf() {
+      if (!data?.classroom) return;
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const qs = new URLSearchParams({ classroom: data.classroom, year, term });
+      try {
+        const resp = await fetch('/api/schedule/timetable-pdf?' + qs.toString(), {
+          headers: { 'Authorization': 'Bearer ' + session.access_token }
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `schedule-${data.classroom}-${year}-${term}.pdf`.replace(/[\/\\]/g, '_');
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert(t('schedule.pdfFailed') + ': ' + e.message);
+      }
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  </script>
+</body>
+</html>

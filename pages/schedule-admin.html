@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Class Schedule — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: sticky; top: 0; z-index: 50; }
+    .topbar-left { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .brand-link img { height: 26px; }
+    .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-links a { text-decoration: none; color: var(--pk-ash); font-size: 13.5px; font-weight: 500; padding: 6px 12px; border-radius: 8px; }
+    .nav-links a:hover { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+    .nav-links a.active { background: var(--pk-blue-100); color: var(--pk-blue-800); font-weight: 600; }
+    .admin-topbar-right { display: flex; align-items: center; gap: 12px; }
+    .btn-out { padding: 7px 14px; border-radius: 8px; background: transparent; border: 1px solid var(--pk-border); color: var(--pk-ash); font-size: 13px; cursor: pointer; font-family: inherit; }
+
+    .container { max-width: 1500px; margin: 0 auto; padding: 24px; }
+    .page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 18px; }
+    .page-title h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-title p { color: var(--pk-ash); font-size: 14px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn { padding: 9px 14px; border-radius: 9px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--pk-blue-800); color: #fff; }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+    .btn-danger { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    .controls-bar { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .controls-bar label { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .controls-bar input, .controls-bar select { padding: 8px 12px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+
+    /* Timetable grid */
+    .timetable-wrap { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px; overflow-x: auto; }
+    .timetable {
+      display: grid;
+      grid-template-columns: 130px repeat(5, minmax(150px, 1fr));
+      gap: 6px;
+      min-width: 950px;
+    }
+    .tt-cell {
+      background: var(--pk-canvas);
+      border-radius: 8px;
+      padding: 8px 10px;
+      min-height: 76px;
+      position: relative;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .tt-cell:hover { border-color: var(--pk-blue-600); background: var(--pk-blue-50); }
+    .tt-cell.filled { background: #fff; border: 1px solid var(--pk-border); }
+    .tt-cell.filled .subj { font-weight: 700; font-size: 13px; color: var(--pk-blue-800); }
+    .tt-cell.filled .teacher { font-size: 11px; color: var(--pk-ash); margin-top: 2px; }
+    .tt-cell.filled .room { font-size: 10px; color: var(--pk-mist); margin-top: 2px; font-family: 'Inter', monospace; }
+    .tt-cell .add-hint { font-size: 11px; color: var(--pk-mist); text-align: center; padding: 18px 0; }
+    .tt-cell.break { background: #FFF7E6; border: 1px dashed #F59E0B; cursor: default; }
+    .tt-cell.break:hover { border-color: #F59E0B; background: #FFF7E6; }
+    .tt-cell.break .break-label { font-size: 11px; color: #92400E; font-weight: 600; text-align: center; padding-top: 22px; }
+
+    .tt-header {
+      background: var(--pk-blue-100); color: var(--pk-blue-900);
+      padding: 10px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      text-align: center;
+    }
+    .tt-period {
+      background: var(--pk-canvas);
+      padding: 10px; border-radius: 8px;
+      text-align: center;
+    }
+    .tt-period .pnum { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .tt-period .ptime { font-size: 11px; color: var(--pk-mist); font-family: 'Inter', monospace; margin-top: 2px; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,26,54,0.55); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 100; }
+    .modal-backdrop.show { display: flex; }
+    .modal { background: #fff; border-radius: 14px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal h2 { font-size: 18px; margin-bottom: 14px; }
+    .modal .field { margin-bottom: 12px; }
+    .modal label { display: block; font-size: 12px; color: var(--pk-ash); font-weight: 600; margin-bottom: 4px; }
+    .modal input, .modal select, .modal textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+    .modal textarea { resize: vertical; min-height: 56px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+
+    .conflict-warning {
+      background: var(--pk-warning-bg); color: var(--pk-warning);
+      border: 1px solid #F59E0B; border-radius: 8px;
+      padding: 10px 12px; font-size: 13px; margin-bottom: 10px;
+      display: none;
+    }
+    .conflict-warning.show { display: block; }
+    .conflict-warning ul { margin-top: 6px; padding-left: 18px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 28px; right: 28px; background: var(--pk-ink); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 14px; opacity: 0; transition: all 0.3s; z-index: 200; }
+    .toast.show { opacity: 1; }
+    .toast.success { background: var(--pk-success); }
+    .toast.error { background: var(--pk-danger); }
+
+    /* Setup card (when no periods configured) */
+    .setup-card { background: #fff; border: 1px dashed var(--pk-border-em); border-radius: 12px; padding: 24px; text-align: center; }
+    .setup-card .icon { font-size: 40px; margin-bottom: 8px; }
+
+    @media (max-width: 900px) {
+      .timetable { min-width: 900px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="brand-link" href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <nav class="nav-links">
+        <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+        <a href="students.html" data-i18n="nav.students">Students</a>
+        <a href="teachers.html" data-i18n="nav.teachers">Teachers</a>
+        <a href="grades-admin.html" data-i18n="nav.grades">Grades</a>
+        <a href="attendance.html" data-i18n="nav.attendance">Attendance</a>
+        <a href="schedule-admin.html" class="active" data-i18n="nav.schedule">Schedule</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <span class="user-info" id="userInfo"></span>
+      <button class="btn-out" onclick="signOut()" data-i18n="common.signOut">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="schedule.title">🗓️ Class Schedule</h1>
+        <p data-i18n="schedule.subtitle">Build weekly timetables per class. Click a cell to assign a subject + teacher.</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="openPeriodsModal()" data-i18n="schedule.managePeriods">⏰ Manage Periods</button>
+      </div>
+    </div>
+
+    <div class="controls-bar">
+      <label data-i18n="grades.year">Year:</label>
+      <input type="text" id="yearInput" placeholder="2569" style="width:90px;" />
+      <label data-i18n="grades.term">Term:</label>
+      <select id="termSelect">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="summer" data-i18n="grades.termSummer">Summer</option>
+      </select>
+      <label data-i18n="schedule.class">Class:</label>
+      <select id="classroomSelect" style="min-width:160px;">
+        <option value="" data-i18n="schedule.selectClass">Select class...</option>
+      </select>
+      <button class="btn btn-primary" onclick="loadTimetable()" data-i18n="schedule.load">🔄 Load</button>
+    </div>
+
+    <div id="setupCard" class="setup-card" style="display:none;">
+      <div class="icon">⏰</div>
+      <h3 data-i18n="schedule.setupTitle">First time? Set up your school's class periods</h3>
+      <p style="color: var(--pk-ash); font-size:13px; margin: 8px 0 14px;" data-i18n="schedule.setupDesc">Define the time slots used in your school day (e.g. Period 1 = 08:30-09:20).</p>
+      <button class="btn btn-primary" onclick="seedDefaultPeriods()" data-i18n="schedule.seedDefault">⚡ Use Default Template (8 periods)</button>
+      <button class="btn btn-secondary" onclick="openPeriodsModal()" style="margin-left:8px;" data-i18n="schedule.customPeriods">✏️ Custom Setup</button>
+    </div>
+
+    <div id="timetableWrap" class="timetable-wrap" style="display:none;">
+      <div id="timetable" class="timetable"></div>
+    </div>
+  </div>
+
+  <!-- Slot edit modal -->
+  <div class="modal-backdrop" id="slotModal">
+    <div class="modal">
+      <h2 id="slotModalTitle" data-i18n="schedule.editSlot">Edit Schedule Slot</h2>
+      <div id="conflictWarn" class="conflict-warning"></div>
+
+      <div class="field">
+        <label data-i18n="schedule.subject">Subject</label>
+        <select id="slotSubject" onchange="syncSubject()"></select>
+      </div>
+      <div class="field">
+        <label data-i18n="schedule.teacher">Teacher</label>
+        <select id="slotTeacher" onchange="checkConflict()"></select>
+      </div>
+      <div class="field">
+        <label data-i18n="schedule.room">Room</label>
+        <input type="text" id="slotRoom" placeholder="e.g. Lab 1 / อาคาร 3 ห้อง 301" oninput="checkConflict()" />
+      </div>
+      <div class="field">
+        <label data-i18n="schedule.notes">Notes</label>
+        <textarea id="slotNotes" rows="2"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="deleteSlot()" id="deleteBtn" style="display:none" data-i18n="common.delete">🗑️ Delete</button>
+        <button class="btn btn-secondary" onclick="closeSlotModal()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSlot()" data-i18n="common.save">💾 Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Periods config modal -->
+  <div class="modal-backdrop" id="periodsModal">
+    <div class="modal" style="max-width: 640px;">
+      <h2 data-i18n="schedule.periodsTitle">⏰ Class Periods Configuration</h2>
+      <p style="font-size:13px; color: var(--pk-ash); margin-bottom: 12px;" data-i18n="schedule.periodsDesc">Define each period's time. Mark recess/lunch as "Break" — they won't be assignable.</p>
+      <div id="periodsList"></div>
+      <button class="btn btn-secondary btn-sm" onclick="addPeriodRow()" style="margin-top:8px;" data-i18n="schedule.addPeriod">➕ Add Period</button>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closePeriodsModal()" data-i18n="common.close">Close</button>
+        <button class="btn btn-primary" onclick="savePeriods()" data-i18n="common.save">💾 Save All</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    let periods = [];
+    let slots = [];
+    let subjects = [];
+    let teachers = [];
+    let classrooms = [];
+    let currentSlot = null;  // editing slot: {day, period, existing?}
+
+    const DAYS = [
+      { n: 1, key: 'mon' }, { n: 2, key: 'tue' }, { n: 3, key: 'wed' },
+      { n: 4, key: 'thu' }, { n: 5, key: 'fri' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      await Promise.all([loadPeriods(), loadSubjects(), loadTeachers(), loadClassrooms()]);
+      // Default to current Thai year
+      const now = new Date();
+      document.getElementById('yearInput').value = (now.getFullYear() + 543).toString();
+    });
+    document.addEventListener('langchange', () => {
+      if (slots.length || periods.length) renderTimetable();
+    });
+
+    async function loadPeriods() {
+      const { data } = await supabaseClient.rpc('get_periods');
+      periods = data || [];
+      if (!periods.length) {
+        document.getElementById('setupCard').style.display = 'block';
+        document.getElementById('timetableWrap').style.display = 'none';
+      } else {
+        document.getElementById('setupCard').style.display = 'none';
+      }
+    }
+
+    async function loadSubjects() {
+      try {
+        const { data } = await supabaseClient.rpc('get_subjects');
+        subjects = data || [];
+      } catch { subjects = []; }
+    }
+
+    async function loadTeachers() {
+      try {
+        const { data } = await supabaseClient.rpc('get_teachers', { p_search: null, p_status: 'active' });
+        teachers = data?.rows || data || [];
+      } catch { teachers = []; }
+    }
+
+    async function loadClassrooms() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('students')
+          .select('classroom')
+          .eq('status', 'active')
+          .not('classroom', 'is', null);
+        if (error) throw error;
+        const set = new Set((data || []).map(r => r.classroom).filter(Boolean));
+        classrooms = Array.from(set).sort();
+        const sel = document.getElementById('classroomSelect');
+        sel.innerHTML = '<option value="">' + t('schedule.selectClass') + '</option>'
+          + classrooms.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+      } catch (e) {
+        console.warn('classrooms', e);
+      }
+    }
+
+    async function loadTimetable() {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      if (!year || !classroom) { toast(t('schedule.fillFilters'), 'error'); return; }
+
+      const { data, error } = await supabaseClient.rpc('get_class_timetable', {
+        p_classroom: classroom, p_academic_year: year, p_term: term
+      });
+      if (error) return toast(error.message, 'error');
+      if (data.error) return toast(data.error, 'error');
+      slots = data.slots || [];
+      periods = data.periods || periods;
+      document.getElementById('timetableWrap').style.display = 'block';
+      renderTimetable();
+    }
+
+    function renderTimetable() {
+      const grid = document.getElementById('timetable');
+      const cells = [];
+      // Header row: empty + day names
+      cells.push(`<div class="tt-header"></div>`);
+      for (const d of DAYS) {
+        cells.push(`<div class="tt-header">${t('schedule.day_' + d.key)}</div>`);
+      }
+      // Each period row
+      for (const p of periods) {
+        const periodLabel = p.label || (t('schedule.period') + ' ' + p.period_number);
+        cells.push(`
+          <div class="tt-period">
+            <div class="pnum">${esc(periodLabel)}</div>
+            <div class="ptime">${(p.start_time || '').slice(0,5)}–${(p.end_time || '').slice(0,5)}</div>
+          </div>
+        `);
+        for (const d of DAYS) {
+          if (p.is_break) {
+            cells.push(`<div class="tt-cell break"><div class="break-label">${esc(periodLabel)}</div></div>`);
+            continue;
+          }
+          const slot = slots.find(s => s.day_of_week === d.n && s.period_number === p.period_number);
+          if (slot) {
+            cells.push(`
+              <div class="tt-cell filled" onclick="editSlot(${d.n}, ${p.period_number})" style="${slot.color ? 'border-left:4px solid ' + esc(slot.color) : ''}">
+                <div class="subj">${esc(slot.subject_code || '')} ${esc(slot.subject_name || '')}</div>
+                <div class="teacher">${esc(slot.teacher_name || '')}</div>
+                <div class="room">${slot.room ? '📍 ' + esc(slot.room) : ''}</div>
+              </div>
+            `);
+          } else {
+            cells.push(`<div class="tt-cell" onclick="editSlot(${d.n}, ${p.period_number})"><div class="add-hint">+ ${t('schedule.add')}</div></div>`);
+          }
+        }
+      }
+      grid.innerHTML = cells.join('');
+    }
+
+    function editSlot(day, periodNumber) {
+      const existing = slots.find(s => s.day_of_week === day && s.period_number === periodNumber);
+      currentSlot = { day, period: periodNumber, existing: existing || null };
+
+      // Populate dropdowns
+      const subjSel = document.getElementById('slotSubject');
+      subjSel.innerHTML = '<option value="">— ' + t('schedule.noSubject') + ' —</option>'
+        + subjects.map(s => `<option value="${esc(s.code || s.id)}" data-name="${esc(s.name_th || s.name || s.name_en || '')}" data-id="${esc(s.id || '')}">${esc(s.code || '')} — ${esc(s.name_th || s.name || s.name_en || '')}</option>`).join('');
+      const tchSel = document.getElementById('slotTeacher');
+      tchSel.innerHTML = '<option value="">— ' + t('schedule.noTeacher') + ' —</option>'
+        + teachers.map(tch => {
+          const nameTh = ((tch.first_name_th || '') + ' ' + (tch.last_name_th || '')).trim();
+          const nameEn = ((tch.first_name_en || '') + ' ' + (tch.last_name_en || '')).trim();
+          return `<option value="${esc(tch.id)}" data-name="${esc(nameTh || nameEn)}">${esc(nameTh || nameEn)}</option>`;
+        }).join('');
+
+      if (existing) {
+        subjSel.value = existing.subject_code || '';
+        tchSel.value = existing.teacher_id || '';
+        document.getElementById('slotRoom').value = existing.room || '';
+        document.getElementById('slotNotes').value = existing.notes || '';
+        document.getElementById('deleteBtn').style.display = 'inline-flex';
+      } else {
+        subjSel.value = '';
+        tchSel.value = '';
+        document.getElementById('slotRoom').value = '';
+        document.getElementById('slotNotes').value = '';
+        document.getElementById('deleteBtn').style.display = 'none';
+      }
+      document.getElementById('conflictWarn').classList.remove('show');
+      document.getElementById('slotModal').classList.add('show');
+      checkConflict();
+    }
+
+    function syncSubject() { /* placeholder for future subject->color mapping */ }
+
+    function closeSlotModal() {
+      document.getElementById('slotModal').classList.remove('show');
+      currentSlot = null;
+    }
+
+    async function checkConflict() {
+      if (!currentSlot) return;
+      const teacherId = document.getElementById('slotTeacher').value || null;
+      const room = document.getElementById('slotRoom').value.trim() || null;
+      if (!teacherId && !room) {
+        document.getElementById('conflictWarn').classList.remove('show');
+        return;
+      }
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const { data } = await supabaseClient.rpc('check_slot_conflict', {
+        p_academic_year: year, p_term: term,
+        p_day_of_week: currentSlot.day, p_period_number: currentSlot.period,
+        p_teacher_id: teacherId, p_room: room,
+        p_exclude_slot_id: currentSlot.existing?.id || null
+      });
+      const warn = document.getElementById('conflictWarn');
+      const conflicts = (data && data.conflicts) || [];
+      if (conflicts.length) {
+        warn.innerHTML = `<strong>⚠️ ${t('schedule.conflictHeader')}</strong><ul>${
+          conflicts.map(c => `<li>${esc(c.classroom)} — ${esc(c.subject_code || '')} ${esc(c.subject_name || '')} (${c.conflict_type === 'teacher' ? t('schedule.teacherBusy') : t('schedule.roomBusy')})</li>`).join('')
+        }</ul>`;
+        warn.classList.add('show');
+      } else {
+        warn.classList.remove('show');
+      }
+    }
+
+    async function saveSlot() {
+      if (!currentSlot) return;
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const classroom = document.getElementById('classroomSelect').value;
+
+      const subjSel = document.getElementById('slotSubject');
+      const subjOpt = subjSel.options[subjSel.selectedIndex];
+      const subjectCode = subjSel.value || null;
+      const subjectName = subjOpt?.dataset.name || null;
+      const subjectId = subjOpt?.dataset.id && subjOpt.dataset.id !== '' ? subjOpt.dataset.id : null;
+
+      const tchSel = document.getElementById('slotTeacher');
+      const tchOpt = tchSel.options[tchSel.selectedIndex];
+      const teacherId = tchSel.value || null;
+      const teacherName = tchOpt?.dataset.name || null;
+
+      const room = document.getElementById('slotRoom').value.trim() || null;
+      const notes = document.getElementById('slotNotes').value.trim() || null;
+
+      // Confirm if conflict
+      const conflictShown = document.getElementById('conflictWarn').classList.contains('show');
+      const allowConflict = conflictShown ? confirm(t('schedule.confirmConflict')) : false;
+      if (conflictShown && !allowConflict) return;
+
+      const { data, error } = await supabaseClient.rpc('upsert_schedule_slot', {
+        p_id: currentSlot.existing?.id || null,
+        p_academic_year: year, p_term: term, p_classroom: classroom,
+        p_day_of_week: currentSlot.day, p_period_number: currentSlot.period,
+        p_subject_code: subjectCode, p_subject_name: subjectName, p_subject_id: subjectId,
+        p_teacher_id: teacherId, p_teacher_name: teacherName,
+        p_room: room, p_notes: notes, p_color: null,
+        p_allow_conflict: allowConflict
+      });
+
+      if (error) return toast(error.message, 'error');
+      if (!data.success) {
+        if (data.error === 'conflict') {
+          toast(t('schedule.hasConflict'), 'error');
+        } else {
+          toast(data.error || 'failed', 'error');
+        }
+        return;
+      }
+      toast(t('common.saved'), 'success');
+      closeSlotModal();
+      loadTimetable();
+    }
+
+    async function deleteSlot() {
+      if (!currentSlot?.existing) return;
+      if (!confirm(t('schedule.confirmDelete'))) return;
+      const { data, error } = await supabaseClient.rpc('delete_schedule_slot', { p_id: currentSlot.existing.id });
+      if (error) return toast(error.message, 'error');
+      if (!data.success) return toast('failed', 'error');
+      toast(t('common.deleted'), 'success');
+      closeSlotModal();
+      loadTimetable();
+    }
+
+    // ---------- Periods modal ----------
+    function openPeriodsModal() {
+      renderPeriodsList();
+      document.getElementById('periodsModal').classList.add('show');
+    }
+    function closePeriodsModal() {
+      document.getElementById('periodsModal').classList.remove('show');
+    }
+    function renderPeriodsList() {
+      const list = document.getElementById('periodsList');
+      list.innerHTML = (periods.length ? periods : [makeEmptyPeriod(1)]).map((p, i) => periodRowHtml(p, i)).join('');
+    }
+    function makeEmptyPeriod(n) { return { period_number: n, label: '', start_time: '08:00', end_time: '08:50', is_break: false, sort_order: n * 10 }; }
+    function periodRowHtml(p, i) {
+      return `
+        <div class="period-row" data-idx="${i}" style="display:grid; grid-template-columns:60px 1fr 110px 110px 80px 40px; gap:6px; align-items:center; margin-bottom:6px;">
+          <input type="number" placeholder="#" value="${p.period_number || ''}" data-f="period_number" style="padding:6px 8px; font-size:13px;" />
+          <input type="text" placeholder="${t('schedule.periodLabel')}" value="${esc(p.label || '')}" data-f="label" style="padding:6px 8px; font-size:13px;" />
+          <input type="time" value="${p.start_time || '08:00'}" data-f="start_time" style="padding:6px 8px; font-size:13px;" />
+          <input type="time" value="${p.end_time || '08:50'}" data-f="end_time" style="padding:6px 8px; font-size:13px;" />
+          <label style="font-size:11px; display:flex; align-items:center; gap:4px;"><input type="checkbox" data-f="is_break" ${p.is_break ? 'checked' : ''} /> ${t('schedule.break')}</label>
+          <button class="btn-out" onclick="removePeriodRow(${i})" style="padding:4px 8px; font-size:14px;">🗑️</button>
+        </div>
+      `;
+    }
+    function addPeriodRow() {
+      periods.push(makeEmptyPeriod((periods[periods.length-1]?.period_number || 0) + 1));
+      renderPeriodsList();
+    }
+    function removePeriodRow(idx) {
+      periods.splice(idx, 1);
+      renderPeriodsList();
+    }
+    async function savePeriods() {
+      const rows = document.querySelectorAll('.period-row');
+      const list = [];
+      rows.forEach(row => {
+        const get = (f) => row.querySelector(`[data-f="${f}"]`);
+        const obj = {
+          period_number: parseInt(get('period_number').value),
+          label: get('label').value,
+          start_time: get('start_time').value,
+          end_time: get('end_time').value,
+          is_break: get('is_break').checked,
+          sort_order: (parseInt(get('period_number').value) || 0) * 10
+        };
+        if (!isNaN(obj.period_number)) list.push(obj);
+      });
+      const { data, error } = await supabaseClient.rpc('bulk_upsert_periods', { p_periods: list });
+      if (error) return toast(error.message, 'error');
+      toast(t('schedule.periodsSaved').replace('{n}', data.saved), 'success');
+      closePeriodsModal();
+      await loadPeriods();
+      if (classrooms.length) loadTimetable();
+    }
+    async function seedDefaultPeriods() {
+      const tpl = [
+        { period_number:1, label: t('schedule.period') + ' 1', start_time:'08:30', end_time:'09:20', sort_order:10 },
+        { period_number:2, label: t('schedule.period') + ' 2', start_time:'09:20', end_time:'10:10', sort_order:20 },
+        { period_number:3, label: t('schedule.morningBreak'), start_time:'10:10', end_time:'10:25', is_break:true, sort_order:30 },
+        { period_number:4, label: t('schedule.period') + ' 3', start_time:'10:25', end_time:'11:15', sort_order:40 },
+        { period_number:5, label: t('schedule.period') + ' 4', start_time:'11:15', end_time:'12:05', sort_order:50 },
+        { period_number:6, label: t('schedule.lunchBreak'), start_time:'12:05', end_time:'13:00', is_break:true, sort_order:60 },
+        { period_number:7, label: t('schedule.period') + ' 5', start_time:'13:00', end_time:'13:50', sort_order:70 },
+        { period_number:8, label: t('schedule.period') + ' 6', start_time:'13:50', end_time:'14:40', sort_order:80 },
+        { period_number:9, label: t('schedule.period') + ' 7', start_time:'14:40', end_time:'15:30', sort_order:90 }
+      ];
+      const { data, error } = await supabaseClient.rpc('bulk_upsert_periods', { p_periods: tpl });
+      if (error) return toast(error.message, 'error');
+      toast(t('schedule.defaultSeeded'), 'success');
+      await loadPeriods();
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(msg, type='info') { const tt=document.getElementById('toast'); tt.className='toast show ' + type; tt.textContent=msg; setTimeout(()=>{tt.className='toast';},3500); }
+    async function signOut() { await supabaseClient.auth.signOut(); window.location.href='../login.html'; }
+  </script>
+</body>
+</html>

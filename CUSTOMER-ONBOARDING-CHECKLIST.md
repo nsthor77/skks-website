@@ -186,6 +186,41 @@ UPDATE schools SET line_settings = jsonb_build_object(
 
 ---
 
+## 🎯 Phase 8: Class Schedule (Sprint 14) — ตารางเรียน
+
+### ✅ 8.1 ตั้งคาบเรียนของโรงเรียน (ครั้งเดียว)
+- ไป `/pages/schedule-admin.html` → กดปุ่ม **"⏰ Manage Periods"**
+- หรือกด **"⚡ Use Default Template"** (8 คาบมาตรฐาน 50 นาที)
+- ทำเครื่องหมาย "พัก" สำหรับช่วงพักเช้า/พักกลางวัน
+- คาบที่เป็น "พัก" จะใส่วิชาไม่ได้ (lock อัตโนมัติ)
+
+### ✅ 8.2 สร้างตารางเรียนรายห้อง
+- เลือก **ปีการศึกษา** + **เทอม** + **ห้องเรียน**
+- คลิกช่องว่างในตาราง → popup ให้เลือก:
+  - วิชา (จาก subjects ที่ตั้งไว้)
+  - ครูผู้สอน (จาก teachers list)
+  - ห้องเรียน (ถ้ามี เช่น "Lab 1", "อาคาร 3 ห้อง 301")
+  - หมายเหตุ (optional)
+- ⚠️ **Conflict detection อัตโนมัติ:**
+  - ครูคนเดียวกัน 2 ห้องพร้อมกัน → เตือนทันที
+  - ห้องเรียนเดียวกัน 2 คาบพร้อมกัน → เตือนทันที
+
+### ✅ 8.3 ทำซ้ำทุกห้อง
+- ทำตารางของแต่ละห้องให้ครบ
+- ระหว่างทำห้องอื่น ระบบตรวจ conflict ข้ามห้องให้
+
+### ✅ 8.4 นักเรียน/ผู้ปกครองเห็นตารางที่:
+- `/pages/my-schedule.html` (ตารางของห้องลูก)
+- มีหน้า **"NEXT CLASS"** บอกคาบถัดไปแบบ real-time
+- ดาวน์โหลด PDF ได้
+
+### ✅ 8.5 ครูเห็นตารางสอนตัวเองที่:
+- `/pages/teacher-schedule.html` (staff/owner เลือกครูได้)
+- มี stats: คาบรวม, จำนวนห้อง, จำนวนวิชา
+- ใช้ดูภาระงานก่อนเปิดเทอม
+
+---
+
 ## 📞 Support
 
 | ปัญหา | ติดต่อ |
@@ -198,5 +233,5 @@ UPDATE schools SET line_settings = jsonb_build_object(
 
 ---
 
-**Last updated:** 2026-05-27  
-**Sprint:** Sprint 13.7 — ปพ. Thai Government Report Cards
+**Last updated:** 2026-05-28  
+**Sprint:** Sprint 14 — Class Schedule (Timetable)

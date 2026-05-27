@@ -16,6 +16,9 @@
     },
     "api/grades/popor-6-pdf.js": {
       "includeFiles": "lib/fonts/**"
+    },
+    "api/schedule/timetable-pdf.js": {
+      "includeFiles": "lib/fonts/**"
     }
   },
   "crons": [

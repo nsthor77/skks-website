@@ -466,6 +466,19 @@
       pdfFailed: { en: 'PDF download failed', th: 'ดาวน์โหลด PDF ไม่ได้' }
     },
 
+    // ---------- ปพ. Documents (Sprint 13.7) — Thai Ministry of Education official report formats ----------
+    popor: {
+      title: { en: '📑 Official Documents (ปพ.)', th: '📑 เอกสารทางการ (ปพ.)' },
+      subtitle: { en: 'Thai Ministry of Education official report formats', th: 'แบบรายงานตามมาตรฐานกระทรวงศึกษาธิการ' },
+      dl1: { en: '📄 ปพ.1 Transcript', th: '📄 ปพ.1 ระเบียนแสดงผลการเรียน' },
+      dl5Admin: { en: '📊 ปพ.5 (Class Roster)', th: '📊 ปพ.5 (บันทึกผลรายวิชา)' },
+      dl6: { en: '📋 ปพ.6 Progress Book', th: '📋 ปพ.6 รายงานพัฒนาผู้เรียน' },
+      noStudent: { en: 'Student not loaded yet — please wait or refresh.', th: 'ข้อมูลนักเรียนยังไม่โหลด กรุณารอสักครู่หรือรีเฟรช' },
+      needClassYear: { en: 'Please select class + year before downloading ปพ.5', th: 'กรุณาเลือกห้องเรียนและปีการศึกษาก่อนดาวน์โหลด ปพ.5' },
+      downloaded: { en: 'Document downloaded', th: 'ดาวน์โหลดเอกสารเรียบร้อย' },
+      downloadFailed: { en: 'Download failed', th: 'ดาวน์โหลดไม่ได้' }
+    },
+
     // ---------- Grade Config (Sprint 13.4) ----------
     gradeConfig: {
       back: { en: '← Back to Grades', th: '← กลับไปเกรด' },

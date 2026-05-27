@@ -129,6 +129,20 @@
       <button class="btn btn-secondary" onclick="downloadReportCard()" data-i18n="myGrades.downloadPdf">📄 Download Report Card</button>
     </div>
 
+    <!-- Sprint 13.7: ปพ. (Thai Government) Documents -->
+    <div class="card" id="poporCard" style="padding: 18px; margin-bottom: 16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <div>
+          <h3 style="font-size: 15px; margin-bottom: 4px;" data-i18n="popor.title">📑 Official Documents (ปพ.)</h3>
+          <p style="font-size: 12.5px; color: var(--pk-ash);" data-i18n="popor.subtitle">Thai Ministry of Education official report formats</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="downloadPopor('1')" data-i18n="popor.dl1">📄 ปพ.1 Transcript</button>
+          <button class="btn btn-secondary" onclick="downloadPopor('6')" data-i18n="popor.dl6">📋 ปพ.6 Progress Book</button>
+        </div>
+      </div>
+    </div>
+
     <div id="gpaSection"></div>
 
     <div class="card">
@@ -264,6 +278,48 @@
         URL.revokeObjectURL(dlUrl);
       } catch (e) {
         alert(t('myGrades.pdfFailed') + ': ' + e.message);
+      }
+    }
+
+    // Sprint 13.7: Download ปพ.1 / ปพ.6
+    async function downloadPopor(type) {
+      if (!currentData || !currentData.student_id) {
+        alert(t('popor.noStudent') || 'Student not loaded yet — please wait or refresh.');
+        return;
+      }
+      const studentId = currentData.student_id;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      let url, filename;
+      if (type === '1') {
+        // ปพ.1 = transcript (all years, no year/term needed)
+        url = `/api/grades/popor-1-pdf?student_id=${encodeURIComponent(studentId)}`;
+        filename = `popor1-${studentId}.pdf`;
+      } else if (type === '6') {
+        // ปพ.6 = progress book (requires year+term)
+        const year = document.getElementById('yearSelect').value;
+        const term = document.getElementById('termSelect').value;
+        if (!year || !term) { alert(t('myGrades.selectYearTerm')); return; }
+        url = `/api/grades/popor-6-pdf?student_id=${encodeURIComponent(studentId)}&year=${encodeURIComponent(year)}&term=${encodeURIComponent(term)}`;
+        filename = `popor6-${year}-${term}.pdf`;
+      } else {
+        return;
+      }
+
+      try {
+        const resp = await fetch(url, { headers: { 'Authorization': 'Bearer ' + session.access_token } });
+        if (!resp.ok) {
+          const errText = await resp.text().catch(() => '');
+          throw new Error(errText || ('HTTP ' + resp.status));
+        }
+        const blob = await resp.blob();
+        const dlUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = dlUrl; a.download = filename;
+        a.click();
+        URL.revokeObjectURL(dlUrl);
+      } catch (e) {
+        alert((t('myGrades.pdfFailed') || 'Download failed') + ': ' + e.message);
       }
     }
 

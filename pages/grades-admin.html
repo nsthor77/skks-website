@@ -140,8 +140,9 @@
         <h1 data-i18n="grades.title">📝 Grades</h1>
         <p data-i18n="grades.subtitle">Enter grades by class + subject + term</p>
       </div>
-      <div style="display:flex;gap:8px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <a href="grade-config.html" class="btn btn-secondary owner-only" style="display:none" data-i18n="grades.configScale">⚙️ Grade Scale</a>
+        <button class="btn btn-secondary" onclick="downloadPopor5()" data-i18n="popor.dl5Admin">📊 ปพ.5 (Class Roster)</button>
         <button class="btn btn-success" onclick="publishGrades()" data-i18n="grades.publish">📢 Publish to Parents</button>
         <button class="btn btn-primary" onclick="saveAll()" data-i18n="grades.saveAll">💾 Save All</button>
       </div>
@@ -404,6 +405,41 @@
       if (!data?.success) return toast(t('grades.saveFailed'), 'error');
       toast(t('grades.savedCount').replace('{n}', data.saved), 'success');
       loadGrades(); // refresh
+    }
+
+    // Sprint 13.7: Download ปพ.5 (class grade summary)
+    async function downloadPopor5() {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      const subjectCode = document.getElementById('subjectSelect').value;  // optional — empty = all subjects
+      if (!classroom || !year) {
+        toast(t('popor.needClassYear') || 'Please select class + year before downloading ปพ.5', 'error');
+        return;
+      }
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const qs = new URLSearchParams({ classroom, year, term });
+      if (subjectCode) qs.set('subject_code', subjectCode);
+
+      try {
+        const resp = await fetch('/api/grades/popor-5-pdf?' + qs.toString(), {
+          headers: { 'Authorization': 'Bearer ' + session.access_token }
+        });
+        if (!resp.ok) {
+          const txt = await resp.text().catch(() => '');
+          throw new Error(txt || ('HTTP ' + resp.status));
+        }
+        const blob = await resp.blob();
+        const dlUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = dlUrl;
+        a.download = `popor5-${classroom}-${year}-${term}${subjectCode ? '-' + subjectCode : ''}.pdf`.replace(/[\/\\]/g, '_');
+        a.click();
+        URL.revokeObjectURL(dlUrl);
+        toast(t('popor.downloaded') || 'ปพ.5 downloaded', 'success');
+      } catch (e) {
+        toast((t('popor.downloadFailed') || 'Download failed') + ': ' + e.message, 'error');
+      }
     }
 
     async function publishGrades() {

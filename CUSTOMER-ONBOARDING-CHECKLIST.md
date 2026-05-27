@@ -158,6 +158,34 @@ UPDATE schools SET line_settings = jsonb_build_object(
 
 ---
 
+## 🎯 Phase 7: ปพ. Documents (Sprint 13.7) — เอกสารทางการกระทรวงศึกษา
+
+### ✅ 7.1 ตรวจชื่อโรงเรียน + ที่อยู่
+- ไปที่ Settings → School Profile
+- กรอกให้ครบ: `name_th`, `name_en`, `address_th`, `district`, `province`
+- ข้อมูลเหล่านี้จะปรากฏใน header ของ ปพ.1 / ปพ.5 / ปพ.6
+
+### ✅ 7.2 กรอกข้อมูลพ่อ-แม่ของนักเรียน
+- ใน student profile → custom fields ใส่:
+  - `father_name` — ชื่อบิดา
+  - `mother_name` — ชื่อมารดา
+  - `national_id` — เลขประจำตัวประชาชน
+- ฟิลด์เหล่านี้จะแสดงใน ปพ.1 อัตโนมัติ
+
+### ✅ 7.3 ดาวน์โหลด ปพ. แต่ละแบบ
+- **ปพ.1** (Transcript): `/pages/my-grades.html` → กดปุ่ม "📄 ปพ.1"  
+  หรือใน student detail (staff) → ปุ่มดาวน์โหลด ปพ.1
+- **ปพ.5** (Class Roster): `/pages/grades-admin.html` → เลือกห้อง + ปี + เทอม → กด "📊 ปพ.5"
+- **ปพ.6** (Progress Book): `/pages/my-grades.html` → เลือกปี + เทอม → กดปุ่ม "📋 ปพ.6"
+
+### ⚠️ 7.4 หมายเหตุการใช้งาน
+- เลขที่เอกสาร (serial) ออกอัตโนมัติเมื่อ download (ใช้ `?issue=true` ใน URL)
+- snapshot ของข้อมูลเก็บไว้ใน `popor_documents` table — เผื่อข้อมูลเปลี่ยนภายหลัง
+- รูปนักเรียน, ตราโรงเรียน, ลายเซ็น = ยังต้องประทับด้วยมือ (Sprint 16: optional image upload)
+- ถ้ารูปแบบ ปพ. ของโรงเรียนต่างจากมาตรฐาน → แจ้งเราเพื่อ custom layout
+
+---
+
 ## 📞 Support
 
 | ปัญหา | ติดต่อ |
@@ -166,8 +194,9 @@ UPDATE schools SET line_settings = jsonb_build_object(
 | Billing | billing@panyaschoolkit.com |
 | LINE OA Setup | LINE Help Center |
 | PromptPay | ธนาคารของคุณ |
+| ปพ. Custom Format | support@panyaschoolkit.com |
 
 ---
 
 **Last updated:** 2026-05-27  
-**Sprint:** Sprint 12 — Attendance + LINE Messaging
+**Sprint:** Sprint 13.7 — ปพ. Thai Government Report Cards

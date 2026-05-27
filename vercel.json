@@ -7,6 +7,15 @@
     },
     "api/grades/report-card-pdf.js": {
       "includeFiles": "lib/fonts/**"
+    },
+    "api/grades/popor-1-pdf.js": {
+      "includeFiles": "lib/fonts/**"
+    },
+    "api/grades/popor-5-pdf.js": {
+      "includeFiles": "lib/fonts/**"
+    },
+    "api/grades/popor-6-pdf.js": {
+      "includeFiles": "lib/fonts/**"
     }
   },
   "crons": [

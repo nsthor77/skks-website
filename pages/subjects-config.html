@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subjects — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .topbar img { height: 26px; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
+    .back-link:hover { background: var(--pk-canvas); color: var(--pk-ink); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
+    .page-head h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-head p { color: var(--pk-ash); font-size: 14px; max-width: 600px; }
+
+    .btn { padding: 10px 16px; border-radius: 10px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--pk-blue-800); color: var(--pk-paper); box-shadow: 0 2px 6px rgba(30,64,175,0.2); }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+    .btn-danger { background: var(--pk-danger-bg); color: var(--pk-danger); border: none; }
+    .btn-danger:hover { background: #FECACA; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    .card { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: var(--pk-canvas); }
+    th { text-align: left; padding: 11px 14px; font-weight: 600; font-size: 11px; color: var(--pk-ash); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--pk-border); }
+    td { padding: 12px 14px; border-bottom: 1px solid #F0F2F7; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFBFC; }
+
+    .sub-code { font-family: 'Inter', monospace; font-weight: 600; color: var(--pk-blue-700); }
+    .sub-name { font-weight: 600; color: var(--pk-ink); }
+    .sub-en { color: var(--pk-mist); font-size: 12px; }
+    .dept-pill { display: inline-block; padding: 2px 8px; background: var(--pk-blue-50); color: var(--pk-blue-700); border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .status-active { color: var(--pk-success); font-weight: 600; }
+    .status-inactive { color: var(--pk-mist); }
+
+    .action-cell { display: flex; gap: 4px; justify-content: flex-end; }
+    .empty { padding: 60px 20px; text-align: center; color: var(--pk-ash); }
+    .empty .icon { font-size: 48px; margin-bottom: 12px; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 26, 54, 0.65); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--pk-paper); border-radius: 16px; max-width: 600px; width: 100%; box-shadow: 0 20px 60px -10px rgba(0,0,0,0.3); }
+    .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--pk-border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-header h3 { font-size: 17px; font-weight: 700; }
+    .modal-close { background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--pk-ash); width: 32px; height: 32px; border-radius: 6px; }
+    .modal-close:hover { background: var(--pk-canvas); }
+    .modal-body { padding: 22px 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--pk-border); display: flex; justify-content: flex-end; gap: 10px; background: #FBFCFD; border-radius: 0 0 16px 16px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .form-row.full { grid-template-columns: 1fr; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--pk-ink-soft); margin-bottom: 4px; }
+    .form-group label .req { color: var(--pk-danger); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 9px 12px;
+      border: 1px solid var(--pk-border); border-radius: 8px;
+      font-family: inherit; font-size: 14px; color: var(--pk-ink); background: var(--pk-paper);
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--pk-blue-600); box-shadow: 0 0 0 3px var(--pk-blue-100);
+    }
+    .check-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .check-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 9999; font-size: 14px; font-weight: 500; display: none; }
+    .toast.show { display: block; }
+    .toast.success { background: var(--pk-success-bg); color: var(--pk-success); }
+    .toast.error { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .toast.info { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .form-row { grid-template-columns: 1fr; }
+      input, select, textarea { font-size: 16px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="teachers.html" class="back-link" data-i18n="subjects.back">← Back to Teachers</a>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="container">
+    <div class="page-head">
+      <div>
+        <h1 data-i18n="subjects.title">📚 Subjects</h1>
+        <p data-i18n="subjects.desc">Define subjects taught at your school — used in teacher assignments, grade reports, and timetables.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openCreateModal()" data-i18n="subjects.addSubject">➕ Add Subject</button>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="subjects.colCode">Code</th>
+            <th data-i18n="subjects.colName">Name</th>
+            <th data-i18n="subjects.colDept">Department</th>
+            <th data-i18n="subjects.colCredit">Credits</th>
+            <th data-i18n="subjects.colStatus">Status</th>
+            <th style="text-align:right;" data-i18n="subjects.colActions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6"><div class="empty">⏳ Loading...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle" data-i18n="subjects.modalAdd">➕ Add Subject</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <form onsubmit="saveSubject(event)">
+        <div class="modal-body">
+          <input type="hidden" id="fId" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="subjects.fldCode">Code <span class="req">*</span></label>
+              <input type="text" id="fCode" required placeholder="MATH" maxlength="20" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="subjects.fldSort">Sort Order</label>
+              <input type="number" id="fSortOrder" value="100" min="0" max="999" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="subjects.fldNameTh">Name (Thai) <span class="req">*</span></label>
+              <input type="text" id="fNameTh" required placeholder="คณิตศาสตร์" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="subjects.fldNameEn">Name (English)</label>
+              <input type="text" id="fNameEn" placeholder="Mathematics" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="subjects.fldDept">Department</label>
+              <input type="text" id="fDepartment" placeholder="Mathematics / Languages / Science..." />
+            </div>
+            <div class="form-group">
+              <label data-i18n="subjects.fldCreditHours">Credit Hours</label>
+              <input type="number" id="fCreditHours" step="0.5" placeholder="2.0" />
+            </div>
+          </div>
+
+          <div class="form-row full">
+            <div class="form-group">
+              <label data-i18n="subjects.fldDesc">Description</label>
+              <textarea id="fDescription" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="fIsActive" checked />
+            <label for="fIsActive" data-i18n="subjects.fldActive">Active (show in teacher assignments)</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSave" data-i18n="common.save">💾 Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    let allSubjects = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireRole(['owner','developer']);
+      if (!profile) return;
+      loadSubjects();
+    });
+    document.addEventListener('langchange', render);
+
+    async function loadSubjects() {
+      const { data, error } = await supabaseClient.from('subjects').select('*').order('sort_order').order('name_th');
+      if (error) return toast('Load failed', 'error');
+      allSubjects = data || [];
+      render();
+    }
+
+    function render() {
+      const tbody = document.getElementById('tbody');
+      const lang = pkI18n.getLang();
+      if (!allSubjects.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="icon">📚</div><h4>${t('subjects.empty')}</h4><p>${t('subjects.emptyDesc')}</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = allSubjects.map(s => {
+        const displayName = lang === 'en' && s.name_en ? s.name_en : (s.name_th || s.code);
+        const altName = lang === 'en' ? s.name_th : (s.name_en || '');
+        return `<tr>
+          <td><span class="sub-code">${esc(s.code || '—')}</span></td>
+          <td>
+            <div class="sub-name">${esc(displayName)}</div>
+            ${altName && altName !== displayName ? `<div class="sub-en">${esc(altName)}</div>` : ''}
+          </td>
+          <td>${s.department ? `<span class="dept-pill">${esc(s.department)}</span>` : '—'}</td>
+          <td>${s.credit_hours ?? '—'}</td>
+          <td><span class="${s.is_active ? 'status-active' : 'status-inactive'}">${s.is_active ? '● ' + t('common.active') : '○ ' + t('common.inactive')}</span></td>
+          <td class="action-cell">
+            <button class="btn btn-sm btn-secondary" onclick="editSubject('${s.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSubject('${s.id}', ${JSON.stringify(displayName)})">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = t('subjects.modalAdd');
+      document.getElementById('fId').value = '';
+      document.getElementById('fCode').value = '';
+      document.getElementById('fNameTh').value = '';
+      document.getElementById('fNameEn').value = '';
+      document.getElementById('fDepartment').value = '';
+      document.getElementById('fCreditHours').value = '';
+      document.getElementById('fDescription').value = '';
+      document.getElementById('fSortOrder').value = 100 + allSubjects.length * 10;
+      document.getElementById('fIsActive').checked = true;
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    async function editSubject(id) {
+      const s = allSubjects.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('modalTitle').textContent = t('subjects.modalEdit');
+      document.getElementById('fId').value = s.id;
+      document.getElementById('fCode').value = s.code || '';
+      document.getElementById('fNameTh').value = s.name_th || '';
+      document.getElementById('fNameEn').value = s.name_en || '';
+      document.getElementById('fDepartment').value = s.department || '';
+      document.getElementById('fCreditHours').value = s.credit_hours ?? '';
+      document.getElementById('fDescription').value = s.description || '';
+      document.getElementById('fSortOrder').value = s.sort_order ?? 100;
+      document.getElementById('fIsActive').checked = !!s.is_active;
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function closeModal() { document.getElementById('editModal').classList.remove('show'); }
+
+    async function saveSubject(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSave');
+      btn.disabled = true;
+      const params = {
+        p_id: document.getElementById('fId').value || null,
+        p_code: document.getElementById('fCode').value.trim().toUpperCase(),
+        p_name_th: document.getElementById('fNameTh').value.trim(),
+        p_name_en: document.getElementById('fNameEn').value.trim() || null,
+        p_description: document.getElementById('fDescription').value.trim() || null,
+        p_department: document.getElementById('fDepartment').value.trim() || null,
+        p_credit_hours: parseFloat(document.getElementById('fCreditHours').value) || null,
+        p_sort_order: parseInt(document.getElementById('fSortOrder').value) || 100,
+        p_is_active: document.getElementById('fIsActive').checked
+      };
+      const { data, error } = await supabaseClient.rpc('upsert_subject', params);
+      btn.disabled = false;
+      if (error) return toast('Save failed: ' + error.message, 'error');
+      if (!data?.success) return toast(data?.error || 'Failed', 'error');
+      toast(params.p_id ? t('subjects.saveOk') : t('subjects.addOk'), 'success');
+      closeModal();
+      loadSubjects();
+    }
+
+    async function deleteSubject(id, name) {
+      if (!confirm(t('subjects.confirmDelete').replace('{name}', name))) return;
+      const { data, error } = await supabaseClient.rpc('delete_subject', { p_id: id });
+      if (error || !data?.success) return toast('Delete failed', 'error');
+      toast(t('subjects.deleteOk'), 'success');
+      loadSubjects();
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(msg, type = 'info') {
+      const tt = document.getElementById('toast');
+      tt.className = 'toast show ' + type;
+      tt.textContent = msg;
+      setTimeout(() => { tt.className = 'toast'; }, 3500);
+    }
+  </script>
+</body>
+</html>

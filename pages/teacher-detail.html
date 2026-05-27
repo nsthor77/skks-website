@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Details — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      background: var(--pk-canvas); color: var(--pk-ink);
+      min-height: 100vh; -webkit-font-smoothing: antialiased;
+    }
+    .topbar {
+      background: var(--pk-paper); border-bottom: 1px solid var(--pk-border);
+      padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar img { height: 26px; }
+    .back-link {
+      color: var(--pk-ash); text-decoration: none; font-size: 13.5px;
+      padding: 6px 12px; border-radius: 8px;
+    }
+    .back-link:hover { background: var(--pk-canvas); color: var(--pk-ink); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    .profile-header {
+      background: var(--pk-paper); border: 1px solid var(--pk-border);
+      border-radius: 16px; padding: 28px; margin-bottom: 20px;
+      display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
+    }
+    .photo-circle {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--pk-blue-600), var(--pk-blue-900));
+      color: var(--pk-paper);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 700; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(30,64,175,0.25);
+    }
+    .profile-info { flex: 1; min-width: 200px; }
+    .profile-info h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .profile-info .eng { color: var(--pk-ash); font-size: 15px; }
+    .profile-info .meta {
+      margin-top: 10px; display: flex; gap: 14px; flex-wrap: wrap;
+      font-size: 13px; color: var(--pk-ash);
+    }
+    .profile-info .meta strong { color: var(--pk-ink); }
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .status-active { background: var(--pk-success-bg); color: var(--pk-success); }
+    .status-inactive { background: var(--pk-warning-bg); color: var(--pk-warning); }
+    .status-on_leave { background: #DBEAFE; color: #1E40AF; }
+    .status-resigned { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .homeroom-pill {
+      background: var(--pk-blue-100); color: var(--pk-blue-800);
+      padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 600;
+    }
+
+    .actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 9px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; border: none; font-family: inherit; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: var(--pk-blue-800); color: var(--pk-paper); }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card {
+      background: var(--pk-paper); border: 1px solid var(--pk-border);
+      border-radius: 12px; padding: 20px 22px;
+    }
+    .card h3 {
+      font-size: 13px; font-weight: 700; color: var(--pk-blue-800);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--pk-blue-100);
+    }
+    .field {
+      display: grid; grid-template-columns: 130px 1fr; gap: 10px;
+      padding: 6px 0; font-size: 14px;
+    }
+    .field .lbl { color: var(--pk-ash); font-size: 12.5px; font-weight: 500; }
+    .field .val { color: var(--pk-ink); word-break: break-word; }
+    .field .val.muted { color: var(--pk-mist); font-style: italic; }
+    .field .val a { color: var(--pk-blue-600); text-decoration: none; }
+    .field .val a:hover { text-decoration: underline; }
+
+    .loading, .err { padding: 60px; text-align: center; color: var(--pk-ash); }
+    .err { color: #991B1B; }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .profile-header { padding: 20px; gap: 16px; }
+      .photo-circle { width: 72px; height: 72px; font-size: 26px; }
+      .profile-info h1 { font-size: 20px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .field { grid-template-columns: 110px 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="teachers.html" class="back-link" data-i18n="teacherDetail.back">← Back to Teachers</a>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="container">
+    <div id="content"><div class="loading">⏳ Loading...</div></div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function v(val, fallback = '—') {
+      return (val === null || val === undefined || val === '') ? `<span class="val muted">${fallback}</span>` : esc(val);
+    }
+    function date(d) {
+      if (!d) return '—';
+      const lang = pkI18n.getLang();
+      return new Date(d).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    function years(hireDate) {
+      if (!hireDate) return '—';
+      const h = new Date(hireDate), n = new Date();
+      let yrs = n.getFullYear() - h.getFullYear();
+      if (n.getMonth() < h.getMonth() || (n.getMonth() === h.getMonth() && n.getDate() < h.getDate())) yrs--;
+      return yrs + ' ' + t('teacherDetail.years');
+    }
+
+    async function render() {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+
+      const id = new URLSearchParams(location.search).get('id');
+      if (!id) {
+        document.getElementById('content').innerHTML = '<div class="err">⚠️ ' + t('teacherDetail.noId') + '</div>';
+        return;
+      }
+
+      const { data: r, error } = await supabaseClient.from('teachers').select('*').eq('id', id).single();
+      if (error || !r) {
+        document.getElementById('content').innerHTML = '<div class="err">❌ ' + t('teacherDetail.notFound') + '</div>';
+        return;
+      }
+
+      // Sprint 11.5: load custom field definitions
+      let customFieldDefs = [];
+      try {
+        const { data: defs } = await supabaseClient.rpc('get_teacher_field_definitions', { p_include_inactive: false });
+        customFieldDefs = defs || [];
+      } catch (e) { /* not deployed yet */ }
+
+      const lang = pkI18n.getLang();
+      const positionLabels = {
+        principal: t('teachers.posPrincipal'), vice_principal: t('teachers.posVicePrincipal'),
+        homeroom_teacher: t('teachers.posHomeroom'), subject_teacher: t('teachers.posSubject'),
+        assistant: t('teachers.posAssistant'), admin: t('teachers.posAdmin')
+      };
+      const genderLabels = {
+        male: t('teachers.genderMale'), female: t('teachers.genderFemale'), other: t('teachers.genderOther')
+      };
+      const statusLabels = {
+        active: t('teachers.statusActive'), inactive: t('teachers.statusInactive'),
+        on_leave: t('teachers.statusOnLeave'), resigned: t('teachers.statusResigned')
+      };
+
+      const titleTh = r.title_th || '';
+      const titleEn = r.title_en || '';
+      const fullTh = ((titleTh ? titleTh + ' ' : '') + (r.first_name_th || '') + ' ' + (r.last_name_th || '')).trim();
+      const fullEn = ((titleEn ? titleEn + ' ' : '') + (r.first_name_en || '') + ' ' + (r.last_name_en || '')).trim();
+      const displayName = lang === 'en' ? (fullEn || fullTh || t('teacherDetail.noName')) : (fullTh || fullEn || t('teacherDetail.noName'));
+      const altName = lang === 'en' ? fullTh : fullEn;
+      const initial = ((r.first_name_th?.[0]) || (r.first_name_en?.[0]) || '?').toUpperCase();
+
+      document.getElementById('content').innerHTML = `
+        <div class="profile-header">
+          <div class="photo-circle">${esc(initial)}</div>
+          <div class="profile-info">
+            <h1>${esc(displayName)}${r.nickname ? ` <span style="color:#7B8497;font-weight:500;font-size:18px;">(${esc(r.nickname)})</span>` : ''}</h1>
+            ${altName ? `<div class="eng">${esc(altName)}</div>` : ''}
+            <div class="meta">
+              <span><strong>${t('teachers.colEmpId')}:</strong> ${esc(r.employee_id || '—')}</span>
+              <span><strong>${t('teachers.colPosition')}:</strong> ${esc(positionLabels[r.position] || '—')}</span>
+              <span><strong>${t('teachers.colDept')}:</strong> ${esc(r.department || '—')}</span>
+              <span class="status-badge status-${r.status || 'active'}">${esc(statusLabels[r.status] || 'Active')}</span>
+              ${r.is_homeroom ? `<span class="homeroom-pill">🏠 ${t('teachers.colHomeroom')}: ${esc(r.homeroom_class || '✓')}</span>` : ''}
+            </div>
+          </div>
+          <div class="actions">
+            <a href="teachers.html" class="btn btn-secondary">← ${t('common.back')}</a>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>${t('teachers.sectionGeneral')}</h3>
+            <div class="field"><div class="lbl">${t('teachers.fldFirstNameTh')} / ${t('teachers.fldLastNameTh')}</div><div class="val">${v(fullTh)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldFirstNameEn')} / ${t('teachers.fldLastNameEn')}</div><div class="val">${v(fullEn)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldNickname')}</div><div class="val">${v(r.nickname)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldGender')}</div><div class="val">${v(genderLabels[r.gender])}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldBirthDate')}</div><div class="val">${date(r.birth_date)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldNationality')}</div><div class="val">${v(r.nationality)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldPhone')}</div><div class="val">${v(r.phone)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldEmail')}</div><div class="val">${r.email ? `<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>` : '—'}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldAddress')}</div><div class="val">${v(r.address)}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>${t('teachers.sectionEmployment')}</h3>
+            <div class="field"><div class="lbl">${t('teachers.fldEmpId')}</div><div class="val">${v(r.employee_id)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldPosition')}</div><div class="val">${v(positionLabels[r.position])}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldDept')}</div><div class="val">${v(r.department)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldHireDate')}</div><div class="val">${date(r.hire_date)}</div></div>
+            <div class="field"><div class="lbl">${t('teacherDetail.tenure')}</div><div class="val">${years(r.hire_date)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldHomeroomClass')}</div><div class="val">${r.is_homeroom ? esc(r.homeroom_class || '✓') : '—'}</div></div>
+            <div class="field"><div class="lbl">${t('common.status')}</div><div class="val">${esc(statusLabels[r.status] || 'Active')}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>${t('teachers.sectionQualifications')}</h3>
+            <div class="field"><div class="lbl">${t('teachers.fldEducation')}</div><div class="val">${v(r.highest_education)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldMajor')}</div><div class="val">${v(r.major)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldUniversity')}</div><div class="val">${v(r.university)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldLicense')}</div><div class="val">${v(r.teacher_license)}</div></div>
+          </div>
+
+          <div class="card">
+            <h3>${t('teachers.sectionEmergency')}</h3>
+            <div class="field"><div class="lbl">${t('teachers.fldEmergencyName')}</div><div class="val">${v(r.emergency_name)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldEmergencyRelation')}</div><div class="val">${v(r.emergency_relation)}</div></div>
+            <div class="field"><div class="lbl">${t('teachers.fldEmergencyPhone')}</div><div class="val">${v(r.emergency_phone)}</div></div>
+          </div>
+
+          ${(r.bio || r.notes) ? `
+          <div class="card" style="grid-column: span 2;">
+            <h3>${t('teachers.sectionAbout')}</h3>
+            ${r.bio ? `<div class="field"><div class="lbl">${t('teachers.fldBio')}</div><div class="val">${esc(r.bio)}</div></div>` : ''}
+            ${r.notes ? `<div class="field"><div class="lbl">${t('teachers.fldNotes')}</div><div class="val">${esc(r.notes)}</div></div>` : ''}
+          </div>` : ''}
+
+          ${renderCustomDataCard(r.custom_data || {}, customFieldDefs)}
+        </div>
+      `;
+    }
+
+    // Sprint 11.5: render custom data card
+    function renderCustomDataCard(customData, defs) {
+      if (!defs || !defs.length) return '';
+      const renderValue = (val, def) => {
+        if (val === null || val === undefined || val === '') return '<span class="val muted">—</span>';
+        if (def.field_type === 'select') {
+          const opt = (def.options || []).find(o => o.value === val);
+          return opt ? esc(opt.label_th || opt.value) : esc(val);
+        }
+        if (def.field_type === 'multi_select') {
+          if (!Array.isArray(val)) return esc(val);
+          return val.map(v2 => {
+            const opt = (def.options || []).find(o => o.value === v2);
+            return opt ? esc(opt.label_th || opt.value) : esc(v2);
+          }).join(', ') || '<span class="val muted">—</span>';
+        }
+        if (def.field_type === 'checkbox') return val === true || val === 'true' ? '✓' : '✗';
+        if (def.field_type === 'date' || def.field_type === 'datetime') return date(val);
+        if (def.field_type === 'url') return `<a href="${esc(val)}" target="_blank">${esc(val)}</a>`;
+        if (def.field_type === 'email') return `<a href="mailto:${esc(val)}">${esc(val)}</a>`;
+        return esc(val);
+      };
+      const items = defs.map(def => `
+        <div class="field">
+          <div class="lbl">${esc(def.label_th)}</div>
+          <div class="val">${renderValue(customData[def.field_key], def)}</div>
+        </div>
+      `).join('');
+      return `<div class="card" style="grid-column: span 2;">
+        <h3>${t('teachers.sectionCustom')}</h3>
+        ${items}
+      </div>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', render);
+    document.addEventListener('langchange', render);
+  </script>
+</body>
+</html>

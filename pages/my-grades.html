@@ -3,100 +3,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Grades — SKKS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/admin.css" />
-  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <title>My Grades — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    .summary-card{background:linear-gradient(135deg,#1B5E3F 0%,#5BB8E0 100%);color:white;padding:24px;border-radius:14px;margin-bottom:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center}
-    .summary-num{font-size:32px;font-weight:800;line-height:1}
-    .summary-lbl{font-size:12px;opacity:0.9;margin-top:6px;text-transform:uppercase;letter-spacing:1px}
-    
-    .grades-table{background:white;border-radius:12px;overflow:hidden;border:1px solid #E5E7EB}
-    table{width:100%;border-collapse:collapse}
-    th{background:#F0FDF4;color:#1B5E3F;padding:12px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
-    td{padding:14px;border-top:1px solid #F3F4F6;font-size:13px}
-    
-    .grade-letter{display:inline-block;font-weight:800;padding:4px 10px;border-radius:6px;font-size:13px}
-    .grade-a{background:#DCFCE7;color:#15803D}
-    .grade-b{background:#DBEAFE;color:#1E40AF}
-    .grade-c{background:#FEF3C7;color:#A16207}
-    .grade-d{background:#FED7AA;color:#9A3412}
-    .grade-f{background:#FEE2E2;color:#991B1B}
-    
-    .progress-bar{height:6px;background:#F3F4F6;border-radius:3px;overflow:hidden;margin-top:4px}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#1B5E3F,#5BB8E0);border-radius:3px}
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar img { height: 26px; }
+    .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
+    .back-link:hover { background: var(--pk-canvas); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+    .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-header p { color: var(--pk-ash); font-size: 14px; margin-bottom: 20px; }
+
+    .controls { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .controls label { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .controls input, .controls select { padding: 8px 12px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+    .btn { padding: 8px 16px; border-radius: 9px; background: var(--pk-blue-800); color: #fff; border: none; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+
+    /* GPA Hero card */
+    .gpa-card {
+      background: linear-gradient(135deg, var(--pk-blue-800), var(--pk-blue-900));
+      color: var(--pk-paper);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 4px 20px -8px rgba(30,64,175,0.4);
+    }
+    .gpa-card .gpa-num { font-size: 60px; font-weight: 800; font-family: 'Inter', sans-serif; line-height: 1; }
+    .gpa-card .gpa-label { font-size: 12px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.06em; }
+    .gpa-card .gpa-meta { display: flex; gap: 28px; }
+    .gpa-card .meta-item .v { font-size: 22px; font-weight: 700; font-family: 'Inter', sans-serif; }
+    .gpa-card .meta-item .l { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    .card { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: var(--pk-canvas); }
+    th { text-align: left; padding: 11px 14px; font-weight: 600; font-size: 11px; color: var(--pk-ash); text-transform: uppercase; letter-spacing: 0.04em; }
+    td { padding: 12px 14px; border-bottom: 1px solid #F0F2F7; }
+    tr:last-child td { border-bottom: none; }
+
+    .grade-pill {
+      display: inline-block; padding: 4px 12px; border-radius: 100px;
+      font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
+      min-width: 44px; text-align: center;
+    }
+    .grade-A { background: #D1FAE5; color: #065F46; }
+    .grade-B { background: #DBEAFE; color: #1E40AF; }
+    .grade-C { background: #FEF3C7; color: #92400E; }
+    .grade-D { background: #FED7AA; color: #9A3412; }
+    .grade-F { background: #FEE2E2; color: #991B1B; }
+    .grade-P { background: #D1FAE5; color: #065F46; }
+
+    .score-cell { font-family: 'Inter', monospace; font-weight: 600; color: var(--pk-blue-700); }
+    .comments-cell { color: var(--pk-ash); font-size: 12px; font-style: italic; }
+
+    .empty { padding: 60px 20px; text-align: center; color: var(--pk-ash); }
+    .empty .icon { font-size: 48px; margin-bottom: 12px; }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .gpa-card { flex-direction: column; align-items: flex-start; padding: 20px; }
+      .gpa-card .gpa-num { font-size: 48px; }
+      .gpa-card .gpa-meta { width: 100%; gap: 16px; }
+      input, select { font-size: 16px !important; }
+      th, td { padding: 8px 10px; }
+    }
   </style>
 </head>
 <body>
-  <div class="admin-topbar">
-    <div class="admin-topbar-left">
-      <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS</h1>
-      </a>
-      <nav class="admin-nav">
-        <a href="student-dashboard.html">🏠 Home</a>
-        <a href="my-grades.html" class="active">📊 My Grades</a>
-        <a href="my-bills.html">💰 My Bills</a>
-        <a href="my-attendance.html">📅 Attendance</a>
-        <a href="my-certificates.html">🏆 Certs</a>
-        <a href="profile.html">👤 Profile</a>
-      </nav>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" data-i18n="myGrades.back">← Dashboard</a>
     </div>
-    <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
-    </div>
+    <div class="topbar-right"></div>
   </div>
 
-  <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
-    <div id="content" style="display:none;">
-      <div class="page-header">
-        <div>
-          <h2>📊 My Grades</h2>
-          <p>คะแนนของฉันในทุกวิชา</p>
-        </div>
-        <select id="termFilter" onchange="renderGrades()">
-          <option value="all">All Terms</option>
-          <option value="1/2026">Term 1/2026</option>
-          <option value="2/2026">Term 2/2026</option>
-        </select>
-      </div>
+  <div class="container">
+    <div class="page-header">
+      <h1 data-i18n="myGrades.title">📝 My Grades</h1>
+      <p data-i18n="myGrades.subtitle">View your grade history and download report card</p>
+    </div>
 
-      <div class="summary-card">
-        <div>
-          <div class="summary-num" id="overallGPA">—</div>
-          <div class="summary-lbl">Overall GPA</div>
-        </div>
-        <div>
-          <div class="summary-num" id="avgScore">—</div>
-          <div class="summary-lbl">Average Score</div>
-        </div>
-        <div>
-          <div class="summary-num" id="totalSubjects">—</div>
-          <div class="summary-lbl">Subjects</div>
-        </div>
-      </div>
+    <div class="controls">
+      <label data-i18n="myGrades.year">Academic Year:</label>
+      <select id="yearSelect"><option value="" data-i18n="myGrades.allYears">All years</option></select>
+      <label data-i18n="myGrades.term">Term:</label>
+      <select id="termSelect">
+        <option value="" data-i18n="myGrades.allTerms">All terms</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="summer" data-i18n="grades.termSummer">Summer</option>
+      </select>
+      <button class="btn" onclick="loadGrades()" data-i18n="myGrades.refresh">🔄 Refresh</button>
+      <button class="btn btn-secondary" onclick="downloadReportCard()" data-i18n="myGrades.downloadPdf">📄 Download Report Card</button>
+    </div>
 
-      <div class="grades-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Term</th>
-              <th>Assignment</th>
-              <th>Midterm</th>
-              <th>Final</th>
-              <th>Total</th>
-              <th>Grade</th>
-            </tr>
-          </thead>
-          <tbody id="gradesTbody"></tbody>
-        </table>
-      </div>
+    <div id="gpaSection"></div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="myGrades.colYearTerm">Year/Term</th>
+            <th data-i18n="myGrades.colSubject">Subject</th>
+            <th data-i18n="myGrades.colMidterm">Midterm</th>
+            <th data-i18n="myGrades.colFinal">Final</th>
+            <th data-i18n="myGrades.colTotal">Total</th>
+            <th data-i18n="myGrades.colGrade">Grade</th>
+            <th data-i18n="myGrades.colComments">Comments</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="7"><div class="empty">⏳ Loading...</div></td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -104,92 +155,119 @@
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
-  <script>document.addEventListener("langchange", () => location.reload());</script>
-  <script src="../js/data-helpers.js"></script>
+
   <script>
-    let allGrades = [];
-    let currentStudent = null;
-    
-    async function init() {
-      const profile = await requireStudent();
-      if (!profile) return;
-      
-      const { data: student } = await supabaseClient
-        .from('students')
-        .select('*')
-        .eq('profile_id', profile.id)
-        .single();
-      
-      if (!student) {
-        document.getElementById('loadingMsg').innerHTML = 
-          '<p style="text-align:center;color:#9CA3AF;padding:40px;">No student record found.</p>';
-        return;
-      }
-      
-      currentStudent = student;
-      
-      const { data: grades } = await supabaseClient
-        .from('student_grades')
-        .select('*, subjects(name, name_th, code)')
-        .eq('student_id', student.id)
-        .order('created_at', { ascending: false });
-      
-      allGrades = grades || [];
-      renderGrades();
-      
-      document.getElementById('loadingMsg').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
+    let currentData = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      bindFilters();
+      loadGrades();
+    });
+    document.addEventListener('langchange', render);
+
+    function bindFilters() {
+      document.getElementById('yearSelect').addEventListener('change', loadGrades);
+      document.getElementById('termSelect').addEventListener('change', loadGrades);
     }
-    
-    function renderGrades() {
-      const term = document.getElementById('termFilter').value;
-      let filtered = allGrades;
-      
-      if (term !== 'all') {
-        const [t, y] = term.split('/');
-        filtered = allGrades.filter(g => g.term === t && g.academic_year === y);
-      }
-      
-      if (filtered.length === 0) {
-        document.getElementById('gradesTbody').innerHTML = 
-          '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:40px;">ยังไม่มีคะแนนในเทอมนี้</td></tr>';
-        document.getElementById('overallGPA').textContent = '—';
-        document.getElementById('avgScore').textContent = '—';
-        document.getElementById('totalSubjects').textContent = '0';
+
+    async function loadGrades() {
+      const year = document.getElementById('yearSelect').value;
+      const term = document.getElementById('termSelect').value;
+      document.getElementById('tbody').innerHTML = '<tr><td colspan="7"><div class="empty">⏳ ' + t('common.loading') + '</div></td></tr>';
+
+      const { data, error } = await supabaseClient.rpc('get_my_grades', {
+        p_academic_year: year || null, p_term: term || null
+      });
+      if (error) {
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="7"><div class="empty">' + t('myGrades.loadFailed') + '</div></td></tr>';
         return;
       }
-      
-      const avgGPA = filtered.reduce((sum, g) => sum + Number(g.gpa || 0), 0) / filtered.length;
-      const avgScore = filtered.reduce((sum, g) => sum + Number(g.total_score || 0), 0) / filtered.length;
-      
-      document.getElementById('overallGPA').textContent = avgGPA.toFixed(2);
-      document.getElementById('avgScore').textContent = avgScore.toFixed(1);
-      document.getElementById('totalSubjects').textContent = filtered.length;
-      
-      document.getElementById('gradesTbody').innerHTML = filtered.map(g => {
-        const letter = g.letter_grade || 'N/A';
-        const cls = letter.startsWith('A') ? 'grade-a' : letter.startsWith('B') ? 'grade-b' :
-                    letter.startsWith('C') ? 'grade-c' : letter.startsWith('D') ? 'grade-d' : 'grade-f';
-        const total = Number(g.total_score || 0);
+      if (data?.error) {
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="7"><div class="empty">' + t('myGrades.noAccess') + '</div></td></tr>';
+        return;
+      }
+      currentData = data;
+      // Build year filter from data
+      const yearSel = document.getElementById('yearSelect');
+      const existingYears = new Set([...yearSel.options].map(o => o.value));
+      (data.rows || []).forEach(r => {
+        if (r.academic_year && !existingYears.has(r.academic_year)) {
+          existingYears.add(r.academic_year);
+          const opt = document.createElement('option');
+          opt.value = r.academic_year; opt.textContent = r.academic_year;
+          yearSel.appendChild(opt);
+        }
+      });
+      render();
+    }
+
+    function render() {
+      if (!currentData) return;
+      // GPA card
+      const gpaHtml = currentData.gpa !== null && currentData.gpa !== undefined
+        ? `<div class="gpa-card">
+            <div>
+              <div class="gpa-label">${t('myGrades.gpaLabel')}</div>
+              <div class="gpa-num">${Number(currentData.gpa).toFixed(2)}</div>
+            </div>
+            <div class="gpa-meta">
+              <div class="meta-item">
+                <div class="v">${currentData.total_credits ?? 0}</div>
+                <div class="l">${t('myGrades.totalCredits')}</div>
+              </div>
+              <div class="meta-item">
+                <div class="v">${(currentData.rows || []).length}</div>
+                <div class="l">${t('myGrades.subjects')}</div>
+              </div>
+            </div>
+          </div>`
+        : '';
+      document.getElementById('gpaSection').innerHTML = gpaHtml;
+
+      const tbody = document.getElementById('tbody');
+      const rows = currentData.rows || [];
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="icon">📝</div><h4>${t('myGrades.empty')}</h4><p>${t('myGrades.emptyDesc')}</p></div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(g => {
+        const gradeClass = 'grade-' + (g.grade_label || '').replace(/[+\-]/g, '').charAt(0).toUpperCase();
         return `<tr>
-          <td>
-            <div style="font-weight:600;color:#1B5E3F;">${g.subjects?.name || '—'}</div>
-            <div style="font-size:11px;color:#9CA3AF;">${g.subjects?.code || ''}</div>
-          </td>
-          <td>${g.term}/${g.academic_year}</td>
-          <td>${Number(g.assignment_score || 0).toFixed(1)}</td>
-          <td>${Number(g.midterm_score || 0).toFixed(1)}</td>
-          <td>${Number(g.final_score || 0).toFixed(1)}</td>
-          <td>
-            <div style="font-weight:700;color:#1B5E3F;">${total.toFixed(1)}</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:${total}%"></div></div>
-          </td>
-          <td><span class="grade-letter ${cls}">${letter}</span></td>
+          <td>${esc(g.academic_year || '')} / ${esc(g.term || '')}</td>
+          <td><strong>${esc(g.subject_code || '')}</strong> ${esc(g.subject_name || '')}</td>
+          <td class="score-cell">${g.score_midterm ?? '—'}</td>
+          <td class="score-cell">${g.score_final ?? '—'}</td>
+          <td class="score-cell">${g.score_total ?? '—'}</td>
+          <td>${g.grade_label ? `<span class="grade-pill ${gradeClass}">${esc(g.grade_label)}</span>` : '—'}</td>
+          <td class="comments-cell">${esc(g.comments || '')}</td>
         </tr>`;
       }).join('');
     }
-    
-    init();
+
+    async function downloadReportCard() {
+      const year = document.getElementById('yearSelect').value;
+      const term = document.getElementById('termSelect').value;
+      if (!year || !term) { alert(t('myGrades.selectYearTerm')); return; }
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const url = `/api/grades/report-card-pdf?year=${encodeURIComponent(year)}&term=${encodeURIComponent(term)}`;
+      try {
+        const resp = await fetch(url, { headers: { 'Authorization': 'Bearer ' + session.access_token } });
+        if (!resp.ok) throw new Error('Failed');
+        const blob = await resp.blob();
+        const dlUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = dlUrl; a.download = `report-card-${year}-${term}.pdf`;
+        a.click();
+        URL.revokeObjectURL(dlUrl);
+      } catch (e) {
+        alert(t('myGrades.pdfFailed') + ': ' + e.message);
+      }
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   </script>
 </body>
 </html>

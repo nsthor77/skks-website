@@ -4,6 +4,9 @@
   "functions": {
     "api/invoices/[id]/pdf.js": {
       "includeFiles": "lib/fonts/**"
+    },
+    "api/grades/report-card-pdf.js": {
+      "includeFiles": "lib/fonts/**"
     }
   },
   "crons": [

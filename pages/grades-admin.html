@@ -3,371 +3,428 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Grades — SKKS</title>
+  <title>Grades — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/admin.css" />
-  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    .grade-grid{background:white;border-radius:12px;overflow-x:auto;border:1px solid #E5E7EB}
-    .grade-table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
-    .grade-table th{background:#F0FDF4;color:#1B5E3F;padding:12px 10px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;border-bottom:2px solid #1B5E3F;position:sticky;top:0;z-index:2}
-    .grade-table td{padding:10px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
-    .grade-table tr:hover{background:#F9FAFB}
-    .grade-input{width:65px;padding:6px 8px;border:1px solid #D1D5DB;border-radius:6px;text-align:center;font-family:monospace;font-size:13px}
-    .grade-input:focus{outline:none;border-color:#1B5E3F;box-shadow:0 0 0 2px rgba(27,94,63,0.1)}
-    .grade-display{font-weight:700;font-size:16px;color:#1B5E3F;text-align:center;width:55px;display:inline-block}
-    .letter-badge{display:inline-block;padding:4px 12px;border-radius:6px;font-size:13px;font-weight:700;min-width:40px;text-align:center}
-    .grade-A{background:#DCFCE7;color:#15803D}
-    .grade-B{background:#DBEAFE;color:#1E40AF}
-    .grade-C{background:#FEF3C7;color:#A16207}
-    .grade-D{background:#FED7AA;color:#C2410C}
-    .grade-F{background:#FEE2E2;color:#991B1B}
-    .student-cell{display:flex;align-items:center;gap:10px}
-    .avatar{width:32px;height:32px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
-    .student-name{font-weight:600;color:#1B5E3F;font-size:13px;line-height:1.2}
-    .student-meta{font-size:11px;color:#9CA3AF;margin-top:2px}
-    
-    .filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;background:white;padding:14px;border-radius:10px;border:1px solid #E5E7EB}
-    .filter-bar select, .filter-bar input{padding:8px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px}
-    
-    .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:#6B7280;justify-content:center}
-    .legend span{display:flex;align-items:center;gap:4px}
-    .legend .dot{width:10px;height:10px;border-radius:3px}
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: sticky; top: 0; z-index: 50; }
+    .topbar-left { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .brand-link img { height: 26px; }
+    .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-links a { text-decoration: none; color: var(--pk-ash); font-size: 13.5px; font-weight: 500; padding: 6px 12px; border-radius: 8px; }
+    .nav-links a:hover { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+    .nav-links a.active { background: var(--pk-blue-100); color: var(--pk-blue-800); font-weight: 600; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .user-info { font-size: 13px; color: var(--pk-ash); }
+    .btn-out { padding: 7px 14px; border-radius: 8px; background: transparent; border: 1px solid var(--pk-border); color: var(--pk-ash); font-size: 13px; cursor: pointer; font-family: inherit; }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+    .page-title h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-title p { color: var(--pk-ash); font-size: 14px; }
+
+    .controls-bar { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .controls-bar label { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .controls-bar input, .controls-bar select { padding: 8px 12px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+    .controls-bar input:focus, .controls-bar select:focus { outline: none; border-color: var(--pk-blue-600); box-shadow: 0 0 0 3px var(--pk-blue-100); }
+
+    .btn { padding: 9px 14px; border-radius: 9px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+    .btn-primary { background: var(--pk-blue-800); color: var(--pk-paper); }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-success { background: var(--pk-success-bg); color: var(--pk-success); }
+    .btn-success:hover { background: #A7F3D0; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    .card { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; overflow: hidden; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead { background: var(--pk-canvas); }
+    th { text-align: left; padding: 11px 14px; font-weight: 600; font-size: 11px; color: var(--pk-ash); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--pk-border); white-space: nowrap; }
+    td { padding: 10px 14px; border-bottom: 1px solid #F0F2F7; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFBFC; }
+
+    .stu-num { font-family: 'Inter', monospace; font-weight: 600; color: var(--pk-blue-700); }
+    .stu-name { font-weight: 600; color: var(--pk-ink); }
+    .stu-nick { color: var(--pk-mist); font-size: 12px; }
+
+    .score-input {
+      width: 70px; padding: 5px 8px; border: 1px solid var(--pk-border); border-radius: 6px;
+      font-family: 'Inter', monospace; font-size: 13px; text-align: center;
+    }
+    .grade-select {
+      padding: 5px 8px; border: 1px solid var(--pk-border); border-radius: 6px;
+      font-family: inherit; font-size: 13px;
+    }
+    .comments-input {
+      width: 100%; min-width: 180px; padding: 5px 8px;
+      border: 1px solid var(--pk-border); border-radius: 6px;
+      font-family: inherit; font-size: 13px;
+    }
+    .pub-pill {
+      display: inline-block; padding: 2px 8px; border-radius: 100px;
+      font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    }
+    .pub-pill.published { background: var(--pk-success-bg); color: var(--pk-success); }
+    .pub-pill.draft { background: var(--pk-warning-bg); color: var(--pk-warning); }
+
+    .empty-state { padding: 60px 20px; text-align: center; color: var(--pk-ash); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state h4 { font-size: 17px; font-weight: 600; color: var(--pk-ink); margin-bottom: 6px; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 9999; font-size: 14px; font-weight: 500; display: none; }
+    .toast.show { display: block; }
+    .toast.success { background: var(--pk-success-bg); color: var(--pk-success); }
+    .toast.error { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .toast.info { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+
+    .info-banner {
+      background: var(--pk-blue-50); border: 1px solid var(--pk-blue-100);
+      padding: 12px 16px; border-radius: 10px; margin-bottom: 16px;
+      font-size: 13.5px; color: var(--pk-ink-soft);
+    }
+    .info-banner strong { color: var(--pk-blue-800); }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+      .controls-bar select, .controls-bar input { width: 100%; }
+      input, select, textarea { font-size: 16px !important; }
+      .table-wrap { overflow-x: auto; }
+    }
   </style>
 </head>
 <body>
-  <div class="admin-topbar">
-    <div class="admin-topbar-left">
-      <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
-      </a>
-      <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="grades-admin.html" class="active">📝 Grades</a>
-        <a href="report-cards.html">📄 Reports</a>
-        <a href="certificates.html">🏆 Certificates</a>
-        <a href="attendance.html">📅 Attendance</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html" class="brand-link"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <nav class="nav-links">
+        <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+        <a href="students.html" data-i18n="nav.students">Students</a>
+        <a href="teachers.html" data-i18n="nav.teachers">Teachers</a>
+        <a href="attendance.html" data-i18n="nav.attendance">Attendance</a>
+        <a href="grades-admin.html" class="active" data-i18n="nav.grades">Grades</a>
+        <a href="finance.html" class="owner-only" style="display:none" data-i18n="nav.finance">Finance</a>
       </nav>
     </div>
-    <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    <div class="topbar-right">
+      <span class="user-info" id="userInfo">...</span>
+      <button class="btn-out" onclick="signOut()" data-i18n="common.signOut">Sign Out</button>
     </div>
   </div>
 
-  <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
-    <div id="content" style="display:none;">
-      <div class="page-header">
-        <div>
-          <h2>📝 Grade Management</h2>
-          <p>บันทึกคะแนนนักเรียน — ระบบคำนวณเกรด GPA อัตโนมัติ</p>
-        </div>
-        <button class="btn btn-primary" onclick="saveAllGrades()">💾 Save All Changes</button>
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="grades.title">📝 Grades</h1>
+        <p data-i18n="grades.subtitle">Enter grades by class + subject + term</p>
       </div>
-
-      <div class="filter-bar">
-        <select id="filterTerm" onchange="loadGrades()">
-          <option value="1/2026">Term 1 / 2026</option>
-          <option value="2/2026">Term 2 / 2026</option>
-          <option value="1/2025">Term 1 / 2025</option>
-        </select>
-        <select id="filterSubject" onchange="loadGrades()">
-          <option value="">Select Subject...</option>
-        </select>
-        <select id="filterProgram" onchange="loadGrades()">
-          <option value="">All Programs</option>
-          <option value="prek">Pre-K</option>
-          <option value="k">K</option>
-          <option value="ep">EP</option>
-          <option value="mep">MEP</option>
-        </select>
-        <select id="filterGrade" onchange="loadGrades()">
-          <option value="">All Grades</option>
-        </select>
-        <input type="search" id="searchStudent" placeholder="🔍 ค้นหานักเรียน..." oninput="renderGrades()" style="flex:1;min-width:180px;" />
+      <div style="display:flex;gap:8px;">
+        <a href="grade-config.html" class="btn btn-secondary owner-only" style="display:none" data-i18n="grades.configScale">⚙️ Grade Scale</a>
+        <button class="btn btn-success" onclick="publishGrades()" data-i18n="grades.publish">📢 Publish to Parents</button>
+        <button class="btn btn-primary" onclick="saveAll()" data-i18n="grades.saveAll">💾 Save All</button>
       </div>
+    </div>
 
-      <div class="grade-grid">
-        <table class="grade-table">
+    <div class="info-banner" data-i18n-html="grades.infoBanner">
+      <strong>💡 Tip:</strong> Enter scores (0-100) — grade letter auto-calculates. Or enter grade letter directly. Click <strong>Save All</strong> to commit. Use <strong>Publish</strong> to make grades visible to parents/students.
+    </div>
+
+    <div class="controls-bar">
+      <label data-i18n="grades.year">Year:</label>
+      <input type="text" id="yearInput" placeholder="2569" style="width:90px;" />
+      <label data-i18n="grades.term">Term:</label>
+      <select id="termSelect">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="summer" data-i18n="grades.termSummer">Summer</option>
+      </select>
+      <label data-i18n="grades.classroom">Class:</label>
+      <select id="classroomSelect">
+        <option value="" data-i18n="grades.selectClass">Select class...</option>
+      </select>
+      <label data-i18n="grades.subject">Subject:</label>
+      <select id="subjectSelect">
+        <option value="" data-i18n="grades.selectSubject">Select subject...</option>
+      </select>
+      <button class="btn btn-primary" onclick="loadGrades()" data-i18n="grades.load">🔄 Load</button>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap" style="overflow-x:auto;">
+        <table>
           <thead>
             <tr>
-              <th style="width:35%;">Student</th>
-              <th style="width:14%;text-align:center;">Assignments<br><small style="font-weight:400;">(30%)</small></th>
-              <th style="width:14%;text-align:center;">Midterm<br><small style="font-weight:400;">(30%)</small></th>
-              <th style="width:14%;text-align:center;">Final<br><small style="font-weight:400;">(40%)</small></th>
-              <th style="width:10%;text-align:center;">Total</th>
-              <th style="width:8%;text-align:center;">Grade</th>
-              <th style="width:5%;text-align:center;">GPA</th>
+              <th data-i18n="grades.colStuNum">Student #</th>
+              <th data-i18n="grades.colName">Name</th>
+              <th data-i18n="grades.colMidterm">Midterm</th>
+              <th data-i18n="grades.colFinal">Final</th>
+              <th data-i18n="grades.colAssign">Assignment</th>
+              <th data-i18n="grades.colTotal">Total</th>
+              <th data-i18n="grades.colGrade">Grade</th>
+              <th data-i18n="grades.colComments">Comments</th>
+              <th data-i18n="grades.colStatus">Status</th>
             </tr>
           </thead>
-          <tbody id="gradesBody">
+          <tbody id="tbody">
+            <tr><td colspan="9"><div class="empty-state"><div class="icon">📝</div><h4 data-i18n="grades.selectFirst">Select class & subject</h4><p data-i18n="grades.selectFirstDesc">Choose classroom and subject, then click Load</p></div></td></tr>
           </tbody>
         </table>
       </div>
-      
-      <div class="legend">
-        <span><span class="dot grade-A"></span> A: 90+</span>
-        <span><span class="dot grade-B"></span> B: 80-89</span>
-        <span><span class="dot grade-C"></span> C: 70-79</span>
-        <span><span class="dot grade-D"></span> D: 60-69</span>
-        <span><span class="dot grade-F"></span> F: 0-59</span>
-      </div>
-      
-      <div id="emptyState" style="display:none;text-align:center;padding:60px 20px;">
-        <div style="font-size:64px;">📚</div>
-        <h3 style="color:#1B5E3F;">เลือก Subject เพื่อเริ่ม</h3>
-        <p>เลือกวิชาที่ต้องการกรอกคะแนนจาก dropdown ด้านบน</p>
-      </div>
     </div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
-  <script>document.addEventListener("langchange", () => location.reload());</script>
-  <script src="../js/data-helpers.js"></script>
+
   <script>
-    let allStudents = [];
-    let allSubjects = [];
-    let gradeScales = [];
-    let currentGrades = {};
-    let changedRows = new Set();
-    
-    async function init() {
-      const profile = await requireStaff();
+    let currentProfile = null;
+    let rows = [];
+    let subjects = [];
+    let scales = [];
+    let activeScale = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireStaff();
       if (!profile) return;
-      
-      if (profile.role === 'owner' || profile.role === 'developer') {
+      currentProfile = profile;
+      if (['owner','developer'].includes(profile.role)) {
         document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
       }
-      
-      await Promise.all([loadStudents(), loadSubjects(), loadGradeScales()]);
-      populateGradeFilter();
-      
-      document.getElementById('loadingMsg').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
-    }
-    
-    async function loadStudents() {
-      const { data } = await supabaseClient
-        .from('students')
-        .select('id, first_name, last_name, nickname, program, grade, student_number')
-        .eq('status', 'active')
-        .order('first_name');
-      allStudents = data || [];
-    }
-    
-    async function loadSubjects() {
-      const { data } = await supabaseClient
-        .from('subjects')
-        .select('*')
-        .eq('active', true)
-        .order('display_order');
-      allSubjects = data || [];
-      
-      const sel = document.getElementById('filterSubject');
-      sel.innerHTML = '<option value="">Select Subject...</option>' +
-        allSubjects.map(s => `<option value="${s.id}">${s.code} - ${s.name} (${(s.program||'').toUpperCase()})</option>`).join('');
-    }
-    
-    async function loadGradeScales() {
-      const { data } = await supabaseClient
-        .from('grade_scales')
-        .select('*')
-        .eq('active', true)
-        .order('min_score', { ascending: false });
-      gradeScales = data || [];
-    }
-    
-    function populateGradeFilter() {
-      const grades = [...new Set(allStudents.map(s => s.grade).filter(Boolean))].sort();
-      const sel = document.getElementById('filterGrade');
-      sel.innerHTML = '<option value="">All Grades</option>' +
-        grades.map(g => `<option value="${g}">${g}</option>`).join('');
-    }
-    
-    async function loadGrades() {
-      const subjectId = document.getElementById('filterSubject').value;
-      const term = document.getElementById('filterTerm').value;
-      
-      currentGrades = {};
-      changedRows.clear();
-      
-      if (!subjectId) {
-        document.getElementById('emptyState').style.display = 'block';
-        document.getElementById('gradesBody').innerHTML = '';
-        return;
-      }
-      
-      document.getElementById('emptyState').style.display = 'none';
-      
-      const [termNum, year] = term.split('/');
-      const { data } = await supabaseClient
-        .from('student_grades')
-        .select('*')
-        .eq('subject_id', subjectId)
-        .eq('term', termNum)
-        .eq('academic_year', year);
-      
-      (data || []).forEach(g => {
-        currentGrades[g.student_id] = g;
+      document.getElementById('userInfo').textContent = profile.email || (profile.first_name || '') + ' ' + (profile.last_name || '');
+
+      // Default year (Thai Buddhist year)
+      document.getElementById('yearInput').value = (new Date().getFullYear() + 543).toString();
+
+      await loadClassrooms();
+      await loadSubjects();
+      await loadScales();
+    });
+    document.addEventListener('langchange', render);
+
+    async function loadClassrooms() {
+      const { data } = await supabaseClient.from('students').select('classroom').not('classroom','is',null).order('classroom');
+      const sel = document.getElementById('classroomSelect');
+      const seen = new Set();
+      (data || []).forEach(r => {
+        if (r.classroom && !seen.has(r.classroom)) {
+          seen.add(r.classroom);
+          const opt = document.createElement('option');
+          opt.value = r.classroom; opt.textContent = r.classroom;
+          sel.appendChild(opt);
+        }
       });
-      
-      renderGrades();
     }
-    
-    function renderGrades() {
-      const tbody = document.getElementById('gradesBody');
-      const program = document.getElementById('filterProgram').value;
-      const grade = document.getElementById('filterGrade').value;
-      const search = document.getElementById('searchStudent').value.toLowerCase().trim();
-      const subjectId = document.getElementById('filterSubject').value;
-      
-      if (!subjectId) {
-        tbody.innerHTML = '';
+
+    async function loadSubjects() {
+      const { data } = await supabaseClient.from('subjects').select('*').eq('is_active', true).order('sort_order').order('name_th');
+      subjects = data || [];
+      const sel = document.getElementById('subjectSelect');
+      const lang = pkI18n.getLang();
+      subjects.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.code;
+        opt.textContent = `${s.code} — ${lang === 'en' && s.name_en ? s.name_en : s.name_th}`;
+        opt.dataset.name = s.name_th || s.name_en || s.code;
+        opt.dataset.credits = s.credit_hours || '';
+        sel.appendChild(opt);
+      });
+    }
+
+    async function loadScales() {
+      const { data } = await supabaseClient.rpc('get_grading_scales');
+      scales = Array.isArray(data) ? data : [];
+      activeScale = scales.find(s => s.is_default) || scales[0] || null;
+    }
+
+    async function loadGrades() {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      const subjectCode = document.getElementById('subjectSelect').value;
+
+      if (!year || !classroom || !subjectCode) {
+        toast(t('grades.fillAllFilters'), 'error');
         return;
       }
-      
-      let filtered = allStudents;
-      if (program) filtered = filtered.filter(s => s.program === program);
-      if (grade) filtered = filtered.filter(s => s.grade === grade);
-      if (search) {
-        filtered = filtered.filter(s => {
-          const t = `${s.first_name} ${s.last_name} ${s.nickname || ''}`.toLowerCase();
-          return t.includes(search);
-        });
-      }
-      
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA3AF;">No students match filters</td></tr>';
+
+      document.getElementById('tbody').innerHTML = '<tr><td colspan="9"><div class="empty-state">⏳ ' + t('common.loading') + '</div></td></tr>';
+
+      const { data, error } = await supabaseClient.rpc('get_grades_for_class', {
+        p_classroom: classroom,
+        p_subject_code: subjectCode,
+        p_academic_year: year,
+        p_term: term
+      });
+      if (error) return toast(t('grades.loadFailed') + ': ' + error.message, 'error');
+      if (data?.error) return toast(data.error, 'error');
+
+      rows = data.rows || [];
+      render();
+    }
+
+    function render() {
+      const tbody = document.getElementById('tbody');
+      const lang = pkI18n.getLang();
+
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">📝</div><h4>${t('grades.noStudents')}</h4><p>${t('grades.noStudentsDesc')}</p></div></td></tr>`;
         return;
       }
-      
-      tbody.innerHTML = filtered.map(s => {
-        const g = currentGrades[s.id] || {};
-        const initials = ((s.first_name||'?')[0] + (s.last_name||'')[0]).toUpperCase();
-        return `<tr data-student="${s.id}">
+
+      // Build grade options from active scale
+      let gradeOptions = '<option value="">—</option>';
+      if (activeScale && Array.isArray(activeScale.grades)) {
+        gradeOptions += activeScale.grades.map(g => `<option value="${esc(g.label)}" data-value="${g.value ?? ''}">${esc(g.label)}${g.value !== null ? ` (${g.value})` : ''}</option>`).join('');
+      }
+
+      tbody.innerHTML = rows.map(r => {
+        const fullTh = ((r.first_name_th || '') + ' ' + (r.last_name_th || '')).trim();
+        const fullEn = ((r.first_name_en || '') + ' ' + (r.last_name_en || '')).trim();
+        const displayName = lang === 'en' ? (fullEn || fullTh || '—') : (fullTh || fullEn || '—');
+
+        return `<tr data-student-id="${r.student_id}">
+          <td><span class="stu-num">${esc(r.student_number || '—')}</span></td>
           <td>
-            <div class="student-cell">
-              <div class="avatar">${initials}</div>
-              <div>
-                <div class="student-name">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''}</div>
-                <div class="student-meta">${(s.program||'').toUpperCase()} ${s.grade||''} • ${s.student_number||''}</div>
-              </div>
-            </div>
+            <div class="stu-name">${esc(displayName)}</div>
+            ${r.nickname ? `<div class="stu-nick">(${esc(r.nickname)})</div>` : ''}
           </td>
-          <td style="text-align:center;">
-            <input type="number" class="grade-input" min="0" max="100" step="0.01" value="${g.assignment_score || ''}" 
-              oninput="updateRow('${s.id}', 'assignment_score', this.value)" placeholder="-" />
+          <td><input type="number" class="score-input" data-field="score_midterm" min="0" max="100" step="0.5" value="${r.score_midterm ?? ''}" onchange="recalcTotal(this)" /></td>
+          <td><input type="number" class="score-input" data-field="score_final" min="0" max="100" step="0.5" value="${r.score_final ?? ''}" onchange="recalcTotal(this)" /></td>
+          <td><input type="number" class="score-input" data-field="score_assignment" min="0" max="100" step="0.5" value="${r.score_assignment ?? ''}" onchange="recalcTotal(this)" /></td>
+          <td><input type="number" class="score-input" data-field="score_total" min="0" max="100" step="0.5" value="${r.score_total ?? ''}" onchange="autoGradeFromTotal(this)" /></td>
+          <td>
+            <select class="grade-select" data-field="grade_label">
+              ${gradeOptions.replace('value="' + esc(r.grade_label || '') + '"', 'value="' + esc(r.grade_label || '') + '" selected')}
+            </select>
           </td>
-          <td style="text-align:center;">
-            <input type="number" class="grade-input" min="0" max="100" step="0.01" value="${g.midterm_score || ''}" 
-              oninput="updateRow('${s.id}', 'midterm_score', this.value)" placeholder="-" />
-          </td>
-          <td style="text-align:center;">
-            <input type="number" class="grade-input" min="0" max="100" step="0.01" value="${g.final_score || ''}" 
-              oninput="updateRow('${s.id}', 'final_score', this.value)" placeholder="-" />
-          </td>
-          <td style="text-align:center;">
-            <span class="grade-display" id="total-${s.id}">${g.total_score ? Number(g.total_score).toFixed(1) : '-'}</span>
-          </td>
-          <td style="text-align:center;">
-            <span id="letter-${s.id}">${g.letter_grade ? `<span class="letter-badge grade-${g.letter_grade[0]}">${g.letter_grade}</span>` : '-'}</span>
-          </td>
-          <td style="text-align:center;">
-            <span style="font-weight:700;color:#1B5E3F;" id="gpa-${s.id}">${g.gpa ? Number(g.gpa).toFixed(2) : '-'}</span>
-          </td>
+          <td><input type="text" class="comments-input" data-field="comments" value="${esc(r.comments || '')}" /></td>
+          <td><span class="pub-pill ${r.published ? 'published' : 'draft'}">${r.published ? t('grades.statusPublished') : t('grades.statusDraft')}</span></td>
         </tr>`;
       }).join('');
     }
-    
-    function updateRow(studentId, field, value) {
-      if (!currentGrades[studentId]) {
-        currentGrades[studentId] = { student_id: studentId };
+
+    function recalcTotal(input) {
+      const tr = input.closest('tr');
+      const mid = parseFloat(tr.querySelector('[data-field="score_midterm"]').value) || 0;
+      const fin = parseFloat(tr.querySelector('[data-field="score_final"]').value) || 0;
+      const ass = parseFloat(tr.querySelector('[data-field="score_assignment"]').value) || 0;
+      // Simple equal weighting (33/33/34) if all 3 present, or weighted: mid 30%, final 50%, assignment 20%
+      let total = null;
+      if (mid || fin || ass) {
+        total = (mid * 0.3) + (fin * 0.5) + (ass * 0.2);
+        total = Math.round(total * 100) / 100;
       }
-      currentGrades[studentId][field] = value === '' ? null : parseFloat(value);
-      changedRows.add(studentId);
-      
-      const g = currentGrades[studentId];
-      const asgn = parseFloat(g.assignment_score) || 0;
-      const mid = parseFloat(g.midterm_score) || 0;
-      const fin = parseFloat(g.final_score) || 0;
-      
-      const total = (asgn * 0.3) + (mid * 0.3) + (fin * 0.4);
-      g.total_score = total;
-      
-      const scale = gradeScales.find(s => total >= parseFloat(s.min_score) && total <= parseFloat(s.max_score));
-      if (scale) {
-        g.letter_grade = scale.grade;
-        g.gpa = parseFloat(scale.gpa);
+      const totalInput = tr.querySelector('[data-field="score_total"]');
+      if (total !== null && !totalInput.dataset.manual) {
+        totalInput.value = total;
+        autoGradeFromTotal(totalInput);
       }
-      
-      document.getElementById(`total-${studentId}`).textContent = total > 0 ? total.toFixed(1) : '-';
-      document.getElementById(`letter-${studentId}`).innerHTML = scale ? `<span class="letter-badge grade-${scale.grade[0]}">${scale.grade}</span>` : '-';
-      document.getElementById(`gpa-${studentId}`).textContent = scale ? Number(scale.gpa).toFixed(2) : '-';
     }
-    
-    async function saveAllGrades() {
-      if (changedRows.size === 0) {
-        dataHelpers.toast('No changes to save', 'info');
-        return;
+
+    function autoGradeFromTotal(input) {
+      input.dataset.manual = '1';
+      const total = parseFloat(input.value);
+      if (isNaN(total)) return;
+      if (!activeScale || !Array.isArray(activeScale.grades)) return;
+      const matched = activeScale.grades.find(g => total >= (g.min ?? 0) && total <= (g.max ?? 100));
+      if (matched) {
+        const tr = input.closest('tr');
+        const sel = tr.querySelector('[data-field="grade_label"]');
+        if (sel) sel.value = matched.label;
       }
-      
-      const subjectId = document.getElementById('filterSubject').value;
-      const [termNum, year] = document.getElementById('filterTerm').value.split('/');
-      
-      if (!subjectId) {
-        dataHelpers.toast('❌ Select a subject first', 'error');
-        return;
-      }
-      
-      if (!confirm(`Save grades for ${changedRows.size} students?`)) return;
-      
-      const user = await supabaseClient.auth.getUser();
-      const records = Array.from(changedRows).map(studentId => {
-        const g = currentGrades[studentId];
-        return {
+    }
+
+    async function saveAll() {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const subjectCode = document.getElementById('subjectSelect').value;
+      const subjOption = document.getElementById('subjectSelect').selectedOptions[0];
+      const subjectName = subjOption?.dataset.name || subjectCode;
+      const credits = parseFloat(subjOption?.dataset.credits) || null;
+
+      if (!rows.length) return toast(t('grades.noDataToSave'), 'error');
+
+      const payload = [];
+      document.querySelectorAll('#tbody tr[data-student-id]').forEach(tr => {
+        const studentId = tr.dataset.studentId;
+        const v = (sel) => { const el = tr.querySelector(sel); return el ? el.value.trim() : ''; };
+        const num = (s) => { const n = parseFloat(s); return isNaN(n) ? null : n; };
+        const gradeLabelEl = tr.querySelector('[data-field="grade_label"]');
+        const gradeLabel = gradeLabelEl?.value || null;
+        const gradeOpt = gradeLabelEl?.selectedOptions[0];
+        const gradeValue = gradeOpt?.dataset.value ? parseFloat(gradeOpt.dataset.value) : null;
+
+        payload.push({
           student_id: studentId,
-          subject_id: subjectId,
-          term: termNum,
+          subject_code: subjectCode,
+          subject_name: subjectName,
           academic_year: year,
-          assignment_score: g.assignment_score,
-          midterm_score: g.midterm_score,
-          final_score: g.final_score,
-          total_score: g.total_score,
-          letter_grade: g.letter_grade,
-          gpa: g.gpa,
-          teacher_id: user.data.user.id,
-          updated_at: new Date().toISOString()
-        };
+          term: term,
+          score_midterm: num(v('[data-field="score_midterm"]')),
+          score_final: num(v('[data-field="score_final"]')),
+          score_assignment: num(v('[data-field="score_assignment"]')),
+          score_total: num(v('[data-field="score_total"]')),
+          grade_label: gradeLabel || null,
+          grade_value: gradeValue,
+          comments: v('[data-field="comments"]') || null,
+          credit_hours: credits,
+          published: false
+        });
       });
-      
-      const { error } = await supabaseClient
-        .from('student_grades')
-        .upsert(records, { onConflict: 'student_id,subject_id,term,academic_year' });
-      
-      if (error) {
-        dataHelpers.toast('❌ Save failed: ' + error.message, 'error');
-        return;
-      }
-      
-      dataHelpers.toast(`✅ Saved ${changedRows.size} grades!`, 'success');
-      changedRows.clear();
-      await loadGrades();
+
+      const { data, error } = await supabaseClient.rpc('bulk_upsert_grades', { p_rows: payload });
+      if (error) return toast(t('grades.saveFailed') + ': ' + error.message, 'error');
+      if (!data?.success) return toast(t('grades.saveFailed'), 'error');
+      toast(t('grades.savedCount').replace('{n}', data.saved), 'success');
+      loadGrades(); // refresh
     }
-    
-    init();
+
+    async function publishGrades() {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      const subjectCode = document.getElementById('subjectSelect').value;
+      if (!classroom || !subjectCode || !year) return toast(t('grades.fillAllFilters'), 'error');
+      if (!confirm(t('grades.confirmPublish'))) return;
+
+      const { data, error } = await supabaseClient.rpc('publish_grades', {
+        p_classroom: classroom, p_subject_code: subjectCode, p_academic_year: year, p_term: term
+      });
+      if (error) return toast(t('grades.publishFailed') + ': ' + error.message, 'error');
+      toast(t('grades.publishedCount').replace('{n}', data.published), 'success');
+      loadGrades();
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(msg, type = 'info') { const tt = document.getElementById('toast'); tt.className = 'toast show ' + type; tt.textContent = msg; setTimeout(() => { tt.className = 'toast'; }, 3500); }
+    async function signOut() { await supabaseClient.auth.signOut(); window.location.href = '../login.html'; }
   </script>
 </body>
 </html>

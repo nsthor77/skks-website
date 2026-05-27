@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grading Scale Config — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8; --pk-blue-600: #2563EB;
+      --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar img { height: 26px; }
+    .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
+    .back-link:hover { background: var(--pk-canvas); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
+    .page-head h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-head p { color: var(--pk-ash); font-size: 14px; max-width: 600px; }
+
+    .btn { padding: 10px 16px; border-radius: 10px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--pk-blue-800); color: var(--pk-paper); }
+    .btn-primary:hover { background: #1E3A8A; }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+    .btn-danger { background: var(--pk-danger-bg); color: var(--pk-danger); border: none; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    .info-banner { background: var(--pk-blue-50); border: 1px solid var(--pk-blue-100); padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; color: var(--pk-ink-soft); }
+    .info-banner strong { color: var(--pk-blue-800); }
+
+    .scale-list { display: grid; gap: 14px; }
+    .scale-card { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 18px 20px; }
+    .scale-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+    .scale-name { font-size: 16px; font-weight: 700; color: var(--pk-ink); }
+    .scale-meta { color: var(--pk-mist); font-size: 12px; }
+    .default-badge { background: var(--pk-success-bg); color: var(--pk-success); padding: 2px 9px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+
+    .grades-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .grade-chip {
+      padding: 6px 12px; border-radius: 100px; font-weight: 700; font-family: 'Inter', sans-serif;
+      font-size: 13px; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .grade-chip .v { font-size: 11px; opacity: 0.7; }
+    .grade-chip .r { font-size: 10.5px; opacity: 0.65; }
+
+    .empty { padding: 60px 20px; text-align: center; color: var(--pk-ash); }
+    .empty .icon { font-size: 48px; margin-bottom: 12px; }
+
+    .quick-templates { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .template-btn { padding: 8px 14px; border: 1px dashed var(--pk-blue-600); background: transparent; color: var(--pk-blue-700); border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 12.5px; font-weight: 500; }
+    .template-btn:hover { background: var(--pk-blue-50); }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 26, 54, 0.65); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--pk-paper); border-radius: 16px; max-width: 720px; width: 100%; box-shadow: 0 20px 60px -10px rgba(0,0,0,0.3); }
+    .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--pk-border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-close { background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--pk-ash); width: 32px; height: 32px; border-radius: 6px; }
+    .modal-body { padding: 22px 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--pk-border); display: flex; justify-content: flex-end; gap: 10px; background: #FBFCFD; border-radius: 0 0 16px 16px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .form-row.full { grid-template-columns: 1fr; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--pk-ink-soft); margin-bottom: 4px; }
+    .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--pk-blue-600); box-shadow: 0 0 0 3px var(--pk-blue-100); }
+
+    .grade-editor { border: 1px dashed var(--pk-border); border-radius: 8px; padding: 12px; background: #FAFBFC; }
+    .grade-input-row { display: grid; grid-template-columns: 80px 80px 80px 80px 80px auto; gap: 6px; margin-bottom: 6px; align-items: center; }
+    .grade-input-row input { padding: 6px 8px; font-size: 13px; }
+    .grade-input-row .col-label { font-size: 10.5px; color: var(--pk-mist); padding: 0 4px; }
+    .btn-add-grade { background: transparent; border: 1px dashed var(--pk-blue-600); color: var(--pk-blue-700); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 12px; width: 100%; margin-top: 6px; }
+
+    .check-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .check-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 9999; font-size: 14px; font-weight: 500; display: none; }
+    .toast.show { display: block; }
+    .toast.success { background: var(--pk-success-bg); color: var(--pk-success); }
+    .toast.error { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .toast.info { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .form-row { grid-template-columns: 1fr; }
+      .grade-input-row { grid-template-columns: 1fr 1fr; }
+      .grade-input-row .col-label { display: none; }
+      input, select { font-size: 16px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="grades-admin.html" class="back-link" data-i18n="gradeConfig.back">← Back to Grades</a>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="container">
+    <div class="page-head">
+      <div>
+        <h1 data-i18n="gradeConfig.title">⚙️ Grading Scale Configuration</h1>
+        <p data-i18n="gradeConfig.desc">Define how grades are calculated and displayed in your school. Set the default scale used when entering grades.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openCreateModal()" data-i18n="gradeConfig.addScale">➕ Add Scale</button>
+    </div>
+
+    <div class="info-banner" data-i18n-html="gradeConfig.infoBanner">
+      <strong>💡 Common Thai school scales:</strong><br/>
+      • <strong>A-F Letter</strong>: International / bilingual schools (A=80-100, B+=75-79, etc.)<br/>
+      • <strong>4.0 GPA</strong>: Thai standard (เกรด 4, 3.5, 3, 2.5, 2, 1.5, 1, 0)<br/>
+      • <strong>Pass/Fail</strong>: Kindergarten / elective subjects<br/>
+      Use templates below to start quickly.
+    </div>
+
+    <div class="quick-templates">
+      <span style="font-size:13px;color:var(--pk-ash);align-self:center;" data-i18n="gradeConfig.templates">Templates:</span>
+      <button class="template-btn" onclick="useTemplate('thai_letter')">A-F (Thai Standard)</button>
+      <button class="template-btn" onclick="useTemplate('thai_gpa')">4.0 GPA</button>
+      <button class="template-btn" onclick="useTemplate('pass_fail')">Pass / Fail</button>
+      <button class="template-btn" onclick="useTemplate('percent')">0-100%</button>
+    </div>
+
+    <div class="scale-list" id="scaleList">
+      <div class="empty">⏳ Loading...</div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle" data-i18n="gradeConfig.modalAdd">➕ Add Grading Scale</h3>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <form onsubmit="saveScale(event)">
+        <div class="modal-body">
+          <input type="hidden" id="fId" />
+
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="gradeConfig.fldName">Scale Name *</label>
+              <input type="text" id="fName" required placeholder="Standard A-F" />
+            </div>
+            <div class="form-group">
+              <label data-i18n="gradeConfig.fldType">Scale Type *</label>
+              <select id="fScaleType" required>
+                <option value="letter" data-i18n="gradeConfig.typeLetter">Letter (A, B+, C, ...)</option>
+                <option value="gpa" data-i18n="gradeConfig.typeGpa">GPA (4.0, 3.5, ...)</option>
+                <option value="percent" data-i18n="gradeConfig.typePercent">Percent (0-100)</option>
+                <option value="pass_fail" data-i18n="gradeConfig.typePassFail">Pass / Fail</option>
+                <option value="custom" data-i18n="gradeConfig.typeCustom">Custom</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row full">
+            <div class="form-group">
+              <label data-i18n="gradeConfig.fldGrades">Grades</label>
+              <div class="grade-editor">
+                <div class="grade-input-row">
+                  <div class="col-label">Label</div>
+                  <div class="col-label">Value</div>
+                  <div class="col-label">Min %</div>
+                  <div class="col-label">Max %</div>
+                  <div class="col-label">Color</div>
+                  <div></div>
+                </div>
+                <div id="gradesContainer"></div>
+                <button type="button" class="btn-add-grade" onclick="addGradeRow()" data-i18n="gradeConfig.addGrade">+ Add Grade Level</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="check-row">
+            <input type="checkbox" id="fIsDefault" />
+            <label for="fIsDefault" data-i18n="gradeConfig.fldDefault">Set as default scale (used when entering grades)</label>
+          </div>
+          <div class="check-row">
+            <input type="checkbox" id="fIsActive" checked />
+            <label for="fIsActive" data-i18n="gradeConfig.fldActive">Active</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()" data-i18n="common.cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSave" data-i18n="common.save">💾 Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    let allScales = [];
+
+    const TEMPLATES = {
+      thai_letter: {
+        name: 'A-F Letter (Thai 4.0 GPA)',
+        scale_type: 'letter',
+        grades: [
+          { label: 'A',  value: 4.0, min: 80, max: 100, color: '#065F46' },
+          { label: 'B+', value: 3.5, min: 75, max: 79,  color: '#10B981' },
+          { label: 'B',  value: 3.0, min: 70, max: 74,  color: '#34D399' },
+          { label: 'C+', value: 2.5, min: 65, max: 69,  color: '#F59E0B' },
+          { label: 'C',  value: 2.0, min: 60, max: 64,  color: '#F59E0B' },
+          { label: 'D+', value: 1.5, min: 55, max: 59,  color: '#F97316' },
+          { label: 'D',  value: 1.0, min: 50, max: 54,  color: '#EF4444' },
+          { label: 'F',  value: 0.0, min: 0,  max: 49,  color: '#991B1B' }
+        ]
+      },
+      thai_gpa: {
+        name: 'Thai 4.0 GPA',
+        scale_type: 'gpa',
+        grades: [
+          { label: '4',   value: 4.0, min: 80, max: 100, color: '#065F46' },
+          { label: '3.5', value: 3.5, min: 75, max: 79,  color: '#10B981' },
+          { label: '3',   value: 3.0, min: 70, max: 74,  color: '#34D399' },
+          { label: '2.5', value: 2.5, min: 65, max: 69,  color: '#F59E0B' },
+          { label: '2',   value: 2.0, min: 60, max: 64,  color: '#F59E0B' },
+          { label: '1.5', value: 1.5, min: 55, max: 59,  color: '#F97316' },
+          { label: '1',   value: 1.0, min: 50, max: 54,  color: '#EF4444' },
+          { label: '0',   value: 0.0, min: 0,  max: 49,  color: '#991B1B' }
+        ]
+      },
+      pass_fail: {
+        name: 'Pass / Fail',
+        scale_type: 'pass_fail',
+        grades: [
+          { label: 'P', value: 1.0, min: 50, max: 100, color: '#065F46' },
+          { label: 'F', value: 0.0, min: 0,  max: 49,  color: '#991B1B' }
+        ]
+      },
+      percent: {
+        name: 'Percent (0-100)',
+        scale_type: 'percent',
+        grades: [
+          { label: '90-100', value: 4.0, min: 90, max: 100, color: '#065F46' },
+          { label: '80-89',  value: 3.5, min: 80, max: 89,  color: '#10B981' },
+          { label: '70-79',  value: 3.0, min: 70, max: 79,  color: '#34D399' },
+          { label: '60-69',  value: 2.0, min: 60, max: 69,  color: '#F59E0B' },
+          { label: '50-59',  value: 1.0, min: 50, max: 59,  color: '#EF4444' },
+          { label: '0-49',   value: 0.0, min: 0,  max: 49,  color: '#991B1B' }
+        ]
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireRole(['owner','developer']);
+      if (!profile) return;
+      loadScales();
+    });
+    document.addEventListener('langchange', renderScales);
+
+    async function loadScales() {
+      const { data, error } = await supabaseClient.from('grading_scales').select('*').order('sort_order').order('name');
+      if (error) return toast('Load failed: ' + error.message, 'error');
+      allScales = data || [];
+      renderScales();
+    }
+
+    function renderScales() {
+      const list = document.getElementById('scaleList');
+      if (!allScales.length) {
+        list.innerHTML = `<div class="empty"><div class="icon">📊</div><h4>${t('gradeConfig.empty')}</h4><p>${t('gradeConfig.emptyDesc')}</p></div>`;
+        return;
+      }
+      list.innerHTML = allScales.map(s => {
+        const grades = Array.isArray(s.grades) ? s.grades : [];
+        return `<div class="scale-card">
+          <div class="scale-header">
+            <div>
+              <div class="scale-name">${esc(s.name)} ${s.is_default ? '<span class="default-badge">DEFAULT</span>' : ''}</div>
+              <div class="scale-meta">${esc(s.scale_type)} · ${grades.length} ${t('gradeConfig.gradeCount')}</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm btn-secondary" onclick="editScale('${s.id}')">✏️ ${t('common.edit')}</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteScale('${s.id}', ${JSON.stringify(s.name)})">🗑️</button>
+            </div>
+          </div>
+          <div class="grades-row">
+            ${grades.map(g => `<span class="grade-chip" style="background:${g.color || '#E5E7EB'}30;color:${g.color || '#374151'};border:1px solid ${g.color || '#E5E7EB'};">
+              ${esc(g.label || '')}
+              ${g.value !== null && g.value !== undefined ? `<span class="v">${g.value}</span>` : ''}
+              ${g.min !== null && g.min !== undefined ? `<span class="r">${g.min}-${g.max}</span>` : ''}
+            </span>`).join('')}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function useTemplate(key) {
+      const tpl = TEMPLATES[key];
+      if (!tpl) return;
+      openCreateModal();
+      document.getElementById('fName').value = tpl.name;
+      document.getElementById('fScaleType').value = tpl.scale_type;
+      document.getElementById('gradesContainer').innerHTML = '';
+      tpl.grades.forEach(g => addGradeRow(g));
+    }
+
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = t('gradeConfig.modalAdd');
+      document.getElementById('fId').value = '';
+      document.getElementById('fName').value = '';
+      document.getElementById('fScaleType').value = 'letter';
+      document.getElementById('fIsDefault').checked = !allScales.some(s => s.is_default);
+      document.getElementById('fIsActive').checked = true;
+      document.getElementById('gradesContainer').innerHTML = '';
+      addGradeRow();
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function editScale(id) {
+      const s = allScales.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('modalTitle').textContent = t('gradeConfig.modalEdit');
+      document.getElementById('fId').value = s.id;
+      document.getElementById('fName').value = s.name || '';
+      document.getElementById('fScaleType').value = s.scale_type || 'letter';
+      document.getElementById('fIsDefault').checked = !!s.is_default;
+      document.getElementById('fIsActive').checked = !!s.is_active;
+      document.getElementById('gradesContainer').innerHTML = '';
+      (Array.isArray(s.grades) ? s.grades : []).forEach(g => addGradeRow(g));
+      document.getElementById('editModal').classList.add('show');
+    }
+
+    function closeModal() { document.getElementById('editModal').classList.remove('show'); }
+
+    function addGradeRow(g = {}) {
+      const c = document.getElementById('gradesContainer');
+      const div = document.createElement('div');
+      div.className = 'grade-input-row';
+      div.innerHTML = `
+        <input type="text" placeholder="A" value="${esc(g.label || '')}" data-f="label" />
+        <input type="number" step="0.01" placeholder="4.0" value="${g.value ?? ''}" data-f="value" />
+        <input type="number" step="1" placeholder="80" value="${g.min ?? ''}" data-f="min" />
+        <input type="number" step="1" placeholder="100" value="${g.max ?? ''}" data-f="max" />
+        <input type="color" value="${g.color || '#065F46'}" data-f="color" />
+        <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">×</button>
+      `;
+      c.appendChild(div);
+    }
+
+    function collectGrades() {
+      const rows = document.querySelectorAll('#gradesContainer .grade-input-row');
+      const grades = [];
+      rows.forEach(r => {
+        const label = r.querySelector('[data-f="label"]').value.trim();
+        const value = parseFloat(r.querySelector('[data-f="value"]').value);
+        const min = parseFloat(r.querySelector('[data-f="min"]').value);
+        const max = parseFloat(r.querySelector('[data-f="max"]').value);
+        const color = r.querySelector('[data-f="color"]').value;
+        if (label) {
+          grades.push({
+            label,
+            value: isNaN(value) ? null : value,
+            min: isNaN(min) ? null : min,
+            max: isNaN(max) ? null : max,
+            color
+          });
+        }
+      });
+      return grades;
+    }
+
+    async function saveScale(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSave');
+      btn.disabled = true;
+      const params = {
+        p_id: document.getElementById('fId').value || null,
+        p_name: document.getElementById('fName').value.trim(),
+        p_scale_type: document.getElementById('fScaleType').value,
+        p_grades: JSON.stringify(collectGrades()),
+        p_is_default: document.getElementById('fIsDefault').checked,
+        p_is_active: document.getElementById('fIsActive').checked,
+        p_sort_order: 100
+      };
+      const { data, error } = await supabaseClient.rpc('upsert_grading_scale', params);
+      btn.disabled = false;
+      if (error) return toast('Save failed: ' + error.message, 'error');
+      if (!data?.success) return toast(data?.error || 'Failed', 'error');
+      toast(params.p_id ? t('gradeConfig.saveOk') : t('gradeConfig.addOk'), 'success');
+      closeModal();
+      loadScales();
+    }
+
+    async function deleteScale(id, name) {
+      if (!confirm(t('gradeConfig.confirmDelete').replace('{name}', name))) return;
+      const { error } = await supabaseClient.from('grading_scales').delete().eq('id', id);
+      if (error) return toast('Delete failed: ' + error.message, 'error');
+      toast(t('gradeConfig.deleteOk'), 'success');
+      loadScales();
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(msg, type = 'info') { const tt = document.getElementById('toast'); tt.className = 'toast show ' + type; tt.textContent = msg; setTimeout(() => { tt.className = 'toast'; }, 3500); }
+  </script>
+</body>
+</html>

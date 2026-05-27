@@ -3,316 +3,377 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Attendance — SKKS</title>
+  <title>Attendance — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/admin.css" />
-  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    .att-grid{background:white;border-radius:12px;overflow-x:auto;border:1px solid #E5E7EB}
-    .att-table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
-    .att-table th{background:#F0FDF4;color:#1B5E3F;padding:12px 10px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;border-bottom:2px solid #1B5E3F;text-transform:uppercase;position:sticky;top:0}
-    .att-table td{padding:10px;border-bottom:1px solid #F3F4F6}
-    .att-table tr:hover{background:#F9FAFB}
-    .student-cell{display:flex;align-items:center;gap:10px}
-    .avatar{width:32px;height:32px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
-    
-    .status-btns{display:flex;gap:6px;flex-wrap:wrap}
-    .status-btn{padding:6px 12px;border:1px solid #D1D5DB;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:0.5px;background:white;transition:all 0.15s}
-    .status-btn:hover{transform:translateY(-1px)}
-    .status-btn.active.present{background:#10B981;color:white;border-color:#10B981}
-    .status-btn.active.late{background:#F59E0B;color:white;border-color:#F59E0B}
-    .status-btn.active.absent{background:#EF4444;color:white;border-color:#EF4444}
-    .status-btn.active.excused{background:#5BB8E0;color:white;border-color:#5BB8E0}
-    
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-    .stat-attendance{background:white;border-radius:10px;padding:18px;border:1px solid #E5E7EB;text-align:center}
-    .stat-attendance .icon{font-size:28px;margin-bottom:6px}
-    .stat-attendance .num{font-size:28px;font-weight:800;color:#1B5E3F}
-    .stat-attendance .lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-    
-    .filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;background:white;padding:14px;border-radius:10px;border:1px solid #E5E7EB}
-    .filter-bar select, .filter-bar input{padding:8px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px}
-    
-    .quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-    .quick-btn{padding:8px 14px;background:#F0FDF4;color:#1B5E3F;border:1px solid #1B5E3F;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.15s}
-    .quick-btn:hover{background:#1B5E3F;color:white}
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+      --pk-purple-bg: #EDE9FE; --pk-purple: #5B21B6;
+      --pk-cyan-bg: #CFFAFE; --pk-cyan: #155E75;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: sticky; top: 0; z-index: 50; }
+    .topbar-left { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .brand-link img { height: 26px; }
+    .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-links a { text-decoration: none; color: var(--pk-ash); font-size: 13.5px; font-weight: 500; padding: 6px 12px; border-radius: 8px; transition: all .15s; }
+    .nav-links a:hover { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+    .nav-links a.active { background: var(--pk-blue-100); color: var(--pk-blue-800); font-weight: 600; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .user-info { font-size: 13px; color: var(--pk-ash); }
+    .btn-out { padding: 7px 14px; border-radius: 8px; background: transparent; border: 1px solid var(--pk-border); color: var(--pk-ash); font-size: 13px; cursor: pointer; font-family: inherit; }
+    .btn-out:hover { background: var(--pk-canvas); color: var(--pk-ink); }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    .page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+    .page-title h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-title p { color: var(--pk-ash); font-size: 14px; }
+
+    .controls-bar { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .controls-bar label { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .controls-bar input, .controls-bar select { padding: 8px 12px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; color: var(--pk-ink); background: var(--pk-paper); }
+    .controls-bar input:focus, .controls-bar select:focus { outline: none; border-color: var(--pk-blue-600); box-shadow: 0 0 0 3px var(--pk-blue-100); }
+
+    .btn { padding: 9px 14px; border-radius: 9px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+    .btn-primary { background: var(--pk-blue-800); color: var(--pk-paper); }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .stat-card { background: var(--pk-paper); padding: 14px 16px; border-radius: 10px; border: 1px solid var(--pk-border); }
+    .stat-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--pk-ash); }
+    .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; font-family: 'Inter', sans-serif; }
+    .stat-card.present .stat-value { color: var(--pk-success); }
+    .stat-card.absent .stat-value { color: var(--pk-danger); }
+    .stat-card.late .stat-value { color: var(--pk-warning); }
+    .stat-card.excused .stat-value { color: var(--pk-blue-700); }
+    .stat-card.leave .stat-value { color: var(--pk-purple); }
+    .stat-card.sick .stat-value { color: var(--pk-cyan); }
+    .stat-card.unmarked .stat-value { color: var(--pk-mist); }
+
+    .quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .quick-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--pk-border); background: var(--pk-paper); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; }
+    .quick-btn.success { background: var(--pk-success-bg); color: var(--pk-success); border-color: var(--pk-success-bg); }
+    .quick-btn.danger { background: var(--pk-danger-bg); color: var(--pk-danger); border-color: var(--pk-danger-bg); }
+
+    .card { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; overflow: hidden; }
+    .student-list { padding: 8px; }
+    .student-row { display: grid; grid-template-columns: 90px 1fr auto; gap: 14px; padding: 12px 16px; align-items: center; border-bottom: 1px solid #F0F2F7; transition: background .15s; }
+    .student-row:last-child { border-bottom: none; }
+    .student-row:hover { background: #FAFBFC; }
+    .student-row.checked-in { background: rgba(6,95,70,0.04); }
+    .student-row.absent-row { background: rgba(153,27,27,0.04); }
+
+    .stu-num { font-family: 'Inter', monospace; font-weight: 600; color: var(--pk-blue-700); font-size: 13px; }
+    .stu-info .name { font-weight: 600; color: var(--pk-ink); font-size: 14.5px; }
+    .stu-info .meta { color: var(--pk-mist); font-size: 12px; margin-top: 2px; }
+    .stu-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+    .status-btn { padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid var(--pk-border); background: var(--pk-paper); color: var(--pk-ash); cursor: pointer; font-family: inherit; min-width: 50px; }
+    .status-btn:hover { background: var(--pk-canvas); }
+    .status-btn.active.present { background: var(--pk-success-bg); color: var(--pk-success); border-color: var(--pk-success-bg); }
+    .status-btn.active.absent { background: var(--pk-danger-bg); color: var(--pk-danger); border-color: var(--pk-danger-bg); }
+    .status-btn.active.late { background: var(--pk-warning-bg); color: var(--pk-warning); border-color: var(--pk-warning-bg); }
+    .status-btn.active.excused { background: var(--pk-blue-50); color: var(--pk-blue-700); border-color: var(--pk-blue-50); }
+    .status-btn.active.leave { background: var(--pk-purple-bg); color: var(--pk-purple); border-color: var(--pk-purple-bg); }
+    .status-btn.active.sick { background: var(--pk-cyan-bg); color: var(--pk-cyan); border-color: var(--pk-cyan-bg); }
+
+    .empty-state { padding: 60px 20px; text-align: center; color: var(--pk-ash); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .line-status { font-size: 11px; color: var(--pk-mist); margin-top: 4px; }
+    .line-status.sent { color: var(--pk-success); }
+    .line-status.failed { color: var(--pk-danger); }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 9999; font-size: 14px; font-weight: 500; display: none; }
+    .toast.show { display: block; }
+    .toast.success { background: var(--pk-success-bg); color: var(--pk-success); }
+    .toast.error { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .toast.info { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .student-row { grid-template-columns: 1fr; gap: 8px; }
+      .stu-actions { width: 100%; }
+      input, select, textarea { font-size: 16px !important; }
+    }
   </style>
 </head>
 <body>
-  <div class="admin-topbar">
-    <div class="admin-topbar-left">
-      <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
-      </a>
-      <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="grades-admin.html">📝 Grades</a>
-        <a href="report-cards.html">📄 Reports</a>
-        <a href="certificates.html">🏆 Certificates</a>
-        <a href="attendance.html" class="active">📅 Attendance</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html" class="brand-link"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <nav class="nav-links">
+        <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+        <a href="students.html" data-i18n="nav.students">Students</a>
+        <a href="teachers.html" data-i18n="nav.teachers">Teachers</a>
+        <a href="attendance.html" class="active" data-i18n="nav.attendance">Attendance</a>
+        <a href="applications.html" data-i18n="nav.applications">Applications</a>
+        <a href="finance.html" class="owner-only" style="display:none" data-i18n="nav.finance">Finance</a>
       </nav>
     </div>
-    <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+    <div class="topbar-right">
+      <span class="user-info" id="userInfo">...</span>
+      <button class="btn-out" onclick="signOut()" data-i18n="common.signOut">Sign Out</button>
     </div>
   </div>
 
-  <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
-    <div id="content" style="display:none;">
-      <div class="page-header">
-        <div>
-          <h2>📅 Attendance</h2>
-          <p>เช็คชื่อนักเรียน — บันทึกการขาด-ลา-มาสาย</p>
-        </div>
-        <button class="btn btn-primary" onclick="saveAttendance()">💾 Save All</button>
-      </div>
+  <div class="container">
 
-      <div class="stats-row">
-        <div class="stat-attendance">
-          <div class="icon">👥</div>
-          <div class="num" id="cntTotal">0</div>
-          <div class="lbl">Total Students</div>
-        </div>
-        <div class="stat-attendance" style="background:#ECFDF5;">
-          <div class="icon">✅</div>
-          <div class="num" id="cntPresent" style="color:#10B981;">0</div>
-          <div class="lbl">Present</div>
-        </div>
-        <div class="stat-attendance" style="background:#FEF3C7;">
-          <div class="icon">⏰</div>
-          <div class="num" id="cntLate" style="color:#F59E0B;">0</div>
-          <div class="lbl">Late</div>
-        </div>
-        <div class="stat-attendance" style="background:#FEE2E2;">
-          <div class="icon">❌</div>
-          <div class="num" id="cntAbsent" style="color:#EF4444;">0</div>
-          <div class="lbl">Absent</div>
-        </div>
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="attendance.title">📅 Attendance</h1>
+        <p data-i18n="attendance.subtitle">Mark daily attendance and notify parents via LINE</p>
       </div>
-
-      <div class="filter-bar">
-        <input type="date" id="dateFilter" onchange="loadAttendance()" />
-        <select id="programFilter" onchange="renderRows()">
-          <option value="">All Programs</option>
-          <option value="prek">Pre-K</option>
-          <option value="k">K</option>
-          <option value="ep">EP</option>
-          <option value="mep">MEP</option>
-        </select>
-        <select id="gradeFilter" onchange="renderRows()">
-          <option value="">All Grades</option>
-        </select>
-        <input type="search" id="searchStudent" placeholder="🔍 ค้นหา..." oninput="renderRows()" style="flex:1;min-width:180px;" />
-      </div>
-
-      <div class="quick-actions">
-        <button class="quick-btn" onclick="markAll('present')">✅ Mark All Present</button>
-        <button class="quick-btn" onclick="markAll('absent')">❌ Mark All Absent</button>
-        <button class="quick-btn" onclick="markAll(null)">🔄 Reset</button>
-      </div>
-
-      <div class="att-grid">
-        <table class="att-table">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th style="width:240px;">Status</th>
-              <th style="width:120px;">Check-in</th>
-              <th style="width:140px;">Notes</th>
-            </tr>
-          </thead>
-          <tbody id="attBody"></tbody>
-        </table>
+      <div style="display:flex;gap:8px;">
+        <a href="my-attendance.html" class="btn btn-secondary" data-i18n="attendance.myView">📋 My View</a>
+        <button class="btn btn-secondary" onclick="exportCsv()" data-i18n="attendance.export">📤 Export</button>
       </div>
     </div>
+
+    <div class="controls-bar">
+      <label data-i18n="attendance.date">Date:</label>
+      <input type="date" id="dateInput" />
+      <label data-i18n="attendance.classroom">Class:</label>
+      <select id="classroomSelect">
+        <option value="" data-i18n="attendance.allClasses">All classes</option>
+      </select>
+      <label data-i18n="attendance.grade">Grade:</label>
+      <input type="text" id="gradeInput" placeholder="e.g. Grade 3" style="width:120px;" />
+      <button class="btn btn-primary" onclick="loadAttendance()" data-i18n="attendance.refresh">🔄 Refresh</button>
+    </div>
+
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-label" data-i18n="attendance.statTotal">Total</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat-card present"><div class="stat-label" data-i18n="attendance.statPresent">Present</div><div class="stat-value" id="statPresent">—</div></div>
+      <div class="stat-card absent"><div class="stat-label" data-i18n="attendance.statAbsent">Absent</div><div class="stat-value" id="statAbsent">—</div></div>
+      <div class="stat-card late"><div class="stat-label" data-i18n="attendance.statLate">Late</div><div class="stat-value" id="statLate">—</div></div>
+      <div class="stat-card excused"><div class="stat-label" data-i18n="attendance.statExcused">Excused</div><div class="stat-value" id="statExcused">—</div></div>
+      <div class="stat-card leave"><div class="stat-label" data-i18n="attendance.statLeave">Leave</div><div class="stat-value" id="statLeave">—</div></div>
+      <div class="stat-card sick"><div class="stat-label" data-i18n="attendance.statSick">Sick</div><div class="stat-value" id="statSick">—</div></div>
+      <div class="stat-card unmarked"><div class="stat-label" data-i18n="attendance.statUnmarked">Unmarked</div><div class="stat-value" id="statUnmarked">—</div></div>
+    </div>
+
+    <div class="quick-actions">
+      <button class="quick-btn success" onclick="markAllAs('present')" data-i18n="attendance.markAllPresent">✓ Mark all Present</button>
+      <button class="quick-btn" onclick="markAllAs('absent')" data-i18n="attendance.markAllAbsent">✗ Mark all Absent</button>
+    </div>
+
+    <div class="card">
+      <div class="student-list" id="studentList">
+        <div class="empty-state">⏳ Loading...</div>
+      </div>
+    </div>
+
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
-  <script>document.addEventListener("langchange", () => location.reload());</script>
-  <script src="../js/data-helpers.js"></script>
+
   <script>
-    let allStudents = [];
-    let currentAttendance = {};
-    
-    async function init() {
-      const profile = await requireStaff();
+    let currentProfile = null;
+    let rows = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireStaff();
       if (!profile) return;
-      
-      if (profile.role === 'owner' || profile.role === 'developer') {
+      currentProfile = profile;
+      if (['owner','developer'].includes(profile.role)) {
         document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
       }
-      
-      document.getElementById('dateFilter').value = new Date().toISOString().split('T')[0];
-      
-      await loadStudents();
-      populateGradeFilter();
+      document.getElementById('userInfo').textContent = profile.email || (profile.first_name || '') + ' ' + (profile.last_name || '');
+      document.getElementById('dateInput').valueAsDate = new Date();
+      bindFilters();
+      await loadClassrooms();
       await loadAttendance();
-      
-      document.getElementById('loadingMsg').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
+    });
+    document.addEventListener('langchange', () => { render(); loadStats(); });
+
+    let debTimer = null;
+    function debounce(fn, ms) { return () => { clearTimeout(debTimer); debTimer = setTimeout(fn, ms); }; }
+
+    function bindFilters() {
+      document.getElementById('dateInput').addEventListener('change', loadAttendance);
+      document.getElementById('classroomSelect').addEventListener('change', loadAttendance);
+      document.getElementById('gradeInput').addEventListener('input', debounce(loadAttendance, 400));
     }
-    
-    async function loadStudents() {
-      const { data } = await supabaseClient
-        .from('students')
-        .select('id, first_name, last_name, nickname, program, grade, student_number')
-        .eq('status', 'active')
-        .order('first_name');
-      allStudents = data || [];
-    }
-    
-    function populateGradeFilter() {
-      const grades = [...new Set(allStudents.map(s => s.grade).filter(Boolean))].sort();
-      const sel = document.getElementById('gradeFilter');
-      sel.innerHTML = '<option value="">All Grades</option>' +
-        grades.map(g => `<option value="${g}">${g}</option>`).join('');
-    }
-    
-    async function loadAttendance() {
-      const date = document.getElementById('dateFilter').value;
-      const { data } = await supabaseClient
-        .from('attendance')
-        .select('*')
-        .eq('attendance_date', date);
-      
-      currentAttendance = {};
-      (data || []).forEach(a => {
-        currentAttendance[a.student_id] = a;
-      });
-      
-      renderRows();
-    }
-    
-    function renderRows() {
-      const program = document.getElementById('programFilter').value;
-      const grade = document.getElementById('gradeFilter').value;
-      const search = document.getElementById('searchStudent').value.toLowerCase().trim();
-      
-      let filtered = allStudents;
-      if (program) filtered = filtered.filter(s => s.program === program);
-      if (grade) filtered = filtered.filter(s => s.grade === grade);
-      if (search) filtered = filtered.filter(s => `${s.first_name} ${s.last_name} ${s.nickname||''}`.toLowerCase().includes(search));
-      
-      const tbody = document.getElementById('attBody');
-      tbody.innerHTML = filtered.map(s => {
-        const a = currentAttendance[s.id] || { status: null };
-        const initials = ((s.first_name||'?')[0] + (s.last_name||'')[0]).toUpperCase();
-        
-        return `<tr data-student="${s.id}">
-          <td>
-            <div class="student-cell">
-              <div class="avatar">${initials}</div>
-              <div>
-                <div style="font-weight:600;color:#1B5E3F;">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''}</div>
-                <div style="font-size:11px;color:#9CA3AF;">${(s.program||'').toUpperCase()} ${s.grade||''}</div>
-              </div>
-            </div>
-          </td>
-          <td>
-            <div class="status-btns">
-              <button class="status-btn ${a.status==='present'?'active present':''}" onclick="setStatus('${s.id}','present')">✅ Present</button>
-              <button class="status-btn ${a.status==='late'?'active late':''}" onclick="setStatus('${s.id}','late')">⏰ Late</button>
-              <button class="status-btn ${a.status==='absent'?'active absent':''}" onclick="setStatus('${s.id}','absent')">❌ Absent</button>
-              <button class="status-btn ${a.status==='excused'?'active excused':''}" onclick="setStatus('${s.id}','excused')">🏥 Excused</button>
-            </div>
-          </td>
-          <td>
-            <input type="time" value="${a.check_in_time || ''}" onchange="setField('${s.id}','check_in_time',this.value)" style="padding:6px 8px;border:1px solid #D1D5DB;border-radius:6px;font-size:12px;" />
-          </td>
-          <td>
-            <input type="text" value="${a.notes || ''}" placeholder="หมายเหตุ" onchange="setField('${s.id}','notes',this.value)" style="padding:6px 8px;border:1px solid #D1D5DB;border-radius:6px;font-size:12px;width:100%;" />
-          </td>
-        </tr>`;
-      }).join('');
-      
-      updateStats();
-    }
-    
-    function updateStats() {
-      const stats = { present:0, late:0, absent:0, excused:0 };
-      Object.values(currentAttendance).forEach(a => { if (stats[a.status] !== undefined) stats[a.status]++; });
-      
-      document.getElementById('cntTotal').textContent = allStudents.length;
-      document.getElementById('cntPresent').textContent = stats.present;
-      document.getElementById('cntLate').textContent = stats.late;
-      document.getElementById('cntAbsent').textContent = stats.absent;
-    }
-    
-    function setStatus(studentId, status) {
-      if (!currentAttendance[studentId]) currentAttendance[studentId] = { student_id: studentId };
-      currentAttendance[studentId].status = status;
-      if (status === 'present' || status === 'late') {
-        if (!currentAttendance[studentId].check_in_time) {
-          currentAttendance[studentId].check_in_time = new Date().toTimeString().substring(0,5);
+
+    async function loadClassrooms() {
+      const { data } = await supabaseClient.from('students').select('classroom').not('classroom','is',null).order('classroom');
+      const sel = document.getElementById('classroomSelect');
+      const seen = new Set();
+      (data || []).forEach(r => {
+        if (r.classroom && !seen.has(r.classroom)) {
+          seen.add(r.classroom);
+          const opt = document.createElement('option');
+          opt.value = r.classroom; opt.textContent = r.classroom;
+          sel.appendChild(opt);
         }
-      }
-      renderRows();
-    }
-    
-    function setField(studentId, field, value) {
-      if (!currentAttendance[studentId]) currentAttendance[studentId] = { student_id: studentId };
-      currentAttendance[studentId][field] = value || null;
-    }
-    
-    function markAll(status) {
-      const program = document.getElementById('programFilter').value;
-      const grade = document.getElementById('gradeFilter').value;
-      let filtered = allStudents;
-      if (program) filtered = filtered.filter(s => s.program === program);
-      if (grade) filtered = filtered.filter(s => s.grade === grade);
-      
-      filtered.forEach(s => {
-        if (status) setStatus(s.id, status);
-        else delete currentAttendance[s.id];
       });
-      renderRows();
     }
-    
-    async function saveAttendance() {
-      const date = document.getElementById('dateFilter').value;
-      const user = await supabaseClient.auth.getUser();
-      
-      const records = Object.values(currentAttendance).filter(a => a.status).map(a => ({
-        student_id: a.student_id,
-        attendance_date: date,
-        status: a.status,
-        check_in_time: a.check_in_time || null,
-        notes: a.notes || null,
-        recorded_by: user.data.user.id
-      }));
-      
-      if (records.length === 0) {
-        dataHelpers.toast('No attendance to save', 'info');
+
+    async function loadAttendance() {
+      const date = document.getElementById('dateInput').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      const grade = document.getElementById('gradeInput').value.trim();
+      if (!date) return;
+
+      document.getElementById('studentList').innerHTML = '<div class="empty-state">⏳ ' + t('common.loading') + '</div>';
+
+      const { data, error } = await supabaseClient.rpc('get_attendance_for_date', {
+        p_date: date, p_classroom: classroom || null, p_grade: grade || null
+      });
+      if (error) return toast(t('attendance.loadFailed') + ': ' + error.message, 'error');
+      if (data?.error) return toast(data.error, 'error');
+      rows = data.rows || [];
+      render();
+      loadStats();
+    }
+
+    async function loadStats() {
+      const date = document.getElementById('dateInput').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      const { data } = await supabaseClient.rpc('get_attendance_stats', { p_date: date, p_classroom: classroom || null });
+      if (!data || data.error) return;
+      document.getElementById('statTotal').textContent    = (data.total ?? 0).toLocaleString();
+      document.getElementById('statPresent').textContent  = (data.present ?? 0).toLocaleString();
+      document.getElementById('statAbsent').textContent   = (data.absent ?? 0).toLocaleString();
+      document.getElementById('statLate').textContent     = (data.late ?? 0).toLocaleString();
+      document.getElementById('statExcused').textContent  = (data.excused ?? 0).toLocaleString();
+      document.getElementById('statLeave').textContent    = (data.leave ?? 0).toLocaleString();
+      document.getElementById('statSick').textContent     = (data.sick ?? 0).toLocaleString();
+      document.getElementById('statUnmarked').textContent = (data.unmarked ?? 0).toLocaleString();
+    }
+
+    function render() {
+      const list = document.getElementById('studentList');
+      const lang = pkI18n.getLang();
+      if (!rows.length) {
+        list.innerHTML = `<div class="empty-state"><div class="icon">📅</div><h4>${t('attendance.empty')}</h4><p>${t('attendance.emptyDesc')}</p></div>`;
         return;
       }
-      
-      const { error } = await supabaseClient
-        .from('attendance')
-        .upsert(records, { onConflict: 'student_id,attendance_date' });
-      
-      if (error) {
-        dataHelpers.toast('❌ ' + error.message, 'error');
-        return;
-      }
-      
-      dataHelpers.toast(`✅ Saved ${records.length} records!`, 'success');
-      await loadAttendance();
+
+      const statusBtns = ['present','absent','late','excused','leave','sick'];
+      const statusLabels = {
+        present: t('attendance.statusPresent'),
+        absent:  t('attendance.statusAbsent'),
+        late:    t('attendance.statusLate'),
+        excused: t('attendance.statusExcused'),
+        leave:   t('attendance.statusLeave'),
+        sick:    t('attendance.statusSick')
+      };
+
+      list.innerHTML = rows.map(r => {
+        const fullTh = ((r.first_name_th || '') + ' ' + (r.last_name_th || '')).trim();
+        const fullEn = ((r.first_name_en || '') + ' ' + (r.last_name_en || '')).trim();
+        const displayName = lang === 'en' ? (fullEn || fullTh || '—') : (fullTh || fullEn || '—');
+        const classBadge = `${esc(r.grade || '')} / ${esc(r.classroom || '')}`;
+        const rowClass = ['present','late','half_day_am','half_day_pm'].includes(r.status) ? 'checked-in' :
+                         (r.status === 'absent' ? 'absent-row' : '');
+        const lineStatus = r.line_send_status ? `<div class="line-status ${r.line_send_status}">LINE: ${r.line_send_status}</div>` : '';
+        const btnsHtml = statusBtns.map(st => `
+          <button class="status-btn ${r.status === st ? 'active ' + st : ''}"
+                  onclick="setStatus('${r.student_id}', '${st}')"
+                  title="${statusLabels[st]}">
+            ${statusLabels[st]}
+          </button>
+        `).join('');
+        return `<div class="student-row ${rowClass}">
+          <div class="stu-num">${esc(r.student_number || '—')}</div>
+          <div class="stu-info">
+            <div class="name">${esc(displayName)}${r.nickname ? ` <span style="color:#7B8497;font-weight:400;">(${esc(r.nickname)})</span>` : ''}</div>
+            <div class="meta">${classBadge}</div>
+            ${lineStatus}
+          </div>
+          <div class="stu-actions">${btnsHtml}</div>
+        </div>`;
+      }).join('');
     }
-    
-    init();
+
+    async function setStatus(studentId, status) {
+      const date = document.getElementById('dateInput').value;
+      const { data, error } = await supabaseClient.rpc('mark_attendance', {
+        p_student_id: studentId, p_date: date, p_status: status, p_method: 'manual'
+      });
+      if (error || !data?.success) return toast(t('attendance.markFailed'), 'error');
+      toast(t('attendance.markedAs') + ': ' + t('attendance.status' + status.charAt(0).toUpperCase() + status.slice(1)), 'success');
+      const row = rows.find(r => r.student_id === studentId);
+      if (row) {
+        row.status = status;
+        if (['present','late','half_day_am'].includes(status)) row.check_in_at = new Date().toISOString();
+      }
+      render();
+      loadStats();
+
+      // Trigger LINE notification (best effort, fire-and-forget)
+      sendLineNotification(data.id, studentId, status).catch(e => console.warn('LINE notify failed:', e));
+    }
+
+    async function sendLineNotification(attendanceId, studentId, status) {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+        await fetch('/api/line/notify-attendance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ attendance_id: attendanceId, student_id: studentId, status })
+        });
+      } catch (e) { /* fail silently for now */ }
+    }
+
+    async function markAllAs(status) {
+      const date = document.getElementById('dateInput').value;
+      if (!confirm(t('attendance.confirmMarkAll').replace('{status}', t('attendance.status' + status.charAt(0).toUpperCase() + status.slice(1))))) return;
+      const payload = rows.filter(r => r.status !== status).map(r => ({ student_id: r.student_id, date, status, method: 'manual' }));
+      if (!payload.length) return toast(t('attendance.allAlreadySet'), 'info');
+      const { data, error } = await supabaseClient.rpc('bulk_mark_attendance', { p_rows: payload });
+      if (error) return toast(t('attendance.markFailed'), 'error');
+      toast(t('attendance.markedCount').replace('{n}', data.marked), 'success');
+      loadAttendance();
+    }
+
+    function exportCsv() {
+      const date = document.getElementById('dateInput').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      if (!rows.length) return toast(t('attendance.empty'), 'info');
+      const headers = ['student_number','name','classroom','status','check_in_at','reason','notes'];
+      const lines = [headers.join(',')];
+      for (const r of rows) {
+        const name = ((r.first_name_th || '') + ' ' + (r.last_name_th || '')).trim();
+        lines.push([r.student_number, name, r.classroom, r.status, r.check_in_at, r.reason || '', r.notes || ''].map(csvCell).join(','));
+      }
+      const csv = '﻿' + lines.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `attendance-${date}${classroom ? '-' + classroom : ''}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    function csvCell(v) { if (v === null || v === undefined) return ''; const s = String(v).replace(/"/g, '""'); return /[,"\n]/.test(s) ? `"${s}"` : s; }
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(msg, type = 'info') { const tt = document.getElementById('toast'); tt.className = 'toast show ' + type; tt.textContent = msg; setTimeout(() => { tt.className = 'toast'; }, 3500); }
+    async function signOut() { await supabaseClient.auth.signOut(); window.location.href = '../login.html'; }
   </script>
 </body>
 </html>

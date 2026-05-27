@@ -3,110 +3,116 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Attendance — SKKS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/admin.css" />
-  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <title>My Attendance — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-    @media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
-    .stat-box{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center}
-    .stat-num{font-size:28px;font-weight:800}
-    .stat-lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
-    .green{color:#10B981}
-    .yellow{color:#F59E0B}
-    .red{color:#EF4444}
-    .gray{color:#6B7280}
-    
-    .calendar{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:20px;margin-bottom:18px}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:14px}
-    .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;font-size:11px;background:#F9FAFB}
-    .cal-day.present{background:#DCFCE7;color:#15803D}
-    .cal-day.late{background:#FEF3C7;color:#A16207}
-    .cal-day.absent{background:#FEE2E2;color:#991B1B}
-    .cal-day.excused{background:#DBEAFE;color:#1E40AF}
-    .cal-day.weekend{background:#F3F4F6;color:#9CA3AF;font-style:italic}
-    .cal-day .date{font-weight:700;font-size:14px}
-    .cal-day .ico{font-size:14px;margin-top:2px}
-    .day-header{font-size:11px;font-weight:700;color:#6B7280;text-align:center;padding:6px;text-transform:uppercase}
-    
-    .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;justify-content:center}
-    .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B7280}
-    .legend-color{width:14px;height:14px;border-radius:3px}
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+      --pk-warning: #92400E; --pk-warning-bg: #FEF3C7;
+      --pk-danger: #991B1B; --pk-danger-bg: #FEE2E2;
+      --pk-purple-bg: #EDE9FE; --pk-purple: #5B21B6;
+      --pk-cyan-bg: #CFFAFE; --pk-cyan: #155E75;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar img { height: 26px; }
+    .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
+    .back-link:hover { background: var(--pk-canvas); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-header p { color: var(--pk-ash); font-size: 14px; margin-bottom: 20px; }
+
+    .controls { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .controls label { font-size: 12px; color: var(--pk-ash); font-weight: 600; }
+    .controls input, .controls select { padding: 8px 12px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .stat-card { background: var(--pk-paper); padding: 14px 16px; border-radius: 10px; border: 1px solid var(--pk-border); }
+    .stat-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--pk-ash); }
+    .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; font-family: 'Inter', sans-serif; }
+    .stat-card.present .stat-value { color: var(--pk-success); }
+    .stat-card.absent .stat-value { color: var(--pk-danger); }
+    .stat-card.late .stat-value { color: var(--pk-warning); }
+
+    .card { background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 12px; overflow: hidden; }
+    .history-list { padding: 4px; }
+    .history-row { display: grid; grid-template-columns: 120px 1fr auto; gap: 14px; padding: 12px 16px; align-items: center; border-bottom: 1px solid #F0F2F7; }
+    .history-row:last-child { border-bottom: none; }
+    .history-row .date { font-family: 'Inter', monospace; font-weight: 600; color: var(--pk-blue-700); font-size: 13px; }
+    .history-row .info .meta { color: var(--pk-mist); font-size: 12px; }
+    .history-row .info .notes { color: var(--pk-ash); font-size: 12px; margin-top: 3px; font-style: italic; }
+
+    .status-pill {
+      display: inline-block; padding: 4px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .status-pill.present { background: var(--pk-success-bg); color: var(--pk-success); }
+    .status-pill.absent  { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .status-pill.late    { background: var(--pk-warning-bg); color: var(--pk-warning); }
+    .status-pill.excused { background: var(--pk-blue-50); color: var(--pk-blue-700); }
+    .status-pill.leave   { background: var(--pk-purple-bg); color: var(--pk-purple); }
+    .status-pill.sick    { background: var(--pk-cyan-bg); color: var(--pk-cyan); }
+
+    .empty { padding: 60px 20px; text-align: center; color: var(--pk-ash); }
+    .empty .icon { font-size: 48px; margin-bottom: 12px; }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .history-row { grid-template-columns: 1fr; gap: 6px; }
+      input, select { font-size: 16px !important; }
+    }
   </style>
 </head>
 <body>
-  <div class="admin-topbar">
-    <div class="admin-topbar-left">
-      <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS</h1>
-      </a>
-      <nav class="admin-nav">
-        <a href="student-dashboard.html">🏠 Home</a>
-        <a href="my-grades.html">📊 My Grades</a>
-        <a href="my-bills.html">💰 My Bills</a>
-        <a href="my-attendance.html" class="active">📅 Attendance</a>
-        <a href="my-certificates.html">🏆 Certs</a>
-        <a href="profile.html">👤 Profile</a>
-      </nav>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" data-i18n="myAtt.back">← Dashboard</a>
     </div>
-    <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
-    </div>
+    <div class="topbar-right"></div>
   </div>
 
-  <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
-    <div id="content" style="display:none;">
-      <div class="page-header">
-        <div>
-          <h2>📅 My Attendance</h2>
-          <p>การมาเรียนของฉัน</p>
-        </div>
-      </div>
+  <div class="container">
+    <div class="page-header">
+      <h1 data-i18n="myAtt.title">📋 My Attendance History</h1>
+      <p data-i18n="myAtt.subtitle">View your attendance records</p>
+    </div>
 
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-num green" id="cntPresent">0</div>
-          <div class="stat-lbl">Present</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num yellow" id="cntLate">0</div>
-          <div class="stat-lbl">Late</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num red" id="cntAbsent">0</div>
-          <div class="stat-lbl">Absent</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num" id="rate">—</div>
-          <div class="stat-lbl">Attendance Rate</div>
-        </div>
-      </div>
+    <div class="controls">
+      <label data-i18n="myAtt.from">From:</label>
+      <input type="date" id="fromDate" />
+      <label data-i18n="myAtt.to">To:</label>
+      <input type="date" id="toDate" />
+      <button class="btn-primary" onclick="loadHistory()" style="padding:8px 16px;border-radius:9px;background:#1E40AF;color:#fff;border:none;font-family:inherit;font-weight:600;cursor:pointer;" data-i18n="myAtt.refresh">🔄 Refresh</button>
+    </div>
 
-      <div class="calendar">
-        <h3 style="color:#1B5E3F;margin:0 0 10px;">📅 Last 30 Days</h3>
-        <div class="cal-grid" id="dayHeaders">
-          <div class="day-header">Mon</div>
-          <div class="day-header">Tue</div>
-          <div class="day-header">Wed</div>
-          <div class="day-header">Thu</div>
-          <div class="day-header">Fri</div>
-          <div class="day-header">Sat</div>
-          <div class="day-header">Sun</div>
-        </div>
-        <div class="cal-grid" id="calGrid"></div>
-        
-        <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background:#DCFCE7;"></div>Present</div>
-          <div class="legend-item"><div class="legend-color" style="background:#FEF3C7;"></div>Late</div>
-          <div class="legend-item"><div class="legend-color" style="background:#FEE2E2;"></div>Absent</div>
-          <div class="legend-item"><div class="legend-color" style="background:#DBEAFE;"></div>Excused</div>
-          <div class="legend-item"><div class="legend-color" style="background:#F3F4F6;"></div>Weekend</div>
-        </div>
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-label" data-i18n="attendance.statTotal">Total</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat-card present"><div class="stat-label" data-i18n="attendance.statPresent">Present</div><div class="stat-value" id="statPresent">—</div></div>
+      <div class="stat-card absent"><div class="stat-label" data-i18n="attendance.statAbsent">Absent</div><div class="stat-value" id="statAbsent">—</div></div>
+      <div class="stat-card late"><div class="stat-label" data-i18n="attendance.statLate">Late</div><div class="stat-value" id="statLate">—</div></div>
+    </div>
+
+    <div class="card">
+      <div class="history-list" id="historyList">
+        <div class="empty">⏳ Loading...</div>
       </div>
     </div>
   </div>
@@ -115,93 +121,77 @@
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
-  <script>document.addEventListener("langchange", () => location.reload());</script>
-  <script src="../js/data-helpers.js"></script>
+
   <script>
-    async function init() {
-      const profile = await requireStudent();
-      if (!profile) return;
-      
-      const { data: student } = await supabaseClient
-        .from('students')
-        .select('*')
-        .eq('profile_id', profile.id)
-        .single();
-      
-      if (!student) return;
-      
-      const { data: att } = await supabaseClient
-        .from('attendance')
-        .select('*')
-        .eq('student_id', student.id)
-        .order('attendance_date', { ascending: false });
-      
-      renderStats(att || []);
-      renderCalendar(att || []);
-      
-      document.getElementById('loadingMsg').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
-    }
-    
-    function renderStats(records) {
-      const present = records.filter(r => r.status === 'present').length;
-      const late = records.filter(r => r.status === 'late').length;
-      const absent = records.filter(r => r.status === 'absent').length;
-      const total = records.length;
-      const rate = total > 0 ? Math.round(((present + late * 0.5) / total) * 100) : 0;
-      
-      document.getElementById('cntPresent').textContent = present;
-      document.getElementById('cntLate').textContent = late;
-      document.getElementById('cntAbsent').textContent = absent;
-      document.getElementById('rate').textContent = rate + '%';
-      
-      const rateEl = document.getElementById('rate');
-      rateEl.className = 'stat-num ' + (rate >= 90 ? 'green' : rate >= 80 ? 'yellow' : 'red');
-    }
-    
-    function renderCalendar(records) {
-      const grid = document.getElementById('calGrid');
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+
       const today = new Date();
-      const map = {};
-      records.forEach(r => { map[r.attendance_date] = r.status; });
-      
-      const days = [];
-      for (let i = 29; i >= 0; i--) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        days.push(d);
+      const ago30 = new Date(today.getTime() - 30 * 86400 * 1000);
+      document.getElementById('fromDate').valueAsDate = ago30;
+      document.getElementById('toDate').valueAsDate = today;
+
+      document.getElementById('fromDate').addEventListener('change', loadHistory);
+      document.getElementById('toDate').addEventListener('change', loadHistory);
+
+      loadHistory();
+    });
+    document.addEventListener('langchange', () => loadHistory());
+
+    async function loadHistory() {
+      const from = document.getElementById('fromDate').value;
+      const to = document.getElementById('toDate').value;
+
+      document.getElementById('historyList').innerHTML = '<div class="empty">⏳ ' + t('common.loading') + '</div>';
+
+      const { data, error } = await supabaseClient.rpc('get_my_attendance', {
+        p_from: from || null, p_to: to || null
+      });
+
+      if (error) {
+        document.getElementById('historyList').innerHTML = '<div class="empty">' + t('myAtt.loadFailed') + '</div>';
+        return;
       }
-      
-      // Add empty cells for first row alignment (Mon = 1, Sun = 0)
-      const firstDay = days[0];
-      const dayOfWeek = (firstDay.getDay() + 6) % 7; // Convert: Mon=0
-      const emptyCells = Array(dayOfWeek).fill(null);
-      
-      grid.innerHTML = [...emptyCells, ...days].map(d => {
-        if (!d) return '<div></div>';
-        const dStr = d.toISOString().split('T')[0];
-        const day = (d.getDay() + 6) % 7;
-        const isWeekend = day >= 5;
-        const status = map[dStr];
-        
-        let icon = '';
-        let cls = 'weekend';
-        if (!isWeekend) {
-          if (status === 'present') { icon = '✓'; cls = 'present'; }
-          else if (status === 'late') { icon = '⏰'; cls = 'late'; }
-          else if (status === 'absent') { icon = '✗'; cls = 'absent'; }
-          else if (status === 'excused') { icon = '📝'; cls = 'excused'; }
-          else cls = '';
-        }
-        
-        return `<div class="cal-day ${cls}">
-          <div class="date">${d.getDate()}</div>
-          <div class="ico">${icon}</div>
+      if (data?.error) {
+        document.getElementById('historyList').innerHTML = '<div class="empty">' + t('myAtt.noAccess') + '</div>';
+        return;
+      }
+
+      const sum = data.summary || {};
+      document.getElementById('statTotal').textContent   = (sum.total ?? 0).toLocaleString();
+      document.getElementById('statPresent').textContent = (sum.present ?? 0).toLocaleString();
+      document.getElementById('statAbsent').textContent  = (sum.absent ?? 0).toLocaleString();
+      document.getElementById('statLate').textContent    = (sum.late ?? 0).toLocaleString();
+
+      renderHistory(data.rows || []);
+    }
+
+    function renderHistory(rows) {
+      const list = document.getElementById('historyList');
+      if (!rows.length) {
+        list.innerHTML = `<div class="empty"><div class="icon">📅</div><h4>${t('myAtt.empty')}</h4><p>${t('myAtt.emptyDesc')}</p></div>`;
+        return;
+      }
+      const lang = pkI18n.getLang();
+      const dateOpts = { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' };
+      list.innerHTML = rows.map(r => {
+        const dateStr = new Date(r.attendance_date).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-US', dateOpts);
+        const checkIn = r.check_in_at ? new Date(r.check_in_at).toLocaleTimeString(lang === 'th' ? 'th-TH' : 'en-US', { hour: '2-digit', minute: '2-digit' }) : '—';
+        const statusLabel = t('attendance.status' + r.status.charAt(0).toUpperCase() + r.status.slice(1).replace(/_(\w)/g, (_,c) => c.toUpperCase())) || r.status;
+        return `<div class="history-row">
+          <div class="date">${esc(dateStr)}</div>
+          <div class="info">
+            <div class="meta">${t('attendance.checkIn')}: ${checkIn}</div>
+            ${r.reason ? `<div class="notes">${t('attendance.reason')}: ${esc(r.reason)}</div>` : ''}
+            ${r.notes ? `<div class="notes">${esc(r.notes)}</div>` : ''}
+          </div>
+          <div><span class="status-pill ${r.status}">${esc(statusLabel)}</span></div>
         </div>`;
       }).join('');
     }
-    
-    init();
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   </script>
 </body>
 </html>

@@ -353,6 +353,61 @@
       needOption: { en: 'Please add at least 1 option', th: 'กรุณาเพิ่มตัวเลือกอย่างน้อย 1 ตัว' }
     },
 
+    // ---------- Attendance (Sprint 12) ----------
+    attendance: {
+      title: { en: '📅 Attendance', th: '📅 เช็คชื่อ' },
+      subtitle: { en: 'Mark daily attendance and notify parents via LINE', th: 'เช็คชื่อนักเรียนและแจ้งผู้ปกครองผ่าน LINE' },
+      myView: { en: '📋 My View', th: '📋 ของฉัน' },
+      export: { en: '📤 Export', th: '📤 Export' },
+      date: { en: 'Date', th: 'วันที่' },
+      classroom: { en: 'Class', th: 'ห้อง' },
+      grade: { en: 'Grade', th: 'ระดับชั้น' },
+      allClasses: { en: 'All classes', th: 'ทุกห้อง' },
+      refresh: { en: '🔄 Refresh', th: '🔄 รีเฟรช' },
+      statTotal: { en: 'Total', th: 'ทั้งหมด' },
+      statPresent: { en: 'Present', th: 'มาเรียน' },
+      statAbsent: { en: 'Absent', th: 'ขาด' },
+      statLate: { en: 'Late', th: 'มาสาย' },
+      statExcused: { en: 'Excused', th: 'ขาด (ใบลา)' },
+      statLeave: { en: 'Leave', th: 'ลา' },
+      statSick: { en: 'Sick', th: 'ป่วย' },
+      statUnmarked: { en: 'Unmarked', th: 'ยังไม่เช็ค' },
+      statusPresent: { en: '✓ Present', th: '✓ มา' },
+      statusAbsent: { en: '✗ Absent', th: '✗ ขาด' },
+      statusLate: { en: 'Late', th: 'สาย' },
+      statusExcused: { en: 'Excused', th: 'ใบลา' },
+      statusLeave: { en: 'Leave', th: 'ลา' },
+      statusSick: { en: 'Sick', th: 'ป่วย' },
+      statusHalfDayAm: { en: 'Half Day AM', th: 'ครึ่งวันเช้า' },
+      statusHalfDayPm: { en: 'Half Day PM', th: 'ครึ่งวันบ่าย' },
+      markAllPresent: { en: '✓ Mark all Present', th: '✓ เช็คมาทั้งหมด' },
+      markAllAbsent: { en: '✗ Mark all Absent', th: '✗ เช็คขาดทั้งหมด' },
+      markedAs: { en: 'Marked as', th: 'เช็คเป็น' },
+      markedCount: { en: 'Marked {n} students', th: 'เช็คชื่อ {n} คน' },
+      markFailed: { en: 'Failed to mark', th: 'เช็คไม่สำเร็จ' },
+      confirmMarkAll: { en: 'Mark all students as {status}? This will overwrite existing marks.', th: 'เช็คทั้งหมดเป็น "{status}"? จะทับการเช็คที่มีอยู่' },
+      allAlreadySet: { en: 'All students already set', th: 'นักเรียนทุกคนตั้งค่าแล้ว' },
+      empty: { en: 'No students found', th: 'ไม่พบนักเรียน' },
+      emptyDesc: { en: 'Try different filters or check that students are enrolled', th: 'ลองเปลี่ยน filter หรือเช็คว่ามีนักเรียนในระบบ' },
+      loadFailed: { en: 'Load failed', th: 'โหลดไม่สำเร็จ' },
+      checkIn: { en: 'Check-in', th: 'เช้คอิน' },
+      reason: { en: 'Reason', th: 'เหตุผล' }
+    },
+
+    // ---------- My Attendance ----------
+    myAtt: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '📋 My Attendance History', th: '📋 ประวัติการเข้าเรียนของฉัน' },
+      subtitle: { en: 'View your attendance records', th: 'ดูประวัติการเข้าเรียน' },
+      from: { en: 'From', th: 'ตั้งแต่' },
+      to: { en: 'To', th: 'ถึง' },
+      refresh: { en: '🔄 Refresh', th: '🔄 รีเฟรช' },
+      empty: { en: 'No records found', th: 'ไม่มีข้อมูล' },
+      emptyDesc: { en: 'No attendance records in this date range', th: 'ไม่มีประวัติการเช็คชื่อในช่วงเวลานี้' },
+      loadFailed: { en: 'Could not load data', th: 'โหลดข้อมูลไม่ได้' },
+      noAccess: { en: 'You do not have access to this data', th: 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้' }
+    },
+
     // ---------- Subjects (Sprint 11.6) ----------
     subjects: {
       back: { en: '← Back to Teachers', th: '← กลับไปครู' },

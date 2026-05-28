@@ -42,6 +42,23 @@
     .slip-upload-area:hover{background:#DCFCE7}
     .slip-upload-area.has-file{padding:14px}
     .slip-preview{max-width:200px;max-height:200px;border-radius:8px}
+    /* Dynamic QR canvas: keep within small screens */
+    .qr-display #qrCanvas img, .qr-display #qrCanvas canvas { max-width:100%; height:auto; }
+
+    @media (max-width: 768px) {
+      .container{padding:0 14px}
+      .stat-cards{grid-template-columns:1fr 1fr !important;gap:10px}
+      .bill-card{flex-direction:column;align-items:stretch;text-align:left}
+      .bill-amount{text-align:left;min-width:0}
+      .bill-card .btn{width:100%;justify-content:center}
+      .pay-modal-content{max-width:100%}
+      .qr-display{padding:16px}
+      .qr-display .amount-big{font-size:30px}
+      .form-row{flex-direction:column}
+      .modal-footer{flex-direction:column-reverse}
+      .modal-footer .btn{width:100%}
+      input,select,textarea{font-size:16px !important}   /* no iOS zoom */
+    }
   </style>
 </head>
 <body>

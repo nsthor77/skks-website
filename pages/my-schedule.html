@@ -84,6 +84,18 @@
 
     .empty-state { text-align: center; padding: 60px 20px; color: var(--pk-ash); }
     .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    @media (max-width: 768px) {
+      .container { padding: 14px; }
+      .page-header { flex-direction: column; align-items: stretch; }
+      .actions { width: 100%; }
+      .actions .btn { width: 100%; justify-content: center; }
+      .controls { gap: 8px; }
+      .controls input, .controls select { font-size: 16px; }   /* no iOS zoom */
+      .timetable { min-width: 720px; }   /* horizontal scroll on phone */
+      .next-class-card { flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px; }
+      .next-class-card .subject { font-size: 19px; }
+    }
   </style>
 </head>
 <body>

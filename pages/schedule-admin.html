@@ -152,7 +152,27 @@
     .setup-card .icon { font-size: 40px; margin-bottom: 8px; }
 
     @media (max-width: 900px) {
-      .timetable { min-width: 900px; }
+      .timetable { min-width: 760px; }   /* still scrolls horizontally, a touch tighter */
+    }
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .page-header { flex-direction: column; align-items: stretch; }
+      .page-header .actions { width: 100%; }
+      .page-header .actions .btn { flex: 1; justify-content: center; }
+      .controls-bar { gap: 8px; }
+      .controls-bar input, .controls-bar select { font-size: 16px; }  /* prevent iOS zoom */
+      .class-meta-badge { margin-left: 0; width: 100%; justify-content: center; }
+      /* Modal full-width on phones */
+      .modal { max-width: 100%; margin: 0 10px; padding: 18px; max-height: 92vh; }
+      .modal input, .modal select, .modal textarea { font-size: 16px; }
+      .add-teacher-row { flex-wrap: wrap; }
+      .add-teacher-row select { flex: 1 1 100%; }
+      .add-teacher-row .btn { flex: 1 1 100%; }
+      .modal-actions { flex-direction: column-reverse; }
+      .modal-actions .btn { width: 100%; justify-content: center; }
+      /* Period config rows stack labels */
+      .period-row { grid-template-columns: 50px 1fr 1fr !important; row-gap: 4px; }
+      .tt-cell { min-height: 64px; }
     }
   </style>
 </head>

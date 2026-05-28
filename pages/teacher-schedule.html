@@ -68,6 +68,17 @@
     .tt-cell .room { font-size: 10px; color: var(--pk-mist); margin-top: 2px; font-family: 'Inter', monospace; }
     .tt-cell.break { background: #FFF7E6; border: 1px dashed #F59E0B; }
     .tt-cell.break .break-label { color: #92400E; font-weight: 600; font-size: 11px; text-align: center; padding-top: 22px; }
+
+    @media (max-width: 768px) {
+      .container { padding: 14px; }
+      .page-header { flex-direction: column; align-items: stretch; }
+      .controls { gap: 8px; }
+      .controls input, .controls select { font-size: 16px; min-width: 0; }
+      .controls select { flex: 1; }
+      .timetable { min-width: 720px; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      .stat .v { font-size: 18px; }
+    }
   </style>
 </head>
 <body>

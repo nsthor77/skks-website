@@ -638,6 +638,32 @@
       not_found: { en: 'Not found', th: 'ไม่พบข้อมูล' }
     },
 
+    // ---------- Behavior / Conduct Points (Sprint 19) ----------
+    behavior: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '⭐ Behavior Points', th: '⭐ คะแนนพฤติกรรม' },
+      subtitle: { en: 'Record conduct points and view history', th: 'บันทึกคะแนนความประพฤติและดูประวัติ' },
+      student: { en: 'Student', th: 'นักเรียน' },
+      baseNote: { en: 'Starts at 100', th: 'เริ่มต้น 100 คะแนน' },
+      records: { en: 'records', th: 'รายการ' },
+      type: { en: 'Type', th: 'ประเภท' },
+      deduct: { en: '− Deduct', th: '− หักคะแนน' },
+      add: { en: '+ Add', th: '+ เพิ่มคะแนน' },
+      points: { en: 'Points', th: 'คะแนน' },
+      reason: { en: 'Reason', th: 'เหตุผล' },
+      save: { en: '💾 Record', th: '💾 บันทึก' },
+      history: { en: 'History', th: 'ประวัติ' },
+      empty: { en: 'No records yet', th: 'ยังไม่มีรายการ' },
+      recorded: { en: '✅ Recorded', th: '✅ บันทึกแล้ว' },
+      deleted: { en: 'Record deleted', th: 'ลบรายการแล้ว' },
+      confirmDelete: { en: 'Delete this record?', th: 'ลบรายการนี้?' },
+      noStudent: { en: 'No student selected', th: 'ยังไม่ได้เลือกนักเรียน' },
+      noPoints: { en: 'Please enter points', th: 'กรุณากรอกคะแนน' },
+      no_points: { en: 'Please enter points', th: 'กรุณากรอกคะแนน' },
+      no_student: { en: 'No student selected', th: 'ยังไม่ได้เลือกนักเรียน' },
+      forbidden: { en: 'Staff only', th: 'เฉพาะเจ้าหน้าที่' }
+    },
+
     // ---------- Onboarding Wizard (Sprint 16.X) ----------
     onboarding: {
       back: { en: '← Dashboard', th: '← แดชบอร์ด' },

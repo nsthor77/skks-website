@@ -38,6 +38,7 @@
       { href: 'attendance.html',      tier: 'teacher', en: 'Attendance', th: 'เช็คชื่อ' },
       { href: 'leave-requests.html',  tier: 'teacher', en: 'Leave',      th: 'การลา' },
       { href: 'homework.html',        tier: 'teacher', en: 'Homework',   th: 'การบ้าน' },
+      { href: 'behavior.html',        tier: 'teacher', en: 'Behavior',   th: 'พฤติกรรม' },
       { href: 'grades-admin.html',    tier: 'teacher', en: 'Grades',     th: 'เกรด' },
       { href: 'schedule-admin.html',  tier: 'admin',   en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'teacher-schedule.html',tier: 'teacher', en: 'My Schedule',th: 'ตารางสอนของฉัน' },
@@ -69,6 +70,7 @@
       { href: 'my-schedule.html',       en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'my-grades.html',         en: 'My Grades',  th: 'เกรด' },
       { href: 'homework.html',          en: 'Homework',   th: 'การบ้าน' },
+      { href: 'behavior.html',          en: 'Behavior',   th: 'พฤติกรรม' },
       { href: 'my-attendance.html',     en: 'Attendance', th: 'เช็คชื่อ' }
     ]},
     { label: { en: 'General', th: 'ทั่วไป' }, items: [
@@ -94,6 +96,10 @@
     + '#pk-sb .pk-sb-group.open{color:#1E40AF;}'
     + '#pk-sb .pk-sb-group .chev{color:#A6AFC2;font-size:17px;line-height:1;transition:transform .2s ease;}'
     + '#pk-sb .pk-sb-group.open .chev{transform:rotate(90deg);color:#2563EB;}'
+    + '#pk-sb .pk-sb-gl{display:flex;align-items:center;gap:10px;min-width:0;}'
+    + '#pk-sb .pk-sb-ic{width:17px;height:17px;color:#8A93A6;flex-shrink:0;}'
+    + '#pk-sb .pk-sb-group:hover .pk-sb-ic{color:#1E40AF;}'
+    + '#pk-sb .pk-sb-group.open .pk-sb-ic{color:#2563EB;}'
     + '#pk-sb .pk-sb-sub{overflow:hidden;max-height:0;transition:max-height .22s ease;padding-left:6px;}'
     + '#pk-sb .pk-sb-sub.open{max-height:680px;}'
     + '#pk-sb a.pk-sb-link{position:relative;display:block;padding:8px 12px 8px 22px;margin:1px 0;border-radius:8px;'
@@ -125,6 +131,18 @@
 
   var TIER_RANK = { teacher: 1, admin: 2, owner: 3 };
 
+  // subtle line icons (Feather) per category header — keyed by English label
+  var GROUP_ICONS = {
+    'Main': '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+    'People': '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+    'Academic': '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    'Finance': '<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>',
+    'Communicate': '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    'Settings': '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+    'Learning': '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    'General': '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>'
+  };
+
   function buildNav(menu, rank) {
     var lang = langOf();
     var here = curFile();
@@ -134,8 +152,12 @@
       if (!links.length) return;
       var hasActive = links.some(function (it) { return it.href.toLowerCase() === here; });
       var open = hasActive ? ' open' : '';
+      var ic = GROUP_ICONS[group.label.en] || '';
       html += '<button type="button" class="pk-sb-group' + open + '">'
-        + '<span>' + esc(group.label[lang]) + '</span><span class="chev">&#8250;</span></button>';
+        + '<span class="pk-sb-gl">'
+        + (ic ? '<svg class="pk-sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + ic + '</svg>' : '')
+        + '<span>' + esc(group.label[lang]) + '</span></span>'
+        + '<span class="chev">&#8250;</span></button>';
       html += '<div class="pk-sb-sub' + open + '">';
       links.forEach(function (it) {
         var active = (it.href.toLowerCase() === here) ? ' active' : '';

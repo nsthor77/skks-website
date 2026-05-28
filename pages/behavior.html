@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Behavior Points — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-600:#2563EB;--pk-blue-50:#EEF3FF;
+      --pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;
+      --pk-border:#D8DEE9;--pk-border-em:#A8B2C4;
+      --pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-warn:#92400E;--pk-warn-bg:#FEF3C7;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:920px;margin:0 auto;padding:24px;}
+    .page-header h1{font-size:24px;font-weight:700;}
+    .page-header p{color:var(--pk-ash);font-size:14px;margin-top:4px;margin-bottom:18px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}
+    .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-success{background:var(--pk-success-bg);color:var(--pk-success);}
+    .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);}
+    .btn-sm{padding:6px 12px;font-size:12px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:16px 18px;margin-bottom:14px;}
+    .picker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .picker select{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;min-width:240px;}
+    .score-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+    .score-num{font-size:46px;font-weight:800;line-height:1;}
+    .score-num small{font-size:16px;font-weight:600;color:var(--pk-mist);}
+    .score-good{color:#16A34A;}.score-mid{color:#92400E;}.score-bad{color:#991B1B;}
+    .score-meta{font-size:13px;color:var(--pk-ash);}
+    .addgrid{display:grid;grid-template-columns:auto 110px 1fr;gap:10px;align-items:end;}
+    .addgrid label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .addgrid input,.addgrid select{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .seg{display:flex;border:1px solid var(--pk-border);border-radius:8px;overflow:hidden;}
+    .seg button{border:none;background:#fff;padding:9px 14px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;color:var(--pk-ash);}
+    .seg button.on.minus{background:var(--pk-danger);color:#fff;}
+    .seg button.on.plus{background:#16A34A;color:#fff;}
+    .rec{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid #EEF1F6;padding:11px 0;}
+    .rec:last-child{border-bottom:none;}
+    .rec .delta{font-weight:800;font-size:18px;min-width:52px;text-align:right;}
+    .rec .delta.pos{color:#16A34A;}.rec .delta.neg{color:#991B1B;}
+    .rec .info .cat{font-weight:600;font-size:14px;}
+    .rec .info .meta{font-size:12px;color:var(--pk-ash);margin-top:2px;}
+    .empty{text-align:center;padding:40px 20px;color:var(--pk-ash);}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}
+    .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.addgrid{grid-template-columns:1fr;}.picker select{min-width:0;width:100%;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" id="backLink" data-i18n="behavior.back">← Dashboard</a>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <h1 data-i18n="behavior.title">⭐ Behavior Points</h1>
+      <p data-i18n="behavior.subtitle">Record conduct points and view history</p>
+    </div>
+
+    <div class="card" id="pickerCard" style="display:none">
+      <div class="picker">
+        <label data-i18n="behavior.student" style="font-size:13px;color:var(--pk-ash);font-weight:600;">Student:</label>
+        <select id="studentSel" onchange="load()"></select>
+      </div>
+    </div>
+
+    <div class="card" id="scoreCard" style="display:none">
+      <div class="score-wrap">
+        <div><div class="score-num" id="scoreNum">100</div></div>
+        <div class="score-meta"><span id="scoreName"></span><br/><span data-i18n="behavior.baseNote">Starts at 100</span> · <span id="recCount">0</span> <span data-i18n="behavior.records">records</span></div>
+      </div>
+    </div>
+
+    <!-- staff add form -->
+    <div class="card" id="addCard" style="display:none">
+      <div class="addgrid">
+        <div>
+          <label data-i18n="behavior.type">Type</label>
+          <div class="seg">
+            <button type="button" id="segMinus" class="on minus" onclick="setSign(-1)" data-i18n="behavior.deduct">− Deduct</button>
+            <button type="button" id="segPlus" class="plus" onclick="setSign(1)" data-i18n="behavior.add">+ Add</button>
+          </div>
+        </div>
+        <div>
+          <label data-i18n="behavior.points">Points</label>
+          <input type="number" id="bPoints" min="1" step="1" value="5" />
+        </div>
+        <div>
+          <label data-i18n="behavior.reason">Reason</label>
+          <input type="text" id="bReason" list="catList" placeholder="" />
+          <datalist id="catList">
+            <option value="มาสาย"></option><option value="แต่งกายผิดระเบียบ"></option>
+            <option value="ไม่ส่งงาน"></option><option value="ทะเลาะวิวาท"></option>
+            <option value="ช่วยเหลือครู"></option><option value="จิตอาสา"></option>
+            <option value="มารยาทดี"></option><option value="ทำความดี"></option>
+          </datalist>
+        </div>
+      </div>
+      <div style="margin-top:12px;text-align:right;">
+        <button class="btn btn-primary" onclick="record()" data-i18n="behavior.save">💾 Record</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:15px;margin-bottom:8px;" data-i18n="behavior.history">History</h3>
+      <div id="list"><div class="empty">⏳ Loading...</div></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff = false, myStudents = [], rows = [], sign = -1;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      try {
+        const { data: prof } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+        isStaff = ['teacher','staff','admin','owner','developer'].includes(prof?.role);
+      } catch {}
+      document.getElementById('backLink').setAttribute('href', isStaff ? 'dashboard.html' : 'student-dashboard.html');
+      await loadStudents();
+      if (isStaff) { document.getElementById('pickerCard').style.display=''; document.getElementById('addCard').style.display=''; }
+      load();
+    });
+    document.addEventListener('langchange', render);
+
+    async function loadStudents() {
+      try {
+        if (isStaff) {
+          const { data } = await supabaseClient.from('students').select('id, student_number, first_name_th, last_name_th, classroom').eq('status','active').order('classroom').order('student_number').limit(3000);
+          myStudents = data || [];
+        } else {
+          const { data } = await supabaseClient.from('students').select('id, first_name_th, last_name_th, classroom').limit(50);
+          myStudents = data || [];
+        }
+      } catch { myStudents = []; }
+      const sel = document.getElementById('studentSel');
+      if (sel) sel.innerHTML = myStudents.map(s => `<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))}${s.classroom?(' · '+esc(s.classroom)):''}</option>`).join('');
+    }
+
+    function currentStudentId() {
+      if (isStaff) return document.getElementById('studentSel').value || (myStudents[0]&&myStudents[0].id);
+      return (myStudents[0] && myStudents[0].id) || null;
+    }
+
+    async function load() {
+      const sid = currentStudentId();
+      document.getElementById('list').innerHTML = '<div class="empty">⏳ '+t('common.loading')+'</div>';
+      const { data, error } = await supabaseClient.rpc('get_behavior', { p_student_id: sid || null });
+      if (error) { document.getElementById('list').innerHTML = '<div class="empty">'+esc(error.message)+'</div>'; return; }
+      rows = Array.isArray(data) ? data : [];
+      render();
+    }
+
+    function render() {
+      const score = 100 + rows.reduce((a,r)=>a + Number(r.delta||0), 0);
+      const sc = document.getElementById('scoreCard');
+      if (rows.length || isStaff) {
+        sc.style.display='';
+        const num = document.getElementById('scoreNum');
+        num.innerHTML = score + '<small> / 100</small>';
+        num.className = 'score-num ' + (score>=80?'score-good':score>=50?'score-mid':'score-bad');
+        document.getElementById('recCount').textContent = rows.length;
+        const nm = rows[0] ? (((rows[0].first_name_th||'')+' '+(rows[0].last_name_th||'')).trim()) : '';
+        document.getElementById('scoreName').textContent = nm;
+      } else { sc.style.display='none'; }
+
+      const list = document.getElementById('list');
+      if (!rows.length) { list.innerHTML = `<div class="empty">${t('behavior.empty')}</div>`; return; }
+      list.innerHTML = rows.map(r => {
+        const d = Number(r.delta||0);
+        return `<div class="rec">
+          <div class="info">
+            <div class="cat">${esc(r.reason || r.category || '—')}</div>
+            <div class="meta">📅 ${fmt(r.occurred_date)}${r.recorded_by_name?(' · '+esc(r.recorded_by_name)):''}${r.note?(' · '+esc(r.note)):''}</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="delta ${d>=0?'pos':'neg'}">${d>=0?'+':''}${d}</span>
+            ${isStaff?`<button class="btn btn-danger btn-sm" onclick="del('${r.id}')">✕</button>`:''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function setSign(s){ sign=s;
+      document.getElementById('segMinus').classList.toggle('on', s<0);
+      document.getElementById('segPlus').classList.toggle('on', s>0);
+    }
+
+    async function record() {
+      const sid = currentStudentId();
+      if (!sid) { toast(t('behavior.noStudent'),'error'); return; }
+      const pts = Math.abs(Number(document.getElementById('bPoints').value)||0);
+      if (!pts) { toast(t('behavior.noPoints'),'error'); return; }
+      const reason = document.getElementById('bReason').value.trim();
+      const { data, error } = await supabaseClient.rpc('record_behavior', {
+        p_student_id: sid, p_delta: sign*pts, p_category: reason || null, p_reason: reason || null, p_note: null, p_occurred_date: null
+      });
+      if (error) { toast(error.message,'error'); return; }
+      if (!data.success) { toast(t('behavior.'+data.error)||data.error,'error'); return; }
+      toast(t('behavior.recorded'),'success');
+      document.getElementById('bReason').value='';
+      load();
+    }
+
+    async function del(id){
+      if (!confirm(t('behavior.confirmDelete'))) return;
+      const { data, error } = await supabaseClient.rpc('delete_behavior', { p_id: id });
+      if (error) { toast(error.message,'error'); return; }
+      if (!data.success) { toast(data.error,'error'); return; }
+      toast(t('behavior.deleted'),'success'); load();
+    }
+
+    function fmt(d){ try { return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'}); } catch { return d; } }
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(m,ty='info'){ const tt=document.getElementById('toast'); tt.className='toast show '+ty; tt.textContent=m; setTimeout(()=>tt.className='toast',3500); }
+  </script>
+</body>
+</html>

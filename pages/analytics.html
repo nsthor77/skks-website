@@ -147,6 +147,11 @@
       </div>
 
       <div class="chart-card" style="margin-top:18px;">
+        <h3>🎓 GPA เฉลี่ยรายห้อง · Average GPA by Classroom</h3>
+        <div class="chart-wrap" style="height:300px;"><canvas id="gpaClassChart"></canvas></div>
+      </div>
+
+      <div class="chart-card" style="margin-top:18px;">
         <h3>📈 Revenue Trend — Last 6 Months</h3>
         <div class="chart-wrap" style="height:300px;"><canvas id="revenueChart"></canvas></div>
       </div>
@@ -186,6 +191,7 @@
         loadGradeChart(),
         loadBillsChart(),
         loadRevenueChart(),
+        loadGpaByClassChart(),
         loadInsights()
       ]);
     }
@@ -260,10 +266,10 @@
     }
     
     async function loadGradeChart() {
-      const { data } = await supabaseClient.from('student_grades').select('letter_grade');
+      const { data } = await supabaseClient.from('student_grades').select('grade_label');
       const counts = {};
       (data || []).forEach(g => {
-        if (g.letter_grade) counts[g.letter_grade] = (counts[g.letter_grade] || 0) + 1;
+        if (g.grade_label) counts[g.grade_label] = (counts[g.grade_label] || 0) + 1;
       });
       
       const labels = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'].filter(g => counts[g]);
@@ -337,6 +343,58 @@
       });
     }
     
+    async function loadGpaByClassChart() {
+      // Weighted GPA per classroom from student_grades (grade_value × credit_hours)
+      const { data } = await supabaseClient
+        .from('student_grades')
+        .select('classroom, grade_value, credit_hours');
+
+      const byClass = {};
+      (data || []).forEach(g => {
+        if (!g.classroom || g.grade_value === null || g.grade_value === undefined) return;
+        const credits = Number(g.credit_hours || 1);
+        if (!byClass[g.classroom]) byClass[g.classroom] = { sum: 0, cred: 0 };
+        byClass[g.classroom].sum += Number(g.grade_value) * credits;
+        byClass[g.classroom].cred += credits;
+      });
+
+      const labels = Object.keys(byClass)
+        .filter(c => byClass[c].cred > 0)
+        .sort();
+      const values = labels.map(c => +(byClass[c].sum / byClass[c].cred).toFixed(2));
+
+      const canvas = document.getElementById('gpaClassChart');
+      if (!canvas) return;
+
+      if (!labels.length) {
+        // no grade data yet — show friendly empty state
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        charts.gpaClass = new Chart(canvas, {
+          type: 'bar',
+          data: { labels: ['—'], datasets: [{ data: [0], backgroundColor: '#E5E7EB' }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { y: { max: 4, beginAtZero: true } } }
+        });
+        return;
+      }
+
+      // Color by GPA band (green good, amber mid, red low)
+      const colors = values.map(v => v >= 3 ? '#10B981' : (v >= 2 ? '#F59E0B' : '#EF4444'));
+
+      charts.gpaClass = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{ label: 'GPA', data: values, backgroundColor: colors, borderRadius: 6 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => 'GPA: ' + c.parsed.y.toFixed(2) } } },
+          scales: { y: { beginAtZero: true, max: 4, ticks: { stepSize: 0.5 } } }
+        }
+      });
+    }
+
     async function loadInsights() {
       const insights = [];
       
@@ -360,8 +418,8 @@
         insights.push(`วันนี้มีนักเรียนขาดเรียน <strong>${absentToday} คน (${rate}%)</strong>`);
       }
       
-      const { data: grades } = await supabaseClient.from('student_grades').select('letter_grade');
-      const failGrades = (grades || []).filter(g => g.letter_grade === 'F').length;
+      const { data: grades } = await supabaseClient.from('student_grades').select('grade_label');
+      const failGrades = (grades || []).filter(g => g.grade_label === 'F').length;
       
       if (failGrades > 0) {
         insights.push(`มีนักเรียน <strong>${failGrades} วิชา</strong> ที่ได้เกรด F — ควรพิจารณาการสอนซ่อมเสริม`);

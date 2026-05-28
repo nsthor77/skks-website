@@ -75,6 +75,17 @@ const DAYS_TH = ['จันทร์', 'อังคาร', 'พุธ', 'พ�
 function n(v) { return (v === null || v === undefined || v === '') ? '—' : String(v); }
 function tm(s) { return (s || '').toString().slice(0, 5); }
 
+// Co-teaching: join all teacher names (foreign teacher prefixed). Falls back to teacher_name.
+function teacherNames(slot) {
+  const arr = Array.isArray(slot.teachers) && slot.teachers.length
+    ? slot.teachers
+    : (slot.teacher_name ? [{ teacher_name: slot.teacher_name, role: 'lead' }] : []);
+  return arr
+    .map(tch => (tch.role === 'foreign' ? '* ' : '') + (tch.teacher_name || ''))
+    .filter(Boolean)
+    .join(', ');
+}
+
 // ============================================================
 // Build PDF
 // ============================================================
@@ -178,19 +189,20 @@ async function buildPDF({ school, mode, title, subtitle, periods, slots, year, t
           line2 = (slot.subject_code || '') + ' ' + (slot.subject_name || '');
           line3 = slot.room || '';
         } else {
-          // For class view: subject (big) + teacher + room
+          // For class view: subject (big) + teacher(s) + room
           line1 = (slot.subject_code || '') + ' ' + (slot.subject_name || '');
-          line2 = slot.teacher_name || '';
+          line2 = teacherNames(slot);   // joins co-teachers
           line3 = slot.room || '';
         }
 
         doc.fillColor(COLOR.primaryDk).font('Sarabun-Bold').fontSize(11)
            .text(line1 || '—', cx + 8, y + 6, { width: dayColW - 14, lineBreak: false, ellipsis: true });
+        // Teacher line(s) — allow up to 2 visual lines for co-teaching
         doc.fillColor(COLOR.textMuted).font('Sarabun').fontSize(9)
-           .text(line2 || '', cx + 8, y + 22, { width: dayColW - 14, lineBreak: false, ellipsis: true });
+           .text(line2 || '', cx + 8, y + 22, { width: dayColW - 14, height: 22, ellipsis: true });
         if (line3) {
           doc.fillColor(COLOR.textLight).font('Sarabun').fontSize(8)
-             .text('📍 ' + line3, cx + 8, y + 36, { width: dayColW - 14, lineBreak: false, ellipsis: true });
+             .text('📍 ' + line3, cx + 8, y + rowH - 14, { width: dayColW - 14, lineBreak: false, ellipsis: true });
         }
       } else {
         doc.rect(cx, y, dayColW, rowH).fillAndStroke('#FAFAFA', COLOR.border);

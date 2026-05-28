@@ -106,6 +106,32 @@
     .modal textarea { resize: vertical; min-height: 56px; }
     .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
 
+    /* Multi-teacher list */
+    .teacher-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .teacher-chip {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--pk-blue-50); border: 1px solid var(--pk-blue-100);
+      border-radius: 8px; padding: 7px 10px; font-size: 13px;
+    }
+    .teacher-chip .tc-name { font-weight: 600; color: var(--pk-ink); }
+    .teacher-chip .tc-role {
+      font-size: 11px; padding: 2px 8px; border-radius: 100px; margin-left: 8px;
+      background: #fff; color: var(--pk-ash); border: 1px solid var(--pk-border);
+    }
+    .teacher-chip .tc-role.foreign { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+    .teacher-chip .tc-role.lead { background: #DBEAFE; color: #1E40AF; border-color: #BFDBFE; }
+    .teacher-chip .tc-remove { background: none; border: none; color: var(--pk-danger); cursor: pointer; font-size: 16px; padding: 0 4px; }
+    .teacher-list:empty::after { content: attr(data-empty); color: var(--pk-mist); font-size: 12px; font-style: italic; }
+    .add-teacher-row { display: flex; gap: 6px; align-items: center; }
+    .add-teacher-row select { flex: 1; padding: 7px 10px; border: 1px solid var(--pk-border); border-radius: 8px; font-family: inherit; font-size: 13px; }
+    .add-teacher-row select:first-child { flex: 2; }
+    .class-meta-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--pk-blue-50); color: var(--pk-blue-800);
+      border: 1px solid var(--pk-blue-100); border-radius: 100px;
+      padding: 4px 12px; font-size: 12.5px; font-weight: 600; margin-left: 8px;
+    }
+
     .conflict-warning {
       background: var(--pk-warning-bg); color: var(--pk-warning);
       border: 1px solid #F59E0B; border-radius: 8px;
@@ -176,6 +202,7 @@
         <option value="" data-i18n="schedule.selectClass">Select class...</option>
       </select>
       <button class="btn btn-primary" onclick="loadTimetable()" data-i18n="schedule.load">🔄 Load</button>
+      <span id="classMeta" class="class-meta-badge" style="display:none;"></span>
     </div>
 
     <div id="setupCard" class="setup-card" style="display:none;">
@@ -202,8 +229,18 @@
         <select id="slotSubject" onchange="syncSubject()"></select>
       </div>
       <div class="field">
-        <label data-i18n="schedule.teacher">Teacher</label>
-        <select id="slotTeacher" onchange="checkConflict()"></select>
+        <label data-i18n="schedule.teachers">Teachers (co-teaching supported)</label>
+        <div id="teacherList" class="teacher-list"></div>
+        <div class="add-teacher-row">
+          <select id="addTeacherSelect"></select>
+          <select id="addTeacherRole">
+            <option value="lead" data-i18n="schedule.roleLead">Lead</option>
+            <option value="thai" data-i18n="schedule.roleThai">Thai Teacher</option>
+            <option value="foreign" data-i18n="schedule.roleForeign">Foreign Teacher</option>
+            <option value="assistant" data-i18n="schedule.roleAssistant">Assistant</option>
+          </select>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addTeacherToSlot()" data-i18n="schedule.addTeacher">➕ Add</button>
+        </div>
       </div>
       <div class="field">
         <label data-i18n="schedule.room">Room</label>
@@ -250,6 +287,7 @@
     let teachers = [];
     let classrooms = [];
     let currentSlot = null;  // editing slot: {day, period, existing?}
+    let currentTeachers = [];  // [{teacher_id, teacher_name, role}] for slot being edited
 
     const DAYS = [
       { n: 1, key: 'mon' }, { n: 2, key: 'tue' }, { n: 3, key: 'wed' },
@@ -324,8 +362,31 @@
       if (data.error) return toast(data.error, 'error');
       slots = data.slots || [];
       periods = data.periods || periods;
+
+      // Student count badge (data-aware)
+      const meta = document.getElementById('classMeta');
+      if (data.student_count !== undefined && data.student_count !== null) {
+        meta.style.display = 'inline-flex';
+        meta.innerHTML = `👥 ${classroom} · ${data.student_count} ${t('schedule.students')}`;
+      } else {
+        meta.style.display = 'none';
+      }
+
       document.getElementById('timetableWrap').style.display = 'block';
       renderTimetable();
+    }
+
+    // Build display string for a slot's teachers (handles co-teaching)
+    function slotTeachersHtml(slot) {
+      const list = Array.isArray(slot.teachers) && slot.teachers.length
+        ? slot.teachers
+        : (slot.teacher_name ? [{ teacher_name: slot.teacher_name, role: 'lead' }] : []);
+      if (!list.length) return '';
+      return list.map(tch => {
+        const roleClass = tch.role === 'foreign' ? 'foreign' : (tch.role === 'lead' ? 'lead' : '');
+        const flag = tch.role === 'foreign' ? '🌐 ' : '';
+        return `<div class="teacher">${flag}${esc(tch.teacher_name || '')}</div>`;
+      }).join('');
     }
 
     function renderTimetable() {
@@ -355,7 +416,7 @@
             cells.push(`
               <div class="tt-cell filled" onclick="editSlot(${d.n}, ${p.period_number})" style="${slot.color ? 'border-left:4px solid ' + esc(slot.color) : ''}">
                 <div class="subj">${esc(slot.subject_code || '')} ${esc(slot.subject_name || '')}</div>
-                <div class="teacher">${esc(slot.teacher_name || '')}</div>
+                ${slotTeachersHtml(slot)}
                 <div class="room">${slot.room ? '📍 ' + esc(slot.room) : ''}</div>
               </div>
             `);
@@ -367,37 +428,84 @@
       grid.innerHTML = cells.join('');
     }
 
+    function teacherDisplayName(tch) {
+      const nameTh = ((tch.first_name_th || '') + ' ' + (tch.last_name_th || '')).trim();
+      const nameEn = ((tch.first_name_en || '') + ' ' + (tch.last_name_en || '')).trim();
+      return nameTh || nameEn || tch.email || '—';
+    }
+
     function editSlot(day, periodNumber) {
       const existing = slots.find(s => s.day_of_week === day && s.period_number === periodNumber);
       currentSlot = { day, period: periodNumber, existing: existing || null };
 
-      // Populate dropdowns
+      // Subject dropdown
       const subjSel = document.getElementById('slotSubject');
       subjSel.innerHTML = '<option value="">— ' + t('schedule.noSubject') + ' —</option>'
         + subjects.map(s => `<option value="${esc(s.code || s.id)}" data-name="${esc(s.name_th || s.name || s.name_en || '')}" data-id="${esc(s.id || '')}">${esc(s.code || '')} — ${esc(s.name_th || s.name || s.name_en || '')}</option>`).join('');
-      const tchSel = document.getElementById('slotTeacher');
-      tchSel.innerHTML = '<option value="">— ' + t('schedule.noTeacher') + ' —</option>'
-        + teachers.map(tch => {
-          const nameTh = ((tch.first_name_th || '') + ' ' + (tch.last_name_th || '')).trim();
-          const nameEn = ((tch.first_name_en || '') + ' ' + (tch.last_name_en || '')).trim();
-          return `<option value="${esc(tch.id)}" data-name="${esc(nameTh || nameEn)}">${esc(nameTh || nameEn)}</option>`;
-        }).join('');
 
+      // Add-teacher dropdown
+      const addSel = document.getElementById('addTeacherSelect');
+      addSel.innerHTML = '<option value="">— ' + t('schedule.selectTeacherDots') + ' —</option>'
+        + teachers.map(tch => `<option value="${esc(tch.id)}">${esc(teacherDisplayName(tch))}</option>`).join('');
+
+      // Load existing teachers into currentTeachers
       if (existing) {
+        currentTeachers = Array.isArray(existing.teachers) && existing.teachers.length
+          ? existing.teachers.map(x => ({ teacher_id: x.teacher_id, teacher_name: x.teacher_name, role: x.role || 'lead' }))
+          : (existing.teacher_id ? [{ teacher_id: existing.teacher_id, teacher_name: existing.teacher_name, role: 'lead' }] : []);
         subjSel.value = existing.subject_code || '';
-        tchSel.value = existing.teacher_id || '';
         document.getElementById('slotRoom').value = existing.room || '';
         document.getElementById('slotNotes').value = existing.notes || '';
         document.getElementById('deleteBtn').style.display = 'inline-flex';
       } else {
+        currentTeachers = [];
         subjSel.value = '';
-        tchSel.value = '';
         document.getElementById('slotRoom').value = '';
         document.getElementById('slotNotes').value = '';
         document.getElementById('deleteBtn').style.display = 'none';
       }
+      renderTeacherList();
       document.getElementById('conflictWarn').classList.remove('show');
       document.getElementById('slotModal').classList.add('show');
+      checkConflict();
+    }
+
+    function renderTeacherList() {
+      const list = document.getElementById('teacherList');
+      list.setAttribute('data-empty', t('schedule.noTeachersYet'));
+      list.innerHTML = currentTeachers.map((tch, i) => {
+        const roleLabel = t('schedule.role' + (tch.role || 'lead').charAt(0).toUpperCase() + (tch.role || 'lead').slice(1)) || tch.role;
+        const roleClass = tch.role === 'foreign' ? 'foreign' : (tch.role === 'lead' ? 'lead' : '');
+        return `<div class="teacher-chip">
+          <span><span class="tc-name">${esc(tch.teacher_name || '')}</span><span class="tc-role ${roleClass}">${esc(roleLabel)}</span></span>
+          <button type="button" class="tc-remove" onclick="removeTeacherFromSlot(${i})">✕</button>
+        </div>`;
+      }).join('');
+    }
+
+    function addTeacherToSlot() {
+      const sel = document.getElementById('addTeacherSelect');
+      const roleSel = document.getElementById('addTeacherRole');
+      const id = sel.value;
+      if (!id) return;
+      if (currentTeachers.some(x => x.teacher_id === id)) {
+        toast(t('schedule.teacherAlready'), 'error');
+        return;
+      }
+      const tch = teachers.find(x => x.id === id);
+      currentTeachers.push({
+        teacher_id: id,
+        teacher_name: tch ? teacherDisplayName(tch) : '',
+        role: roleSel.value || 'lead'
+      });
+      sel.value = '';
+      renderTeacherList();
+      checkConflict();
+    }
+
+    function removeTeacherFromSlot(idx) {
+      currentTeachers.splice(idx, 1);
+      renderTeacherList();
       checkConflict();
     }
 
@@ -406,13 +514,15 @@
     function closeSlotModal() {
       document.getElementById('slotModal').classList.remove('show');
       currentSlot = null;
+      currentTeachers = [];
     }
 
     async function checkConflict() {
       if (!currentSlot) return;
-      const teacherId = document.getElementById('slotTeacher').value || null;
+      const teacherIds = currentTeachers.map(x => x.teacher_id).filter(Boolean);
       const room = document.getElementById('slotRoom').value.trim() || null;
-      if (!teacherId && !room) {
+      const classroom = document.getElementById('classroomSelect').value;
+      if (!teacherIds.length && !room) {
         document.getElementById('conflictWarn').classList.remove('show');
         return;
       }
@@ -421,14 +531,19 @@
       const { data } = await supabaseClient.rpc('check_slot_conflict', {
         p_academic_year: year, p_term: term,
         p_day_of_week: currentSlot.day, p_period_number: currentSlot.period,
-        p_teacher_id: teacherId, p_room: room,
+        p_teacher_ids: teacherIds, p_room: room, p_classroom: classroom,
         p_exclude_slot_id: currentSlot.existing?.id || null
       });
       const warn = document.getElementById('conflictWarn');
       const conflicts = (data && data.conflicts) || [];
       if (conflicts.length) {
         warn.innerHTML = `<strong>⚠️ ${t('schedule.conflictHeader')}</strong><ul>${
-          conflicts.map(c => `<li>${esc(c.classroom)} — ${esc(c.subject_code || '')} ${esc(c.subject_name || '')} (${c.conflict_type === 'teacher' ? t('schedule.teacherBusy') : t('schedule.roomBusy')})</li>`).join('')
+          conflicts.map(c => {
+            const who = (c.overlap_teachers && c.overlap_teachers.length)
+              ? ' — ' + c.overlap_teachers.map(x => esc(x.teacher_name || '')).join(', ')
+              : '';
+            return `<li>${esc(c.classroom)} · ${esc(c.subject_code || '')} ${esc(c.subject_name || '')} (${c.conflict_type === 'teacher' ? t('schedule.teacherBusy') : t('schedule.roomBusy')})${who}</li>`;
+          }).join('')
         }</ul>`;
         warn.classList.add('show');
       } else {
@@ -448,11 +563,6 @@
       const subjectName = subjOpt?.dataset.name || null;
       const subjectId = subjOpt?.dataset.id && subjOpt.dataset.id !== '' ? subjOpt.dataset.id : null;
 
-      const tchSel = document.getElementById('slotTeacher');
-      const tchOpt = tchSel.options[tchSel.selectedIndex];
-      const teacherId = tchSel.value || null;
-      const teacherName = tchOpt?.dataset.name || null;
-
       const room = document.getElementById('slotRoom').value.trim() || null;
       const notes = document.getElementById('slotNotes').value.trim() || null;
 
@@ -466,7 +576,7 @@
         p_academic_year: year, p_term: term, p_classroom: classroom,
         p_day_of_week: currentSlot.day, p_period_number: currentSlot.period,
         p_subject_code: subjectCode, p_subject_name: subjectName, p_subject_id: subjectId,
-        p_teacher_id: teacherId, p_teacher_name: teacherName,
+        p_teachers: currentTeachers,
         p_room: room, p_notes: notes, p_color: null,
         p_allow_conflict: allowConflict
       });

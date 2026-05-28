@@ -206,7 +206,7 @@
             <div style="flex:1;">
               <div class="label">${isNow ? t('mySchedule.nowLabel') : t('mySchedule.nextLabel')}</div>
               <div class="subject">${esc(nextClass.slot.subject_name || nextClass.slot.subject_code || '—')}</div>
-              <div class="meta">${esc(nextClass.slot.teacher_name || '')} ${nextClass.slot.room ? '· 📍 ' + esc(nextClass.slot.room) : ''}</div>
+              <div class="meta">${esc(slotTeacherNames(nextClass.slot))} ${nextClass.slot.room ? '· 📍 ' + esc(nextClass.slot.room) : ''}</div>
             </div>
             <div style="text-align:right;">
               <div class="label">${t('schedule.period')} ${nextClass.period.period_number}</div>
@@ -245,7 +245,7 @@
             cells.push(`
               <div class="tt-cell ${isCurrent ? 'today-now' : ''}">
                 <div class="subj">${esc(slot.subject_code || '')} ${esc(slot.subject_name || '')}</div>
-                <div class="teacher">${esc(slot.teacher_name || '')}</div>
+                ${slotTeachersHtml(slot)}
                 <div class="room">${slot.room ? '📍 ' + esc(slot.room) : ''}</div>
               </div>
             `);
@@ -279,7 +279,23 @@
       }
     }
 
+    // Co-teaching helpers
+    function slotTeacherArray(slot) {
+      if (Array.isArray(slot.teachers) && slot.teachers.length) return slot.teachers;
+      if (slot.teacher_name) return [{ teacher_name: slot.teacher_name, role: 'lead' }];
+      return [];
+    }
+    function slotTeachersHtml(slot) {
+      return slotTeacherArray(slot).map(tch => {
+        const flag = tch.role === 'foreign' ? '🌐 ' : '';
+        return `<div class="teacher">${flag}${esc(tch.teacher_name || '')}</div>`;
+      }).join('');
+    }
+    function slotTeacherNames(slot) {
+      return slotTeacherArray(slot).map(x => x.teacher_name || '').filter(Boolean).join(', ');
+    }
+
     function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  </script>
+</script>
 </body>
 </html>

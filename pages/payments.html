@@ -300,7 +300,7 @@
     let currentProfile = null;
     
     async function init() {
-      const profile = await roleGuard.requireStaff();
+      const profile = await roleGuard.requireOwner();
       if (!profile) return;
       currentProfile = profile;
       

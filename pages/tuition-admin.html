@@ -178,7 +178,7 @@
     let allFees = [];
     
     async function init() {
-      const profile = await requireStaff();
+      const profile = await roleGuard.requireOwner();
       if (!profile) return;
       
       if (profile.role === 'owner' || profile.role === 'developer') {

@@ -1,0 +1,233 @@
+/* ============================================================================
+   PanyaSchoolKit — Shared Sidebar Navigation (Sprint: nav refresh)
+   ----------------------------------------------------------------------------
+   Replaces the cramped horizontal top-nav with a clean left sidebar.
+   - Self-contained: injects its own CSS + markup, hides the old .admin-nav
+   - Role-aware: staff/owner menu vs student/parent menu; owner-only items
+   - Active-link highlight by current filename
+   - Bilingual TH/EN (reads document.documentElement.lang, re-renders on langchange)
+   - Responsive: off-canvas drawer + hamburger on mobile
+
+   Loaded once. Guarded against double-load. Skips /admin/, login, add-payment.
+   ============================================================================ */
+(function () {
+  if (window.__pkSidebarLoaded) return;
+  window.__pkSidebarLoaded = true;
+
+  var path = (location.pathname || '').toLowerCase();
+  if (path.indexOf('/admin/') > -1) return;                 // platform admin has its own context
+  if (/(login|add-payment)\.html$/.test(path)) return;       // auth / payment flows: no app nav
+
+  // ---- Menu definitions -----------------------------------------------------
+  // tier = minimum role needed to SEE the item: 'teacher' < 'admin' < 'owner'
+  //   teacher  → teaching tools (also visible to admin + owner)
+  //   admin    → site management (also visible to owner) — NOT teachers
+  //   owner    → finance / money (owner only) — NOT admin, NOT teachers
+  var STAFF_MENU = [
+    { label: { en: 'Main', th: 'หลัก' }, items: [
+      { href: 'dashboard.html',   tier: 'teacher', en: 'Dashboard',   th: 'แดชบอร์ด' },
+      { href: 'onboarding.html',  tier: 'admin',   en: 'Setup Guide', th: 'คู่มือตั้งค่า' },
+      { href: 'help.html',        tier: 'teacher', en: 'Manual',      th: 'คู่มือใช้งาน' }
+    ]},
+    { label: { en: 'People', th: 'บุคลากร' }, items: [
+      { href: 'students.html',    tier: 'teacher', en: 'Students',     th: 'นักเรียน' },
+      { href: 'teachers.html',    tier: 'admin',   en: 'Teachers',     th: 'ครู' },
+      { href: 'applications.html',tier: 'admin',   en: 'Applications', th: 'ใบสมัคร' }
+    ]},
+    { label: { en: 'Academic', th: 'วิชาการ' }, items: [
+      { href: 'attendance.html',      tier: 'teacher', en: 'Attendance', th: 'เช็คชื่อ' },
+      { href: 'leave-requests.html',  tier: 'teacher', en: 'Leave',      th: 'การลา' },
+      { href: 'homework.html',        tier: 'teacher', en: 'Homework',   th: 'การบ้าน' },
+      { href: 'grades-admin.html',    tier: 'teacher', en: 'Grades',     th: 'เกรด' },
+      { href: 'schedule-admin.html',  tier: 'admin',   en: 'Schedule',   th: 'ตารางเรียน' },
+      { href: 'teacher-schedule.html',tier: 'teacher', en: 'My Schedule',th: 'ตารางสอนของฉัน' },
+      { href: 'reports.html',         tier: 'admin',   en: 'Reports',    th: 'รายงาน' }
+    ]},
+    { label: { en: 'Finance', th: 'การเงิน' }, items: [
+      { href: 'payments.html',          tier: 'owner', en: 'Payments',  th: 'การชำระเงิน' },
+      { href: 'payment-approvals.html', tier: 'owner', en: 'Approvals', th: 'อนุมัติสลิป' },
+      { href: 'create-bills.html',      tier: 'owner', en: 'Bills',     th: 'ออกบิล' },
+      { href: 'tuition-admin.html',     tier: 'owner', en: 'Tuition',   th: 'ค่าเทอม' },
+      { href: 'finance.html',           tier: 'owner', en: 'Finance',   th: 'การเงินรวม' }
+    ]},
+    { label: { en: 'Communicate', th: 'ข่าวสาร' }, items: [
+      { href: 'events-admin.html', tier: 'admin', en: 'Events', th: 'กิจกรรม' },
+      { href: 'news-admin.html',   tier: 'admin', en: 'News',   th: 'ข่าว' }
+    ]},
+    { label: { en: 'Settings', th: 'ตั้งค่า' }, items: [
+      { href: 'payment-settings.html', tier: 'owner', en: 'Payment Settings', th: 'ตั้งค่าชำระเงิน' },
+      { href: 'custom-tables.html',    tier: 'admin', en: 'Custom Tables',    th: 'ตารางกำหนดเอง' },
+      { href: 'users.html',            tier: 'admin', en: 'Users',            th: 'ผู้ใช้' },
+      { href: 'manage-invites.html',   tier: 'admin', en: 'Invites',          th: 'คำเชิญ' },
+      { href: 'school-settings.html',  tier: 'admin', en: 'School',           th: 'โรงเรียน' }
+    ]}
+  ];
+
+  var STUDENT_MENU = [
+    { label: { en: 'Learning', th: 'การเรียน' }, items: [
+      { href: 'student-dashboard.html', en: 'Home',       th: 'หน้าหลัก' },
+      { href: 'my-schedule.html',       en: 'Schedule',   th: 'ตารางเรียน' },
+      { href: 'my-grades.html',         en: 'My Grades',  th: 'เกรด' },
+      { href: 'homework.html',          en: 'Homework',   th: 'การบ้าน' },
+      { href: 'my-attendance.html',     en: 'Attendance', th: 'เช็คชื่อ' }
+    ]},
+    { label: { en: 'General', th: 'ทั่วไป' }, items: [
+      { href: 'leave-requests.html',  en: 'Leave',        th: 'ขอลา' },
+      { href: 'my-bills.html',        en: 'My Bills',     th: 'ค่าเทอม' },
+      { href: 'my-certificates.html', en: 'Certificates', th: 'เกียรติบัตร' },
+      { href: 'profile.html',         en: 'Profile',      th: 'โปรไฟล์' }
+    ]}
+  ];
+
+  // ---- Styles ---------------------------------------------------------------
+  var CSS = ''
+    + '#pk-sb{position:fixed;top:0;left:0;width:248px;height:100vh;background:#fff;border-right:1px solid #E1E7F5;'
+    + 'overflow-y:auto;z-index:900;display:flex;flex-direction:column;'
+    + "font-family:'IBM Plex Sans Thai','Inter',sans-serif;-webkit-font-smoothing:antialiased;}"
+    + '#pk-sb::-webkit-scrollbar{width:8px;}#pk-sb::-webkit-scrollbar-thumb{background:#D8DEE9;border-radius:8px;}'
+    + '#pk-sb .pk-sb-brand{display:flex;align-items:center;gap:10px;padding:16px 18px 14px;border-bottom:1px solid #EEF0F5;position:sticky;top:0;background:#fff;z-index:1;}'
+    + '#pk-sb .pk-sb-brand img{height:26px;width:auto;}'
+    + '#pk-sb .pk-sb-nav{padding:10px 12px 28px;flex:1;}'
+    + '#pk-sb .pk-sb-group{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;cursor:pointer;'
+    + "font-family:inherit;text-align:left;padding:11px 12px;margin-top:4px;border-radius:9px;color:#15213F;font-size:14.5px;font-weight:700;}"
+    + '#pk-sb .pk-sb-group:hover{background:#F3F6FC;}'
+    + '#pk-sb .pk-sb-group.open{color:#1E40AF;}'
+    + '#pk-sb .pk-sb-group .chev{color:#A6AFC2;font-size:17px;line-height:1;transition:transform .2s ease;}'
+    + '#pk-sb .pk-sb-group.open .chev{transform:rotate(90deg);color:#2563EB;}'
+    + '#pk-sb .pk-sb-sub{overflow:hidden;max-height:0;transition:max-height .22s ease;padding-left:6px;}'
+    + '#pk-sb .pk-sb-sub.open{max-height:680px;}'
+    + '#pk-sb a.pk-sb-link{position:relative;display:block;padding:8px 12px 8px 22px;margin:1px 0;border-radius:8px;'
+    + 'color:#46506B;text-decoration:none;font-size:13.5px;font-weight:500;line-height:1.3;transition:background .14s,color .14s;}'
+    + '#pk-sb a.pk-sb-link:hover{background:#F3F6FC;color:#1E40AF;}'
+    + '#pk-sb a.pk-sb-link.active{background:#EAF0FE;color:#1E40AF;font-weight:600;}'
+    + '#pk-sb a.pk-sb-link.active::before{content:"";position:absolute;left:8px;top:50%;transform:translateY(-50%);width:3px;height:16px;border-radius:3px;background:#2563EB;}'
+    + 'body.pk-has-sb{padding-left:248px;}'
+    + 'body.pk-has-sb .admin-nav{display:none !important;}'
+    + 'body.pk-has-sb .admin-logo{display:none !important;}'
+    + 'body.pk-has-sb .topbar .topbar-left>a:first-child{display:none !important;}'
+    + '#pk-sb-toggle{display:none;}'
+    + '#pk-sb-backdrop{display:none;position:fixed;inset:0;background:rgba(15,26,54,.45);z-index:899;}'
+    + '@media(max-width:900px){'
+    + '  body.pk-has-sb{padding-left:0;}'
+    + '  #pk-sb{transform:translateX(-100%);transition:transform .25s ease;box-shadow:0 0 50px rgba(15,26,54,.25);}'
+    + '  #pk-sb.open{transform:none;}'
+    + '  #pk-sb-backdrop.show{display:block;}'
+    + '  #pk-sb-toggle{display:flex;align-items:center;justify-content:center;position:fixed;top:11px;left:11px;z-index:902;'
+    + '    width:40px;height:40px;border-radius:10px;background:#1E40AF;color:#fff;border:none;cursor:pointer;font-size:18px;'
+    + '    box-shadow:0 4px 14px rgba(30,64,175,.35);}'
+    + '  body.pk-has-sb .admin-topbar,body.pk-has-sb .topbar{padding-left:60px;}'
+    + '}';
+
+  // ---- Helpers --------------------------------------------------------------
+  function langOf() { return (document.documentElement.lang === 'en') ? 'en' : 'th'; }
+  function curFile() { var p = location.pathname.split('/'); return (p[p.length - 1] || 'dashboard.html').toLowerCase(); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+
+  var TIER_RANK = { teacher: 1, admin: 2, owner: 3 };
+
+  function buildNav(menu, rank) {
+    var lang = langOf();
+    var here = curFile();
+    var html = '';
+    menu.forEach(function (group) {
+      var links = group.items.filter(function (it) { return (TIER_RANK[it.tier] || 2) <= rank; });
+      if (!links.length) return;
+      var hasActive = links.some(function (it) { return it.href.toLowerCase() === here; });
+      var open = hasActive ? ' open' : '';
+      html += '<button type="button" class="pk-sb-group' + open + '">'
+        + '<span>' + esc(group.label[lang]) + '</span><span class="chev">&#8250;</span></button>';
+      html += '<div class="pk-sb-sub' + open + '">';
+      links.forEach(function (it) {
+        var active = (it.href.toLowerCase() === here) ? ' active' : '';
+        html += '<a class="pk-sb-link' + active + '" href="' + esc(it.href) + '">' + esc(it[lang]) + '</a>';
+      });
+      html += '</div>';
+    });
+    return html;
+  }
+
+  // ---- Render ---------------------------------------------------------------
+  var sb, nav, menu, userRank;
+
+  function render() {
+    if (nav) nav.innerHTML = buildNav(menu, userRank);
+  }
+
+  function mount(isStudent, rank) {
+    menu = isStudent ? STUDENT_MENU : STAFF_MENU;
+    userRank = rank;
+
+    var style = document.createElement('style');
+    style.id = 'pk-sb-style';
+    style.textContent = CSS;
+    document.head.appendChild(style);
+
+    // base path for the logo image (pages live in /pages/)
+    var logo = '../images/panya-schoolkit-lockup.png';
+
+    sb = document.createElement('aside');
+    sb.id = 'pk-sb';
+    sb.innerHTML = '<div class="pk-sb-brand"><img src="' + logo + '" alt="Panya School Kit" '
+      + 'onerror="this.style.display=\'none\'" /></div><nav class="pk-sb-nav"></nav>';
+    document.body.appendChild(sb);
+    nav = sb.querySelector('.pk-sb-nav');
+
+    // accordion: click a category header to expand/collapse its sub-links
+    nav.addEventListener('click', function (e) {
+      var g = e.target.closest('.pk-sb-group');
+      if (!g) return;
+      var sub = g.nextElementSibling;
+      var willOpen = !g.classList.contains('open');
+      g.classList.toggle('open', willOpen);
+      if (sub && sub.classList.contains('pk-sb-sub')) sub.classList.toggle('open', willOpen);
+    });
+
+    var backdrop = document.createElement('div');
+    backdrop.id = 'pk-sb-backdrop';
+    document.body.appendChild(backdrop);
+
+    var toggle = document.createElement('button');
+    toggle.id = 'pk-sb-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-label', 'Menu');
+    toggle.innerHTML = '☰';
+    document.body.appendChild(toggle);
+
+    function openSb() { sb.classList.add('open'); backdrop.classList.add('show'); }
+    function closeSb() { sb.classList.remove('open'); backdrop.classList.remove('show'); }
+    toggle.addEventListener('click', function () { sb.classList.contains('open') ? closeSb() : openSb(); });
+    backdrop.addEventListener('click', closeSb);
+    sb.addEventListener('click', function (e) { if (e.target.closest('a.pk-sb-link')) closeSb(); });
+
+    document.body.classList.add('pk-has-sb');
+    render();
+    document.addEventListener('langchange', render);
+  }
+
+  // ---- Init -----------------------------------------------------------------
+  async function init() {
+    var role = 'staff';
+    try {
+      if (window.auth && typeof window.auth.getProfile === 'function') {
+        var p = await window.auth.getProfile();
+        if (p && p.role) role = p.role;
+      }
+    } catch (e) { /* fall back to staff/admin menu */ }
+
+    var isStudent = (role === 'student' || role === 'parent');
+    // role → tier rank (teacher 1 < admin 2 < owner 3)
+    var rank;
+    if (role === 'owner' || role === 'developer') rank = 3;        // owner: everything incl finance
+    else if (role === 'teacher') rank = 1;                          // teacher: teaching tools only
+    else if (isStudent) rank = 99;                                  // student menu (no tiers)
+    else rank = 2;                                                  // staff = admin: all except finance
+
+    mount(isStudent, rank);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

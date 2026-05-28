@@ -11,9 +11,10 @@ const roleGuard = {
   ROLES: {
     student: 1,
     parent: 1,
-    staff: 2,
-    owner: 3,
-    developer: 4
+    teacher: 2,   // teaching only
+    staff: 3,     // = admin: manages site, no finance
+    owner: 4,     // full incl finance
+    developer: 5
   },
   
   /**
@@ -125,14 +126,30 @@ const roleGuard = {
   },
   
   /**
-   * Require staff or higher (staff/owner/developer)
+   * Require staff/admin or higher (staff=admin / owner / developer)
+   * NOTE: 'staff' is the ADMIN tier — manages the whole site EXCEPT finance.
    */
   async requireStaff() {
     return this.requireRole(['staff', 'owner', 'developer']);
   },
-  
+
   /**
-   * Require owner or developer
+   * Alias of requireStaff — admin tier (manage site, no finance). Teachers are NOT admins.
+   */
+  async requireAdmin() {
+    return this.requireRole(['staff', 'owner', 'developer']);
+  },
+
+  /**
+   * Require teacher or higher (teacher / staff=admin / owner / developer)
+   * Use on teaching pages: attendance, grades, homework, students view, etc.
+   */
+  async requireTeacher() {
+    return this.requireRole(['teacher', 'staff', 'owner', 'developer']);
+  },
+
+  /**
+   * Require owner or developer (finance / sensitive settings)
    */
   async requireOwner() {
     return this.requireRole(['owner', 'developer']);

@@ -90,7 +90,8 @@
             <option value="">All Roles</option>
             <option value="student">Student</option>
             <option value="parent">Parent</option>
-            <option value="staff">Staff</option>
+            <option value="teacher">Teacher (ครู)</option>
+            <option value="staff">Admin (ผู้ดูแล)</option>
             <option value="owner">Owner</option>
             <option value="developer">Developer</option>
           </select>
@@ -144,11 +145,12 @@
         <div class="form-group">
           <label>New Role <span class="req">*</span></label>
           <select id="newRole" required>
-            <option value="student">👨‍🎓 Student — basic access</option>
-            <option value="parent">👨‍👩‍👧 Parent — view own children</option>
-            <option value="staff">👨‍🏫 Staff — manage students/applications/payments</option>
-            <option value="owner">👑 Owner — full access including finance</option>
-            <option value="developer">🛠️ Developer — system access</option>
+            <option value="student">Student — basic access</option>
+            <option value="parent">Parent — view own children</option>
+            <option value="teacher">Teacher (ครู) — teaching only (attendance, grades, homework)</option>
+            <option value="staff">Admin (ผู้ดูแล) — manage everything except finance</option>
+            <option value="owner">Owner — full access including finance</option>
+            <option value="developer">Developer — system access</option>
           </select>
         </div>
         

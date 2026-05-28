@@ -163,7 +163,9 @@
     }
     
     function payBill(id, amount) {
-      alert(`💰 Payment for ฿${amount.toLocaleString()}\n\nIn production: This redirects to QR payment / Credit card gateway.\n\nFor demo: Visit /pages/parent-bills.html for full payment flow.`);
+      // Full payment flow (dynamic PromptPay QR + slip upload) lives in parent-bills.html.
+      // Pass the bill id so it auto-opens the pay modal.
+      window.location.href = 'parent-bills.html?bill=' + encodeURIComponent(id);
     }
     
     init();

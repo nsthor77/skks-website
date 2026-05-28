@@ -148,6 +148,8 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
+  <script src="../js/promptpay.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
@@ -159,15 +161,23 @@
     let paymentSettings = null;
     let currentBill = null;
     let selectedSlipFile = null;
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     
     async function init() {
       const profile = await requireAuth();
       if (!profile) return;
       
       await Promise.all([loadBills(), loadPaymentSettings()]);
-      
+
       document.getElementById('loadingMsg').style.display = 'none';
       document.getElementById('content').style.display = 'block';
+
+      // Auto-open pay modal if redirected with ?bill=<id> (from my-bills.html)
+      const billParam = new URLSearchParams(window.location.search).get('bill');
+      if (billParam && allBills.some(b => b.id === billParam && b.status !== 'paid')) {
+        openPay(billParam);
+      }
     }
     
     async function loadBills() {
@@ -270,15 +280,30 @@
       selectedSlipFile = null;
       const s = currentBill.students || {};
       
+      // Build QR area: prefer dynamic amount-encoded PromptPay QR, fallback to static image.
+      const ppId = paymentSettings.promptpay_id;
+      let qrBlock;
+      if (ppId && window.PromptPay) {
+        // Dynamic QR — amount baked in, parent scans & pays exact amount
+        qrBlock = `
+          <div id="qrCanvas" style="display:inline-block; margin-top:14px; padding:10px; background:#fff; border-radius:10px;"></div>
+          <p style="margin:10px 0 0; font-size:12px; color:#15803D; font-weight:600;">✅ สแกนแล้วยอดเงินขึ้นอัตโนมัติ — ไม่ต้องพิมพ์เอง</p>
+          <p style="margin:4px 0 0; font-size:11px; color:#9CA3AF;">PromptPay · ${esc(paymentSettings.account_name || '')}</p>`;
+      } else if (paymentSettings.qr_code_url) {
+        qrBlock = `<img src="${paymentSettings.qr_code_url}" alt="QR Code" style="margin-top:14px;" />
+          <p style="margin:10px 0 0; font-size:12px; color:#6B7280;">สแกน QR เพื่อจ่ายด้วย PromptPay<br><small style="color:#A16207;">⚠️ กรุณาพิมพ์ยอด ฿${Number(currentBill.amount).toLocaleString('en-US')} เอง</small></p>`;
+      } else {
+        qrBlock = '<div style="margin-top:14px; padding:30px; background:#F3F4F6; border-radius:8px; color:#9CA3AF;">QR Code จะปรากฏที่นี่<br><small>(โรงเรียนยังไม่ได้ตั้งค่า PromptPay)</small></div>';
+      }
+
       document.getElementById('paymentDetails').innerHTML = `
         <h4 style="color:#1B5E3F; margin:0 0 10px;">💰 จำนวนเงิน</h4>
         <div class="qr-display">
           <div class="amount-big">฿${Number(currentBill.amount).toLocaleString('en-US')}</div>
           <div style="color:#6B7280; font-size:13px;">${currentBill.description}<br>${s.first_name} ${s.last_name}</div>
-          ${paymentSettings.qr_code_url ? `<img src="${paymentSettings.qr_code_url}" alt="QR Code" style="margin-top:14px;" />` : '<div style="margin-top:14px; padding:30px; background:#F3F4F6; border-radius:8px; color:#9CA3AF;">QR Code จะปรากฏที่นี่<br><small>(Owner ยังไม่ได้อัป QR Code)</small></div>'}
-          <p style="margin:10px 0 0; font-size:12px; color:#6B7280;">สแกน QR เพื่อจ่ายด้วย PromptPay</p>
+          ${qrBlock}
         </div>
-        
+
         <div class="bank-info">
           <h4 style="color:#1B5E3F; margin:0 0 10px;">🏦 หรือโอนผ่านธนาคาร</h4>
           <p><strong>ธนาคาร:</strong> ${paymentSettings.bank_name}</p>
@@ -286,10 +311,20 @@
           <p><strong>ชื่อบัญชี:</strong> ${paymentSettings.account_name}</p>
           ${paymentSettings.branch ? `<p><strong>สาขา:</strong> ${paymentSettings.branch}</p>` : ''}
         </div>
-        
+
         ${paymentSettings.payment_note_th ? `<p style="background:#FEF3C7; padding:12px; border-radius:8px; font-size:13px; color:#92400E;">💡 ${paymentSettings.payment_note_th}</p>` : ''}
       `;
-      
+
+      // Render dynamic QR after DOM insert
+      if (ppId && window.PromptPay) {
+        const payload = window.PromptPay.generatePayload(ppId, currentBill.amount);
+        const holder = document.getElementById('qrCanvas');
+        if (payload && holder && window.QRCode) {
+          holder.innerHTML = '';
+          new QRCode(holder, { text: payload, width: 240, height: 240, correctLevel: QRCode.CorrectLevel.M });
+        }
+      }
+
       document.getElementById('slipForm').reset();
       document.getElementById('slipPreview').style.display = 'none';
       document.getElementById('slipPlaceholder').style.display = 'block';

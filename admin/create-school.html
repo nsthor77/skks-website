@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboard School — Panya Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--blue-800:#1E40AF;--blue-50:#EEF3FF;--canvas:#EBF0FA;--ink:#0F1A36;--ash:#4B5670;--border:#D8DEE9;--border-em:#A8B2C4;--success:#065F46;--success-bg:#D1FAE5;--danger:#991B1B;--danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--canvas);color:var(--ink);min-height:100vh;}
+    .topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;} .back-link{color:var(--ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:640px;margin:0 auto;padding:24px;}
+    h1{font-size:23px;font-weight:700;} .sub{color:var(--ash);font-size:14px;margin-top:4px;margin-bottom:18px;}
+    .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;}
+    .field{margin-bottom:14px;} .field label{display:block;font-size:12.5px;color:var(--ash);font-weight:600;margin-bottom:5px;}
+    .field input,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:14px;}
+    .req{color:var(--danger);}
+    .row2{display:flex;gap:12px;}.row2>div{flex:1;}
+    .hint{font-size:11.5px;color:#9AA3B5;margin-top:4px;}
+    .chk{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:14px;}
+    .btn{padding:11px 20px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--blue-800);color:#fff;} .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-ghost{background:#fff;border:1px solid var(--border-em);color:var(--ink);font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer;}
+    .alert{padding:12px 14px;border-radius:10px;font-size:13.5px;margin-bottom:14px;display:none;}
+    .alert.show{display:block;} .alert.err{background:var(--danger-bg);color:var(--danger);} .alert.ok{background:var(--success-bg);color:var(--success);}
+    .result{background:var(--blue-50);border:1px solid #C9D4EE;border-radius:12px;padding:16px;margin-top:16px;display:none;}
+    .result.show{display:block;} .result h3{font-size:15px;margin-bottom:8px;} .result .kv{font-size:13.5px;margin:4px 0;} .result code{background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:13px;}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya Admin" /></a>
+    <a href="dashboard.html" class="back-link">← Admin</a>
+  </div>
+  <div class="container">
+    <h1>🏫 เพิ่มโรงเรียน (Onboard)</h1>
+    <div class="sub">สร้างโรงเรียน + บัญชีผู้บริหาร + เปิดใช้ฟรี (comp) / ส่วนลด — ในขั้นตอนเดียว</div>
+
+    <div class="alert" id="alert"></div>
+
+    <div class="card">
+      <div class="field"><label>ชื่อโรงเรียน (ไทย) <span class="req">*</span></label><input id="schoolName" oninput="autoSlug()" /></div>
+      <div class="field"><label>School name (EN)</label><input id="schoolNameEn" /></div>
+      <div class="field"><label>Subdomain (slug) <span class="req">*</span></label>
+        <input id="slug" placeholder="suansonkk" />
+        <div class="hint">จะได้ลิงก์ <span id="slugPreview">slug</span>.panyaschoolkit.com · a-z 0-9 - เท่านั้น</div>
+      </div>
+      <hr style="border:none;border-top:1px solid #EEF0F5;margin:6px 0 16px;" />
+      <div class="field"><label>อีเมลผู้บริหาร (ใช้ล็อกอิน) <span class="req">*</span></label><input id="ownerEmail" type="email" placeholder="owner@school.ac.th" /></div>
+      <div class="field"><label>รหัสผ่านชั่วคราว <span class="req">*</span></label>
+        <div style="display:flex;gap:8px;"><input id="ownerPassword" style="flex:1;" /><button class="btn-ghost" type="button" onclick="genPass()">สุ่ม</button></div>
+        <div class="hint">อย่างน้อย 8 ตัวอักษร — ส่งให้โรงเรียนเปลี่ยนทีหลัง</div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>ชื่อผู้บริหาร</label><input id="ownerFirstName" /></div>
+        <div class="field"><label>นามสกุล</label><input id="ownerLastName" /></div>
+      </div>
+      <hr style="border:none;border-top:1px solid #EEF0F5;margin:6px 0 16px;" />
+      <div class="row2">
+        <div class="field"><label>ส่วนลดพิเศษ (%)</label><input id="discountPercent" type="number" min="0" max="100" value="0" /></div>
+      </div>
+      <label class="chk"><input type="checkbox" id="comp" checked /> เปิดใช้ฟรี / Comp (ข้ามการจ่ายเงิน — สำหรับทดลอง)</label>
+      <div class="field"><label>หมายเหตุ (ภายใน)</label><textarea id="notes" rows="2" placeholder="เช่น โรงเรียนทดลอง ติดต่อโดยครูสมศรี"></textarea></div>
+
+      <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" style="width:100%;">➕ สร้างโรงเรียน + เปิดใช้</button>
+    </div>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let slugTouched = false;
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireDeveloper();   // developer only
+      if (!prof) return;
+      document.getElementById('slug').addEventListener('input', () => { slugTouched = true; updateSlugPreview(); });
+    });
+
+    function autoSlug(){ if(slugTouched) return; const v=document.getElementById('schoolNameEn').value||document.getElementById('schoolName').value;
+      const s=String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
+      document.getElementById('slug').value=s; updateSlugPreview(); }
+    function updateSlugPreview(){ document.getElementById('slugPreview').textContent=document.getElementById('slug').value||'slug'; }
+    function genPass(){ const c='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let p=''; for(let i=0;i<10;i++)p+=c[Math.floor(Math.random()*c.length)]; document.getElementById('ownerPassword').value=p; }
+
+    function showAlert(msg, ok){ const a=document.getElementById('alert'); a.className='alert show '+(ok?'ok':'err'); a.textContent=msg; a.scrollIntoView({behavior:'smooth',block:'center'}); }
+
+    async function submitForm(){
+      const btn=document.getElementById('submitBtn');
+      const payload={
+        schoolName: val('schoolName'), schoolNameEn: val('schoolNameEn'), slug: val('slug').toLowerCase(),
+        ownerEmail: val('ownerEmail').toLowerCase(), ownerPassword: val('ownerPassword'),
+        ownerFirstName: val('ownerFirstName'), ownerLastName: val('ownerLastName'),
+        discountPercent: Number(val('discountPercent'))||0, comp: document.getElementById('comp').checked, notes: val('notes')
+      };
+      if(!payload.schoolName||!payload.slug||!payload.ownerEmail||!payload.ownerPassword){ showAlert('กรอกช่องที่มี * ให้ครบ',false); return; }
+      if(payload.ownerPassword.length<8){ showAlert('รหัสผ่านอย่างน้อย 8 ตัว',false); return; }
+
+      const { data:{ session } } = await supabaseClient.auth.getSession();
+      if(!session){ showAlert('เซสชันหมดอายุ — ล็อกอินใหม่',false); return; }
+
+      btn.disabled=true; btn.textContent='⏳ กำลังสร้าง...';
+      try {
+        const r = await fetch('/api/admin/create-school', {
+          method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+session.access_token },
+          body: JSON.stringify(payload)
+        });
+        const data = await r.json();
+        if(!r.ok || !data.success){ throw new Error(data.error||'สร้างไม่สำเร็จ'); }
+        document.getElementById('alert').className='alert';
+        const res=document.getElementById('result');
+        res.className='result show';
+        res.innerHTML=`<h3>✅ สร้างโรงเรียนสำเร็จ!</h3>
+          <div class="kv">โรงเรียน: <strong>${esc(payload.schoolName)}</strong></div>
+          <div class="kv">เว็บ: <code>https://${esc(data.slug)}.panyaschoolkit.com</code></div>
+          <div class="kv">ล็อกอิน: <code>${esc(data.login_email)}</code> / <code>${esc(payload.ownerPassword)}</code></div>
+          <div class="kv">สถานะ: <strong>เปิดใช้แล้ว</strong>${data.comp?' · Comp (ฟรี)':''}${data.discount_percent?(' · ส่วนลด '+data.discount_percent+'%'):''}</div>
+          <div class="kv" style="color:var(--ash);margin-top:8px;">📋 ส่งลิงก์ + อีเมล + รหัสผ่านนี้ให้โรงเรียน แล้วให้เปลี่ยนรหัสเมื่อเข้าใช้ครั้งแรก</div>`;
+        res.scrollIntoView({behavior:'smooth',block:'center'});
+        // reset form
+        ['schoolName','schoolNameEn','slug','ownerEmail','ownerPassword','ownerFirstName','ownerLastName','notes'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('discountPercent').value='0'; slugTouched=false;
+      } catch(err){ showAlert('❌ '+err.message, false); }
+      finally { btn.disabled=false; btn.textContent='➕ สร้างโรงเรียน + เปิดใช้'; }
+    }
+    function val(id){ return (document.getElementById(id).value||'').trim(); }
+    function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student ID Cards — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    :root{--pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-600:#2563EB;--pk-canvas:#EBF0FA;--pk-paper:#fff;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:980px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:14px;}
+    h1{font-size:24px;font-weight:700;} .sub{color:var(--pk-ash);font-size:14px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}
+    .filters{background:#fff;border:1px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .filters select{padding:8px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+    .idcard{width:320px;height:200px;border-radius:14px;background:linear-gradient(135deg,#1E3A8A 0%,#1E40AF 55%,#2563EB 100%);color:#fff;padding:16px;position:relative;overflow:hidden;box-shadow:0 6px 18px rgba(15,26,54,.18);}
+    .idcard .head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;opacity:.95;}
+    .idcard .head img{height:18px;filter:brightness(0) invert(1);}
+    .idcard .body{display:flex;gap:12px;margin-top:12px;}
+    .idcard .photo{width:74px;height:90px;border-radius:8px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;overflow:hidden;flex-shrink:0;}
+    .idcard .photo img{width:100%;height:100%;object-fit:cover;}
+    .idcard .info{flex:1;min-width:0;}
+    .idcard .info .nm{font-size:16px;font-weight:700;line-height:1.2;}
+    .idcard .info .row{font-size:12px;opacity:.9;margin-top:5px;}
+    .idcard .qr{position:absolute;right:14px;bottom:14px;background:#fff;padding:4px;border-radius:6px;width:56px;height:56px;}
+    .idcard .qr img,.idcard .qr canvas{width:48px !important;height:48px !important;}
+    .empty{text-align:center;padding:46px 20px;color:var(--pk-ash);}
+    @media print{ body{background:#fff;} .topbar,.page-header,.filters,.noprint{display:none !important;} .container{max-width:none;padding:0;} .cards{gap:10px;} .idcard{box-shadow:none;border:1px solid #ccc;-webkit-print-color-adjust:exact;print-color-adjust:exact;} }
+    @media(max-width:640px){.container{padding:14px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+    <a href="dashboard.html" class="back-link" id="backLink" data-i18n="idcard.back">← Dashboard</a>
+  </div>
+  <div class="container">
+    <div class="page-header">
+      <div><h1 data-i18n="idcard.title">🪪 Student ID Cards</h1><div class="sub" data-i18n="idcard.subtitle">Printable student cards with QR</div></div>
+      <button class="btn btn-primary noprint" onclick="window.print()" data-i18n="idcard.print">🖨️ Print</button>
+    </div>
+    <div class="filters" id="filterBar" style="display:none">
+      <label data-i18n="idcard.class" style="font-size:12px;color:var(--pk-ash);font-weight:600;">Class:</label>
+      <select id="classFilter" onchange="load()"><option value="" data-i18n="idcard.pickClass">— Select class —</option></select>
+    </div>
+    <div id="cards"><div class="empty" id="hint" data-i18n="idcard.hint">Select a class to generate cards</div></div>
+  </div>
+
+  <script src="../js/i18n.js"></script><script src="../js/supabase-client.js"></script><script src="../js/auth.js"></script><script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff=false, school={name:'',logo_url:''};
+    document.addEventListener('DOMContentLoaded', async()=>{
+      const session=await auth.getSession(); if(!session){location.href='../login.html';return;}
+      try{const{data:prof}=await supabaseClient.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+        isStaff=['teacher','staff','admin','owner','developer'].includes(prof?.role);}catch{}
+      document.getElementById('backLink').setAttribute('href', isStaff?'dashboard.html':'student-dashboard.html');
+      try{const{data}=await supabaseClient.from('schools').select('name, school_name, school_name_th').limit(1).maybeSingle();
+        if(data) school={ name:(data.school_name_th||data.school_name||data.name||''), logo_url:'' };}catch{}
+      if(isStaff){ document.getElementById('filterBar').style.display=''; await loadClasses(); }
+      else { renderCards(await myStudents()); document.getElementById('hint').remove?.(); }
+    });
+
+    async function loadClasses(){let c=[];try{const{data}=await supabaseClient.from('students').select('classroom').eq('status','active').not('classroom','is',null).limit(5000);c=[...new Set((data||[]).map(r=>r.classroom).filter(Boolean))].sort();}catch{}
+      document.getElementById('classFilter').insertAdjacentHTML('beforeend', c.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join(''));}
+    async function myStudents(){try{const{data}=await supabaseClient.from('students').select('*').limit(50);return data||[];}catch{return[];}}
+
+    async function load(){
+      const cls=document.getElementById('classFilter').value;
+      if(!cls){ document.getElementById('cards').innerHTML=`<div class="empty">${t('idcard.hint')}</div>`; return; }
+      document.getElementById('cards').innerHTML='<div class="empty">⏳ '+t('common.loading')+'</div>';
+      const{data,error}=await supabaseClient.from('students').select('*').eq('status','active').eq('classroom',cls).order('student_number').limit(2000);
+      if(error){ document.getElementById('cards').innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      renderCards(data||[]);
+    }
+
+    function renderCards(students){
+      const el=document.getElementById('cards');
+      if(!students.length){ el.innerHTML=`<div class="empty">${t('idcard.none')}</div>`; return; }
+      el.innerHTML = `<div class="cards">${students.map((s,i)=>{
+        const nm=((s.first_name_th||'')+' '+(s.last_name_th||'')).trim() || ((s.first_name_en||'')+' '+(s.last_name_en||'')).trim() || '—';
+        const photo = s.photo_url || s.image_url || s.avatar_url || '';
+        const initials = (nm[0]||'?');
+        return `<div class="idcard">
+          <div class="head"><img src="${esc(school.logo_url||'../images/panya-schoolkit-lockup.png')}" onerror="this.style.display='none'"/> ${esc(school.name||'')}</div>
+          <div class="body">
+            <div class="photo">${photo?`<img src="${esc(photo)}" onerror="this.parentNode.textContent='${esc(initials)}'"/>`:esc(initials)}</div>
+            <div class="info">
+              <div class="nm">${esc(nm)}</div>
+              <div class="row">${t('idcard.no')}: ${esc(s.student_number||'-')}</div>
+              <div class="row">${t('idcard.room')}: ${esc(s.classroom||'-')}</div>
+              ${s.grade?`<div class="row">${esc(s.grade)}</div>`:''}
+            </div>
+          </div>
+          <div class="qr" id="qr_${i}"></div>
+        </div>`;
+      }).join('')}</div>`;
+      // render QR codes
+      students.forEach((s,i)=>{ try{ new QRCode(document.getElementById('qr_'+i), { text: String(s.student_number||s.id||''), width:48, height:48, correctLevel: QRCode.CorrectLevel.M }); }catch(e){} });
+    }
+    function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  </script>
+</body>
+</html>

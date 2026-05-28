@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#fff;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-mist:#7B8497;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:980px;margin:0 auto;padding:20px;}
+    h1{font-size:22px;font-weight:700;margin-bottom:14px;}
+    .layout{display:grid;grid-template-columns:300px 1fr;gap:16px;height:calc(100vh - 160px);min-height:420px;}
+    .pane{background:#fff;border:1px solid var(--pk-border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
+    .thead{padding:12px 14px;border-bottom:1px solid var(--pk-border);font-weight:700;font-size:14px;}
+    .tlist{overflow-y:auto;flex:1;}
+    .thread{padding:11px 14px;border-bottom:1px solid #F1F3F8;cursor:pointer;}
+    .thread:hover{background:var(--pk-blue-50);} .thread.active{background:var(--pk-blue-50);}
+    .thread .nm{font-weight:600;font-size:14px;} .thread .last{font-size:12px;color:var(--pk-ash);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .picker{padding:10px 12px;border-bottom:1px solid var(--pk-border);}
+    .picker select{width:100%;padding:8px 10px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:13px;}
+    .chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:#FAFBFD;}
+    .bub{max-width:75%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.45;}
+    .bub.them{align-self:flex-start;background:#fff;border:1px solid var(--pk-border);border-bottom-left-radius:4px;}
+    .bub.me{align-self:flex-end;background:var(--pk-blue-800);color:#fff;border-bottom-right-radius:4px;}
+    .bub .who{font-size:11px;opacity:.7;margin-bottom:2px;}
+    .bub .tm{font-size:10px;opacity:.6;margin-top:3px;text-align:right;}
+    .composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--pk-border);}
+    .composer input{flex:1;padding:10px 12px;border:1px solid var(--pk-border);border-radius:10px;font-family:inherit;font-size:14px;}
+    .composer button{background:var(--pk-blue-800);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;}
+    .empty{text-align:center;padding:40px 20px;color:var(--pk-ash);margin:auto;}
+    @media(max-width:760px){.layout{grid-template-columns:1fr;height:auto;}.pane.chatpane{min-height:60vh;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+    <a href="dashboard.html" class="back-link" id="backLink" data-i18n="msg.back">← Dashboard</a>
+  </div>
+  <div class="container">
+    <h1 data-i18n="msg.title">💬 Messages</h1>
+    <div class="layout">
+      <div class="pane">
+        <div class="thead" data-i18n="msg.threads">Conversations</div>
+        <div class="picker" id="pickerWrap" style="display:none">
+          <select id="newStudent" onchange="startThread()"><option value="" data-i18n="msg.startNew">+ Start new...</option></select>
+        </div>
+        <div class="tlist" id="threadList"><div class="empty">⏳</div></div>
+      </div>
+      <div class="pane chatpane">
+        <div class="thead" id="chatTitle" data-i18n="msg.pick">Select a conversation</div>
+        <div class="chat" id="chat"><div class="empty" data-i18n="msg.pickHint">Pick a conversation to start chatting</div></div>
+        <div class="composer" id="composer" style="display:none">
+          <input type="text" id="msgInput" placeholder="" onkeydown="if(event.key==='Enter')sendMsg()" />
+          <button onclick="sendMsg()" data-i18n="msg.send">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script><script src="../js/supabase-client.js"></script><script src="../js/auth.js"></script><script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff=false, threads=[], curStudent=null, curName='';
+    document.addEventListener('DOMContentLoaded', async()=>{
+      const session=await auth.getSession(); if(!session){location.href='../login.html';return;}
+      try{const{data:prof}=await supabaseClient.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+        isStaff=['teacher','staff','admin','owner','developer'].includes(prof?.role);}catch{}
+      document.getElementById('backLink').setAttribute('href', isStaff?'dashboard.html':'student-dashboard.html');
+      if(isStaff){ document.getElementById('pickerWrap').style.display=''; await loadAllStudents(); }
+      document.getElementById('msgInput').placeholder=t('msg.type');
+      loadThreads();
+    });
+    async function loadAllStudents(){try{const{data}=await supabaseClient.from('students').select('id, first_name_th, last_name_th, classroom').eq('status','active').order('classroom').order('student_number').limit(3000);
+      document.getElementById('newStudent').insertAdjacentHTML('beforeend',(data||[]).map(s=>`<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))}${s.classroom?(' · '+esc(s.classroom)):''}</option>`).join(''));}catch{}}
+    async function loadThreads(){
+      const{data}=await supabaseClient.rpc('get_threads'); threads=Array.isArray(data)?data:[];
+      const el=document.getElementById('threadList');
+      if(!threads.length){ el.innerHTML=`<div class="empty">${t('msg.none')}</div>`; return; }
+      el.innerHTML=threads.map(th=>{const nm=((th.first_name_th||'')+' '+(th.last_name_th||'')).trim()||'—';
+        return `<div class="thread ${th.student_id===curStudent?'active':''}" onclick="openThread('${th.student_id}', ${JSON.stringify(nm).replace(/"/g,'&quot;')})">
+          <div class="nm">${esc(nm)} ${th.classroom?`<span style="font-size:11px;color:var(--pk-mist);font-weight:400;">· ${esc(th.classroom)}</span>`:''}</div>
+          <div class="last">${th.last_body?esc(th.last_body):'—'}</div></div>`;}).join('');
+    }
+    function startThread(){const sel=document.getElementById('newStudent');const id=sel.value;if(!id)return;
+      const nm=sel.options[sel.selectedIndex].text.split(' · ')[0]; sel.value=''; openThread(id, nm);}
+    async function openThread(sid, nm){
+      curStudent=sid; curName=nm||'';
+      document.getElementById('chatTitle').textContent=curName;
+      document.getElementById('composer').style.display='';
+      document.querySelectorAll('.thread').forEach(t=>t.classList.remove('active'));
+      await loadChat();
+    }
+    async function loadChat(){
+      const{data}=await supabaseClient.rpc('get_messages',{p_student_id:curStudent});
+      const arr=Array.isArray(data)?data:[];
+      const el=document.getElementById('chat');
+      if(!arr.length){ el.innerHTML=`<div class="empty">${t('msg.noMsg')}</div>`; return; }
+      el.innerHTML=arr.map(m=>`<div class="bub ${m.mine?'me':'them'}">
+        ${!m.mine&&m.sender_name?`<div class="who">${esc(m.sender_name)}${m.sender_role?(' · '+roleLabel(m.sender_role)):''}</div>`:''}
+        <div>${esc(m.body)}</div><div class="tm">${tm(m.created_at)}</div></div>`).join('');
+      el.scrollTop=el.scrollHeight;
+    }
+    async function sendMsg(){
+      const inp=document.getElementById('msgInput'); const body=inp.value.trim(); if(!body||!curStudent)return;
+      inp.value='';
+      const{data,error}=await supabaseClient.rpc('send_message',{p_student_id:curStudent,p_body:body});
+      if(error){ inp.value=body; return; }
+      if(!data.success){ inp.value=body; return; }
+      await loadChat(); loadThreads();
+    }
+    function roleLabel(r){ return (r==='owner'||r==='staff'||r==='admin'||r==='teacher'||r==='developer')?t('msg.staff'):t('msg.parent'); }
+    function tm(d){try{return new Date(d).toLocaleString('th-TH',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return'';}}
+    function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  </script>
+</body>
+</html>

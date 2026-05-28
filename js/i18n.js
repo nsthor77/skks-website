@@ -841,6 +841,98 @@
       not_found: { en: 'Not found', th: 'ไม่พบข้อมูล' }
     },
 
+    // ---------- Exam Schedule (Sprint 24) ----------
+    exam: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '🗒️ Exam Schedule', th: '🗒️ ตารางสอบ' },
+      subtitle: { en: 'Exam timetable and seating', th: 'ตารางสอบและผังที่นั่ง' },
+      new: { en: '➕ New Exam', th: '➕ เพิ่มตารางสอบ' },
+      edit: { en: '✏️ Edit Exam', th: '✏️ แก้ไขตารางสอบ' },
+      class: { en: 'Class:', th: 'ห้อง:' },
+      allClasses: { en: 'All classes', th: 'ทุกห้อง' },
+      allSchool: { en: 'Whole school', th: 'ทั้งโรงเรียน' },
+      fTitle: { en: 'Exam name', th: 'ชื่อการสอบ' },
+      fSubject: { en: 'Subject', th: 'วิชา' },
+      fClass: { en: 'Class', th: 'ห้อง' },
+      fDate: { en: 'Date', th: 'วันที่' },
+      fRoom: { en: 'Room', th: 'ห้องสอบ' },
+      fStart: { en: 'Start', th: 'เริ่ม' },
+      fEnd: { en: 'End', th: 'สิ้นสุด' },
+      save: { en: '💾 Save', th: '💾 บันทึก' },
+      seating: { en: 'Seating', th: 'ผังที่นั่ง' },
+      seats: { en: 'seats', th: 'ที่นั่ง' },
+      noStudents: { en: 'No students in this class', th: 'ไม่มีนักเรียนในห้องนี้' },
+      empty: { en: 'No exams scheduled', th: 'ยังไม่มีตารางสอบ' },
+      needTitle: { en: 'Please enter exam name', th: 'กรุณากรอกชื่อการสอบ' },
+      saved: { en: '✅ Saved', th: '✅ บันทึกแล้ว' },
+      deleted: { en: 'Exam deleted', th: 'ลบแล้ว' },
+      confirmDelete: { en: 'Delete this exam?', th: 'ลบตารางสอบนี้?' },
+      no_title: { en: 'Please enter exam name', th: 'กรุณากรอกชื่อการสอบ' },
+      forbidden: { en: 'Staff only', th: 'เฉพาะเจ้าหน้าที่' },
+      not_found: { en: 'Not found', th: 'ไม่พบข้อมูล' }
+    },
+
+    // ---------- Student ID Cards (Sprint 25) ----------
+    idcard: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '🪪 Student ID Cards', th: '🪪 บัตรนักเรียน' },
+      subtitle: { en: 'Printable student cards with QR', th: 'บัตรนักเรียนพร้อมพิมพ์ + QR' },
+      print: { en: '🖨️ Print', th: '🖨️ พิมพ์' },
+      class: { en: 'Class:', th: 'ห้อง:' },
+      pickClass: { en: '— Select class —', th: '— เลือกห้อง —' },
+      hint: { en: 'Select a class to generate cards', th: 'เลือกห้องเพื่อสร้างบัตร' },
+      none: { en: 'No students in this class', th: 'ไม่มีนักเรียนในห้องนี้' },
+      no: { en: 'ID', th: 'เลขประจำตัว' },
+      room: { en: 'Class', th: 'ห้อง' }
+    },
+
+    // ---------- Messaging (Sprint 26) ----------
+    msg: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '💬 Messages', th: '💬 ข้อความ' },
+      threads: { en: 'Conversations', th: 'การสนทนา' },
+      startNew: { en: '+ Start new...', th: '+ เริ่มสนทนาใหม่...' },
+      pick: { en: 'Select a conversation', th: 'เลือกการสนทนา' },
+      pickHint: { en: 'Pick a conversation to start chatting', th: 'เลือกการสนทนาเพื่อเริ่มแชท' },
+      send: { en: 'Send', th: 'ส่ง' },
+      type: { en: 'Type a message...', th: 'พิมพ์ข้อความ...' },
+      none: { en: 'No conversations yet', th: 'ยังไม่มีการสนทนา' },
+      noMsg: { en: 'No messages yet — say hi 👋', th: 'ยังไม่มีข้อความ — ทักทายได้เลย 👋' },
+      staff: { en: 'Teacher', th: 'ครู' },
+      parent: { en: 'Parent', th: 'ผู้ปกครอง' }
+    },
+
+    // ---------- Academic Calendar (Sprint 27) ----------
+    cal: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '📅 Academic Calendar', th: '📅 ปฏิทินการศึกษา' },
+      add: { en: '➕ Add Event', th: '➕ เพิ่มกิจกรรม' },
+      editEvent: { en: '✏️ Edit Event', th: '✏️ แก้ไขกิจกรรม' },
+      today: { en: 'Today', th: 'วันนี้' },
+      holiday: { en: 'Holiday', th: 'วันหยุด' },
+      exam: { en: 'Exam', th: 'สอบ' },
+      activity: { en: 'Activity', th: 'กิจกรรม' },
+      important: { en: 'Important', th: 'สำคัญ' },
+      event: { en: 'Event', th: 'ทั่วไป' },
+      monthEvents: { en: 'This month', th: 'เดือนนี้' },
+      noEvents: { en: 'No events this month', th: 'ไม่มีกิจกรรมเดือนนี้' },
+      fTitle: { en: 'Title', th: 'ชื่อกิจกรรม' },
+      fCategory: { en: 'Category', th: 'ประเภท' },
+      fDate: { en: 'Date', th: 'วันที่' },
+      fEnd: { en: 'End (optional)', th: 'ถึงวันที่ (ถ้ามี)' },
+      fDesc: { en: 'Description', th: 'รายละเอียด' },
+      save: { en: '💾 Save', th: '💾 บันทึก' },
+      delete: { en: '🗑️ Delete', th: '🗑️ ลบ' },
+      needTitle: { en: 'Please enter a title', th: 'กรุณากรอกชื่อกิจกรรม' },
+      saved: { en: '✅ Saved', th: '✅ บันทึกแล้ว' },
+      deleted: { en: 'Deleted', th: 'ลบแล้ว' },
+      confirmDelete: { en: 'Delete this event?', th: 'ลบกิจกรรมนี้?' },
+      no_title: { en: 'Please enter a title', th: 'กรุณากรอกชื่อกิจกรรม' },
+      no_date: { en: 'Please select a date', th: 'กรุณาเลือกวันที่' },
+      forbidden: { en: 'Staff only', th: 'เฉพาะเจ้าหน้าที่' },
+      not_found: { en: 'Not found', th: 'ไม่พบข้อมูล' }
+    },
+
     // ---------- Onboarding Wizard (Sprint 16.X) ----------
     onboarding: {
       back: { en: '← Dashboard', th: '← แดชบอร์ด' },

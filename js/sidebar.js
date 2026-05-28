@@ -27,13 +27,15 @@
     { label: { en: 'Main', th: 'หลัก' }, items: [
       { href: 'dashboard.html',   tier: 'teacher', en: 'Dashboard',   th: 'แดชบอร์ด' },
       { href: 'onboarding.html',  tier: 'admin',   en: 'Setup Guide', th: 'คู่มือตั้งค่า' },
-      { href: 'help.html',        tier: 'teacher', en: 'Manual',      th: 'คู่มือใช้งาน' }
+      { href: 'help.html',        tier: 'teacher', en: 'Manual',      th: 'คู่มือใช้งาน' },
+      { href: 'calendar.html',    tier: 'teacher', en: 'Calendar',    th: 'ปฏิทิน' }
     ]},
     { label: { en: 'People', th: 'บุคลากร' }, items: [
       { href: 'students.html',    tier: 'teacher', en: 'Students',     th: 'นักเรียน' },
       { href: 'health.html',      tier: 'teacher', en: 'Health',       th: 'ห้องพยาบาล' },
       { href: 'teachers.html',    tier: 'admin',   en: 'Teachers',     th: 'ครู' },
-      { href: 'applications.html',tier: 'admin',   en: 'Applications', th: 'ใบสมัคร' }
+      { href: 'applications.html',tier: 'admin',   en: 'Applications', th: 'ใบสมัคร' },
+      { href: 'id-cards.html',    tier: 'admin',   en: 'ID Cards',     th: 'บัตรนักเรียน' }
     ]},
     { label: { en: 'Academic', th: 'วิชาการ' }, items: [
       { href: 'attendance.html',      tier: 'teacher', en: 'Attendance', th: 'เช็คชื่อ' },
@@ -43,6 +45,7 @@
       { href: 'materials.html',       tier: 'teacher', en: 'Materials',  th: 'สื่อการสอน' },
       { href: 'quiz.html',            tier: 'teacher', en: 'Quizzes',    th: 'ข้อสอบ' },
       { href: 'grades-admin.html',    tier: 'teacher', en: 'Grades',     th: 'เกรด' },
+      { href: 'exam-schedule.html',   tier: 'teacher', en: 'Exams',      th: 'ตารางสอบ' },
       { href: 'schedule-admin.html',  tier: 'admin',   en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'teacher-schedule.html',tier: 'teacher', en: 'My Schedule',th: 'ตารางสอนของฉัน' },
       { href: 'library.html',         tier: 'teacher', en: 'Library',    th: 'ห้องสมุด' },
@@ -56,6 +59,7 @@
       { href: 'finance.html',           tier: 'owner', en: 'Finance',   th: 'การเงินรวม' }
     ]},
     { label: { en: 'Communicate', th: 'ข่าวสาร' }, items: [
+      { href: 'messages.html',     tier: 'teacher', en: 'Messages', th: 'ข้อความ' },
       { href: 'events-admin.html', tier: 'admin', en: 'Events', th: 'กิจกรรม' },
       { href: 'news-admin.html',   tier: 'admin', en: 'News',   th: 'ข่าว' }
     ]},
@@ -71,18 +75,22 @@
   var STUDENT_MENU = [
     { label: { en: 'Learning', th: 'การเรียน' }, items: [
       { href: 'student-dashboard.html', en: 'Home',       th: 'หน้าหลัก' },
+      { href: 'calendar.html',          en: 'Calendar',   th: 'ปฏิทิน' },
       { href: 'my-schedule.html',       en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'my-grades.html',         en: 'My Grades',  th: 'เกรด' },
       { href: 'homework.html',          en: 'Homework',   th: 'การบ้าน' },
       { href: 'behavior.html',          en: 'Behavior',   th: 'พฤติกรรม' },
       { href: 'materials.html',         en: 'Materials',  th: 'สื่อการสอน' },
       { href: 'quiz.html',              en: 'Quizzes',    th: 'ข้อสอบ' },
+      { href: 'exam-schedule.html',     en: 'Exam Schedule', th: 'ตารางสอบ' },
       { href: 'my-attendance.html',     en: 'Attendance', th: 'เช็คชื่อ' }
     ]},
     { label: { en: 'General', th: 'ทั่วไป' }, items: [
       { href: 'leave-requests.html',  en: 'Leave',        th: 'ขอลา' },
       { href: 'library.html',         en: 'Library',      th: 'ห้องสมุด' },
       { href: 'health.html',          en: 'Health',       th: 'สุขภาพ' },
+      { href: 'id-cards.html',        en: 'ID Card',      th: 'บัตรนักเรียน' },
+      { href: 'messages.html',        en: 'Messages',     th: 'ข้อความ' },
       { href: 'my-bills.html',        en: 'My Bills',     th: 'ค่าเทอม' },
       { href: 'my-certificates.html', en: 'Certificates', th: 'เกียรติบัตร' },
       { href: 'profile.html',         en: 'Profile',      th: 'โปรไฟล์' }

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>โรงเรียน — PanyaSchoolKit</title>
+  <meta name="description" id="metaDesc" content="เว็บไซต์โรงเรียน" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--ink:#0F1A36;--muted:#5A6788;--line:#E1E7F5;--blue:#2563EB;--blue-deep:#1E3A8A;--blue-700:#1E40AF;--blue-50:#EEF3FF;--canvas:#EBF0FA;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Sarabun',system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased;}
+    h1,h2,h3{font-family:'Prompt',sans-serif;letter-spacing:-.01em;}
+    a{color:inherit;}
+    .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:14px 24px;}
+    .nav .brand{font-family:'Prompt';font-weight:700;font-size:18px;color:var(--blue-deep);}
+    .nav .links{display:flex;gap:18px;align-items:center;font-size:14px;font-weight:500;}
+    .nav .links a{text-decoration:none;color:var(--muted);}
+    .nav .links a:hover{color:var(--blue);}
+    .lang{border:1.5px solid rgba(30,64,175,.28);color:var(--blue-700);background:#fff;font-family:inherit;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer;}
+    .hero{background:radial-gradient(900px 480px at 12% -10%,#DCE6FB 0,rgba(220,230,251,0) 60%),linear-gradient(180deg,#EEF3FF,#fff);padding:72px 24px 56px;text-align:center;}
+    .hero .mark{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--blue-deep));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Prompt';font-weight:800;font-size:30px;margin:0 auto 18px;}
+    .hero h1{font-size:clamp(28px,5vw,46px);font-weight:700;line-height:1.1;}
+    .hero .motto{color:var(--muted);font-size:17px;margin-top:14px;max-width:640px;margin-left:auto;margin-right:auto;}
+    .cta{display:inline-flex;gap:10px;margin-top:26px;}
+    .btn{display:inline-block;padding:12px 24px;border-radius:999px;font-family:'Prompt';font-weight:500;font-size:15px;text-decoration:none;cursor:pointer;}
+    .btn-primary{background:linear-gradient(180deg,var(--blue),var(--blue-700));color:#fff;box-shadow:0 8px 20px rgba(37,99,235,.3);}
+    .btn-outline{background:#fff;border:1.5px solid var(--line);color:var(--ink);}
+    .section{max-width:1080px;margin:0 auto;padding:56px 24px;}
+    .section h2{font-size:clamp(24px,3vw,32px);font-weight:700;text-align:center;}
+    .section .lead{text-align:center;color:var(--muted);margin-top:10px;max-width:720px;margin-left:auto;margin-right:auto;line-height:1.7;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-top:32px;}
+    .ncard{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;transition:transform .2s,box-shadow .2s;}
+    .ncard:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(15,26,54,.08);}
+    .ncard .img{height:150px;background:var(--blue-50) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:40px;color:#B9C6EA;}
+    .ncard .pad{padding:16px 18px;}
+    .ncard h3{font-size:16.5px;font-weight:600;line-height:1.3;}
+    .ncard p{color:var(--muted);font-size:13.5px;margin-top:8px;line-height:1.55;}
+    .ncard .date{font-size:12px;color:var(--blue);font-weight:600;margin-top:10px;}
+    .evrow{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;}
+    .evrow .d{flex-shrink:0;width:64px;text-align:center;background:var(--blue-50);border-radius:10px;padding:8px;}
+    .evrow .d .day{font-family:'Prompt';font-weight:700;font-size:22px;color:var(--blue-deep);line-height:1;}
+    .evrow .d .mon{font-size:12px;color:var(--muted);}
+    .evrow h3{font-size:16px;font-weight:600;} .evrow .meta{font-size:13px;color:var(--muted);margin-top:5px;}
+    .contact{background:var(--canvas);}
+    .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:28px;}
+    .cbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;}
+    .cbox .l{font-size:12px;color:var(--muted);font-weight:600;} .cbox .v{font-size:15px;margin-top:5px;font-weight:500;}
+    footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);}
+    footer a{color:var(--blue);}
+    .state{text-align:center;padding:90px 24px;color:var(--muted);}
+    .hidden{display:none;}
+    @media(max-width:640px){.nav .links a:not(.lang){display:none;}}
+  </style>
+</head>
+<body>
+  <div id="loading" class="state">⏳ กำลังโหลด...</div>
+  <div id="notfound" class="state hidden">
+    <h2 style="font-size:24px;">ไม่พบโรงเรียน</h2>
+    <p style="margin-top:10px;">ไม่พบเว็บไซต์โรงเรียนนี้ — ตรวจสอบลิงก์อีกครั้ง</p>
+  </div>
+
+  <div id="site" class="hidden">
+    <nav class="nav">
+      <div class="brand" id="navBrand"></div>
+      <div class="links">
+        <a href="#news" data-i18n="pub.news">ข่าวสาร</a>
+        <a href="#events" data-i18n="pub.events">กิจกรรม</a>
+        <a href="#contact" data-i18n="pub.contact">ติดต่อ</a>
+        <button class="lang" id="langBtn" onclick="toggleLang()">EN</button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="mark" id="heroMark">M</div>
+      <h1 id="heroName"></h1>
+      <p class="motto" id="heroMotto"></p>
+      <div class="cta">
+        <a href="#contact" class="btn btn-primary" data-i18n="pub.apply">สมัครเรียน / สอบถาม</a>
+        <a href="#news" class="btn btn-outline" data-i18n="pub.seeNews">ดูข่าวสาร</a>
+      </div>
+    </section>
+
+    <section class="section" id="about-sec" style="display:none;">
+      <h2 data-i18n="pub.about">เกี่ยวกับโรงเรียน</h2>
+      <p class="lead" id="aboutText"></p>
+    </section>
+
+    <section class="section" id="news">
+      <h2 data-i18n="pub.news">ข่าวสาร</h2>
+      <div id="newsWrap"></div>
+    </section>
+
+    <section class="section" id="events">
+      <h2 data-i18n="pub.events">กิจกรรม</h2>
+      <div id="eventsWrap" style="margin-top:28px;"></div>
+    </section>
+
+    <section class="section contact" id="contact" style="max-width:none;">
+      <div style="max-width:1080px;margin:0 auto;">
+        <h2 data-i18n="pub.contact">ติดต่อโรงเรียน</h2>
+        <div class="cgrid" id="contactGrid"></div>
+      </div>
+    </section>
+
+    <footer>
+      <div id="footName"></div>
+      <div style="margin-top:6px;">Powered by <a href="https://panyaschoolkit.com" target="_blank" rel="noopener">Panya School Kit</a></div>
+    </footer>
+  </div>
+
+  <script>
+    var SB_URL='https://nuzhkhchimemuetoewzn.supabase.co';
+    var SB_KEY='sb_publishable_prRghlKfBE1VqrpJDZmmSA_1XifObOJ';
+    var sb = window.supabase.createClient(SB_URL, SB_KEY);
+    var lang = (function(){try{return localStorage.getItem('pk_lang')||'th';}catch(e){return 'th';}})();
+    var T = {
+      'pub.news':{th:'ข่าวสาร',en:'News'}, 'pub.events':{th:'กิจกรรม',en:'Events'}, 'pub.contact':{th:'ติดต่อ',en:'Contact'},
+      'pub.apply':{th:'สมัครเรียน / สอบถาม',en:'Admission / Enquire'}, 'pub.seeNews':{th:'ดูข่าวสาร',en:'See news'},
+      'pub.about':{th:'เกี่ยวกับโรงเรียน',en:'About'}, 'pub.noNews':{th:'ยังไม่มีข่าวสาร',en:'No news yet'},
+      'pub.noEvents':{th:'ยังไม่มีกิจกรรม',en:'No events yet'}, 'pub.addr':{th:'ที่อยู่',en:'Address'},
+      'pub.phone':{th:'โทรศัพท์',en:'Phone'}, 'pub.email':{th:'อีเมล',en:'Email'}, 'pub.web':{th:'เว็บไซต์',en:'Website'},
+      'pub.contactTitle':{th:'ติดต่อโรงเรียน',en:'Contact us'}
+    };
+    function tr(k){ return (T[k]&&T[k][lang])||k; }
+    function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+
+    function resolveKey(){
+      var p=new URLSearchParams(location.search);
+      if(p.get('s')) return {slug:p.get('s')};
+      if(p.get('d')) return {domain:p.get('d')};
+      var h=location.hostname;
+      if(h && h!=='localhost' && !h.startsWith('127.')){
+        if(h.endsWith('.panyaschoolkit.com')){ return {slug:h.split('.')[0]}; }
+        if(h!=='panyaschoolkit.com' && h!=='www.panyaschoolkit.com'){ return {domain:h}; }
+      }
+      return {slug:null};
+    }
+
+    (async function init(){
+      var key=resolveKey();
+      if(!key.slug && !key.domain){ show('notfound'); return; }
+      var { data } = await sb.rpc('get_public_school',{ p_slug:key.slug||null, p_domain:key.domain||null });
+      if(!data || data.error || !data.school){ show('notfound'); return; }
+      render(data.school);
+      show('site');
+      var sid=data.school.id;
+      loadNews(sid); loadEvents(sid);
+    })();
+
+    function show(id){ ['loading','notfound','site'].forEach(function(x){ document.getElementById(x).classList.toggle('hidden', x!==id); }); }
+
+    function applyStatic(){ document.querySelectorAll('[data-i18n]').forEach(function(el){ var k=el.getAttribute('data-i18n'); if(T[k]) el.textContent=T[k][lang]; }); document.getElementById('langBtn').textContent= lang==='th'?'EN':'ไทย'; }
+
+    var SCHOOL=null;
+    function render(s){
+      SCHOOL=s;
+      var nm = s.name || s.name_en || '';
+      document.title = nm + ' — โรงเรียน';
+      document.getElementById('navBrand').textContent = nm;
+      document.getElementById('heroName').textContent = nm;
+      document.getElementById('heroMark').textContent = (nm[0]||'โ');
+      document.getElementById('heroMotto').textContent = s.motto || '';
+      document.getElementById('footName').textContent = nm;
+      if(s.about){ document.getElementById('about-sec').style.display=''; document.getElementById('aboutText').textContent=s.about; }
+      var cg=document.getElementById('contactGrid'); var rows=[];
+      if(s.address) rows.push(['pub.addr', s.address]);
+      if(s.phone) rows.push(['pub.phone', s.phone]);
+      if(s.email) rows.push(['pub.email', s.email]);
+      if(s.website) rows.push(['pub.web', s.website]);
+      cg.innerHTML = rows.length? rows.map(function(r){return '<div class="cbox"><div class="l">'+tr(r[0])+'</div><div class="v">'+esc(r[1])+'</div></div>';}).join('') : '<div class="cbox"><div class="v">'+esc(s.email||s.phone||'-')+'</div></div>';
+      applyStatic();
+    }
+
+    async function loadNews(sid){
+      var { data } = await sb.rpc('get_public_news',{ p_school_id:sid });
+      var arr=Array.isArray(data)?data:[]; var w=document.getElementById('newsWrap');
+      if(!arr.length){ w.innerHTML='<p class="lead">'+tr('pub.noNews')+'</p>'; return; }
+      w.innerHTML='<div class="grid">'+arr.map(function(n){
+        return '<div class="ncard"><div class="img" '+(n.image_url?('style="background-image:url(\''+esc(n.image_url)+'\')"'):'')+'>'+(n.image_url?'':'📰')+'</div>'
+          +'<div class="pad"><h3>'+esc(n.title)+'</h3><p>'+esc(n.excerpt||(n.content?String(n.content).slice(0,120):''))+'</p>'
+          +'<div class="date">'+fmt(n.created_at)+'</div></div></div>';
+      }).join('')+'</div>';
+    }
+    async function loadEvents(sid){
+      var { data } = await sb.rpc('get_public_events',{ p_school_id:sid });
+      var arr=Array.isArray(data)?data:[]; var w=document.getElementById('eventsWrap');
+      if(!arr.length){ w.innerHTML='<p class="lead">'+tr('pub.noEvents')+'</p>'; return; }
+      w.innerHTML=arr.map(function(e){ var d=e.event_date?new Date(e.event_date):null;
+        return '<div class="evrow"><div class="d"><div class="day">'+(d?d.getDate():'-')+'</div><div class="mon">'+(d?monShort(d):'')+'</div></div>'
+          +'<div><h3>'+esc(e.title)+'</h3><div class="meta">'+(e.location?('📍 '+esc(e.location)):'')+(e.description?(' · '+esc(e.description)):'')+'</div></div></div>';
+      }).join('');
+    }
+    function toggleLang(){ lang= lang==='th'?'en':'th'; try{localStorage.setItem('pk_lang',lang);}catch(e){} document.documentElement.lang=lang; if(SCHOOL){render(SCHOOL); loadNews(SCHOOL.id); loadEvents(SCHOOL.id);} }
+    function fmt(d){ if(!d)return''; try{return new Date(d).toLocaleDateString(lang==='en'?'en-GB':'th-TH',{day:'numeric',month:'short',year:'numeric'});}catch(e){return'';} }
+    function monShort(d){ try{return d.toLocaleDateString(lang==='en'?'en-GB':'th-TH',{month:'short'});}catch(e){return'';} }
+  </script>
+</body>
+</html>

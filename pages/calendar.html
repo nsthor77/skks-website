@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academic Calendar — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#fff;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-mist:#7B8497;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:960px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;}
+    h1{font-size:22px;font-weight:700;}
+    .btn{padding:8px 14px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}.btn-secondary{background:#fff;color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}.btn-danger{background:#FEE2E2;color:#991B1B;}
+    .navbar{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+    .navbar .mon{font-size:17px;font-weight:700;min-width:160px;text-align:center;}
+    .navbar button{background:#fff;border:1px solid var(--pk-border-em);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;}
+    .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:#fff;border:1px solid var(--pk-border);border-radius:12px;padding:10px;}
+    .dow{font-size:12px;font-weight:700;color:var(--pk-ash);text-align:center;padding:4px 0;}
+    .cell{min-height:78px;border:1px solid #EEF1F6;border-radius:8px;padding:5px;font-size:12px;cursor:pointer;}
+    .cell.out{background:#FAFBFD;color:#C2C8D4;}
+    .cell.today{border-color:var(--pk-blue-800);box-shadow:0 0 0 1px var(--pk-blue-800) inset;}
+    .cell .dn{font-weight:700;font-size:12px;}
+    .ev{margin-top:3px;padding:2px 5px;border-radius:5px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
+    .c-holiday{background:#DC2626;} .c-exam{background:#7C3AED;} .c-activity{background:#16A34A;} .c-important{background:#D97706;} .c-event{background:#2563EB;}
+    .legend{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;font-size:12px;color:var(--pk-ash);}
+    .legend span{display:inline-flex;align-items:center;gap:5px;} .dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+    .list .item{background:#fff;border:1px solid var(--pk-border);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+    .item .d{font-weight:700;color:var(--pk-blue-800);font-size:13px;min-width:60px;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}.modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:440px;} .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;}.field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;}.row2>div{flex:1;} .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}.toast.show{opacity:1;}.toast.success{background:#065F46;}.toast.error{background:#991B1B;}
+    @media(max-width:640px){.container{padding:12px;}.cell{min-height:56px;}.ev{font-size:9px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+    <a href="dashboard.html" class="back-link" id="backLink" data-i18n="cal.back">← Dashboard</a>
+  </div>
+  <div class="container">
+    <div class="page-header">
+      <h1 data-i18n="cal.title">📅 Academic Calendar</h1>
+      <button class="btn btn-primary" id="addBtn" onclick="openEvent()" style="display:none" data-i18n="cal.add">➕ Add Event</button>
+    </div>
+    <div class="navbar">
+      <button onclick="moveMonth(-1)">‹</button>
+      <div class="mon" id="monLabel"></div>
+      <button onclick="moveMonth(1)">›</button>
+      <button class="btn btn-secondary" style="width:auto;height:auto;" onclick="goToday()" data-i18n="cal.today">Today</button>
+    </div>
+    <div class="legend">
+      <span><i class="dot c-holiday"></i><span data-i18n="cal.holiday">Holiday</span></span>
+      <span><i class="dot c-exam"></i><span data-i18n="cal.exam">Exam</span></span>
+      <span><i class="dot c-activity"></i><span data-i18n="cal.activity">Activity</span></span>
+      <span><i class="dot c-important"></i><span data-i18n="cal.important">Important</span></span>
+      <span><i class="dot c-event"></i><span data-i18n="cal.event">Event</span></span>
+    </div>
+    <div class="grid" id="grid"></div>
+    <h3 style="font-size:15px;margin:16px 0 8px;" data-i18n="cal.monthEvents">This month</h3>
+    <div class="list" id="list"></div>
+  </div>
+
+  <div class="modal-bd" id="evModal"><div class="modal">
+    <h2 id="evFormTitle" data-i18n="cal.add">➕ Add Event</h2>
+    <input type="hidden" id="cId" />
+    <div class="field"><label data-i18n="cal.fTitle">Title</label><input type="text" id="cTitle" /></div>
+    <div class="row2">
+      <div class="field"><label data-i18n="cal.fCategory">Category</label>
+        <select id="cCategory">
+          <option value="event" data-i18n="cal.event">Event</option>
+          <option value="holiday" data-i18n="cal.holiday">Holiday</option>
+          <option value="exam" data-i18n="cal.exam">Exam</option>
+          <option value="activity" data-i18n="cal.activity">Activity</option>
+          <option value="important" data-i18n="cal.important">Important</option>
+        </select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label data-i18n="cal.fDate">Date</label><input type="date" id="cDate" /></div>
+      <div class="field"><label data-i18n="cal.fEnd">End (optional)</label><input type="date" id="cEnd" /></div>
+    </div>
+    <div class="field"><label data-i18n="cal.fDesc">Description</label><textarea id="cDesc" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="cDelBtn" onclick="delEvent()" style="display:none" data-i18n="cal.delete">Delete</button>
+      <button class="btn btn-secondary" onclick="closeEvent()" data-i18n="common.cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEvent()" data-i18n="cal.save">💾 Save</button>
+    </div>
+  </div></div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../js/i18n.js"></script><script src="../js/supabase-client.js"></script><script src="../js/auth.js"></script><script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff=false, cur=new Date(), events=[];
+    document.addEventListener('DOMContentLoaded', async()=>{
+      const session=await auth.getSession(); if(!session){location.href='../login.html';return;}
+      try{const{data:prof}=await supabaseClient.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+        isStaff=['teacher','staff','admin','owner','developer'].includes(prof?.role);}catch{}
+      document.getElementById('backLink').setAttribute('href', isStaff?'dashboard.html':'student-dashboard.html');
+      if(isStaff) document.getElementById('addBtn').style.display='';
+      load();
+    });
+    document.addEventListener('langchange', render);
+    function moveMonth(d){ cur=new Date(cur.getFullYear(), cur.getMonth()+d, 1); load(); }
+    function goToday(){ cur=new Date(); load(); }
+    async function load(){
+      const y=cur.getFullYear(), m=cur.getMonth();
+      const from=new Date(y,m,1), to=new Date(y,m+1,0);
+      const{data}=await supabaseClient.rpc('get_calendar_events',{p_from:iso(from), p_to:iso(to)});
+      events=Array.isArray(data)?data:[];
+      render();
+    }
+    function render(){
+      const y=cur.getFullYear(), m=cur.getMonth();
+      const months=(localStorage.getItem('pk_lang')==='en')?['January','February','March','April','May','June','July','August','September','October','November','December']:['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      document.getElementById('monLabel').textContent = months[m]+' '+(y+ (localStorage.getItem('pk_lang')==='en'?0:543));
+      const dows=(localStorage.getItem('pk_lang')==='en')?['Su','Mo','Tu','We','Th','Fr','Sa']:['อา','จ','อ','พ','พฤ','ศ','ส'];
+      const first=new Date(y,m,1).getDay(); const days=new Date(y,m+1,0).getDate();
+      const today=iso(new Date());
+      const byDay={}; events.forEach(e=>{ (byDay[e.event_date]=byDay[e.event_date]||[]).push(e); });
+      let html = dows.map(d=>`<div class="dow">${d}</div>`).join('');
+      for(let i=0;i<first;i++) html+='<div class="cell out"></div>';
+      for(let d=1;d<=days;d++){
+        const ds=iso(new Date(y,m,d));
+        const evs=(byDay[ds]||[]);
+        html+=`<div class="cell ${ds===today?'today':''}" ${isStaff?`onclick="openEvent(null,'${ds}')"`:''}>
+          <div class="dn">${d}</div>
+          ${evs.map(e=>`<div class="ev c-${esc(e.category||'event')}" ${isStaff?`onclick="event.stopPropagation();openEvent('${e.id}')"`:''} title="${esc(e.title)}">${esc(e.title)}</div>`).join('')}
+        </div>`;
+      }
+      document.getElementById('grid').innerHTML=html;
+      const list=document.getElementById('list');
+      list.innerHTML = events.length? events.map(e=>`<div class="item">
+        <div class="d">${dShort(e.event_date)}</div>
+        <div style="flex:1;"><div style="font-weight:600;"><i class="dot c-${esc(e.category||'event')}"></i> ${esc(e.title)}</div>${e.description?`<div style="font-size:12px;color:var(--pk-ash);margin-top:3px;">${esc(e.description)}</div>`:''}</div>
+        ${isStaff?`<button class="btn btn-secondary" style="padding:4px 10px;font-size:12px;" onclick="openEvent('${e.id}')">✏️</button>`:''}
+      </div>`).join('') : `<div style="color:var(--pk-ash);font-size:13px;">${t('cal.noEvents')}</div>`;
+    }
+    function getEvent(id){ return events.find(e=>e.id===id)||{}; }
+    function openEvent(id, date){
+      const e=id?getEvent(id):{};
+      document.getElementById('cId').value=e.id||'';
+      document.getElementById('evFormTitle').textContent=id?t('cal.editEvent'):t('cal.add');
+      document.getElementById('cTitle').value=e.title||'';
+      document.getElementById('cCategory').value=e.category||'event';
+      document.getElementById('cDate').value=e.event_date||date||iso(new Date());
+      document.getElementById('cEnd').value=e.end_date||'';
+      document.getElementById('cDesc').value=e.description||'';
+      document.getElementById('cDelBtn').style.display=id?'':'none';
+      document.getElementById('evModal').classList.add('show');
+    }
+    function closeEvent(){ document.getElementById('evModal').classList.remove('show'); }
+    async function saveEvent(){
+      const title=document.getElementById('cTitle').value.trim(); if(!title){toast(t('cal.needTitle'),'error');return;}
+      const{data,error}=await supabaseClient.rpc('save_calendar_event',{p_id:document.getElementById('cId').value||null,
+        p_title:title, p_event_date:document.getElementById('cDate').value||null, p_category:document.getElementById('cCategory').value,
+        p_end_date:document.getElementById('cEnd').value||null, p_description:document.getElementById('cDesc').value.trim()||null});
+      if(error){toast(error.message,'error');return;} if(!data.success){toast(t('cal.'+data.error)||data.error,'error');return;}
+      toast(t('cal.saved'),'success'); closeEvent(); load();
+    }
+    async function delEvent(){
+      const id=document.getElementById('cId').value; if(!id)return; if(!confirm(t('cal.confirmDelete')))return;
+      const{data,error}=await supabaseClient.rpc('delete_calendar_event',{p_id:id});
+      if(error){toast(error.message,'error');return;} if(!data.success){toast(data.error,'error');return;}
+      toast(t('cal.deleted'),'success'); closeEvent(); load();
+    }
+    function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    function dShort(d){try{return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'});}catch{return d;}}
+    function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function toast(m,ty='info'){const tt=document.getElementById('toast');tt.className='toast show '+ty;tt.textContent=m;setTimeout(()=>tt.className='toast',3500);}
+  </script>
+</body>
+</html>

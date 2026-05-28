@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam Schedule — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#fff;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:900px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:14px;}
+    h1{font-size:24px;font-weight:700;} .sub{color:var(--pk-ash);font-size:14px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}.btn-secondary{background:#fff;color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}.btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);}.btn-sm{padding:6px 12px;font-size:12px;}
+    .filters{background:#fff;border:1px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .filters select{padding:8px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .card{background:#fff;border:1px solid var(--pk-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;}
+    .ex h3{font-size:15px;font-weight:700;color:var(--pk-blue-800);} .ex .meta{font-size:12.5px;color:var(--pk-ash);margin-top:4px;}
+    .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--pk-blue-50);color:var(--pk-blue-800);margin-right:6px;}
+    .actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+    .empty{text-align:center;padding:46px 20px;color:var(--pk-ash);}.empty .icon{font-size:44px;margin-bottom:10px;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}.modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;} .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;}.field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;}.row2>div{flex:1;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .seatgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
+    .seat{border:1px solid var(--pk-border);border-radius:8px;padding:8px;text-align:center;font-size:12.5px;}
+    .seat .no{font-weight:800;color:var(--pk-blue-800);font-size:16px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}.toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.row2{flex-direction:column;}.modal input,.modal select{font-size:16px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+    <a href="dashboard.html" class="back-link" id="backLink" data-i18n="exam.back">← Dashboard</a>
+  </div>
+  <div class="container">
+    <div class="page-header">
+      <div><h1 data-i18n="exam.title">🗒️ Exam Schedule</h1><div class="sub" data-i18n="exam.subtitle">Exam timetable and seating</div></div>
+      <button class="btn btn-primary" id="newBtn" onclick="openExam()" style="display:none" data-i18n="exam.new">➕ New Exam</button>
+    </div>
+    <div class="filters" id="filterBar" style="display:none">
+      <label data-i18n="exam.class" style="font-size:12px;color:var(--pk-ash);font-weight:600;">Class:</label>
+      <select id="classFilter" onchange="load()"><option value="" data-i18n="exam.allClasses">All classes</option></select>
+    </div>
+    <div id="list"><div class="empty">⏳ Loading...</div></div>
+  </div>
+
+  <div class="modal-bd" id="examModal"><div class="modal">
+    <h2 id="examFormTitle" data-i18n="exam.new">➕ New Exam</h2>
+    <input type="hidden" id="eId" />
+    <div class="field"><label data-i18n="exam.fTitle">Exam name</label><input type="text" id="eTitle" placeholder="สอบกลางภาค" /></div>
+    <div class="row2"><div class="field"><label data-i18n="exam.fSubject">Subject</label><input type="text" id="eSubject" /></div>
+      <div class="field"><label data-i18n="exam.fClass">Class</label><select id="eClass"><option value="" data-i18n="exam.allSchool">Whole school</option></select></div></div>
+    <div class="row2"><div class="field"><label data-i18n="exam.fDate">Date</label><input type="date" id="eDate" /></div>
+      <div class="field"><label data-i18n="exam.fRoom">Room</label><input type="text" id="eRoom" /></div></div>
+    <div class="row2"><div class="field"><label data-i18n="exam.fStart">Start</label><input type="time" id="eStart" /></div>
+      <div class="field"><label data-i18n="exam.fEnd">End</label><input type="time" id="eEnd" /></div></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeExam()" data-i18n="common.cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExam()" data-i18n="exam.save">💾 Save</button></div>
+  </div></div>
+
+  <div class="modal-bd" id="seatModal"><div class="modal" style="max-width:560px;">
+    <h2 data-i18n="exam.seating">🪑 Seating</h2>
+    <p id="seatInfo" style="font-size:13px;color:var(--pk-ash);margin-bottom:12px;"></p>
+    <div id="seatBody"><div class="empty">⏳</div></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="document.getElementById('seatModal').classList.remove('show')" data-i18n="common.close">Close</button></div>
+  </div></div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../js/i18n.js"></script><script src="../js/supabase-client.js"></script><script src="../js/auth.js"></script><script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff=false, rows=[];
+    document.addEventListener('DOMContentLoaded', async()=>{
+      const session=await auth.getSession(); if(!session){location.href='../login.html';return;}
+      try{const{data:prof}=await supabaseClient.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+        isStaff=['teacher','staff','admin','owner','developer'].includes(prof?.role);}catch{}
+      document.getElementById('backLink').setAttribute('href', isStaff?'dashboard.html':'student-dashboard.html');
+      if(isStaff){document.getElementById('newBtn').style.display='';document.getElementById('filterBar').style.display='';await loadClasses();}
+      load();
+    });
+    document.addEventListener('langchange', render);
+    async function loadClasses(){let c=[];try{const{data}=await supabaseClient.from('students').select('classroom').eq('status','active').not('classroom','is',null).limit(5000);c=[...new Set((data||[]).map(r=>r.classroom).filter(Boolean))].sort();}catch{}
+      const o=c.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+      document.getElementById('classFilter').insertAdjacentHTML('beforeend',o);document.getElementById('eClass').insertAdjacentHTML('beforeend',o);}
+    async function load(){document.getElementById('list').innerHTML='<div class="empty">⏳ '+t('common.loading')+'</div>';
+      const{data,error}=await supabaseClient.rpc('get_exams',{p_classroom:(document.getElementById('classFilter')||{}).value||null});
+      if(error){document.getElementById('list').innerHTML='<div class="empty">'+esc(error.message)+'</div>';return;}
+      rows=Array.isArray(data)?data:[];render();}
+    function getRow(id){return rows.find(r=>r.id===id)||{};}
+    function render(){const l=document.getElementById('list');
+      if(!rows.length){l.innerHTML=`<div class="empty"><div class="icon">🗒️</div><h3>${t('exam.empty')}</h3></div>`;return;}
+      l.innerHTML=rows.map(r=>`<div class="card"><div class="ex">
+        <h3>${esc(r.title)}</h3>
+        <div class="meta">${r.subject?`<span class="tag">${esc(r.subject)}</span>`:''}${r.classroom?('🎯 '+esc(r.classroom)+' · '):''}📅 ${fmt(r.exam_date)}${r.start_time?(' · ⏰ '+esc(r.start_time)+(r.end_time?('-'+esc(r.end_time)):'')):''}${r.room?(' · 📍 '+esc(r.room)):''}</div>
+      </div><div class="actions">
+        ${isStaff?`<button class="btn btn-secondary btn-sm" onclick="seating('${esc(r.classroom||'')}')" ${r.classroom?'':'disabled style=opacity:.4'}>🪑 ${t('exam.seating')}</button>
+          <button class="btn btn-secondary btn-sm" onclick="openExam('${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('${r.id}')">🗑️</button>`:''}
+      </div></div>`).join('');}
+    function openExam(id){const r=id?getRow(id):{};document.getElementById('eId').value=r.id||'';
+      document.getElementById('examFormTitle').textContent=id?t('exam.edit'):t('exam.new');
+      document.getElementById('eTitle').value=r.title||'';document.getElementById('eSubject').value=r.subject||'';
+      document.getElementById('eClass').value=r.classroom||'';document.getElementById('eDate').value=r.exam_date||'';
+      document.getElementById('eRoom').value=r.room||'';document.getElementById('eStart').value=r.start_time||'';document.getElementById('eEnd').value=r.end_time||'';
+      document.getElementById('examModal').classList.add('show');}
+    function closeExam(){document.getElementById('examModal').classList.remove('show');}
+    async function saveExam(){const title=document.getElementById('eTitle').value.trim();if(!title){toast(t('exam.needTitle'),'error');return;}
+      const{data,error}=await supabaseClient.rpc('save_exam',{p_id:document.getElementById('eId').value||null,p_title:title,
+        p_subject:document.getElementById('eSubject').value.trim()||null,p_classroom:document.getElementById('eClass').value||null,
+        p_grade:null,p_exam_date:document.getElementById('eDate').value||null,p_start_time:document.getElementById('eStart').value||null,
+        p_end_time:document.getElementById('eEnd').value||null,p_room:document.getElementById('eRoom').value.trim()||null,p_note:null});
+      if(error){toast(error.message,'error');return;} if(!data.success){toast(t('exam.'+data.error)||data.error,'error');return;}
+      toast(t('exam.saved'),'success');closeExam();load();}
+    async function del(id){if(!confirm(t('exam.confirmDelete')))return;const{data,error}=await supabaseClient.rpc('delete_exam',{p_id:id});
+      if(error){toast(error.message,'error');return;}if(!data.success){toast(data.error,'error');return;}toast(t('exam.deleted'),'success');load();}
+    async function seating(cls){if(!cls)return;const{data}=await supabaseClient.rpc('get_seating',{p_classroom:cls});const arr=Array.isArray(data)?data:[];
+      document.getElementById('seatInfo').textContent=cls+' · '+arr.length+' '+t('exam.seats');
+      document.getElementById('seatBody').innerHTML=arr.length?`<div class="seatgrid">${arr.map(s=>`<div class="seat"><div class="no">${s.seat_no}</div>${esc(((s.first_name_th||'')+' '+(s.last_name_th||'')).trim()||s.student_number||'')}</div>`).join('')}</div>`:`<div class="empty">${t('exam.noStudents')}</div>`;
+      document.getElementById('seatModal').classList.add('show');}
+    function fmt(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'});}catch{return d;}}
+    function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function toast(m,ty='info'){const tt=document.getElementById('toast');tt.className='toast show '+ty;tt.textContent=m;setTimeout(()=>tt.className='toast',3500);}
+  </script>
+</body>
+</html>

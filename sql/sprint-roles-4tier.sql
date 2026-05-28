@@ -13,6 +13,11 @@
 -- ⚠️ SECURITY-SENSITIVE. Run section 0 FIRST and check the output before section 2.
 -- Run in Supabase → SQL Editor. (Staging first if you have one.)
 -- Created: 2026-05-28
+--
+-- ✅ CONFIRMED 2026-05-28 via diagnostic 0c: profiles.role is TEXT with constraint
+--    profiles_role_check already allowing ('student','parent','teacher','staff',
+--    'admin','owner','developer'). → SECTION 1 IS NOT NEEDED (skip 1A & 1B).
+--    Just run SECTION 2. (Still paste 0a output to Claude to confirm the body first.)
 -- ============================================================================
 
 
@@ -62,7 +67,7 @@ AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.profiles
     WHERE id = auth.uid()
-      AND role IN ('teacher','staff','owner','developer')
+      AND role IN ('teacher','staff','admin','owner','developer')
   );
 $$;
 

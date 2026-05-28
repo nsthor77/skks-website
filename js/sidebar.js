@@ -39,6 +39,7 @@
       { href: 'leave-requests.html',  tier: 'teacher', en: 'Leave',      th: 'การลา' },
       { href: 'homework.html',        tier: 'teacher', en: 'Homework',   th: 'การบ้าน' },
       { href: 'behavior.html',        tier: 'teacher', en: 'Behavior',   th: 'พฤติกรรม' },
+      { href: 'materials.html',       tier: 'teacher', en: 'Materials',  th: 'สื่อการสอน' },
       { href: 'grades-admin.html',    tier: 'teacher', en: 'Grades',     th: 'เกรด' },
       { href: 'schedule-admin.html',  tier: 'admin',   en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'teacher-schedule.html',tier: 'teacher', en: 'My Schedule',th: 'ตารางสอนของฉัน' },
@@ -71,6 +72,7 @@
       { href: 'my-grades.html',         en: 'My Grades',  th: 'เกรด' },
       { href: 'homework.html',          en: 'Homework',   th: 'การบ้าน' },
       { href: 'behavior.html',          en: 'Behavior',   th: 'พฤติกรรม' },
+      { href: 'materials.html',         en: 'Materials',  th: 'สื่อการสอน' },
       { href: 'my-attendance.html',     en: 'Attendance', th: 'เช็คชื่อ' }
     ]},
     { label: { en: 'General', th: 'ทั่วไป' }, items: [

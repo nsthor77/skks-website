@@ -664,6 +664,43 @@
       forbidden: { en: 'Staff only', th: 'เฉพาะเจ้าหน้าที่' }
     },
 
+    // ---------- Learning Materials (Sprint 20) ----------
+    materials: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '📂 Learning Materials', th: '📂 สื่อการสอน' },
+      subtitle: { en: 'Lesson files and links for students', th: 'ไฟล์/ลิงก์บทเรียนสำหรับนักเรียน' },
+      new: { en: '➕ New Material', th: '➕ เพิ่มสื่อ' },
+      newTitle: { en: '➕ New Material', th: '➕ เพิ่มสื่อการสอน' },
+      editTitle: { en: '✏️ Edit Material', th: '✏️ แก้ไขสื่อ' },
+      filterClass: { en: 'Class:', th: 'ห้อง:' },
+      allClasses: { en: 'All classes', th: 'ทุกห้อง' },
+      mineOnly: { en: 'Mine only', th: 'ของฉันเท่านั้น' },
+      allSchool: { en: 'Whole school', th: 'ทั้งโรงเรียน' },
+      fTitle: { en: 'Title', th: 'ชื่อสื่อ' },
+      fType: { en: 'Type', th: 'ประเภท' },
+      fClass: { en: 'Target class', th: 'ห้องที่ให้' },
+      fUrl: { en: 'Link (URL)', th: 'ลิงก์ (URL)' },
+      fSubject: { en: 'Subject', th: 'วิชา' },
+      fDesc: { en: 'Description', th: 'รายละเอียด' },
+      save: { en: '💾 Save', th: '💾 บันทึก' },
+      tLink: { en: 'Link', th: 'ลิงก์' },
+      tDocument: { en: 'Document', th: 'เอกสาร' },
+      tVideo: { en: 'Video', th: 'วิดีโอ' },
+      tFile: { en: 'File', th: 'ไฟล์' },
+      tOther: { en: 'Other', th: 'อื่นๆ' },
+      open: { en: '🔗 Open', th: '🔗 เปิด' },
+      empty: { en: 'No materials yet', th: 'ยังไม่มีสื่อการสอน' },
+      emptyDesc: { en: 'Shared lesson materials will appear here', th: 'สื่อที่แชร์จะปรากฏที่นี่' },
+      created: { en: '✅ Material added', th: '✅ เพิ่มสื่อแล้ว' },
+      saved: { en: '✅ Saved', th: '✅ บันทึกแล้ว' },
+      deleted: { en: 'Material deleted', th: 'ลบสื่อแล้ว' },
+      confirmDelete: { en: 'Delete this material?', th: 'ลบสื่อนี้?' },
+      needTitle: { en: 'Please enter a title', th: 'กรุณากรอกชื่อสื่อ' },
+      no_title: { en: 'Please enter a title', th: 'กรุณากรอกชื่อสื่อ' },
+      forbidden: { en: 'Staff only', th: 'เฉพาะเจ้าหน้าที่' },
+      not_found: { en: 'Not found', th: 'ไม่พบข้อมูล' }
+    },
+
     // ---------- Onboarding Wizard (Sprint 16.X) ----------
     onboarding: {
       back: { en: '← Dashboard', th: '← แดชบอร์ด' },

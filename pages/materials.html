@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learning Materials — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-600:#2563EB;--pk-blue-50:#EEF3FF;
+      --pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;
+      --pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:920px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+    .page-title h1{font-size:24px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:14px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 12px;font-size:12px;}
+    .filters{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .filters select{padding:8px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .filters label{font-size:12px;color:var(--pk-ash);font-weight:600;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:16px 18px;margin-bottom:12px;}
+    .m{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;}
+    .m-info{flex:1;min-width:0;}
+    .m-info h3{font-size:15.5px;font-weight:700;color:var(--pk-blue-800);}
+    .m-info .meta{font-size:12.5px;color:var(--pk-ash);margin-top:5px;}
+    .m-info .desc{font-size:13px;color:var(--pk-ink-soft);margin-top:7px;white-space:pre-wrap;}
+    .type-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--pk-blue-50);color:var(--pk-blue-800);margin-right:6px;}
+    .m-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+    .empty{text-align:center;padding:50px 20px;color:var(--pk-ash);} .empty .icon{font-size:44px;margin-bottom:10px;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+    .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;}
+    .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;} .row2>div{flex:1;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}
+    .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.modal input,.modal select,.modal textarea{font-size:16px;}.row2{flex-direction:column;}.m-actions{width:100%;}.m-actions .btn{flex:1;text-align:center;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" id="backLink" data-i18n="materials.back">← Dashboard</a>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="materials.title">📂 Learning Materials</h1>
+        <p data-i18n="materials.subtitle">Lesson files and links for students</p>
+      </div>
+      <button class="btn btn-primary" id="newBtn" onclick="openCreate()" style="display:none" data-i18n="materials.new">➕ New Material</button>
+    </div>
+
+    <div class="filters">
+      <label data-i18n="materials.filterClass">Class:</label>
+      <select id="classFilter" onchange="load()"><option value="" data-i18n="materials.allClasses">All classes</option></select>
+      <label class="chk" id="mineWrap" style="display:none;font-size:13px;"><input type="checkbox" id="mineFilter" onchange="load()" /> <span data-i18n="materials.mineOnly">Mine only</span></label>
+    </div>
+
+    <div id="list"><div class="empty">⏳ Loading...</div></div>
+  </div>
+
+  <!-- create/edit modal (staff) -->
+  <div class="modal-bd" id="formModal">
+    <div class="modal">
+      <h2 id="formTitle" data-i18n="materials.newTitle">➕ New Material</h2>
+      <input type="hidden" id="mId" />
+      <div class="field"><label data-i18n="materials.fTitle">Title</label><input type="text" id="fTitle" /></div>
+      <div class="row2">
+        <div class="field"><label data-i18n="materials.fType">Type</label>
+          <select id="fType">
+            <option value="link" data-i18n="materials.tLink">Link</option>
+            <option value="document" data-i18n="materials.tDocument">Document</option>
+            <option value="video" data-i18n="materials.tVideo">Video</option>
+            <option value="file" data-i18n="materials.tFile">File</option>
+            <option value="other" data-i18n="materials.tOther">Other</option>
+          </select>
+        </div>
+        <div class="field"><label data-i18n="materials.fClass">Target class</label>
+          <select id="fClass"><option value="" data-i18n="materials.allSchool">Whole school</option></select>
+        </div>
+      </div>
+      <div class="field"><label data-i18n="materials.fUrl">Link (URL)</label><input type="url" id="fUrl" placeholder="https://drive.google.com/... , https://youtube.com/..." /></div>
+      <div class="field"><label data-i18n="materials.fSubject">Subject</label><input type="text" id="fSubject" /></div>
+      <div class="field"><label data-i18n="materials.fDesc">Description</label><textarea id="fDesc" rows="3"></textarea></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeForm()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveMaterial()" data-i18n="materials.save">💾 Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff = false, rows = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      try {
+        const { data: prof } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+        isStaff = ['teacher','staff','admin','owner','developer'].includes(prof?.role);
+      } catch {}
+      document.getElementById('backLink').setAttribute('href', isStaff ? 'dashboard.html' : 'student-dashboard.html');
+      if (isStaff) { document.getElementById('newBtn').style.display=''; document.getElementById('mineWrap').style.display=''; }
+      await loadClassrooms();
+      load();
+    });
+    document.addEventListener('langchange', render);
+
+    async function loadClassrooms() {
+      let classes = [];
+      try {
+        if (isStaff) {
+          const { data } = await supabaseClient.from('students').select('classroom').eq('status','active').not('classroom','is',null).limit(5000);
+          classes = [...new Set((data||[]).map(r => r.classroom).filter(Boolean))].sort();
+        }
+      } catch {}
+      const opts = classes.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+      document.getElementById('classFilter').insertAdjacentHTML('beforeend', opts);
+      const fc = document.getElementById('fClass'); if (fc) fc.insertAdjacentHTML('beforeend', opts);
+    }
+
+    async function load() {
+      document.getElementById('list').innerHTML = '<div class="empty">⏳ '+t('common.loading')+'</div>';
+      const { data, error } = await supabaseClient.rpc('get_materials', {
+        p_classroom: document.getElementById('classFilter').value || null,
+        p_subject: null,
+        p_mine: isStaff ? document.getElementById('mineFilter').checked : false
+      });
+      if (error) { document.getElementById('list').innerHTML = '<div class="empty">'+esc(error.message)+'</div>'; return; }
+      rows = Array.isArray(data) ? data : [];
+      render();
+    }
+
+    function getRow(id){ return rows.find(r => r.id === id) || {}; }
+
+    function render() {
+      const list = document.getElementById('list');
+      if (!rows.length) { list.innerHTML = `<div class="empty"><div class="icon">📂</div><h3>${t('materials.empty')}</h3><p>${t('materials.emptyDesc')}</p></div>`; return; }
+      list.innerHTML = rows.map(r => {
+        const target = r.classroom ? esc(r.classroom) : (r.grade ? esc(r.grade) : t('materials.allSchool'));
+        const typeLabel = t('materials.t'+ (r.material_type||'link').charAt(0).toUpperCase()+(r.material_type||'link').slice(1)) || r.material_type;
+        return `<div class="card"><div class="m">
+          <div class="m-info">
+            <h3>${esc(r.title)}</h3>
+            <div class="meta"><span class="type-tag">${esc(typeLabel)}</span> ${r.subject?('📘 '+esc(r.subject)+' · '):''}🎯 ${target} · 👤 ${esc(r.creator_name||'')}</div>
+            ${r.description?`<div class="desc">${esc(r.description)}</div>`:''}
+          </div>
+          <div class="m-actions">
+            ${r.url?`<a class="btn btn-primary btn-sm" href="${esc(r.url)}" target="_blank" rel="noopener">${t('materials.open')}</a>`:''}
+            ${isStaff?`<button class="btn btn-secondary btn-sm" onclick="openEdit('${r.id}')">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="del('${r.id}')">🗑️</button>`:''}
+          </div>
+        </div></div>`;
+      }).join('');
+    }
+
+    function openCreate() {
+      document.getElementById('mId').value=''; document.getElementById('formTitle').textContent=t('materials.newTitle');
+      document.getElementById('fTitle').value=''; document.getElementById('fUrl').value=''; document.getElementById('fType').value='link';
+      document.getElementById('fClass').value=''; document.getElementById('fSubject').value=''; document.getElementById('fDesc').value='';
+      document.getElementById('formModal').classList.add('show');
+    }
+    function openEdit(id) {
+      const r = getRow(id);
+      document.getElementById('mId').value=r.id; document.getElementById('formTitle').textContent=t('materials.editTitle');
+      document.getElementById('fTitle').value=r.title||''; document.getElementById('fUrl').value=r.url||''; document.getElementById('fType').value=r.material_type||'link';
+      document.getElementById('fClass').value=r.classroom||''; document.getElementById('fSubject').value=r.subject||''; document.getElementById('fDesc').value=r.description||'';
+      document.getElementById('formModal').classList.add('show');
+    }
+    function closeForm() { document.getElementById('formModal').classList.remove('show'); }
+
+    async function saveMaterial() {
+      const id = document.getElementById('mId').value;
+      const title = document.getElementById('fTitle').value.trim();
+      if (!title) { toast(t('materials.needTitle'),'error'); return; }
+      const common = {
+        p_title: title,
+        p_url: document.getElementById('fUrl').value.trim() || null,
+        p_material_type: document.getElementById('fType').value,
+        p_description: document.getElementById('fDesc').value.trim() || null,
+        p_subject: document.getElementById('fSubject').value.trim() || null,
+        p_classroom: document.getElementById('fClass').value || null
+      };
+      let res;
+      if (id) res = await supabaseClient.rpc('update_material', { p_id: id, ...common });
+      else    res = await supabaseClient.rpc('create_material', common);
+      const { data, error } = res;
+      if (error) { toast(error.message,'error'); return; }
+      if (!data.success) { toast(t('materials.'+data.error)||data.error,'error'); return; }
+      toast(t(id?'materials.saved':'materials.created'),'success');
+      closeForm(); load();
+    }
+
+    async function del(id) {
+      if (!confirm(t('materials.confirmDelete'))) return;
+      const { data, error } = await supabaseClient.rpc('delete_material', { p_id: id });
+      if (error) { toast(error.message,'error'); return; }
+      if (!data.success) { toast(data.error,'error'); return; }
+      toast(t('materials.deleted'),'success'); load();
+    }
+
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(m,ty='info'){ const tt=document.getElementById('toast'); tt.className='toast show '+ty; tt.textContent=m; setTimeout(()=>tt.className='toast',3500); }
+  </script>
+</body>
+</html>

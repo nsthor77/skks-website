@@ -802,6 +802,45 @@
       forbidden: { en: 'Staff only', th: 'เฉพาะเจ้าหน้าที่' }
     },
 
+    // ---------- Health / Infirmary (Sprint 23) ----------
+    health: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '🏥 Health Records', th: '🏥 ห้องพยาบาล' },
+      subtitle: { en: 'Health profile and infirmary visits', th: 'ข้อมูลสุขภาพและการเข้าห้องพยาบาล' },
+      student: { en: 'Student', th: 'นักเรียน' },
+      profile: { en: 'Health Profile', th: 'ข้อมูลสุขภาพ' },
+      edit: { en: '✏️ Edit', th: '✏️ แก้ไข' },
+      editProfile: { en: '✏️ Health Profile', th: '✏️ ข้อมูลสุขภาพ' },
+      visits: { en: 'Infirmary Visits', th: 'ประวัติเข้าห้องพยาบาล' },
+      addVisit: { en: '➕ New Visit', th: '➕ บันทึกการเข้า' },
+      newVisit: { en: '➕ Infirmary Visit', th: '➕ บันทึกการเข้าห้องพยาบาล' },
+      blood: { en: 'Blood type', th: 'กรุ๊ปเลือด' },
+      height: { en: 'Height (cm)', th: 'ส่วนสูง (ซม.)' },
+      weight: { en: 'Weight (kg)', th: 'น้ำหนัก (กก.)' },
+      allergies: { en: 'Allergies', th: 'อาการแพ้' },
+      chronic: { en: 'Chronic conditions', th: 'โรคประจำตัว' },
+      meds: { en: 'Regular medications', th: 'ยาประจำ' },
+      ecName: { en: 'Emergency contact', th: 'ผู้ติดต่อฉุกเฉิน' },
+      ecPhone: { en: 'Phone', th: 'เบอร์โทร' },
+      emergency: { en: 'Emergency contact', th: 'ผู้ติดต่อฉุกเฉิน' },
+      date: { en: 'Date', th: 'วันที่' },
+      symptoms: { en: 'Symptoms', th: 'อาการ' },
+      treatment: { en: 'Treatment', th: 'การรักษา' },
+      medicine: { en: 'Medicine given', th: 'ยาที่ให้' },
+      sentHome: { en: 'Sent home', th: 'ส่งกลับบ้าน' },
+      save: { en: '💾 Save', th: '💾 บันทึก' },
+      noStudent: { en: 'No student selected', th: 'ยังไม่ได้เลือกนักเรียน' },
+      noVisits: { en: 'No visits recorded', th: 'ยังไม่มีประวัติ' },
+      saved: { en: '✅ Saved', th: '✅ บันทึกแล้ว' },
+      recorded: { en: '✅ Visit recorded', th: '✅ บันทึกแล้ว' },
+      deleted: { en: 'Record deleted', th: 'ลบรายการแล้ว' },
+      confirmDelete: { en: 'Delete this visit?', th: 'ลบรายการนี้?' },
+      no_student: { en: 'No student selected', th: 'ยังไม่ได้เลือกนักเรียน' },
+      no_access: { en: 'No access', th: 'ไม่มีสิทธิ์' },
+      forbidden: { en: 'Staff only', th: 'เฉพาะเจ้าหน้าที่' },
+      not_found: { en: 'Not found', th: 'ไม่พบข้อมูล' }
+    },
+
     // ---------- Onboarding Wizard (Sprint 16.X) ----------
     onboarding: {
       back: { en: '← Dashboard', th: '← แดชบอร์ด' },

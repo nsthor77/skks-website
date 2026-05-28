@@ -31,6 +31,7 @@
     ]},
     { label: { en: 'People', th: 'บุคลากร' }, items: [
       { href: 'students.html',    tier: 'teacher', en: 'Students',     th: 'นักเรียน' },
+      { href: 'health.html',      tier: 'teacher', en: 'Health',       th: 'ห้องพยาบาล' },
       { href: 'teachers.html',    tier: 'admin',   en: 'Teachers',     th: 'ครู' },
       { href: 'applications.html',tier: 'admin',   en: 'Applications', th: 'ใบสมัคร' }
     ]},
@@ -81,6 +82,7 @@
     { label: { en: 'General', th: 'ทั่วไป' }, items: [
       { href: 'leave-requests.html',  en: 'Leave',        th: 'ขอลา' },
       { href: 'library.html',         en: 'Library',      th: 'ห้องสมุด' },
+      { href: 'health.html',          en: 'Health',       th: 'สุขภาพ' },
       { href: 'my-bills.html',        en: 'My Bills',     th: 'ค่าเทอม' },
       { href: 'my-certificates.html', en: 'Certificates', th: 'เกียรติบัตร' },
       { href: 'profile.html',         en: 'Profile',      th: 'โปรไฟล์' }

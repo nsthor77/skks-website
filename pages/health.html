@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-600:#2563EB;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-warn:#92400E;--pk-warn-bg:#FEF3C7;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:880px;margin:0 auto;padding:24px;}
+    .page-header h1{font-size:24px;font-weight:700;} .page-header p{color:var(--pk-ash);font-size:14px;margin-top:4px;margin-bottom:16px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}.btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);}.btn-sm{padding:6px 12px;font-size:12px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:16px 18px;margin-bottom:14px;}
+    .picker{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .picker select{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;min-width:240px;}
+    .head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+    .head h3{font-size:16px;font-weight:700;}
+    .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+    .pf{font-size:13.5px;} .pf .l{color:var(--pk-ash);font-size:12px;font-weight:600;} .pf .v{margin-top:2px;}
+    .pf .v.alert{color:var(--pk-danger);font-weight:600;}
+    .visit{border-bottom:1px solid #EEF1F6;padding:11px 0;display:flex;justify-content:space-between;gap:12px;}
+    .visit:last-child{border-bottom:none;}
+    .visit .s{font-weight:600;font-size:14px;} .visit .m{font-size:12px;color:var(--pk-ash);margin-top:2px;}
+    .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--pk-warn-bg);color:var(--pk-warn);}
+    .empty{text-align:center;padding:30px 20px;color:var(--pk-ash);}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+    .modal-bd.show{display:flex;} .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;}
+    .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;}.row2>div{flex:1;}
+    .chk{display:flex;align-items:center;gap:8px;font-size:14px;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}.toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.pgrid{grid-template-columns:1fr;}.modal input,.modal select,.modal textarea{font-size:16px;}.row2{flex-direction:column;}.picker select{min-width:0;width:100%;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" id="backLink" data-i18n="health.back">← Dashboard</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <h1 data-i18n="health.title">🏥 Health Records</h1>
+      <p data-i18n="health.subtitle">Health profile and infirmary visits</p>
+    </div>
+
+    <div class="card" id="pickerCard" style="display:none">
+      <div class="picker">
+        <label data-i18n="health.student" style="font-size:13px;color:var(--pk-ash);font-weight:600;">Student:</label>
+        <select id="studentSel" onchange="load()"></select>
+      </div>
+    </div>
+
+    <!-- profile -->
+    <div class="card" id="profileCard">
+      <div class="head">
+        <h3 data-i18n="health.profile">Health Profile</h3>
+        <button class="btn btn-secondary btn-sm" id="editProfBtn" onclick="openProfile()" style="display:none" data-i18n="health.edit">✏️ Edit</button>
+      </div>
+      <div id="profileBody"><div class="empty">—</div></div>
+    </div>
+
+    <!-- visits -->
+    <div class="card">
+      <div class="head">
+        <h3 data-i18n="health.visits">Infirmary Visits</h3>
+        <button class="btn btn-primary btn-sm" id="addVisitBtn" onclick="openVisit()" style="display:none" data-i18n="health.addVisit">➕ New Visit</button>
+      </div>
+      <div id="visitList"><div class="empty">⏳ Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- profile modal -->
+  <div class="modal-bd" id="profileModal">
+    <div class="modal">
+      <h2 data-i18n="health.editProfile">✏️ Health Profile</h2>
+      <div class="row2">
+        <div class="field"><label data-i18n="health.blood">Blood type</label>
+          <select id="pBlood"><option value="">—</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+        <div class="field"><label data-i18n="health.height">Height (cm)</label><input type="number" id="pHeight" step="0.1" /></div>
+        <div class="field"><label data-i18n="health.weight">Weight (kg)</label><input type="number" id="pWeight" step="0.1" /></div>
+      </div>
+      <div class="field"><label data-i18n="health.allergies">Allergies</label><input type="text" id="pAllergies" /></div>
+      <div class="field"><label data-i18n="health.chronic">Chronic conditions</label><input type="text" id="pChronic" /></div>
+      <div class="field"><label data-i18n="health.meds">Regular medications</label><input type="text" id="pMeds" /></div>
+      <div class="row2">
+        <div class="field"><label data-i18n="health.ecName">Emergency contact</label><input type="text" id="pEcName" /></div>
+        <div class="field"><label data-i18n="health.ecPhone">Phone</label><input type="tel" id="pEcPhone" /></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeProfile()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProfile()" data-i18n="health.save">💾 Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- visit modal -->
+  <div class="modal-bd" id="visitModal">
+    <div class="modal">
+      <h2 data-i18n="health.newVisit">➕ Infirmary Visit</h2>
+      <div class="row2">
+        <div class="field"><label data-i18n="health.date">Date</label><input type="date" id="vDate" /></div>
+      </div>
+      <div class="field"><label data-i18n="health.symptoms">Symptoms</label><input type="text" id="vSymptoms" list="symList" />
+        <datalist id="symList"><option value="ปวดหัว"></option><option value="ปวดท้อง"></option><option value="เป็นไข้"></option><option value="แผล/บาดเจ็บ"></option><option value="เป็นลม"></option></datalist>
+      </div>
+      <div class="field"><label data-i18n="health.treatment">Treatment</label><input type="text" id="vTreatment" /></div>
+      <div class="field"><label data-i18n="health.medicine">Medicine given</label><input type="text" id="vMedicine" /></div>
+      <label class="chk" style="margin-bottom:12px;"><input type="checkbox" id="vSentHome" /> <span data-i18n="health.sentHome">Sent home</span></label>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeVisit()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveVisit()" data-i18n="health.save">💾 Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff=false, myStudents=[], profile=null, visits=[];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href='../login.html'; return; }
+      try { const { data: prof } = await supabaseClient.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+        isStaff = ['teacher','staff','admin','owner','developer'].includes(prof?.role); } catch {}
+      document.getElementById('backLink').setAttribute('href', isStaff?'dashboard.html':'student-dashboard.html');
+      await loadStudents();
+      if (isStaff) { document.getElementById('pickerCard').style.display=''; document.getElementById('editProfBtn').style.display=''; document.getElementById('addVisitBtn').style.display=''; }
+      load();
+    });
+    document.addEventListener('langchange', () => { renderProfile(); renderVisits(); });
+
+    async function loadStudents(){
+      try {
+        if (isStaff){ const { data } = await supabaseClient.from('students').select('id, first_name_th, last_name_th, classroom').eq('status','active').order('classroom').order('student_number').limit(3000); myStudents=data||[]; }
+        else { const { data } = await supabaseClient.from('students').select('id, first_name_th, last_name_th, classroom').limit(50); myStudents=data||[]; }
+      } catch { myStudents=[]; }
+      const sel=document.getElementById('studentSel');
+      if(sel) sel.innerHTML = myStudents.map(s=>`<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))}${s.classroom?(' · '+esc(s.classroom)):''}</option>`).join('');
+    }
+    function currentStudentId(){ return isStaff ? (document.getElementById('studentSel').value || (myStudents[0]&&myStudents[0].id)) : (myStudents[0]&&myStudents[0].id) || null; }
+
+    async function load(){
+      const sid=currentStudentId();
+      if(!sid){ document.getElementById('profileBody').innerHTML='<div class="empty">'+t('health.noStudent')+'</div>'; document.getElementById('visitList').innerHTML=''; return; }
+      const [pRes, vRes] = await Promise.all([
+        supabaseClient.rpc('get_health_profile',{p_student_id:sid}),
+        supabaseClient.rpc('get_visits',{p_student_id:sid})
+      ]);
+      profile = (pRes.data && pRes.data.profile) || null;
+      visits = Array.isArray(vRes.data)?vRes.data:[];
+      renderProfile(); renderVisits();
+    }
+
+    function renderProfile(){
+      const el=document.getElementById('profileBody');
+      const p=profile||{};
+      const row=(l,v,alert)=>`<div class="pf"><div class="l">${l}</div><div class="v ${alert&&v?'alert':''}">${v?esc(v):'—'}</div></div>`;
+      el.innerHTML = `<div class="pgrid">
+        ${row(t('health.blood'), p.blood_type)}
+        ${row(t('health.allergies'), p.allergies, true)}
+        ${row(t('health.chronic'), p.chronic_conditions, true)}
+        ${row(t('health.meds'), p.medications)}
+        ${row(t('health.height')+' / '+t('health.weight'), (p.height_cm?p.height_cm+' cm':'')+(p.weight_kg?(' / '+p.weight_kg+' kg'):''))}
+        ${row(t('health.emergency'), (p.emergency_contact_name||'')+(p.emergency_contact_phone?(' · '+p.emergency_contact_phone):''))}
+      </div>`;
+    }
+    function renderVisits(){
+      const el=document.getElementById('visitList');
+      if(!visits.length){ el.innerHTML=`<div class="empty">${t('health.noVisits')}</div>`; return; }
+      el.innerHTML = visits.map(v=>`<div class="visit">
+        <div>
+          <div class="s">${esc(v.symptoms||'—')} ${v.sent_home?`<span class="pill">${t('health.sentHome')}</span>`:''}</div>
+          <div class="m">📅 ${fmt(v.visit_date)}${v.treatment?(' · 💊 '+esc(v.treatment)):''}${v.medicine?(' ('+esc(v.medicine)+')'):''}${v.recorded_by_name?(' · '+esc(v.recorded_by_name)):''}</div>
+        </div>
+        ${isStaff?`<button class="btn btn-danger btn-sm" onclick="delVisit('${v.id}')">✕</button>`:''}
+      </div>`).join('');
+    }
+
+    // profile edit
+    function openProfile(){
+      const p=profile||{};
+      document.getElementById('pBlood').value=p.blood_type||''; document.getElementById('pHeight').value=p.height_cm||'';
+      document.getElementById('pWeight').value=p.weight_kg||''; document.getElementById('pAllergies').value=p.allergies||'';
+      document.getElementById('pChronic').value=p.chronic_conditions||''; document.getElementById('pMeds').value=p.medications||'';
+      document.getElementById('pEcName').value=p.emergency_contact_name||''; document.getElementById('pEcPhone').value=p.emergency_contact_phone||'';
+      document.getElementById('profileModal').classList.add('show');
+    }
+    function closeProfile(){ document.getElementById('profileModal').classList.remove('show'); }
+    async function saveProfile(){
+      const sid=currentStudentId(); if(!sid){ toast(t('health.noStudent'),'error'); return; }
+      const { data, error } = await supabaseClient.rpc('save_health_profile',{
+        p_student_id:sid, p_blood_type:document.getElementById('pBlood').value||null,
+        p_allergies:document.getElementById('pAllergies').value.trim()||null,
+        p_chronic_conditions:document.getElementById('pChronic').value.trim()||null,
+        p_medications:document.getElementById('pMeds').value.trim()||null,
+        p_emergency_contact_name:document.getElementById('pEcName').value.trim()||null,
+        p_emergency_contact_phone:document.getElementById('pEcPhone').value.trim()||null,
+        p_height_cm:document.getElementById('pHeight').value?Number(document.getElementById('pHeight').value):null,
+        p_weight_kg:document.getElementById('pWeight').value?Number(document.getElementById('pWeight').value):null,
+        p_note:null
+      });
+      if(error){ toast(error.message,'error'); return; }
+      if(!data.success){ toast(t('health.'+data.error)||data.error,'error'); return; }
+      toast(t('health.saved'),'success'); closeProfile(); load();
+    }
+
+    // visit
+    function openVisit(){
+      document.getElementById('vDate').value=new Date().toISOString().split('T')[0];
+      ['vSymptoms','vTreatment','vMedicine'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('vSentHome').checked=false;
+      document.getElementById('visitModal').classList.add('show');
+    }
+    function closeVisit(){ document.getElementById('visitModal').classList.remove('show'); }
+    async function saveVisit(){
+      const sid=currentStudentId(); if(!sid){ toast(t('health.noStudent'),'error'); return; }
+      const { data, error } = await supabaseClient.rpc('record_visit',{
+        p_student_id:sid, p_symptoms:document.getElementById('vSymptoms').value.trim()||null,
+        p_treatment:document.getElementById('vTreatment').value.trim()||null,
+        p_medicine:document.getElementById('vMedicine').value.trim()||null,
+        p_sent_home:document.getElementById('vSentHome').checked,
+        p_visit_date:document.getElementById('vDate').value||null, p_note:null
+      });
+      if(error){ toast(error.message,'error'); return; }
+      if(!data.success){ toast(t('health.'+data.error)||data.error,'error'); return; }
+      toast(t('health.recorded'),'success'); closeVisit(); load();
+    }
+    async function delVisit(id){
+      if(!confirm(t('health.confirmDelete'))) return;
+      const { data, error } = await supabaseClient.rpc('delete_visit',{p_id:id});
+      if(error){ toast(error.message,'error'); return; }
+      if(!data.success){ toast(data.error,'error'); return; }
+      toast(t('health.deleted'),'success'); load();
+    }
+
+    function fmt(d){ if(!d) return '—'; try { return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'}); } catch { return d; } }
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(m,ty='info'){ const tt=document.getElementById('toast'); tt.className='toast show '+ty; tt.textContent=m; setTimeout(()=>tt.className='toast',3500); }
+  </script>
+</body>
+</html>

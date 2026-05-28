@@ -345,3 +345,21 @@ const roleGuard = {
 
 window.roleGuard = roleGuard;
 console.log('✅ Role guard loaded');
+
+// ── Auto-load the shared left sidebar nav on every app page ──────────────────
+// Derives sidebar.js URL from THIS script's own src so it works from /pages/.
+// sidebar.js is guarded against double-load (skips /admin/, login, add-payment).
+(function () {
+  try {
+    if (window.__pkSidebarLoaded) return;
+    var ss = document.getElementsByTagName('script');
+    for (var i = 0; i < ss.length; i++) {
+      if (ss[i].src && ss[i].src.indexOf('role-guard.js') > -1) {
+        var s = document.createElement('script');
+        s.src = ss[i].src.replace('role-guard.js', 'sidebar.js');
+        document.head.appendChild(s);
+        break;
+      }
+    }
+  } catch (e) { /* sidebar is non-critical */ }
+})();

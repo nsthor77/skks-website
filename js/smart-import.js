@@ -151,6 +151,10 @@
           <div style="font-weight:700;color:#1E40AF;margin-top:8px;">${L('Click to choose a file', 'คลิกเพื่อเลือกไฟล์')}</div>
           <div style="font-size:12px;color:#7B8497;margin-top:4px;">.xlsx · .xls · .csv</div>
         </label>
+        <div style="margin-top:14px;font-size:13px;color:#6B7280;">
+          ${L("Don't have a file ready?", 'ยังไม่มีไฟล์?')}
+          <a onclick="SmartImport._template()" style="color:#1E40AF;font-weight:600;cursor:pointer;text-decoration:underline;">⬇ ${L('Download Excel template', 'ดาวน์โหลดไฟล์ตัวอย่าง (Excel)')}</a>
+        </div>
         <div id="si-fileerr" style="color:#991B1B;font-size:13px;margin-top:12px;"></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid #E5E7EB;padding-top:16px;">
@@ -336,6 +340,10 @@
     `);
   }
 
+  // Import in BATCHES so large files never hit the DB statement timeout.
+  // A batch that fails is reported but does NOT stop the rest (partial success).
+  const BATCH_SIZE = 150;
+
   async function doImport() {
     const rows = buildRows();
     const valErrors = validateRows(rows);
@@ -348,20 +356,32 @@
     }
 
     const msg = document.getElementById('si-importmsg');
-    msg.innerHTML = '⏳ ' + L('Importing…', 'กำลังนำเข้า…');
+    let inserted = 0, skipped = 0;
+    const serverErrors = [];
+    const total = clean.length;
 
-    try {
-      const { data, error } = await global.supabaseClient.rpc(cfg.rpc, { p_rows: clean });
-      if (error) throw new Error(error.message);
-      if (data && data.error) throw new Error(data.error);
-
-      const inserted = (data && (data.inserted ?? data.saved ?? data.count)) || 0;
-      const skipped = (data && data.skipped) || 0;
-      const serverErrors = (data && data.errors) || [];
-      stepResult(inserted, skipped + valErrors.length, serverErrors, valErrors);
-    } catch (err) {
-      msg.innerHTML = '<span style="color:#991B1B;">❌ ' + esc(err.message) + '</span>';
+    for (let start = 0; start < total; start += BATCH_SIZE) {
+      const chunk = clean.slice(start, start + BATCH_SIZE);
+      const done = Math.min(start + chunk.length, total);
+      msg.innerHTML = '⏳ ' + L('Importing ', 'กำลังนำเข้า ') + done + '/' + total + '… (' + Math.round(done / total * 100) + '%)';
+      try {
+        const { data, error } = await global.supabaseClient.rpc(cfg.rpc, { p_rows: chunk });
+        if (error) throw new Error(error.message);
+        if (data && data.error) throw new Error(data.error);
+        inserted += (data && (data.inserted ?? data.saved ?? data.count)) || 0;
+        skipped += (data && data.skipped) || 0;
+        // re-base per-chunk row numbers to global row numbers (over clean rows)
+        ((data && data.errors) || []).forEach(e => serverErrors.push({
+          row: start + (e.row || 0), error: e.error, student_number: e.student_number
+        }));
+      } catch (err) {
+        // whole batch failed (timeout/network) → count rows as skipped, keep going
+        skipped += chunk.length;
+        serverErrors.push({ row: start + 1, error: L('Batch failed — try a smaller file or retry: ', 'ชุดข้อมูลนี้ล้มเหลว — ลองไฟล์เล็กลงหรือลองใหม่: ') + err.message });
+      }
     }
+
+    stepResult(inserted, skipped + valErrors.length, serverErrors, valErrors);
   }
 
   // ============================================================
@@ -396,6 +416,45 @@
   }
 
   // ============================================================
+  // Template download — builds an .xlsx matching cfg.fields
+  // ============================================================
+  function sampleFor(f) {
+    if (f.normalize === 'gender') return L('male', 'ชาย');
+    if (f.normalize === 'date') return '2555-05-20';
+    const k = (f.key || '').toLowerCase();
+    if (k.includes('email')) return 'name@email.com';
+    if (k.includes('phone')) return '0812345678';
+    if (k.includes('student_number') || k.includes('employee')) return '10001';
+    if (k.includes('first_name_th')) return 'สมชาย';
+    if (k.includes('last_name_th')) return 'ใจดี';
+    if (k.includes('first_name_en')) return 'Somchai';
+    if (k.includes('last_name_en')) return 'Jaidee';
+    if (k.includes('nickname')) return 'ชาย';
+    if (k.includes('classroom') || k.includes('homeroom')) return 'ป.6/1';
+    if (k.includes('grade')) return 'ป.6';
+    if (k.includes('academic_year')) return '2569';
+    return '';
+  }
+
+  async function downloadTemplate() {
+    const errEl = document.getElementById('si-fileerr');
+    try {
+      const XLSX = await loadXLSX();
+      const labels = cfg.fields.map(f => L(f.label, f.labelTh || f.label) + (f.required ? ' *' : ''));
+      const sample = cfg.fields.map(f => sampleFor(f));
+      const ws = XLSX.utils.aoa_to_sheet([labels, sample]);
+      ws['!cols'] = labels.map(l => ({ wch: Math.max(12, String(l).length + 2) }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Template');
+      const base = (cfg.templateName || (cfg.rpc || 'import').replace('bulk_insert_', '') || 'import');
+      XLSX.writeFile(wb, base + '-template.xlsx');
+      if (errEl) { errEl.style.color = '#065F46'; errEl.textContent = L('Template downloaded — fill it in, then upload here.', 'ดาวน์โหลดแล้ว — กรอกข้อมูลแล้วอัปโหลดกลับมาที่นี่'); }
+    } catch (err) {
+      if (errEl) { errEl.style.color = '#991B1B'; errEl.textContent = '❌ ' + err.message; }
+    }
+  }
+
+  // ============================================================
   // Public API
   // ============================================================
   async function open(config) {
@@ -412,6 +471,7 @@
     _remap: remap,
     _preview: preview,
     _import: doImport,
+    _template: downloadTemplate,
     _finish: function () { const done = cfg && cfg.onDone; close(); if (done) done(); }
   };
 

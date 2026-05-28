@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leave Requests — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-700:#1D4ED8;--pk-blue-600:#2563EB;
+      --pk-blue-100:#DBE5FF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;
+      --pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;
+      --pk-border:#D8DEE9;--pk-border-em:#A8B2C4;
+      --pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-warn:#92400E;--pk-warn-bg:#FEF3C7;
+      --pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .back-link:hover{background:var(--pk-canvas);}
+    .topbar-right{display:flex;align-items:center;gap:12px;}
+
+    .container{max-width:1000px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+    .page-title h1{font-size:24px;font-weight:700;}
+    .page-title p{color:var(--pk-ash);font-size:14px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}
+    .btn-primary:hover{background:var(--pk-blue-900);}
+    .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-success{background:var(--pk-success-bg);color:var(--pk-success);}
+    .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);}
+    .btn-sm{padding:6px 12px;font-size:12px;}
+
+    .filters{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .filters select{padding:8px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:16px 18px;margin-bottom:12px;}
+    .lr{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;}
+    .lr-info h3{font-size:15px;font-weight:700;color:var(--pk-blue-800);}
+    .lr-info .meta{font-size:12.5px;color:var(--pk-ash);margin-top:3px;line-height:1.6;}
+    .lr-info .reason{font-size:13px;color:var(--pk-ink-soft);margin-top:6px;font-style:italic;}
+    .status{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;text-transform:uppercase;}
+    .s-pending{background:var(--pk-warn-bg);color:var(--pk-warn);}
+    .s-approved{background:var(--pk-success-bg);color:var(--pk-success);}
+    .s-rejected{background:var(--pk-danger-bg);color:var(--pk-danger);}
+    .type-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--pk-blue-50);color:var(--pk-blue-800);margin-right:6px;}
+    .lr-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+    .empty{text-align:center;padding:50px 20px;color:var(--pk-ash);}
+    .empty .icon{font-size:44px;margin-bottom:10px;}
+
+    /* Modal */
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+    .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;}
+    .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;}
+    .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:all .3s;z-index:200;}
+    .toast.show{opacity:1;}
+    .toast.success{background:var(--pk-success);}
+    .toast.error{background:var(--pk-danger);}
+
+    @media(max-width:640px){
+      .container{padding:14px;}
+      .modal input,.modal select,.modal textarea{font-size:16px;}
+      .lr-actions{width:100%;}
+      .lr-actions .btn{flex:1;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" id="backLink" data-i18n="leave.back">← Dashboard</a>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="leave.title">📝 Leave Requests</h1>
+        <p data-i18n="leave.subtitle">Request and review student leave</p>
+      </div>
+      <button class="btn btn-primary" onclick="openSubmit()" data-i18n="leave.new">➕ Request Leave</button>
+    </div>
+
+    <div class="filters">
+      <label data-i18n="leave.filterStatus" style="font-size:12px;color:var(--pk-ash);font-weight:600;">Status:</label>
+      <select id="statusFilter" onchange="load()">
+        <option value="" data-i18n="leave.all">All</option>
+        <option value="pending" data-i18n="leave.pending">Pending</option>
+        <option value="approved" data-i18n="leave.approved">Approved</option>
+        <option value="rejected" data-i18n="leave.rejected">Rejected</option>
+      </select>
+    </div>
+
+    <div id="list"><div class="empty">⏳ Loading...</div></div>
+  </div>
+
+  <!-- Submit modal -->
+  <div class="modal-bd" id="submitModal">
+    <div class="modal">
+      <h2 data-i18n="leave.newTitle">➕ Request Leave</h2>
+      <div class="field" id="studentField">
+        <label data-i18n="leave.student">Student</label>
+        <select id="lvStudent"></select>
+      </div>
+      <div class="field">
+        <label data-i18n="leave.type">Leave type</label>
+        <select id="lvType">
+          <option value="sick" data-i18n="leave.typeSick">Sick</option>
+          <option value="personal" data-i18n="leave.typePersonal">Personal</option>
+          <option value="activity" data-i18n="leave.typeActivity">Activity</option>
+          <option value="other" data-i18n="leave.typeOther">Other</option>
+        </select>
+      </div>
+      <div class="field" style="display:flex;gap:10px;">
+        <div style="flex:1;"><label data-i18n="leave.from">From</label><input type="date" id="lvStart" /></div>
+        <div style="flex:1;"><label data-i18n="leave.to">To</label><input type="date" id="lvEnd" /></div>
+      </div>
+      <div class="field">
+        <label data-i18n="leave.reason">Reason</label>
+        <textarea id="lvReason" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeSubmit()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="submitLeave()" data-i18n="leave.send">📤 Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff = false;
+    let myStudents = [];
+    let rows = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      // role check
+      try {
+        const { data: prof } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+        isStaff = ['staff','owner','developer','admin','teacher'].includes(prof?.role);
+      } catch {}
+      document.getElementById('backLink').setAttribute('href', isStaff ? 'dashboard.html' : 'student-dashboard.html');
+      await loadStudents();
+      load();
+    });
+    document.addEventListener('langchange', render);
+
+    async function loadStudents() {
+      // For parent/student: list their own children to choose from. For staff: all active.
+      try {
+        if (isStaff) {
+          const { data } = await supabaseClient.from('students').select('id, student_number, first_name_th, last_name_th, classroom').eq('status','active').order('student_number').limit(2000);
+          myStudents = data || [];
+        } else {
+          const { data } = await supabaseClient.from('students').select('id, student_number, first_name_th, last_name_th, classroom').limit(50);
+          myStudents = data || [];
+        }
+      } catch { myStudents = []; }
+      const sel = document.getElementById('lvStudent');
+      sel.innerHTML = myStudents.map(s => `<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))} ${s.classroom?('· '+esc(s.classroom)):''}</option>`).join('');
+      // hide student picker if only 1 (typical parent of 1 child)
+      document.getElementById('studentField').style.display = myStudents.length <= 1 ? 'none' : 'block';
+    }
+
+    async function load() {
+      const status = document.getElementById('statusFilter').value;
+      document.getElementById('list').innerHTML = '<div class="empty">⏳ ' + t('common.loading') + '</div>';
+      const { data, error } = await supabaseClient.rpc('get_leave_requests', { p_status: status || null, p_student_id: null });
+      if (error) { document.getElementById('list').innerHTML = '<div class="empty">' + esc(error.message) + '</div>'; return; }
+      rows = Array.isArray(data) ? data : [];
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById('list');
+      if (!rows.length) {
+        list.innerHTML = `<div class="empty"><div class="icon">📝</div><h3>${t('leave.empty')}</h3><p>${t('leave.emptyDesc')}</p></div>`;
+        return;
+      }
+      list.innerHTML = rows.map(r => {
+        const name = ((r.first_name_th||'')+' '+(r.last_name_th||'')).trim() || ((r.first_name_en||'')+' '+(r.last_name_en||'')).trim() || '—';
+        const typeLabel = t('leave.type'+r.leave_type.charAt(0).toUpperCase()+r.leave_type.slice(1)) || r.leave_type;
+        const statusLabel = t('leave.'+r.status) || r.status;
+        const dates = r.start_date === r.end_date ? fmt(r.start_date) : (fmt(r.start_date)+' → '+fmt(r.end_date));
+        const canReview = isStaff && r.status === 'pending';
+        return `<div class="card"><div class="lr">
+          <div class="lr-info">
+            <h3>${esc(name)} ${r.classroom?('<span style="font-size:12px;color:var(--pk-mist);font-weight:400;">· '+esc(r.classroom)+'</span>'):''}</h3>
+            <div class="meta"><span class="type-tag">${esc(typeLabel)}</span> 📅 ${dates}</div>
+            ${r.reason?`<div class="reason">"${esc(r.reason)}"</div>`:''}
+            ${r.review_note?`<div class="meta">💬 ${esc(r.review_note)}</div>`:''}
+          </div>
+          <div style="text-align:right;">
+            <span class="status s-${r.status}">${esc(statusLabel)}</span>
+            ${canReview?`<div class="lr-actions" style="margin-top:10px;">
+              <button class="btn btn-success btn-sm" onclick="review('${r.id}',true)" data-i18n="leave.approve">✓ Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="review('${r.id}',false)" data-i18n="leave.reject">✕ Reject</button>
+            </div>`:''}
+          </div>
+        </div></div>`;
+      }).join('');
+    }
+
+    function openSubmit() {
+      document.getElementById('lvStart').value = new Date().toISOString().split('T')[0];
+      document.getElementById('lvEnd').value = new Date().toISOString().split('T')[0];
+      document.getElementById('lvReason').value = '';
+      document.getElementById('submitModal').classList.add('show');
+    }
+    function closeSubmit() { document.getElementById('submitModal').classList.remove('show'); }
+
+    async function submitLeave() {
+      const studentId = document.getElementById('lvStudent').value || (myStudents[0] && myStudents[0].id);
+      if (!studentId) { toast(t('leave.noStudent'), 'error'); return; }
+      const payload = {
+        p_student_id: studentId,
+        p_leave_type: document.getElementById('lvType').value,
+        p_start_date: document.getElementById('lvStart').value,
+        p_end_date: document.getElementById('lvEnd').value,
+        p_reason: document.getElementById('lvReason').value.trim() || null,
+        p_attachment_url: null
+      };
+      if (!payload.p_start_date || !payload.p_end_date) { toast(t('leave.pickDates'), 'error'); return; }
+      const { data, error } = await supabaseClient.rpc('submit_leave_request', payload);
+      if (error) { toast(error.message, 'error'); return; }
+      if (!data.success) { toast(t('leave.'+data.error) || data.error, 'error'); return; }
+      toast(t('leave.submitted'), 'success');
+      closeSubmit();
+      load();
+    }
+
+    async function review(id, approve) {
+      const note = approve ? null : prompt(t('leave.rejectReason') || 'Reason for rejection:');
+      if (!approve && note === null) return;
+      const { data, error } = await supabaseClient.rpc('review_leave_request', { p_id: id, p_approve: approve, p_note: note });
+      if (error) { toast(error.message, 'error'); return; }
+      if (!data.success) { toast(data.error, 'error'); return; }
+      toast(approve ? (t('leave.approvedMsg').replace('{n}', data.attendance_marked||0)) : t('leave.rejectedMsg'), 'success');
+      load();
+    }
+
+    function fmt(d){ try { return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'}); } catch { return d; } }
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(m,ty='info'){ const tt=document.getElementById('toast'); tt.className='toast show '+ty; tt.textContent=m; setTimeout(()=>tt.className='toast',3500); }
+  </script>
+</body>
+</html>

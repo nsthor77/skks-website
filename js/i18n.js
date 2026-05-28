@@ -550,6 +550,42 @@
       distinctSubjects: { en: 'Subjects', th: 'จำนวนวิชา' }
     },
 
+    // ---------- Leave Requests (Sprint 17) ----------
+    leave: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '📝 Leave Requests', th: '📝 การขอลา' },
+      subtitle: { en: 'Request and review student leave', th: 'ขอลาและอนุมัติการลาของนักเรียน' },
+      new: { en: '➕ Request Leave', th: '➕ ขอลา' },
+      newTitle: { en: '➕ Request Leave', th: '➕ ขอลา' },
+      filterStatus: { en: 'Status:', th: 'สถานะ:' },
+      all: { en: 'All', th: 'ทั้งหมด' },
+      pending: { en: 'Pending', th: 'รออนุมัติ' },
+      approved: { en: 'Approved', th: 'อนุมัติแล้ว' },
+      rejected: { en: 'Rejected', th: 'ไม่อนุมัติ' },
+      student: { en: 'Student', th: 'นักเรียน' },
+      type: { en: 'Leave type', th: 'ประเภทการลา' },
+      typeSick: { en: 'Sick', th: 'ลาป่วย' },
+      typePersonal: { en: 'Personal', th: 'ลากิจ' },
+      typeActivity: { en: 'Activity', th: 'ลาทำกิจกรรม' },
+      typeOther: { en: 'Other', th: 'อื่นๆ' },
+      from: { en: 'From', th: 'ตั้งแต่' },
+      to: { en: 'To', th: 'ถึง' },
+      reason: { en: 'Reason', th: 'เหตุผล' },
+      send: { en: '📤 Submit', th: '📤 ส่งคำขอ' },
+      approve: { en: '✓ Approve', th: '✓ อนุมัติ' },
+      reject: { en: '✕ Reject', th: '✕ ไม่อนุมัติ' },
+      empty: { en: 'No leave requests', th: 'ยังไม่มีคำขอลา' },
+      emptyDesc: { en: 'Submitted leave requests will appear here', th: 'คำขอลาจะปรากฏที่นี่' },
+      submitted: { en: '✅ Leave request submitted', th: '✅ ส่งคำขอลาแล้ว' },
+      rejectReason: { en: 'Reason for rejection:', th: 'เหตุผลที่ไม่อนุมัติ:' },
+      approvedMsg: { en: '✅ Approved — marked {n} attendance days as leave', th: '✅ อนุมัติแล้ว — บันทึกการลา {n} วัน' },
+      rejectedMsg: { en: 'Request rejected', th: 'ไม่อนุมัติคำขอแล้ว' },
+      noStudent: { en: 'No student selected', th: 'ยังไม่ได้เลือกนักเรียน' },
+      pickDates: { en: 'Please select dates', th: 'กรุณาเลือกวันที่' },
+      no_access: { en: 'No access to this student', th: 'ไม่มีสิทธิ์สำหรับนักเรียนคนนี้' },
+      invalid_dates: { en: 'Invalid dates', th: 'วันที่ไม่ถูกต้อง' }
+    },
+
     // ---------- Onboarding Wizard (Sprint 16.X) ----------
     onboarding: {
       back: { en: '← Dashboard', th: '← แดชบอร์ด' },

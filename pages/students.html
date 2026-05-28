@@ -439,7 +439,7 @@
       </div>
       <div class="page-actions">
         <a href="student-fields-config.html" class="btn btn-secondary owner-only" style="display:none; text-decoration:none;" data-i18n="students.configFields">⚙️ Configure Fields</a>
-        <button class="btn btn-secondary" onclick="openImportModal()" data-i18n="students.importCsv">📥 Import CSV</button>
+        <button class="btn btn-secondary" onclick="openSmartImport()" data-i18n="students.importCsv">📥 Import Excel/CSV</button>
         <button class="btn btn-secondary" onclick="exportCsv()" data-i18n="students.exportCsv">📤 Export CSV</button>
         <button class="btn btn-primary" onclick="openCreateModal()" data-i18n="students.addStudent">➕ Add Student</button>
       </div>
@@ -804,6 +804,40 @@
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
+  <script src="../js/smart-import.js"></script>
+
+  <script>
+    // Smart Import (Excel/CSV + column mapping + Thai value normalization)
+    function openSmartImport() {
+      SmartImport.open({
+        title: '📥 ' + (typeof t === 'function' ? t('students.importCsv') : 'Import Students'),
+        rpc: 'bulk_insert_students',
+        onDone: () => { if (typeof loadStudents === 'function') loadStudents(); },
+        fields: [
+          { key:'student_number', label:'Student ID', labelTh:'รหัสนักเรียน', required:true, aliases:['เลขประจำตัว','รหัส','รหัสประจำตัว','studentid','studentno','id','no'] },
+          { key:'first_name_th', label:'First name (TH)', labelTh:'ชื่อ (ไทย)', required:true, aliases:['ชื่อ','ชื่อจริง','ชื่อภาษาไทย','firstname','firstnameth'] },
+          { key:'last_name_th', label:'Last name (TH)', labelTh:'นามสกุล (ไทย)', required:true, aliases:['นามสกุล','สกุล','lastname','lastnameth'] },
+          { key:'first_name_en', label:'First name (EN)', labelTh:'ชื่อ (อังกฤษ)', aliases:['ชื่ออังกฤษ','firstnameen','nameen'] },
+          { key:'last_name_en', label:'Last name (EN)', labelTh:'นามสกุล (อังกฤษ)', aliases:['นามสกุลอังกฤษ','lastnameen','surname'] },
+          { key:'nickname', label:'Nickname', labelTh:'ชื่อเล่น', aliases:['ชื่อเล่น','nick'] },
+          { key:'gender', label:'Gender', labelTh:'เพศ', normalize:'gender', aliases:['เพศ','sex'] },
+          { key:'birth_date', label:'Birth date', labelTh:'วันเกิด', normalize:'date', aliases:['วันเกิด','วันเดือนปีเกิด','dob','dateofbirth','birthdate'] },
+          { key:'program', label:'Program', labelTh:'โปรแกรม/หลักสูตร', aliases:['โปรแกรม','หลักสูตร','แผนการเรียน'] },
+          { key:'grade', label:'Grade level', labelTh:'ระดับชั้น', aliases:['ระดับชั้น','ชั้น','ชั้นเรียน','level'] },
+          { key:'classroom', label:'Classroom', labelTh:'ห้องเรียน', aliases:['ห้อง','ห้องเรียน','room','class'] },
+          { key:'academic_year', label:'Academic year', labelTh:'ปีการศึกษา', aliases:['ปีการศึกษา','year','academicyear'] },
+          { key:'enrollment_date', label:'Enrollment date', labelTh:'วันที่เข้าเรียน', normalize:'date', aliases:['วันที่เข้าเรียน','วันเข้าเรียน','enrollmentdate'] },
+          { key:'parent1_name', label:'Parent name', labelTh:'ชื่อผู้ปกครอง', aliases:['ผู้ปกครอง','ชื่อผู้ปกครอง','บิดา','มารดา','parent','parentname','guardian'] },
+          { key:'parent1_relation', label:'Parent relation', labelTh:'ความสัมพันธ์', aliases:['ความสัมพันธ์','relation'] },
+          { key:'parent1_phone', label:'Parent phone', labelTh:'เบอร์โทรผู้ปกครอง', aliases:['เบอร์โทร','โทรศัพท์','เบอร์','tel','phone','mobile','parentphone'] },
+          { key:'parent1_email', label:'Parent email', labelTh:'อีเมลผู้ปกครอง', aliases:['อีเมล','email','parentemail'] },
+          { key:'address', label:'Address', labelTh:'ที่อยู่', aliases:['ที่อยู่','address'] },
+          { key:'allergies', label:'Allergies', labelTh:'ภูมิแพ้/แพ้', aliases:['แพ้','ภูมิแพ้','allergy','allergies'] },
+          { key:'notes', label:'Notes', labelTh:'หมายเหตุ', aliases:['หมายเหตุ','note','remark'] }
+        ]
+      });
+    }
+  </script>
 
   <script>
     // ============ State ============

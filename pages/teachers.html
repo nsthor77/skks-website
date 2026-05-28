@@ -315,7 +315,7 @@
       <div class="page-actions">
         <a href="subjects-config.html" class="btn btn-secondary owner-only" style="display:none; text-decoration:none;" data-i18n="teachers.manageSubjects">📚 Subjects</a>
         <a href="teacher-fields-config.html" class="btn btn-secondary owner-only" style="display:none; text-decoration:none;" data-i18n="teachers.configFields">⚙️ Configure Fields</a>
-        <button class="btn btn-secondary" onclick="openImportModal()" data-i18n="teachers.importCsv">📥 Import CSV</button>
+        <button class="btn btn-secondary" onclick="openSmartImport()" data-i18n="teachers.importCsv">📥 Import Excel/CSV</button>
         <button class="btn btn-secondary" onclick="exportCsv()" data-i18n="teachers.exportCsv">📤 Export CSV</button>
         <button class="btn btn-primary" onclick="openCreateModal()" data-i18n="teachers.addTeacher">➕ Add Teacher</button>
       </div>
@@ -638,6 +638,40 @@
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
+  <script src="../js/smart-import.js"></script>
+
+  <script>
+    // Smart Import (Excel/CSV + column mapping + Thai value normalization)
+    function openSmartImport() {
+      SmartImport.open({
+        title: '📥 ' + (typeof t === 'function' ? t('teachers.importCsv') : 'Import Teachers'),
+        rpc: 'bulk_insert_teachers',
+        onDone: () => { if (typeof loadTeachers === 'function') loadTeachers(); else location.reload(); },
+        fields: [
+          { key:'employee_id', label:'Employee ID', labelTh:'รหัสพนักงาน/ครู', required:true, aliases:['รหัสครู','รหัสพนักงาน','รหัส','employeeid','staffid','id','no'] },
+          { key:'title_th', label:'Title (TH)', labelTh:'คำนำหน้า (ไทย)', aliases:['คำนำหน้า','titleth'] },
+          { key:'title_en', label:'Title (EN)', labelTh:'คำนำหน้า (อังกฤษ)', aliases:['titleen'] },
+          { key:'first_name_th', label:'First name (TH)', labelTh:'ชื่อ (ไทย)', required:true, aliases:['ชื่อ','ชื่อจริง','firstname','firstnameth'] },
+          { key:'last_name_th', label:'Last name (TH)', labelTh:'นามสกุล (ไทย)', required:true, aliases:['นามสกุล','สกุล','lastname','lastnameth'] },
+          { key:'first_name_en', label:'First name (EN)', labelTh:'ชื่อ (อังกฤษ)', aliases:['ชื่ออังกฤษ','firstnameen'] },
+          { key:'last_name_en', label:'Last name (EN)', labelTh:'นามสกุล (อังกฤษ)', aliases:['นามสกุลอังกฤษ','lastnameen','surname'] },
+          { key:'nickname', label:'Nickname', labelTh:'ชื่อเล่น', aliases:['ชื่อเล่น','nick'] },
+          { key:'gender', label:'Gender', labelTh:'เพศ', normalize:'gender', aliases:['เพศ','sex'] },
+          { key:'birth_date', label:'Birth date', labelTh:'วันเกิด', normalize:'date', aliases:['วันเกิด','dob','birthdate'] },
+          { key:'phone', label:'Phone', labelTh:'เบอร์โทร', aliases:['เบอร์โทร','โทรศัพท์','เบอร์','tel','mobile'] },
+          { key:'email', label:'Email', labelTh:'อีเมล', aliases:['อีเมล','email','e-mail'] },
+          { key:'hire_date', label:'Hire date', labelTh:'วันที่เริ่มงาน', normalize:'date', aliases:['วันที่เริ่มงาน','วันเริ่มงาน','hiredate','startdate'] },
+          { key:'position', label:'Position', labelTh:'ตำแหน่ง', aliases:['ตำแหน่ง','position','role'] },
+          { key:'department', label:'Department', labelTh:'กลุ่มสาระ/แผนก', aliases:['แผนก','กลุ่มสาระ','department','subject'] },
+          { key:'homeroom_class', label:'Homeroom class', labelTh:'ครูประจำชั้นห้อง', aliases:['ครูประจำชั้น','ห้องประจำชั้น','homeroom','homeroomclass'] },
+          { key:'highest_education', label:'Education', labelTh:'วุฒิการศึกษา', aliases:['วุฒิการศึกษา','การศึกษา','education','degree'] },
+          { key:'major', label:'Major', labelTh:'วิชาเอก', aliases:['วิชาเอก','สาขา','major'] },
+          { key:'university', label:'University', labelTh:'สถาบัน/มหาวิทยาลัย', aliases:['มหาวิทยาลัย','สถาบัน','university'] },
+          { key:'teacher_license', label:'Teacher license', labelTh:'เลขใบประกอบวิชาชีพ', aliases:['ใบประกอบวิชาชีพ','เลขที่ใบอนุญาต','license','teacherlicense'] }
+        ]
+      });
+    }
+  </script>
 
   <script>
     let currentProfile = null;

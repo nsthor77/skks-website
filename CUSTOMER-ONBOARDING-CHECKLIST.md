@@ -53,15 +53,17 @@
   - การอบรมพิเศษ
   - LINE ID
 
-### ✅ 2.4 Import นักเรียน
-- ไป `/pages/students.html` → Import CSV
-- Download template ก่อน
-- เติมข้อมูล → upload
+### ✅ 2.4 Import นักเรียน (Smart Import — รองรับ Excel!)
+- ไป `/pages/students.html` → กด **"📥 Import Excel/CSV"**
+- **อัปโหลดไฟล์ Excel เดิมของโรงเรียนได้เลย** (.xlsx / .csv) — ไม่ต้อง Save As CSV ก่อน
+- ระบบ**จับคู่คอลัมน์อัตโนมัติ** (รองรับหัวคอลัมน์ภาษาไทย เช่น ชื่อ นามสกุล ห้อง เพศ)
+- ตรวจการจับคู่ → ดูตัวอย่าง → นำเข้า
+- ระบบแปลงค่าให้: เพศ (ชาย/หญิง→male/female), วันที่ (พ.ศ.→ค.ศ. อัตโนมัติ)
+- แถวที่ผิดจะถูกข้าม + แสดงรายงานว่าแถวไหนผิดเพราะอะไร
 
-### ✅ 2.5 Import ครู
-- ไป `/pages/teachers.html` → Import CSV
-- Download template ก่อน
-- เติมข้อมูล → upload
+### ✅ 2.5 Import ครู (Smart Import เหมือนกัน)
+- ไป `/pages/teachers.html` → กด **"📥 Import Excel/CSV"**
+- อัปโหลด Excel เดิม → จับคู่คอลัมน์ → นำเข้า (เหมือนนักเรียน)
 
 ---
 

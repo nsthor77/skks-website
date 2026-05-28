@@ -199,7 +199,9 @@
           <a href="${tenantUrl}" target="_blank" class="btn btn-secondary">🌐 เปิดเว็บ tenant</a>
           ${s.status === 'suspended'
             ? '<button class="btn btn-success" onclick="toggleSuspend(false)">▶️ Restore</button>'
-            : '<button class="btn btn-danger" onclick="toggleSuspend(true)">⏸️ Suspend</button>'
+            : (s.status === 'pending_payment' || s.status === 'cancelled')
+              ? '<button class="btn btn-success" onclick="activateComp()">✅ Activate (Comp/Manual)</button>'
+              : '<button class="btn btn-danger" onclick="toggleSuspend(true)">⏸️ Suspend</button>'
           }
         </div>
       </div>
@@ -313,6 +315,39 @@
       return;
     }
     alert(`✅ ${action}สำเร็จ`);
+    loadTenant(currentTenant.school.id);
+  }
+
+  // Soft launch: activate a school manually (comp) — bypass Omise card requirement.
+  // For schools billed by bank transfer / invoice instead of self-serve card.
+  async function activateComp() {
+    if (!currentTenant?.school) return;
+    if (!confirm(
+      'เปิดใช้งานโรงเรียนนี้แบบ Manual (ข้ามการชำระผ่านบัตร Omise)?\n\n' +
+      'ใช้สำหรับ Soft Launch — โรงเรียนที่วางบิล/เก็บเงินแบบโอนเอง\n' +
+      'โรงเรียนจะเข้าใช้ระบบได้ทันที โดยไม่ต้องใส่บัตรเครดิต'
+    )) return;
+
+    // 1) Critical: schools.status = active  → unblocks the add-payment gate (role-guard)
+    const { error } = await supabaseClient
+      .from('schools')
+      .update({ status: 'active' })
+      .eq('id', currentTenant.school.id);
+
+    if (error) {
+      alert('เปิดใช้งานไม่สำเร็จ: ' + error.message);
+      return;
+    }
+
+    // 2) Best-effort: mark subscription active too (ignore if schema differs)
+    try {
+      await supabaseClient
+        .from('subscriptions')
+        .update({ status: 'active' })
+        .eq('school_id', currentTenant.school.id);
+    } catch (e) { /* non-critical */ }
+
+    alert('✅ เปิดใช้งานแบบ Manual สำเร็จ!\n\nโรงเรียนเข้าใช้ระบบได้เลย\n⚠️ อย่าลืมวางบิล/เก็บค่าระบบเองแบบโอน (ดู SOFT-LAUNCH-PLAYBOOK.md)');
     loadTenant(currentTenant.school.id);
   }
   </script>

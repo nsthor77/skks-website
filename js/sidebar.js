@@ -44,6 +44,7 @@
       { href: 'grades-admin.html',    tier: 'teacher', en: 'Grades',     th: 'เกรด' },
       { href: 'schedule-admin.html',  tier: 'admin',   en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'teacher-schedule.html',tier: 'teacher', en: 'My Schedule',th: 'ตารางสอนของฉัน' },
+      { href: 'library.html',         tier: 'teacher', en: 'Library',    th: 'ห้องสมุด' },
       { href: 'reports.html',         tier: 'admin',   en: 'Reports',    th: 'รายงาน' }
     ]},
     { label: { en: 'Finance', th: 'การเงิน' }, items: [
@@ -79,6 +80,7 @@
     ]},
     { label: { en: 'General', th: 'ทั่วไป' }, items: [
       { href: 'leave-requests.html',  en: 'Leave',        th: 'ขอลา' },
+      { href: 'library.html',         en: 'Library',      th: 'ห้องสมุด' },
       { href: 'my-bills.html',        en: 'My Bills',     th: 'ค่าเทอม' },
       { href: 'my-certificates.html', en: 'Certificates', th: 'เกียรติบัตร' },
       { href: 'profile.html',         en: 'Profile',      th: 'โปรไฟล์' }

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-600:#2563EB;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-warn:#92400E;--pk-warn-bg:#FEF3C7;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:920px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:14px;}
+    .page-title h1{font-size:24px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:14px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}.btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-success{background:var(--pk-success-bg);color:var(--pk-success);}.btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);}.btn-sm{padding:6px 12px;font-size:12px;}
+    .tabs{display:flex;gap:8px;margin-bottom:16px;}
+    .tabs button{border:1px solid var(--pk-border-em);background:#fff;color:var(--pk-ash);font-family:inherit;font-weight:600;font-size:13.5px;padding:8px 16px;border-radius:999px;cursor:pointer;}
+    .tabs button.on{background:var(--pk-blue-800);color:#fff;border-color:var(--pk-blue-800);}
+    .filters{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .filters input,.filters select{padding:8px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .filters input{flex:1;min-width:160px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;}
+    .bk h3{font-size:15px;font-weight:700;color:var(--pk-blue-800);} .bk .meta{font-size:12.5px;color:var(--pk-ash);margin-top:3px;}
+    .avail{font-size:12px;font-weight:700;padding:3px 9px;border-radius:100px;}
+    .avail.ok{background:var(--pk-success-bg);color:var(--pk-success);}.avail.no{background:var(--pk-danger-bg);color:var(--pk-danger);}
+    .status{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;text-transform:uppercase;}
+    .s-borrowed{background:var(--pk-blue-50);color:var(--pk-blue-800);}.s-returned{background:var(--pk-success-bg);color:var(--pk-success);}.s-overdue{background:var(--pk-danger-bg);color:var(--pk-danger);}
+    .actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+    .empty{text-align:center;padding:46px 20px;color:var(--pk-ash);}.empty .icon{font-size:44px;margin-bottom:10px;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+    .modal-bd.show{display:flex;} .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;}
+    .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;}.row2>div{flex:1;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}.toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    .hidden{display:none;}
+    @media(max-width:640px){.container{padding:14px;}.modal input,.modal select{font-size:16px;}.row2{flex-direction:column;}.actions{width:100%;}.actions .btn{flex:1;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" id="backLink" data-i18n="library.back">← Dashboard</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title"><h1 data-i18n="library.title">📚 Library</h1><p data-i18n="library.subtitle">Catalog and borrow / return</p></div>
+      <button class="btn btn-primary" id="addBtn" onclick="openBook()" style="display:none" data-i18n="library.addBook">➕ Add Book</button>
+    </div>
+
+    <div class="tabs">
+      <button id="tabCatalog" class="on" onclick="setTab('catalog')" data-i18n="library.catalog">Catalog</button>
+      <button id="tabLoans" onclick="setTab('loans')" data-i18n="library.loans">Loans</button>
+    </div>
+
+    <!-- CATALOG -->
+    <div id="catalogView">
+      <div class="filters">
+        <input type="text" id="search" placeholder="🔍" oninput="debouncedBooks()" data-i18n-ph="library.searchPh" />
+      </div>
+      <div id="bookList"><div class="empty">⏳ Loading...</div></div>
+    </div>
+
+    <!-- LOANS -->
+    <div id="loansView" class="hidden">
+      <div class="filters">
+        <label data-i18n="library.status" style="font-size:12px;color:var(--pk-ash);font-weight:600;">Status:</label>
+        <select id="loanStatus" onchange="loadLoans()">
+          <option value="" data-i18n="library.all">All</option>
+          <option value="borrowed" data-i18n="library.borrowed">Borrowed</option>
+          <option value="returned" data-i18n="library.returned">Returned</option>
+        </select>
+      </div>
+      <div id="loanList"><div class="empty">⏳ Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- book modal (staff) -->
+  <div class="modal-bd" id="bookModal">
+    <div class="modal">
+      <h2 id="bookFormTitle" data-i18n="library.addBook">➕ Add Book</h2>
+      <input type="hidden" id="bId" />
+      <div class="field"><label data-i18n="library.fTitle">Title</label><input type="text" id="bTitle" /></div>
+      <div class="row2">
+        <div class="field"><label data-i18n="library.fAuthor">Author</label><input type="text" id="bAuthor" /></div>
+        <div class="field"><label data-i18n="library.fCategory">Category</label><input type="text" id="bCategory" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label data-i18n="library.fIsbn">ISBN</label><input type="text" id="bIsbn" /></div>
+        <div class="field"><label data-i18n="library.fLocation">Shelf</label><input type="text" id="bLocation" /></div>
+      </div>
+      <div class="field"><label data-i18n="library.fCopies">Total copies</label><input type="number" id="bCopies" min="1" value="1" /></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeBook()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveBook()" data-i18n="library.save">💾 Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- borrow modal (staff) -->
+  <div class="modal-bd" id="borrowModal">
+    <div class="modal">
+      <h2 data-i18n="library.borrowTitle">📖 Issue Loan</h2>
+      <p id="borrowBook" style="font-size:14px;color:var(--pk-ash);margin-bottom:12px;"></p>
+      <div class="field"><label data-i18n="library.student">Student</label><select id="loanStudent"></select></div>
+      <div class="field"><label data-i18n="library.due">Due date</label><input type="date" id="loanDue" /></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeBorrow()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="doBorrow()" data-i18n="library.issue">📖 Issue</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff=false, allStudents=[], books=[], loans=[], curBook=null, searchTimer=null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href='../login.html'; return; }
+      try { const { data: prof } = await supabaseClient.from('profiles').select('role').eq('id',session.user.id).maybeSingle();
+        isStaff = ['teacher','staff','admin','owner','developer'].includes(prof?.role); } catch {}
+      document.getElementById('backLink').setAttribute('href', isStaff?'dashboard.html':'student-dashboard.html');
+      if (isStaff) { document.getElementById('addBtn').style.display=''; await loadStudents(); }
+      loadBooks();
+    });
+    document.addEventListener('langchange', () => { renderBooks(); renderLoans(); });
+
+    async function loadStudents(){
+      try { const { data } = await supabaseClient.from('students').select('id, first_name_th, last_name_th, classroom').eq('status','active').order('classroom').order('student_number').limit(3000);
+        allStudents = data || []; } catch { allStudents=[]; }
+      const sel=document.getElementById('loanStudent');
+      sel.innerHTML = allStudents.map(s=>`<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))}${s.classroom?(' · '+esc(s.classroom)):''}</option>`).join('');
+    }
+
+    function setTab(tab){
+      document.getElementById('tabCatalog').classList.toggle('on', tab==='catalog');
+      document.getElementById('tabLoans').classList.toggle('on', tab==='loans');
+      document.getElementById('catalogView').classList.toggle('hidden', tab!=='catalog');
+      document.getElementById('loansView').classList.toggle('hidden', tab!=='loans');
+      if (tab==='loans') loadLoans();
+    }
+
+    function debouncedBooks(){ clearTimeout(searchTimer); searchTimer=setTimeout(loadBooks, 300); }
+
+    async function loadBooks(){
+      document.getElementById('bookList').innerHTML='<div class="empty">⏳ '+t('common.loading')+'</div>';
+      const { data, error } = await supabaseClient.rpc('get_books', { p_search: document.getElementById('search').value||null, p_category:null });
+      if (error){ document.getElementById('bookList').innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      books = Array.isArray(data)?data:[];
+      renderBooks();
+    }
+    function bookById(id){ return books.find(b=>b.id===id)||{}; }
+
+    function renderBooks(){
+      const el=document.getElementById('bookList');
+      if(!books.length){ el.innerHTML=`<div class="empty"><div class="icon">📚</div><h3>${t('library.empty')}</h3></div>`; return; }
+      el.innerHTML = books.map(b=>{
+        const ok = (b.available_copies||0) > 0;
+        return `<div class="card"><div class="bk">
+          <h3>${esc(b.title)}</h3>
+          <div class="meta">${b.author?('✍️ '+esc(b.author)+' · '):''}${b.category?('🏷 '+esc(b.category)+' · '):''}${b.location?('📍 '+esc(b.location)):''}</div>
+          <div style="margin-top:6px;"><span class="avail ${ok?'ok':'no'}">${t('library.avail')} ${b.available_copies}/${b.total_copies}</span></div>
+        </div>
+        <div class="actions">
+          ${isStaff?`
+            <button class="btn btn-primary btn-sm" onclick="openBorrow('${b.id}')" ${ok?'':'disabled style=opacity:.5'}>${t('library.borrow')}</button>
+            <button class="btn btn-secondary btn-sm" onclick="openBook('${b.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="delBook('${b.id}')">🗑️</button>
+          `:''}
+        </div></div>`;
+      }).join('');
+    }
+
+    async function loadLoans(){
+      document.getElementById('loanList').innerHTML='<div class="empty">⏳ '+t('common.loading')+'</div>';
+      const { data, error } = await supabaseClient.rpc('get_loans', { p_status: document.getElementById('loanStatus').value||null, p_student_id:null });
+      if (error){ document.getElementById('loanList').innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      loans = Array.isArray(data)?data:[];
+      renderLoans();
+    }
+    function renderLoans(){
+      const el=document.getElementById('loanList');
+      if(!loans.length){ el.innerHTML=`<div class="empty"><div class="icon">📖</div><h3>${t('library.noLoans')}</h3></div>`; return; }
+      el.innerHTML = loans.map(l=>{
+        const stKey = l.status==='returned' ? 'returned' : (l.overdue ? 'overdue' : 'borrowed');
+        const stLabel = t('library.'+stKey)||stKey;
+        const nm = ((l.first_name_th||'')+' '+(l.last_name_th||'')).trim() || ((l.first_name_en||'')+' '+(l.last_name_en||'')).trim() || '—';
+        return `<div class="card"><div class="bk">
+          <h3>${esc(l.book_title)}</h3>
+          <div class="meta">👤 ${esc(nm)}${l.classroom?(' · '+esc(l.classroom)):''} · 📅 ${t('library.dueShort')} ${fmt(l.due_date)}${l.returned_date?(' · ✅ '+fmt(l.returned_date)):''}</div>
+        </div>
+        <div class="actions">
+          <span class="status s-${stKey}">${esc(stLabel)}</span>
+          ${(isStaff && l.status==='borrowed')?`<button class="btn btn-success btn-sm" onclick="doReturn('${l.id}')">${t('library.return')}</button>`:''}
+        </div></div>`;
+      }).join('');
+    }
+
+    // book form
+    function openBook(id){
+      const b = id?bookById(id):{};
+      document.getElementById('bId').value=b.id||'';
+      document.getElementById('bookFormTitle').textContent = id?t('library.editBook'):t('library.addBook');
+      document.getElementById('bTitle').value=b.title||''; document.getElementById('bAuthor').value=b.author||'';
+      document.getElementById('bCategory').value=b.category||''; document.getElementById('bIsbn').value=b.isbn||'';
+      document.getElementById('bLocation').value=b.location||''; document.getElementById('bCopies').value=b.total_copies||1;
+      document.getElementById('bookModal').classList.add('show');
+    }
+    function closeBook(){ document.getElementById('bookModal').classList.remove('show'); }
+    async function saveBook(){
+      const title=document.getElementById('bTitle').value.trim();
+      if(!title){ toast(t('library.needTitle'),'error'); return; }
+      const { data, error } = await supabaseClient.rpc('save_book', {
+        p_id: document.getElementById('bId').value||null, p_title:title,
+        p_author: document.getElementById('bAuthor').value.trim()||null,
+        p_isbn: document.getElementById('bIsbn').value.trim()||null,
+        p_category: document.getElementById('bCategory').value.trim()||null,
+        p_cover_url:null, p_location: document.getElementById('bLocation').value.trim()||null,
+        p_total_copies: Number(document.getElementById('bCopies').value)||1
+      });
+      if(error){ toast(error.message,'error'); return; }
+      if(!data.success){ toast(t('library.'+data.error)||data.error,'error'); return; }
+      toast(t('library.saved'),'success'); closeBook(); loadBooks();
+    }
+    async function delBook(id){
+      if(!confirm(t('library.confirmDelete'))) return;
+      const { data, error } = await supabaseClient.rpc('delete_book',{p_id:id});
+      if(error){ toast(error.message,'error'); return; }
+      if(!data.success){ toast(data.error,'error'); return; }
+      toast(t('library.deleted'),'success'); loadBooks();
+    }
+
+    // borrow / return
+    function openBorrow(id){
+      curBook=id; document.getElementById('borrowBook').textContent=bookById(id).title||'';
+      const d=new Date(); d.setDate(d.getDate()+7); document.getElementById('loanDue').value=d.toISOString().split('T')[0];
+      document.getElementById('borrowModal').classList.add('show');
+    }
+    function closeBorrow(){ document.getElementById('borrowModal').classList.remove('show'); }
+    async function doBorrow(){
+      const sid=document.getElementById('loanStudent').value;
+      if(!sid){ toast(t('library.noStudent'),'error'); return; }
+      const { data, error } = await supabaseClient.rpc('borrow_book',{ p_book_id:curBook, p_student_id:sid, p_due_date: document.getElementById('loanDue').value||null });
+      if(error){ toast(error.message,'error'); return; }
+      if(!data.success){ toast(t('library.'+data.error)||data.error,'error'); return; }
+      toast(t('library.issued'),'success'); closeBorrow(); loadBooks();
+    }
+    async function doReturn(id){
+      const { data, error } = await supabaseClient.rpc('return_book',{p_loan_id:id});
+      if(error){ toast(error.message,'error'); return; }
+      if(!data.success){ toast(t('library.'+data.error)||data.error,'error'); return; }
+      toast(t('library.returnedMsg'),'success'); loadLoans(); loadBooks();
+    }
+
+    function fmt(d){ if(!d) return '—'; try { return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'}); } catch { return d; } }
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function toast(m,ty='info'){ const tt=document.getElementById('toast'); tt.className='toast show '+ty; tt.textContent=m; setTimeout(()=>tt.className='toast',3500); }
+  </script>
+</body>
+</html>

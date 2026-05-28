@@ -550,6 +550,41 @@
       distinctSubjects: { en: 'Subjects', th: 'จำนวนวิชา' }
     },
 
+    // ---------- Onboarding Wizard (Sprint 16.X) ----------
+    onboarding: {
+      back: { en: '← Dashboard', th: '← แดชบอร์ด' },
+      title: { en: '🚀 School Setup Guide', th: '🚀 คู่มือตั้งค่าโรงเรียน' },
+      subtitle: { en: 'Complete these steps to get your school fully running on PanyaSchoolKit.', th: 'ทำตามขั้นตอนเหล่านี้ให้ครบ เพื่อเริ่มใช้ระบบเต็มรูปแบบ' },
+      essential: { en: 'Essential Setup', th: 'ตั้งค่าที่จำเป็น' },
+      optional: { en: 'Optional (recommended)', th: 'เพิ่มเติม (แนะนำ)' },
+      stepsDone: { en: 'steps done', th: 'ขั้นตอนเสร็จ' },
+      done: { en: '✓ Done', th: '✓ เสร็จ' },
+      todo: { en: 'To do', th: 'ยังไม่ทำ' },
+      optionalTag: { en: 'Optional', th: 'ไม่บังคับ' },
+      setup: { en: 'Set up', th: 'ตั้งค่า' },
+      review: { en: 'Review', th: 'ดู/แก้ไข' },
+      allDoneTitle: { en: 'All set! Your school is fully configured.', th: 'เสร็จครบแล้ว! โรงเรียนพร้อมใช้งานเต็มรูปแบบ' },
+      allDoneDesc: { en: 'You can revisit any step anytime from the dashboard.', th: 'กลับมาแก้ไขแต่ละขั้นตอนได้ทุกเมื่อจากแดชบอร์ด' },
+      s_subjects: { en: 'Add Subjects', th: 'เพิ่มวิชา' },
+      s_subjects_d: { en: 'Define the subjects taught at your school (MATH, ENG, SCI...).', th: 'กำหนดวิชาที่สอนในโรงเรียน (คณิต อังกฤษ วิทย์...)' },
+      s_periods: { en: 'Set Class Periods', th: 'ตั้งคาบเรียน' },
+      s_periods_d: { en: 'Define daily time slots (Period 1 = 08:30-09:20, breaks...).', th: 'กำหนดเวลาคาบเรียนในแต่ละวัน (คาบ 1 = 08:30-09:20, พัก...)' },
+      s_grading: { en: 'Configure Grading Scale', th: 'ตั้งระบบเกรด' },
+      s_grading_d: { en: 'Choose how grades are calculated (A-F, 4.0 GPA, Pass/Fail).', th: 'เลือกระบบเกรด (A-F, 4.0 GPA, ผ่าน/ไม่ผ่าน)' },
+      s_students: { en: 'Import Students', th: 'นำเข้านักเรียน' },
+      s_students_d: { en: 'Add students manually or import via CSV.', th: 'เพิ่มนักเรียนทีละคน หรือนำเข้าด้วย CSV' },
+      s_teachers: { en: 'Import Teachers', th: 'นำเข้าครู' },
+      s_teachers_d: { en: 'Add your teaching staff manually or via CSV.', th: 'เพิ่มครูทีละคน หรือนำเข้าด้วย CSV' },
+      s_payment: { en: 'Payment / PromptPay', th: 'ตั้งค่าการชำระเงิน / PromptPay' },
+      s_payment_d: { en: 'Enter PromptPay ID to auto-generate QR on tuition bills.', th: 'ใส่ PromptPay ID เพื่อสร้าง QR ในบิลอัตโนมัติ' },
+      s_schedule: { en: 'Build Timetables', th: 'สร้างตารางเรียน' },
+      s_schedule_d: { en: 'Assign subjects + teachers to each class period.', th: 'ใส่วิชา + ครู ในแต่ละคาบของห้องเรียน' },
+      s_line: { en: 'LINE Notifications', th: 'แจ้งเตือน LINE' },
+      s_line_d: { en: 'Connect LINE OA to notify parents (attendance, bills...).', th: 'เชื่อม LINE OA แจ้งเตือนผู้ปกครอง (เช็คชื่อ บิล...)' },
+      s_users: { en: 'Invite Staff', th: 'เชิญทีมงาน' },
+      s_users_d: { en: 'Invite teachers/admins to access the system.', th: 'เชิญครู/ฝ่ายธุรการเข้าใช้ระบบ' }
+    },
+
     // ---------- ปพ. Documents (Sprint 13.7) — Thai Ministry of Education official report formats ----------
     popor: {
       title: { en: '📑 Official Documents (ปพ.)', th: '📑 เอกสารทางการ (ปพ.)' },

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup Guide — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A; --pk-blue-800: #1E40AF; --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB; --pk-blue-100: #DBE5FF; --pk-blue-50: #EEF3FF;
+      --pk-canvas: #EBF0FA; --pk-paper: #FFFFFF;
+      --pk-ink: #0F1A36; --pk-ink-soft: #1F2A4E;
+      --pk-ash: #4B5670; --pk-mist: #7B8497;
+      --pk-border: #D8DEE9; --pk-border-em: #A8B2C4;
+      --pk-success: #065F46; --pk-success-bg: #D1FAE5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; background: var(--pk-canvas); color: var(--pk-ink); min-height: 100vh; }
+    .topbar { background: var(--pk-paper); border-bottom: 1px solid var(--pk-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .topbar img { height: 26px; }
+    .back-link { color: var(--pk-ash); text-decoration: none; font-size: 13.5px; padding: 6px 12px; border-radius: 8px; }
+    .back-link:hover { background: var(--pk-canvas); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .container { max-width: 820px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--pk-blue-800), var(--pk-blue-900));
+      color: #fff; border-radius: 18px; padding: 28px 30px; margin-bottom: 22px;
+      box-shadow: 0 6px 24px -10px rgba(30,64,175,0.5);
+    }
+    .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+    .hero p { font-size: 14px; opacity: 0.85; margin-bottom: 18px; }
+    .progress-wrap { background: rgba(255,255,255,0.2); border-radius: 100px; height: 12px; overflow: hidden; }
+    .progress-bar { background: #fff; height: 100%; border-radius: 100px; transition: width 0.5s ease; width: 0%; }
+    .progress-label { font-size: 13px; font-weight: 600; margin-top: 10px; display: flex; justify-content: space-between; }
+
+    .step-card {
+      background: var(--pk-paper); border: 1px solid var(--pk-border); border-radius: 14px;
+      padding: 18px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px;
+      transition: all 0.15s;
+    }
+    .step-card.done { border-color: #A7F3D0; background: linear-gradient(0deg, #F0FDF9, #fff); }
+    .step-num {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+      background: var(--pk-blue-50);
+    }
+    .step-card.done .step-num { background: var(--pk-success-bg); }
+    .step-body { flex: 1; min-width: 0; }
+    .step-title { font-size: 15px; font-weight: 700; color: var(--pk-ink); display: flex; align-items: center; gap: 8px; }
+    .step-desc { font-size: 12.5px; color: var(--pk-ash); margin-top: 3px; }
+    .step-status { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
+    .st-done { background: var(--pk-success-bg); color: var(--pk-success); }
+    .st-todo { background: #FEF3C7; color: #92400E; }
+    .st-optional { background: #F3F4F6; color: var(--pk-mist); }
+    .step-cta {
+      flex-shrink: 0; padding: 9px 16px; border-radius: 9px; font-family: inherit;
+      font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; border: none;
+      background: var(--pk-blue-800); color: #fff; white-space: nowrap;
+    }
+    .step-cta:hover { background: var(--pk-blue-900); }
+    .step-cta.secondary { background: var(--pk-paper); color: var(--pk-ink-soft); border: 1px solid var(--pk-border-em); }
+    .step-cta.secondary:hover { background: var(--pk-canvas); }
+
+    .section-label { font-size: 12px; font-weight: 700; color: var(--pk-mist); text-transform: uppercase; letter-spacing: 0.06em; margin: 22px 0 10px; }
+
+    .celebrate {
+      display: none; background: linear-gradient(135deg, #D1FAE5, #DBEAFE);
+      border: 1px solid #A7F3D0; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 22px;
+    }
+    .celebrate.show { display: block; }
+    .celebrate .big { font-size: 44px; }
+    .celebrate h2 { color: var(--pk-success); font-size: 20px; margin: 8px 0 4px; }
+    .celebrate p { color: var(--pk-ink-soft); font-size: 14px; }
+
+    .loading { text-align: center; padding: 60px; color: var(--pk-ash); }
+
+    @media (max-width: 640px) {
+      .step-card { flex-wrap: wrap; }
+      .step-cta { width: 100%; text-align: center; }
+      .hero { padding: 22px; }
+      .hero h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" data-i18n="onboarding.back">← Dashboard</a>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="container">
+    <div id="loading" class="loading">⏳ Loading...</div>
+
+    <div id="content" style="display:none;">
+      <div class="hero">
+        <h1 data-i18n="onboarding.title">🚀 School Setup Guide</h1>
+        <p data-i18n="onboarding.subtitle">Complete these steps to get your school fully running on PanyaSchoolKit.</p>
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="progress-label">
+          <span id="progressText">0 / 0</span>
+          <span id="progressPct">0%</span>
+        </div>
+      </div>
+
+      <div class="celebrate" id="celebrate">
+        <div class="big">🎉</div>
+        <h2 data-i18n="onboarding.allDoneTitle">All set! Your school is fully configured.</h2>
+        <p data-i18n="onboarding.allDoneDesc">You can revisit any step anytime from the dashboard.</p>
+      </div>
+
+      <div class="section-label" data-i18n="onboarding.essential">Essential Setup</div>
+      <div id="essentialSteps"></div>
+
+      <div class="section-label" data-i18n="onboarding.optional">Optional (recommended)</div>
+      <div id="optionalSteps"></div>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    // Each step: detect() returns true if complete. Wrapped in try/catch so missing
+    // tables / RLS never crash the wizard — they just show as "to do".
+    const STEPS = [
+      {
+        key: 'subjects', icon: '📚', group: 'essential',
+        titleKey: 'onboarding.s_subjects', descKey: 'onboarding.s_subjects_d',
+        page: 'subjects-config.html',
+        detect: async () => (await countTable('subjects')) > 0
+      },
+      {
+        key: 'periods', icon: '⏰', group: 'essential',
+        titleKey: 'onboarding.s_periods', descKey: 'onboarding.s_periods_d',
+        page: 'schedule-admin.html',
+        detect: async () => {
+          const { data } = await supabaseClient.rpc('get_periods');
+          return Array.isArray(data) && data.length > 0;
+        }
+      },
+      {
+        key: 'grading', icon: '🎯', group: 'essential',
+        titleKey: 'onboarding.s_grading', descKey: 'onboarding.s_grading_d',
+        page: 'grade-config.html',
+        detect: async () => {
+          const { data } = await supabaseClient.rpc('get_grading_scales');
+          return Array.isArray(data) && data.length > 0;
+        }
+      },
+      {
+        key: 'students', icon: '🎓', group: 'essential',
+        titleKey: 'onboarding.s_students', descKey: 'onboarding.s_students_d',
+        page: 'students.html',
+        detect: async () => (await countTable('students')) > 0
+      },
+      {
+        key: 'teachers', icon: '👨‍🏫', group: 'essential',
+        titleKey: 'onboarding.s_teachers', descKey: 'onboarding.s_teachers_d',
+        page: 'teachers.html',
+        detect: async () => (await countTable('teachers')) > 0
+      },
+      {
+        key: 'payment', icon: '💰', group: 'optional',
+        titleKey: 'onboarding.s_payment', descKey: 'onboarding.s_payment_d',
+        page: 'payment-settings.html',
+        detect: async () => {
+          try {
+            const { data } = await supabaseClient.from('payment_settings')
+              .select('promptpay_id, bank_name').eq('active', true).limit(1).maybeSingle();
+            return !!(data && (data.promptpay_id || data.bank_name));
+          } catch { return false; }
+        }
+      },
+      {
+        key: 'schedule', icon: '🗓️', group: 'optional',
+        titleKey: 'onboarding.s_schedule', descKey: 'onboarding.s_schedule_d',
+        page: 'schedule-admin.html',
+        detect: async () => (await countTable('schedule_slots')) > 0
+      },
+      {
+        key: 'line', icon: '📱', group: 'optional',
+        titleKey: 'onboarding.s_line', descKey: 'onboarding.s_line_d',
+        page: 'school-settings.html',
+        detect: async () => {
+          // Try legacy line_settings table, then schools.line_settings jsonb
+          try {
+            const c = await countTable('line_settings');
+            if (c > 0) return true;
+          } catch {}
+          try {
+            const { data } = await supabaseClient.from('schools').select('line_settings').limit(1).maybeSingle();
+            return !!(data && data.line_settings && data.line_settings.enabled);
+          } catch {}
+          return false;
+        }
+      },
+      {
+        key: 'users', icon: '👥', group: 'optional',
+        titleKey: 'onboarding.s_users', descKey: 'onboarding.s_users_d',
+        page: 'users.html',
+        detect: async () => (await countTable('staff_invites')) > 0 || (await countTable('profiles')) > 1
+      }
+    ];
+
+    async function countTable(table) {
+      try {
+        const { count, error } = await supabaseClient.from(table).select('id', { count: 'exact', head: true });
+        if (error) return 0;
+        return count || 0;
+      } catch { return 0; }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      await render();
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    });
+    document.addEventListener('langchange', render);
+
+    async function render() {
+      // Run all detections in parallel
+      const results = await Promise.all(STEPS.map(s => s.detect().then(d => d).catch(() => false)));
+      STEPS.forEach((s, i) => s._done = results[i]);
+
+      const essential = STEPS.filter(s => s.group === 'essential');
+      const optional = STEPS.filter(s => s.group === 'optional');
+
+      // Progress = essential steps only (those are what "ready" means)
+      const doneCount = essential.filter(s => s._done).length;
+      const total = essential.length;
+      const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressText').textContent = `${doneCount} / ${total} ${t('onboarding.stepsDone')}`;
+      document.getElementById('progressPct').textContent = pct + '%';
+      document.getElementById('celebrate').classList.toggle('show', doneCount === total && total > 0);
+
+      document.getElementById('essentialSteps').innerHTML = essential.map((s, i) => stepHtml(s, i + 1)).join('');
+      document.getElementById('optionalSteps').innerHTML = optional.map((s, i) => stepHtml(s, '+')).join('');
+    }
+
+    function stepHtml(s, num) {
+      const done = s._done;
+      const statusClass = done ? 'st-done' : (s.group === 'optional' ? 'st-optional' : 'st-todo');
+      const statusText = done ? t('onboarding.done') : (s.group === 'optional' ? t('onboarding.optionalTag') : t('onboarding.todo'));
+      const ctaText = done ? t('onboarding.review') : t('onboarding.setup');
+      const ctaClass = done ? 'step-cta secondary' : 'step-cta';
+      return `
+        <div class="step-card ${done ? 'done' : ''}">
+          <div class="step-num">${done ? '✅' : s.icon}</div>
+          <div class="step-body">
+            <div class="step-title">${esc(t(s.titleKey))} <span class="step-status ${statusClass}">${statusText}</span></div>
+            <div class="step-desc">${esc(t(s.descKey))}</div>
+          </div>
+          <a href="${s.page}" class="${ctaClass}">${ctaText} →</a>
+        </div>`;
+    }
+
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  </script>
+</body>
+</html>

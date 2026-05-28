@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homework — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-700:#1D4ED8;--pk-blue-600:#2563EB;
+      --pk-blue-100:#DBE5FF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;
+      --pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;
+      --pk-border:#D8DEE9;--pk-border-em:#A8B2C4;
+      --pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-warn:#92400E;--pk-warn-bg:#FEF3C7;
+      --pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .back-link:hover{background:var(--pk-canvas);}
+    .topbar-right{display:flex;align-items:center;gap:12px;}
+
+    .container{max-width:1000px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+    .page-title h1{font-size:24px;font-weight:700;}
+    .page-title p{color:var(--pk-ash);font-size:14px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;}
+    .btn-primary:hover{background:var(--pk-blue-900);}
+    .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-success{background:var(--pk-success-bg);color:var(--pk-success);}
+    .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);}
+    .btn-sm{padding:6px 12px;font-size:12px;}
+
+    .filters{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .filters select{padding:8px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .filters label{font-size:12px;color:var(--pk-ash);font-weight:600;}
+    .chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--pk-ink-soft);cursor:pointer;}
+
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:16px 18px;margin-bottom:12px;}
+    .hw{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;}
+    .hw-info{flex:1;min-width:0;}
+    .hw-info h3{font-size:15.5px;font-weight:700;color:var(--pk-blue-800);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .hw-info .meta{font-size:12.5px;color:var(--pk-ash);margin-top:5px;line-height:1.7;}
+    .hw-info .desc{font-size:13px;color:var(--pk-ink-soft);margin-top:7px;white-space:pre-wrap;}
+    .status{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;text-transform:uppercase;}
+    .s-open{background:var(--pk-blue-50);color:var(--pk-blue-800);}
+    .s-closed{background:var(--pk-warn-bg);color:var(--pk-warn);}
+    .s-submitted{background:var(--pk-success-bg);color:var(--pk-success);}
+    .s-done{background:var(--pk-success-bg);color:var(--pk-success);}
+    .type-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--pk-blue-50);color:var(--pk-blue-800);margin-right:6px;}
+    .due-soon{color:var(--pk-danger);font-weight:600;}
+    .hw-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:4px;}
+
+    .empty{text-align:center;padding:50px 20px;color:var(--pk-ash);}
+    .empty .icon{font-size:44px;margin-bottom:10px;}
+
+    /* Modal */
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+    .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;}
+    .modal.wide{max-width:600px;}
+    .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;}
+    .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;}
+    .row2 > div{flex:1;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+    .sub-item{border:1px solid var(--pk-border);border-radius:10px;padding:12px;margin-bottom:10px;}
+    .sub-item h4{font-size:14px;color:var(--pk-ink);}
+    .sub-item .meta{font-size:12px;color:var(--pk-ash);margin-top:3px;}
+    .sub-grade{display:flex;gap:8px;align-items:center;margin-top:8px;}
+    .sub-grade input{width:80px;padding:6px 10px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:13px;}
+    .sub-grade input.fb{width:auto;flex:1;}
+
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:all .3s;z-index:200;}
+    .toast.show{opacity:1;}
+    .toast.success{background:var(--pk-success);}
+    .toast.error{background:var(--pk-danger);}
+
+    @media(max-width:640px){
+      .container{padding:14px;}
+      .modal input,.modal select,.modal textarea{font-size:16px;}
+      .row2{flex-direction:column;}
+      .hw-actions{width:100%;}
+      .hw-actions .btn{flex:1;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link" id="backLink" data-i18n="homework.back">← Dashboard</a>
+    </div>
+    <div class="topbar-right"></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1 data-i18n="homework.title">📚 Homework</h1>
+        <p data-i18n="homework.subtitle">Assign homework and track submissions</p>
+      </div>
+      <button class="btn btn-primary" id="newBtn" onclick="openCreate()" style="display:none" data-i18n="homework.new">➕ New Homework</button>
+    </div>
+
+    <div class="filters">
+      <label data-i18n="homework.filterClass">Class:</label>
+      <select id="classFilter" onchange="load()"><option value="" data-i18n="homework.allClasses">All classes</option></select>
+      <label data-i18n="homework.filterStatus">Status:</label>
+      <select id="statusFilter" onchange="load()">
+        <option value="" data-i18n="homework.all">All</option>
+        <option value="open" data-i18n="homework.open">Open</option>
+        <option value="closed" data-i18n="homework.closed">Closed</option>
+      </select>
+      <label class="chk" id="mineWrap" style="display:none"><input type="checkbox" id="mineFilter" onchange="load()" /> <span data-i18n="homework.mineOnly">Mine only</span></label>
+    </div>
+
+    <div id="list"><div class="empty">⏳ Loading...</div></div>
+  </div>
+
+  <!-- Create / edit modal (staff) -->
+  <div class="modal-bd" id="formModal">
+    <div class="modal">
+      <h2 id="formTitle" data-i18n="homework.newTitle">➕ New Homework</h2>
+      <input type="hidden" id="hwId" />
+      <div class="field">
+        <label data-i18n="homework.fTitle">Title</label>
+        <input type="text" id="fTitle" />
+      </div>
+      <div class="field">
+        <label data-i18n="homework.fDesc">Details</label>
+        <textarea id="fDesc" rows="3"></textarea>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label data-i18n="homework.fSubject">Subject</label>
+          <input type="text" id="fSubject" placeholder="" />
+        </div>
+        <div class="field">
+          <label data-i18n="homework.fClass">Target class</label>
+          <select id="fClass"><option value="" data-i18n="homework.allSchool">Whole school</option></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label data-i18n="homework.fDue">Due date</label>
+          <input type="date" id="fDue" />
+        </div>
+        <div class="field">
+          <label data-i18n="homework.fPoints">Max score (optional)</label>
+          <input type="number" id="fPoints" min="0" step="1" />
+        </div>
+      </div>
+      <div class="field" id="fStatusWrap" style="display:none">
+        <label data-i18n="homework.fStatus">Status</label>
+        <select id="fStatus">
+          <option value="open" data-i18n="homework.open">Open</option>
+          <option value="closed" data-i18n="homework.closed">Closed</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeForm()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveHomework()" data-i18n="homework.save">💾 Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit modal (student/parent) -->
+  <div class="modal-bd" id="submitModal">
+    <div class="modal">
+      <h2 data-i18n="homework.submitTitle">✓ Submit / Mark done</h2>
+      <p id="submitHwTitle" style="font-size:14px;color:var(--pk-ash);margin-bottom:12px;"></p>
+      <div class="field" id="submitStudentField">
+        <label data-i18n="homework.student">Student</label>
+        <select id="sStudent"></select>
+      </div>
+      <div class="field">
+        <label data-i18n="homework.sNote">Note / answer link (optional)</label>
+        <textarea id="sNote" rows="3" placeholder=""></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeSubmit()" data-i18n="common.cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="doSubmit()" data-i18n="homework.markDone">✓ Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submissions modal (staff) -->
+  <div class="modal-bd" id="subsModal">
+    <div class="modal wide">
+      <h2 data-i18n="homework.subsTitle">📥 Submissions</h2>
+      <p id="subsHwTitle" style="font-size:14px;color:var(--pk-ash);margin-bottom:12px;"></p>
+      <div id="subsList"><div class="empty">⏳ Loading...</div></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeSubs()" data-i18n="common.close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let isStaff = false;
+    let myStudents = [];
+    let rows = [];
+    let curHwId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      try {
+        const { data: prof } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+        isStaff = ['staff','owner','developer','admin','teacher'].includes(prof?.role);
+      } catch {}
+      document.getElementById('backLink').setAttribute('href', isStaff ? 'dashboard.html' : 'student-dashboard.html');
+      if (isStaff) {
+        document.getElementById('newBtn').style.display = '';
+        document.getElementById('mineWrap').style.display = '';
+      }
+      await loadClassrooms();
+      await loadStudents();
+      load();
+    });
+    document.addEventListener('langchange', render);
+
+    async function loadClassrooms() {
+      let classes = [];
+      try {
+        if (isStaff) {
+          const { data } = await supabaseClient.from('students').select('classroom').eq('status','active').not('classroom','is',null).limit(5000);
+          classes = [...new Set((data||[]).map(r => r.classroom).filter(Boolean))].sort();
+        }
+      } catch {}
+      const opts = classes.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+      const cf = document.getElementById('classFilter');
+      cf.insertAdjacentHTML('beforeend', opts);
+      const fc = document.getElementById('fClass');
+      if (fc) fc.insertAdjacentHTML('beforeend', opts);
+    }
+
+    async function loadStudents() {
+      try {
+        if (isStaff) {
+          myStudents = [];
+        } else {
+          const { data } = await supabaseClient.from('students').select('id, first_name_th, last_name_th, classroom').limit(50);
+          myStudents = data || [];
+        }
+      } catch { myStudents = []; }
+      const sel = document.getElementById('sStudent');
+      sel.innerHTML = myStudents.map(s => `<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))} ${s.classroom?('· '+esc(s.classroom)):''}</option>`).join('');
+      document.getElementById('submitStudentField').style.display = myStudents.length <= 1 ? 'none' : 'block';
+    }
+
+    async function load() {
+      document.getElementById('list').innerHTML = '<div class="empty">⏳ ' + t('common.loading') + '</div>';
+      const payload = {
+        p_status: document.getElementById('statusFilter').value || null,
+        p_classroom: document.getElementById('classFilter').value || null,
+        p_mine: isStaff ? document.getElementById('mineFilter').checked : false
+      };
+      const { data, error } = await supabaseClient.rpc('get_homework', payload);
+      if (error) { document.getElementById('list').innerHTML = '<div class="empty">' + esc(error.message) + '</div>'; return; }
+      rows = Array.isArray(data) ? data : [];
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById('list');
+      if (!rows.length) {
+        list.innerHTML = `<div class="empty"><div class="icon">📚</div><h3>${t('homework.empty')}</h3><p>${t('homework.emptyDesc')}</p></div>`;
+        return;
+      }
+      const today = new Date().toISOString().split('T')[0];
+      list.innerHTML = rows.map(r => {
+        const target = r.classroom ? esc(r.classroom) : (r.grade ? esc(r.grade) : t('homework.allSchool'));
+        const due = r.due_date ? fmt(r.due_date) : '—';
+        const dueCls = (r.due_date && r.due_date < today && r.status === 'open') ? 'due-soon' : '';
+        const statusLabel = t('homework.'+r.status) || r.status;
+        return `<div class="card"><div class="hw">
+          <div class="hw-info">
+            <h3>${esc(r.title)} <span class="status s-${r.status}">${esc(statusLabel)}</span></h3>
+            <div class="meta">
+              ${r.subject?`<span class="type-tag">${esc(r.subject)}</span>`:''}
+              🎯 ${target} · 📅 <span class="${dueCls}">${due}</span>${r.points?(' · ⭐ '+esc(r.points)):''}
+            </div>
+            ${r.description?`<div class="desc">${esc(r.description)}</div>`:''}
+            <div class="meta">👤 ${esc(r.creator_name||'')}</div>
+          </div>
+          <div style="text-align:right;min-width:140px;">
+            ${isStaff ? `
+              <div class="hw-actions">
+                <button class="btn btn-secondary btn-sm" onclick="openSubs('${r.id}')">📥 ${t('homework.submissions')} (${r.submission_count||0})</button>
+                <button class="btn btn-secondary btn-sm" onclick="openEdit('${r.id}')">✏️</button>
+                <button class="btn btn-danger btn-sm" onclick="del('${r.id}')">🗑️</button>
+              </div>` : `
+              ${r.my_submitted
+                ? `<span class="status s-submitted">${t('homework.submitted')}</span>`
+                : `<button class="btn btn-primary btn-sm" onclick="openSubmit('${r.id}')">✓ ${t('homework.markDone')}</button>`}
+            `}
+          </div>
+        </div></div>`;
+      }).join('');
+    }
+
+    // ---------- Create / edit (staff) ----------
+    function openCreate() {
+      document.getElementById('hwId').value = '';
+      document.getElementById('formTitle').textContent = t('homework.newTitle');
+      document.getElementById('fTitle').value = '';
+      document.getElementById('fDesc').value = '';
+      document.getElementById('fSubject').value = '';
+      document.getElementById('fClass').value = '';
+      document.getElementById('fDue').value = '';
+      document.getElementById('fPoints').value = '';
+      document.getElementById('fStatusWrap').style.display = 'none';
+      document.getElementById('formModal').classList.add('show');
+    }
+    function getRow(id){ return rows.find(r => r.id === id) || {}; }
+
+    function openEdit(id) {
+      const r = getRow(id);
+      document.getElementById('hwId').value = r.id;
+      document.getElementById('formTitle').textContent = t('homework.editTitle');
+      document.getElementById('fTitle').value = r.title || '';
+      document.getElementById('fDesc').value = r.description || '';
+      document.getElementById('fSubject').value = r.subject || '';
+      document.getElementById('fClass').value = r.classroom || '';
+      document.getElementById('fDue').value = r.due_date || '';
+      document.getElementById('fPoints').value = (r.points ?? '');
+      document.getElementById('fStatus').value = r.status || 'open';
+      document.getElementById('fStatusWrap').style.display = 'block';
+      document.getElementById('formModal').classList.add('show');
+    }
+    function closeForm() { document.getElementById('formModal').classList.remove('show'); }
+
+    async function saveHomework() {
+      const id = document.getElementById('hwId').value;
+      const title = document.getElementById('fTitle').value.trim();
+      if (!title) { toast(t('homework.needTitle'), 'error'); return; }
+      const common = {
+        p_title: title,
+        p_description: document.getElementById('fDesc').value.trim() || null,
+        p_subject: document.getElementById('fSubject').value.trim() || null,
+        p_classroom: document.getElementById('fClass').value || null,
+        p_due_date: document.getElementById('fDue').value || null,
+        p_points: document.getElementById('fPoints').value !== '' ? Number(document.getElementById('fPoints').value) : null
+      };
+      let res;
+      if (id) {
+        res = await supabaseClient.rpc('update_homework', { p_id: id, ...common, p_status: document.getElementById('fStatus').value });
+      } else {
+        res = await supabaseClient.rpc('create_homework', common);
+      }
+      const { data, error } = res;
+      if (error) { toast(error.message, 'error'); return; }
+      if (!data.success) { toast(t('homework.'+data.error) || data.error, 'error'); return; }
+      toast(t(id ? 'homework.saved' : 'homework.created'), 'success');
+      closeForm();
+      load();
+    }
+
+    async function del(id) {
+      if (!confirm(t('homework.confirmDelete'))) return;
+      const { data, error } = await supabaseClient.rpc('delete_homework', { p_id: id });
+      if (error) { toast(error.message, 'error'); return; }
+      if (!data.success) { toast(data.error, 'error'); return; }
+      toast(t('homework.deleted'), 'success');
+      load();
+    }
+
+    // ---------- Submit (student/parent) ----------
+    function openSubmit(hwId) {
+      curHwId = hwId;
+      document.getElementById('submitHwTitle').textContent = getRow(hwId).title || '';
+      document.getElementById('sNote').value = '';
+      document.getElementById('submitModal').classList.add('show');
+    }
+    function closeSubmit() { document.getElementById('submitModal').classList.remove('show'); }
+
+    async function doSubmit() {
+      const studentId = document.getElementById('sStudent').value || (myStudents[0] && myStudents[0].id);
+      if (!studentId) { toast(t('homework.noStudent'), 'error'); return; }
+      const { data, error } = await supabaseClient.rpc('submit_homework', {
+        p_homework_id: curHwId,
+        p_student_id: studentId,
+        p_note: document.getElementById('sNote').value.trim() || null,
+        p_attachment_url: null
+      });
+      if (error) { toast(error.message, 'error'); return; }
+      if (!data.success) { toast(t('homework.'+data.error) || data.error, 'error'); return; }
+      toast(t('homework.submittedMsg'), 'success');
+      closeSubmit();
+      load();
+    }
+
+    // ---------- Submissions (staff) ----------
+    async function openSubs(hwId, title) {
+      curHwId = hwId;
+      document.getElementById('subsHwTitle').textContent = title || '';
+      document.getElementById('subsList').innerHTML = '<div class="empty">⏳ ' + t('common.loading') + '</div>';
+      document.getElementById('subsModal').classList.add('show');
+      const { data, error } = await supabaseClient.rpc('get_homework_submissions', { p_homework_id: hwId });
+      if (error) { document.getElementById('subsList').innerHTML = '<div class="empty">' + esc(error.message) + '</div>'; return; }
+      renderSubs(Array.isArray(data) ? data : []);
+    }
+    function closeSubs() { document.getElementById('subsModal').classList.remove('show'); }
+
+    function renderSubs(subs) {
+      const el = document.getElementById('subsList');
+      if (!subs.length) { el.innerHTML = `<div class="empty"><div class="icon">📭</div><p>${t('homework.noSubs')}</p></div>`; return; }
+      el.innerHTML = subs.map(s => {
+        const name = ((s.first_name_th||'')+' '+(s.last_name_th||'')).trim() || ((s.first_name_en||'')+' '+(s.last_name_en||'')).trim() || '—';
+        return `<div class="sub-item">
+          <h4>${esc(name)} ${s.classroom?`<span style="font-size:12px;color:var(--pk-mist);font-weight:400;">· ${esc(s.classroom)}</span>`:''} <span class="status s-${s.status}">${esc(t('homework.'+s.status)||s.status)}</span></h4>
+          ${s.note?`<div class="meta">📝 ${esc(s.note)}</div>`:''}
+          <div class="meta">📅 ${fmt(s.submitted_at)}</div>
+          <div class="sub-grade">
+            <input type="number" id="score_${s.id}" placeholder="${t('homework.score')}" value="${s.score ?? ''}" min="0" step="0.5" />
+            <input type="text" class="fb" id="fb_${s.id}" placeholder="${t('homework.feedback')}" value="${esc(s.feedback||'')}" />
+            <button class="btn btn-success btn-sm" onclick="gradeSub('${s.id}')" data-i18n="homework.grade">✓ Grade</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function gradeSub(subId) {
+      const score = document.getElementById('score_'+subId).value;
+      const fb = document.getElementById('fb_'+subId).value.trim();
+      const { data, error } = await supabaseClient.rpc('grade_homework', {
+        p_submission_id: subId,
+        p_score: score !== '' ? Number(score) : null,
+        p_feedback: fb || null
+      });
+      if (error) { toast(error.message, 'error'); return; }
+      if (!data.success) { toast(data.error, 'error'); return; }
+      toast(t('homework.graded'), 'success');
+      openSubs(curHwId, document.getElementById('subsHwTitle').textContent);
+      load();
+    }
+
+    function fmt(d){ try { return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'}); } catch { return d; } }
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function js(s){ return JSON.stringify(String(s ?? '')); }
+    function json(o){ return esc(JSON.stringify(o)); }
+    function toast(m,ty='info'){ const tt=document.getElementById('toast'); tt.className='toast show '+ty; tt.textContent=m; setTimeout(()=>tt.className='toast',3500); }
+  </script>
+</body>
+</html>

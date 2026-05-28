@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>คู่มือการใช้งาน — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <style>
+    :root{
+      --pk-blue-900:#1E3A8A;--pk-blue-800:#1E40AF;--pk-blue-700:#1D4ED8;--pk-blue-600:#2563EB;
+      --pk-blue-100:#DBE5FF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;
+      --pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;
+      --pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;
+      --pk-warn:#92400E;--pk-warn-bg:#FEF3C7;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);line-height:1.7;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:14px;}
+    .topbar img{height:24px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .back-link:hover{background:var(--pk-canvas);}
+    .search{padding:8px 12px;border:1px solid var(--pk-border);border-radius:9px;font-family:inherit;font-size:14px;min-width:220px;}
+
+    .layout{display:grid;grid-template-columns:260px 1fr;gap:24px;max-width:1180px;margin:0 auto;padding:24px;align-items:start;}
+    /* Sidebar TOC */
+    .toc{position:sticky;top:78px;background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:14px;max-height:calc(100vh - 100px);overflow-y:auto;}
+    .toc h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--pk-mist);margin:10px 8px 6px;}
+    .toc a{display:block;padding:7px 10px;border-radius:8px;color:var(--pk-ink-soft);text-decoration:none;font-size:13.5px;}
+    .toc a:hover{background:var(--pk-blue-50);color:var(--pk-blue-800);}
+
+    .content{min-width:0;}
+    .hero{background:linear-gradient(135deg,var(--pk-blue-800),var(--pk-blue-900));color:#fff;border-radius:16px;padding:26px 30px;margin-bottom:22px;}
+    .hero h1{font-size:24px;font-weight:800;margin-bottom:6px;}
+    .hero p{font-size:14px;opacity:.88;}
+
+    .sec{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:22px 26px;margin-bottom:16px;scroll-margin-top:80px;}
+    .sec h2{font-size:19px;font-weight:700;color:var(--pk-blue-900);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+    .sec .lead{color:var(--pk-ash);font-size:13.5px;margin-bottom:14px;}
+    .sec h3{font-size:15px;font-weight:700;color:var(--pk-ink);margin:16px 0 6px;}
+    .sec p{font-size:14px;color:var(--pk-ink-soft);margin-bottom:8px;}
+    .sec ol,.sec ul{margin:6px 0 12px 22px;font-size:14px;color:var(--pk-ink-soft);}
+    .sec li{margin-bottom:5px;}
+    .sec code{background:var(--pk-blue-50);color:var(--pk-blue-800);padding:1px 6px;border-radius:5px;font-size:13px;font-family:'Inter',monospace;}
+    .tip{background:var(--pk-success-bg);border-left:3px solid var(--pk-success);border-radius:8px;padding:10px 14px;font-size:13.5px;color:var(--pk-success);margin:10px 0;}
+    .warn{background:var(--pk-warn-bg);border-left:3px solid #F59E0B;border-radius:8px;padding:10px 14px;font-size:13.5px;color:var(--pk-warn);margin:10px 0;}
+    .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:100px;margin-left:6px;}
+    .role-admin{background:#DBEAFE;color:#1E40AF;}
+    .role-parent{background:#FCE7F3;color:#9D174D;}
+    .step-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0;}
+    .step-box{background:var(--pk-canvas);border-radius:10px;padding:12px 14px;font-size:13px;}
+    .step-box b{color:var(--pk-blue-800);display:block;margin-bottom:3px;}
+
+    @media(max-width:860px){
+      .layout{grid-template-columns:1fr;}
+      .toc{position:static;max-height:none;}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div>
+    <input class="search" id="search" placeholder="🔍 ค้นหาในคู่มือ..." oninput="filterSections()" />
+  </div>
+
+  <div class="layout">
+    <!-- TOC -->
+    <nav class="toc" id="toc">
+      <h4>เริ่มต้น</h4>
+      <a href="#start">1. เข้าสู่ระบบ & ภาพรวม</a>
+      <a href="#setup">2. ตั้งค่าระบบ (Setup Guide)</a>
+      <a href="#import">3. นำเข้าข้อมูล (Excel)</a>
+      <h4>งานประจำวัน</h4>
+      <a href="#students">4. จัดการนักเรียน</a>
+      <a href="#teachers">5. จัดการครู</a>
+      <a href="#attendance">6. เช็คชื่อ + LINE</a>
+      <a href="#grades">7. เกรด & ใบรายงาน</a>
+      <a href="#schedule">8. ตารางเรียน</a>
+      <a href="#billing">9. ค่าเทอม & PromptPay</a>
+      <h4>เอกสาร & รายงาน</h4>
+      <a href="#popor">10. เอกสาร ปพ. (1/5/6)</a>
+      <a href="#analytics">11. รายงานภาพรวม</a>
+      <h4>ผู้ปกครอง/นักเรียน</h4>
+      <a href="#parent">12. คู่มือผู้ปกครอง/นักเรียน</a>
+      <h4>อื่นๆ</h4>
+      <a href="#faq">13. คำถามที่พบบ่อย</a>
+      <a href="#support">14. ติดต่อเรา</a>
+    </nav>
+
+    <!-- Content -->
+    <main class="content">
+      <div class="hero">
+        <h1>📖 คู่มือการใช้งาน PanyaSchoolKit</h1>
+        <p>ระบบบริหารจัดการโรงเรียนครบวงจร — คู่มือนี้ครอบคลุมทุกฟีเจอร์ สำหรับผู้ดูแลระบบ ครู และผู้ปกครอง</p>
+      </div>
+
+      <section class="sec" id="start" data-search>
+        <h2>1. เข้าสู่ระบบ & ภาพรวม</h2>
+        <p class="lead">เริ่มต้นใช้งานระบบครั้งแรก</p>
+        <h3>การเข้าสู่ระบบ</h3>
+        <ol>
+          <li>เปิดเว็บของโรงเรียน เช่น <code>ชื่อโรงเรียน.panyaschoolkit.com</code> (หรือโดเมนที่ตั้งไว้)</li>
+          <li>กรอกอีเมล + รหัสผ่านที่ได้รับ → กด <b>เข้าสู่ระบบ</b></li>
+          <li>ระบบจะพาไปหน้า <b>แดชบอร์ด</b> ตามสิทธิ์ของคุณ</li>
+        </ol>
+        <h3>สิทธิ์ผู้ใช้ (Roles)</h3>
+        <ul>
+          <li><b>Owner/ผู้บริหาร</b> — เข้าถึงทุกอย่าง รวมการเงิน + ตั้งค่า</li>
+          <li><b>Staff/ครู</b> — จัดการนักเรียน เช็คชื่อ ใส่เกรด</li>
+          <li><b>ผู้ปกครอง/นักเรียน</b> — ดูข้อมูลของตัวเอง/ลูก</li>
+        </ul>
+        <h3>เปลี่ยนภาษา ไทย/อังกฤษ</h3>
+        <p>กดปุ่ม <b>EN / TH</b> มุมขวาบนของแต่ละหน้า เพื่อสลับภาษา</p>
+        <div class="tip">💡 ลืมรหัสผ่าน? กด "ลืมรหัสผ่าน" ที่หน้า login ระบบจะส่งลิงก์รีเซ็ตไปที่อีเมล</div>
+      </section>
+
+      <section class="sec" id="setup" data-search>
+        <h2>2. ตั้งค่าระบบ <span class="role role-admin">แอดมิน</span></h2>
+        <p class="lead">ตั้งค่าครั้งแรกให้โรงเรียนพร้อมใช้งาน — ใช้ Setup Guide นำทาง</p>
+        <p>ไปที่เมนู <b>🚀 Setup Guide</b> (<code>/pages/onboarding.html</code>) จะเห็นขั้นตอนทั้งหมดพร้อมแถบความคืบหน้า ระบบติ๊กให้อัตโนมัติเมื่อทำเสร็จ</p>
+        <div class="step-grid">
+          <div class="step-box"><b>📚 วิชา</b>เพิ่มวิชาที่สอน (คณิต อังกฤษ วิทย์...)</div>
+          <div class="step-box"><b>⏰ คาบเรียน</b>กำหนดเวลาคาบ + พัก</div>
+          <div class="step-box"><b>🎯 ระบบเกรด</b>เลือก A-F / 4.0 / ผ่าน-ไม่ผ่าน</div>
+          <div class="step-box"><b>🎓 นักเรียน</b>นำเข้าจาก Excel</div>
+          <div class="step-box"><b>👨‍🏫 ครู</b>นำเข้าจาก Excel</div>
+          <div class="step-box"><b>💰 PromptPay</b>ใส่ PromptPay ID</div>
+          <div class="step-box"><b>📱 LINE</b>เชื่อมแจ้งเตือนผู้ปกครอง</div>
+          <div class="step-box"><b>👥 ทีมงาน</b>เชิญครู/ธุรการ</div>
+        </div>
+        <h3>ข้อมูลโรงเรียน</h3>
+        <p>เมนู <b>⚙️ School / Settings</b> → กรอกชื่อ (ไทย/อังกฤษ), ที่อยู่, โลโก้, ชื่อผู้อำนวยการ — ข้อมูลนี้จะปรากฏในใบรายงานและเอกสาร ปพ.</p>
+        <div class="warn">⚠️ กรอกชื่อโรงเรียน + ที่อยู่ + ชื่อ ผอ. ให้ครบ ก่อนออกเอกสาร ปพ. เพราะจะแสดงในหัวเอกสาร</div>
+      </section>
+
+      <section class="sec" id="import" data-search>
+        <h2>3. นำเข้าข้อมูลจาก Excel <span class="role role-admin">แอดมิน</span></h2>
+        <p class="lead">ย้ายข้อมูลนักเรียน/ครูจากไฟล์ Excel เดิม โดยไม่ต้องพิมพ์ใหม่</p>
+        <ol>
+          <li>ไปหน้า <b>นักเรียน</b> หรือ <b>ครู</b> → กดปุ่ม <b>📥 Import Excel/CSV</b></li>
+          <li><b>อัปโหลดไฟล์ Excel เดิม</b> (.xlsx หรือ .csv) ได้เลย ไม่ต้องแปลงไฟล์ก่อน</li>
+          <li>ระบบ <b>จับคู่คอลัมน์อัตโนมัติ</b> (รองรับหัวคอลัมน์ภาษาไทย เช่น ชื่อ นามสกุล ห้อง เพศ) — ตรวจดูแล้วแก้ได้ถ้าไม่ตรง</li>
+          <li>กด <b>ดูตัวอย่าง</b> → ระบบแปลงค่าให้: เพศ (ชาย/หญิง → male/female), วันที่ (พ.ศ. → ค.ศ.)</li>
+          <li>กด <b>นำเข้า</b> → เห็นผล "นำเข้า X / ข้าม Y" + รายงานแถวที่ผิด</li>
+        </ol>
+        <div class="tip">💡 ไฟล์ที่มีนักเรียน 300 คน นำเข้าได้ใน 2 นาที — แถวที่ข้อมูลไม่ครบจะถูกข้ามและบอกเหตุผล ไม่ทำให้ทั้งไฟล์ล้มเหลว</div>
+        <div class="warn">⚠️ ฟิลด์ที่จำเป็น: <b>รหัสนักเรียน, ชื่อ, นามสกุล</b> (ครู: รหัสครู, ชื่อ, นามสกุล) — แถวที่ขาดฟิลด์เหล่านี้จะถูกข้าม</div>
+      </section>
+
+      <section class="sec" id="students" data-search>
+        <h2>4. จัดการนักเรียน <span class="role role-admin">แอดมิน</span></h2>
+        <p>หน้า <b>นักเรียน</b> — เพิ่ม/แก้ไข/ค้นหา/กรองตามห้อง+ระดับชั้น</p>
+        <ul>
+          <li><b>เพิ่มทีละคน:</b> กด ➕ Add Student → กรอกข้อมูล → บันทึก</li>
+          <li><b>ฟิลด์เพิ่มเติม:</b> Owner ตั้งฟิลด์เองได้ที่ <b>⚙️ Configure Fields</b> (เช่น เลขพาสปอร์ต, กรุ๊ปเลือด)</li>
+          <li><b>ดูรายละเอียด:</b> คลิกที่ชื่อนักเรียน → เห็นข้อมูลครบ + เกรด + การเข้าเรียน</li>
+        </ul>
+      </section>
+
+      <section class="sec" id="teachers" data-search>
+        <h2>5. จัดการครู <span class="role role-admin">แอดมิน</span></h2>
+        <p>หน้า <b>ครู</b> — จัดการข้อมูลครู + กำหนดวิชาที่สอน</p>
+        <ul>
+          <li>เพิ่ม/นำเข้าครู (เหมือนนักเรียน)</li>
+          <li>ระบุครูประจำชั้น, กลุ่มสาระ, วิชาที่สอน</li>
+          <li>ฟิลด์เพิ่มเติมตั้งเองได้ (เช่น ภาษาที่พูดได้, การอบรม)</li>
+        </ul>
+      </section>
+
+      <section class="sec" id="attendance" data-search>
+        <h2>6. เช็คชื่อ + แจ้ง LINE <span class="role role-admin">ครู</span></h2>
+        <p class="lead">เช็คชื่อรายวัน + แจ้งผู้ปกครองอัตโนมัติผ่าน LINE</p>
+        <ol>
+          <li>หน้า <b>เช็คชื่อ</b> → เลือกห้อง + วันที่</li>
+          <li>กดปุ่มสถานะของนักเรียนแต่ละคน: มา / ขาด / สาย / ลา / ป่วย</li>
+          <li>ถ้าเชื่อม LINE ไว้ → ระบบส่งแจ้งเตือนผู้ปกครองอัตโนมัติเมื่อขาด/สาย</li>
+        </ol>
+        <div class="tip">💡 ดูสถิติการมาเรียน + ส่งออก CSV ได้ในหน้าเดียวกัน</div>
+        <div class="warn">⚠️ LINE จะส่งได้ต่อเมื่อ (1) โรงเรียนเชื่อม LINE OA แล้ว และ (2) ผู้ปกครอง add เพื่อน LINE OA + ผูก LINE User ID ไว้</div>
+      </section>
+
+      <section class="sec" id="grades" data-search>
+        <h2>7. เกรด & ใบรายงานผล <span class="role role-admin">ครู</span></h2>
+        <p class="lead">ใส่เกรดรายห้อง+วิชา+เทอม → เผยแพร่ให้ผู้ปกครองดู</p>
+        <ol>
+          <li>หน้า <b>เกรด</b> → เลือกปี + เทอม + ห้อง + วิชา → กด Load</li>
+          <li>ใส่คะแนน (กลางภาค/ปลายภาค/เก็บ) → ระบบคำนวณรวม + เกรดอัตโนมัติ</li>
+          <li>กด <b>💾 Save All</b> เพื่อบันทึก (ยังเป็นฉบับร่าง ผู้ปกครองยังไม่เห็น)</li>
+          <li>กด <b>📢 Publish</b> เพื่อเผยแพร่ → ผู้ปกครอง/นักเรียนเห็นเกรด</li>
+        </ol>
+        <p><b>ตั้งระบบเกรด:</b> Owner ตั้งที่ <b>⚙️ Grade Scale</b> — เลือก A-F, 4.0 GPA, ผ่าน/ไม่ผ่าน หรือ 0-100%</p>
+      </section>
+
+      <section class="sec" id="schedule" data-search>
+        <h2>8. ตารางเรียน <span class="role role-admin">แอดมิน</span></h2>
+        <p class="lead">สร้างตารางเรียนรายห้อง — รองรับครูสอนคู่ (co-teaching)</p>
+        <ol>
+          <li>หน้า <b>🗓️ Schedule</b> → ครั้งแรกกด <b>⏰ Manage Periods</b> หรือ "ใช้เทมเพลตเริ่มต้น" (8 คาบ)</li>
+          <li>เลือกปี + เทอม + ห้อง → กด Load</li>
+          <li>คลิกช่องว่าง → เลือกวิชา + ครู (เพิ่มได้หลายคน เช่น ครูต่างชาติ 1 + ครูไทย 2) + ห้อง</li>
+          <li>ระบบ <b>เตือนทันทีถ้าครูซ้อนคาบ</b> (ครูคนเดียวอยู่ 2 ห้องเวลาเดียว)</li>
+        </ol>
+        <ul>
+          <li><b>นักเรียนดูตาราง:</b> <code>my-schedule.html</code> มีการ์ด "คาบถัดไป" แบบ real-time</li>
+          <li><b>ครูดูตารางสอน:</b> <code>teacher-schedule.html</code> + ดาวน์โหลด PDF</li>
+        </ul>
+      </section>
+
+      <section class="sec" id="billing" data-search>
+        <h2>9. ค่าเทอม & PromptPay <span class="role role-admin">แอดมิน</span></h2>
+        <p class="lead">ออกบิล → ผู้ปกครองสแกนจ่าย → ครูอนุมัติสลิป → บันทึกบัญชีอัตโนมัติ</p>
+        <h3>ตั้งค่าครั้งแรก</h3>
+        <p>หน้า <b>Payment Settings</b> → ใส่ <b>PromptPay ID</b> (เบอร์ 10 หลัก หรือเลขผู้เสียภาษี 13 หลัก) + ชื่อบัญชี → ระบบจะสร้าง QR ฝังยอดเงินอัตโนมัติให้แต่ละบิล</p>
+        <h3>ขั้นตอนเก็บเงิน</h3>
+        <ol>
+          <li><b>ออกบิล:</b> หน้า Create Bills → สร้างทีละคน หรือทั้งห้องพร้อมกัน</li>
+          <li><b>ผู้ปกครองจ่าย:</b> เปิดบิล → สแกน QR (ยอดขึ้นอัตโนมัติ) → โอน → อัปโหลดสลิป</li>
+          <li><b>ครูอนุมัติ:</b> หน้า Payment Approvals → ตรวจสลิป → อนุมัติ → บิลเป็น "ชำระแล้ว" + ลงบัญชีอัตโนมัติ</li>
+          <li><b>ดูบัญชี:</b> หน้า Finance → รายรับรายจ่ายทั้งหมด</li>
+        </ol>
+        <div class="tip">💡 PromptPay <b>ไม่มีค่าธรรมเนียม</b> — โรงเรียนได้เงินเต็มจำนวน (ต่างจากบัตรเครดิตที่หัก ~3.65%)</div>
+      </section>
+
+      <section class="sec" id="popor" data-search>
+        <h2>10. เอกสาร ปพ. (1/5/6) <span class="role role-admin">แอดมิน</span></h2>
+        <p class="lead">ออกเอกสารทางการตามมาตรฐานกระทรวงศึกษาธิการ</p>
+        <ul>
+          <li><b>ปพ.1</b> — ระเบียนแสดงผลการเรียน (transcript รวมทุกปี) → ที่หน้าเกรดของนักเรียน</li>
+          <li><b>ปพ.5</b> — บันทึกผลการเรียนประจำรายวิชา (รายชื่อทั้งห้อง) → หน้าเกรด (staff)</li>
+          <li><b>ปพ.6</b> — รายงานพัฒนาผู้เรียนรายบุคคล (เกรด+การมาเรียน+คุณลักษณะ) → หน้าเกรดของนักเรียน</li>
+        </ul>
+        <div class="warn">⚠️ เลขที่เอกสารออกอัตโนมัติ — ตรวจชื่อโรงเรียน/ผอ./ที่อยู่ในหน้า Settings ก่อนออกเอกสาร</div>
+      </section>
+
+      <section class="sec" id="analytics" data-search>
+        <h2>11. รายงานภาพรวม <span class="role role-admin">ผู้บริหาร</span></h2>
+        <p>หน้า <b>📈 Analytics</b> — สรุปภาพรวมโรงเรียนแบบ real-time</p>
+        <ul>
+          <li>จำนวนนักเรียน, ใบสมัครรอ, บิลค้าง, รายได้เดือนนี้</li>
+          <li>กราฟ: นักเรียนตามโปรแกรม, การมาเรียน 7 วัน, การกระจายเกรด, GPA รายห้อง, รายได้ 6 เดือน</li>
+          <li>AI Insights: เตือนบิลเกินกำหนด, นักเรียนขาดเรียน, เกรด F</li>
+        </ul>
+      </section>
+
+      <section class="sec" id="parent" data-search>
+        <h2>12. คู่มือผู้ปกครอง / นักเรียน <span class="role role-parent">ผู้ปกครอง</span></h2>
+        <p class="lead">สิ่งที่ผู้ปกครอง/นักเรียนทำได้</p>
+        <h3>เข้าสู่ระบบ</h3>
+        <p>เปิดเว็บโรงเรียน → login ด้วยบัญชีที่โรงเรียนให้ → เห็นหน้าหลักของลูก</p>
+        <h3>ดูข้อมูล</h3>
+        <ul>
+          <li><b>📊 เกรด</b> — ดูเกรดแต่ละวิชา + GPA + ดาวน์โหลดใบรายงาน/ปพ.</li>
+          <li><b>🗓️ ตารางเรียน</b> — ตารางของห้อง + คาบถัดไป</li>
+          <li><b>📅 การเข้าเรียน</b> — ประวัติมา/ขาด/สาย</li>
+        </ul>
+        <h3>จ่ายค่าเทอม</h3>
+        <ol>
+          <li>หน้า <b>บิล/ค่าเทอม</b> → กดบิลที่ต้องจ่าย</li>
+          <li><b>สแกน QR</b> ด้วยแอปธนาคาร — ยอดเงินขึ้นอัตโนมัติ ไม่ต้องพิมพ์เอง</li>
+          <li>โอนเงิน → <b>อัปโหลดสลิป</b> → รอครูตรวจสอบ</li>
+          <li>เมื่ออนุมัติ บิลจะเปลี่ยนเป็น "ชำระแล้ว"</li>
+        </ol>
+      </section>
+
+      <section class="sec" id="faq" data-search>
+        <h2>13. คำถามที่พบบ่อย (FAQ)</h2>
+        <h3>Q: นำเข้านักเรียนแล้วบางแถวหาย?</h3>
+        <p>A: แถวที่ขาดฟิลด์จำเป็น (รหัส/ชื่อ/นามสกุล) หรือรหัสซ้ำ จะถูกข้าม — ดูรายงานหลังนำเข้าว่าแถวไหนผิดเพราะอะไร แล้วแก้ไฟล์ Excel แล้วนำเข้าใหม่เฉพาะแถวนั้น</p>
+        <h3>Q: ผู้ปกครองไม่ได้รับแจ้งเตือน LINE?</h3>
+        <p>A: ตรวจว่า (1) โรงเรียนเชื่อม LINE OA แล้ว (2) ผู้ปกครอง add เพื่อน LINE OA และผูก LINE User ID ในระบบแล้ว</p>
+        <h3>Q: เปลี่ยนระบบเกรดได้ไหม?</h3>
+        <p>A: ได้ Owner ไปที่ Grade Scale เลือก/สร้างระบบเกรดที่ต้องการ</p>
+        <h3>Q: QR ค่าเทอมไม่ขึ้นยอด?</h3>
+        <p>A: ตรวจว่าใส่ <b>PromptPay ID</b> ในหน้า Payment Settings แล้ว (เบอร์ 10 หลัก หรือเลขผู้เสียภาษี 13 หลัก)</p>
+        <h3>Q: ใช้บนมือถือได้ไหม?</h3>
+        <p>A: ได้ทุกหน้า รองรับมือถือ/แท็บเล็ต ไม่ต้องลงแอป เปิดผ่านเบราว์เซอร์ได้เลย</p>
+      </section>
+
+      <section class="sec" id="support" data-search>
+        <h2>14. ติดต่อเรา</h2>
+        <p>ติดปัญหาการใช้งาน หรืออยากได้ฟีเจอร์ใหม่ — เรายินดีพัฒนาต่อเนื่อง</p>
+        <ul>
+          <li>📧 อีเมล: <b>support@panyaschoolkit.com</b></li>
+          <li>💰 เรื่องบิล/ค่าระบบ: <b>billing@panyaschoolkit.com</b></li>
+          <li>🏢 บริษัท ปัญญา เวนเจอร์ส จำกัด</li>
+        </ul>
+        <div class="tip">💡 จุดเด่นของเรา: พัฒนาโดยผู้มีประสบการณ์บริหารโรงเรียนจริง — บอกความต้องการมาได้ เราพัฒนาให้</div>
+      </section>
+
+      <p style="text-align:center;color:var(--pk-mist);font-size:12px;padding:20px;">PanyaSchoolKit · คู่มือการใช้งาน · อัปเดต 2026</p>
+    </main>
+  </div>
+
+  <script>
+    function filterSections(){
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      document.querySelectorAll('.sec[data-search]').forEach(sec=>{
+        const hit = !q || sec.textContent.toLowerCase().includes(q);
+        sec.style.display = hit ? '' : 'none';
+      });
+    }
+    // smooth scroll for TOC
+    document.querySelectorAll('.toc a').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const id = a.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth'}); }
+      });
+    });
+  </script>
+</body>
+</html>

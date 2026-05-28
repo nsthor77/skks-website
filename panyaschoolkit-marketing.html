@@ -8,7 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="images/logo.png" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -54,7 +54,7 @@
     }
     .logo-mark {
       width: 36px; height: 36px;
-      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      background: linear-gradient(135deg, #2563EB, #1E3A8A);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 20px;
@@ -64,42 +64,46 @@
     .btn-login {
       padding: 8px 18px;
       border-radius: 100px;
-      border: 2px solid #5BB8E0;
-      color: #5BB8E0 !important;
+      border: 2px solid #2563EB;
+      color: #2563EB !important;
       background: white;
       font-weight: 600;
       font-size: 13px;
     }
-    .btn-login:hover { background: #5BB8E0; color: white !important; text-decoration: none; }
+    .btn-login:hover { background: #2563EB; color: white !important; text-decoration: none; }
 
     /* ============= HERO ============= */
     .hero {
-      background: linear-gradient(135deg, #E0F2FE 0%, #DCFCE7 100%);
-      padding: 80px 24px 100px;
+      background:
+        radial-gradient(900px 480px at 50% -12%, #DCE6FB 0%, rgba(220,230,251,0) 62%),
+        linear-gradient(180deg, #EEF3FF 0%, #EBF0FA 100%);
+      padding: 88px 24px 104px;
       text-align: center;
     }
     .hero-inner { max-width: 900px; margin: 0 auto; }
     .hero-badge {
       display: inline-block;
       padding: 6px 16px;
-      background: white;
-      border: 1px solid #BAE6FD;
+      background: #EEF3FF;
+      border: 1px solid #C9D4EE;
       border-radius: 100px;
-      color: #0369A1;
+      color: #1E3A8A;
       font-size: 13px;
       font-weight: 600;
+      letter-spacing: 0.01em;
       margin-bottom: 24px;
     }
     .hero h1 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 48px;
-      font-weight: 800;
-      line-height: 1.15;
+      font-family: 'Prompt', 'IBM Plex Sans Thai', sans-serif;
+      font-size: 50px;
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.01em;
       margin: 0 0 20px 0;
-      color: #1E3A5F;
+      color: #0F1A36;
     }
     .hero h1 span {
-      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      background: linear-gradient(135deg, #2563EB 10%, #1E3A8A 90%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -113,7 +117,7 @@
     .hero-cta { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
     .btn-primary {
       padding: 14px 32px;
-      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      background: linear-gradient(180deg, #2563EB, #1E40AF);
       color: white !important;
       border: none;
       border-radius: 100px;
@@ -126,7 +130,7 @@
     }
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(124, 179, 66, 0.3);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.32);
       text-decoration: none;
     }
     .btn-secondary {
@@ -141,7 +145,7 @@
       font-family: inherit;
       text-decoration: none;
     }
-    .btn-secondary:hover { border-color: #5BB8E0; }
+    .btn-secondary:hover { border-color: #2563EB; }
 
     @media (max-width: 640px) {
       .hero h1 { font-size: 32px; }
@@ -219,14 +223,14 @@
       padding: 32px 28px;
       position: relative;
     }
-    .pricing-card.popular { border-color: #5BB8E0; box-shadow: 0 20px 40px rgba(91, 184, 224, 0.15); }
+    .pricing-card.popular { border-color: #2563EB; box-shadow: 0 20px 40px rgba(37, 99, 235, 0.18); }
     .popular-badge {
       position: absolute;
       top: -14px;
       left: 50%;
       transform: translateX(-50%);
       padding: 6px 16px;
-      background: linear-gradient(135deg, #7CB342, #5BB8E0);
+      background: linear-gradient(135deg, #2563EB, #1E3A8A);
       color: white;
       border-radius: 100px;
       font-size: 11px;
@@ -383,9 +387,10 @@
         <span>SchoolKit</span>
       </div>
       <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="https://www.suansonkk.com/login.html" class="btn-login">Login</a>
+        <a href="#features">ฟีเจอร์</a>
+        <a href="#why-us">ทำไมต้องเรา</a>
+        <a href="#pricing">ราคา</a>
+        <a href="https://www.suansonkk.com/login.html" class="btn-login">เข้าสู่ระบบ</a>
       </div>
     </div>
   </header>
@@ -403,36 +408,192 @@
     </div>
   </section>
 
-  <!-- ============= FEATURES ============= -->
-  <section class="section" id="features">
-    <div class="container">
-      <h2 class="section-title">ฟีเจอร์ครบทุกที่โรงเรียนต้องใช้</h2>
-      <p class="section-subtitle">ไม่ต้องใช้หลายระบบให้ปวดหัว — SchoolKit รวมทุกอย่างในที่เดียว</p>
-
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon green">🏫</div>
-          <h3>เว็บไซต์โรงเรียน</h3>
-          <p>เว็บไซต์ประชาสัมพันธ์โรงเรียน พร้อมหน้าสมัครเรียนออนไลน์ — ไม่ต้องจ้างคนทำเว็บ</p>
+  <!-- ============= FEATURES (Premium drop-in) ============= -->
+  <style>
+    .psk-feat{--psk-ink:#0F1A36;--psk-ink-2:#2A375E;--psk-muted:#5A6788;--psk-line:#E1E7F5;--psk-line-strong:#C9D4EE;--psk-surface:#FFFFFF;--psk-blue:#2563EB;--psk-blue-deep:#1E3A8A;--psk-blue-700:#1E40AF;--psk-blue-50:#EEF3FF;--psk-green:#16A34A;--psk-green-50:#E7F7EC;--psk-shadow-sm:0 1px 2px rgba(15,26,54,.04),0 1px 1px rgba(15,26,54,.03);--psk-shadow-md:0 2px 4px rgba(15,26,54,.04),0 8px 24px rgba(15,26,54,.06);font-family:"Sarabun","IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;color:var(--psk-ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;background:radial-gradient(900px 500px at 10% -10%,#DCE6FB 0%,rgba(220,230,251,0) 60%),linear-gradient(180deg,#EEF3FF 0%,#EBF0FA 100%);}
+    .psk-feat *,.psk-feat *::before,.psk-feat *::after{box-sizing:border-box;}
+    .psk-feat h2,.psk-feat h3{font-family:"Prompt","IBM Plex Sans Thai",sans-serif;color:var(--psk-ink);margin:0;letter-spacing:-0.01em;}
+    .psk-feat p{margin:0;}
+    .psk-feat-inner{max-width:1240px;margin:0 auto;padding:80px 32px;}
+    .psk-feat-head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:end;gap:48px;margin-bottom:48px;}
+    .psk-feat-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--psk-blue-50);color:var(--psk-blue-deep);font-family:"Prompt",sans-serif;font-weight:600;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;}
+    .psk-feat-eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--psk-blue);}
+    .psk-feat-head h2{margin-top:14px;font-size:clamp(30px,3.6vw,46px);font-weight:700;line-height:1.1;}
+    .psk-feat-head h2 .psk-accent{background:linear-gradient(135deg,#2563EB 10%,#1E3A8A 90%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .psk-feat-head p{font-size:16.5px;line-height:1.65;color:var(--psk-muted);max-width:52ch;}
+    .psk-feat-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:14px;align-items:stretch;}
+    .psk-feat-cell{grid-column:span 2;position:relative;background:var(--psk-surface);border:1px solid var(--psk-line);border-radius:18px;padding:26px 22px 24px;box-shadow:var(--psk-shadow-sm);transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s,opacity .55s ease;display:flex;flex-direction:column;min-height:196px;overflow:hidden;opacity:0;transform:translateY(10px);}
+    .psk-feat-cell.psk-in{opacity:1;transform:translateY(0);}
+    .psk-feat-cell:hover{transform:translateY(-3px);box-shadow:var(--psk-shadow-md);border-color:var(--psk-line-strong);}
+    .psk-feat-cat{font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--psk-blue);margin-bottom:12px;display:inline-flex;align-items:center;gap:6px;}
+    .psk-feat-cat::before{content:"";width:14px;height:1.5px;background:currentColor;border-radius:2px;}
+    .psk-feat-title{font-family:"Prompt",sans-serif;font-weight:600;font-size:18px;line-height:1.3;color:var(--psk-ink);letter-spacing:-0.005em;text-wrap:pretty;}
+    .psk-feat-body{margin-top:8px;font-size:13.5px;line-height:1.55;color:var(--psk-muted);text-wrap:pretty;}
+    .psk-feat-tag{margin-top:auto;padding-top:14px;display:inline-flex;align-items:center;gap:6px;font-family:"Prompt",sans-serif;font-weight:500;font-size:12px;color:var(--psk-blue-deep);}
+    .psk-feat-tag .psk-pip{background:var(--psk-blue-50);padding:3px 9px;border-radius:999px;font-size:11px;letter-spacing:0.04em;}
+    .psk-feat-tag .psk-pip.psk-green{background:var(--psk-green-50);color:var(--psk-green);}
+    .psk-feat-cell.psk-featured{background:linear-gradient(160deg,#1E3A8A 0%,#1E40AF 60%,#2563EB 100%);color:white;border-color:transparent;}
+    .psk-feat-cell.psk-featured::before{content:"";position:absolute;inset:0;background:radial-gradient(220px 160px at 100% 100%,rgba(255,255,255,.14),transparent 60%),radial-gradient(180px 120px at 0% 0%,rgba(255,255,255,.10),transparent 60%);pointer-events:none;}
+    .psk-feat-cell.psk-featured:hover{box-shadow:0 16px 36px rgba(37,99,235,.32);}
+    .psk-feat-cell.psk-featured .psk-feat-cat{color:rgba(255,255,255,.7);}
+    .psk-feat-cell.psk-featured .psk-feat-title{color:white;}
+    .psk-feat-cell.psk-featured .psk-feat-body{color:rgba(255,255,255,.78);}
+    .psk-feat-cell.psk-featured .psk-feat-tag{color:rgba(255,255,255,.92);}
+    .psk-feat-cell.psk-featured .psk-feat-tag .psk-pip{background:rgba(255,255,255,.16);color:white;}
+    .psk-feat-cell.psk-featured .psk-feat-tag .psk-pip.psk-green{background:rgba(22,163,74,.92);color:white;}
+    .psk-feat-foot{margin-top:28px;padding:22px 28px;background:white;border:1px solid var(--psk-line);border-radius:16px;display:flex;align-items:center;justify-content:space-between;gap:24px;box-shadow:var(--psk-shadow-sm);}
+    .psk-feat-foot-text{font-family:"Prompt",sans-serif;font-weight:500;color:var(--psk-ink);font-size:16px;}
+    .psk-feat-foot-text strong{font-weight:700;}
+    .psk-feat-foot-text span{color:var(--psk-muted);font-weight:400;}
+    .psk-feat-foot-cta{display:flex;gap:12px;flex-shrink:0;}
+    .psk-feat-foot-cta .psk-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:999px;font-family:"Prompt",sans-serif;font-weight:500;font-size:14.5px;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .15s ease,box-shadow .2s ease;}
+    .psk-feat-foot-cta .psk-btn-primary{background:linear-gradient(180deg,#2563EB,#1E40AF);color:white;box-shadow:0 6px 18px rgba(37,99,235,.32);}
+    .psk-feat-foot-cta .psk-btn-primary:hover{transform:translateY(-1px);}
+    .psk-feat-foot-cta .psk-btn-outline{background:white;border-color:var(--psk-line-strong);color:var(--psk-ink);}
+    .psk-feat-foot-cta .psk-btn-outline:hover{background:var(--psk-blue-50);border-color:var(--psk-blue);}
+    @media (max-width:1100px){.psk-feat-grid{grid-template-columns:repeat(6,minmax(0,1fr));}.psk-feat-cell{grid-column:span 2;}.psk-feat-cell.psk-featured{grid-column:span 3;}.psk-feat-head{grid-template-columns:1fr;gap:16px;align-items:start;}}
+    @media (max-width:720px){.psk-feat-inner{padding:56px 20px;}.psk-feat-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}.psk-feat-cell{grid-column:span 2;min-height:170px;padding:22px 18px 20px;}.psk-feat-cell.psk-featured{grid-column:span 4;}.psk-feat-foot{flex-direction:column;align-items:flex-start;gap:14px;padding:18px 20px;}}
+    @media (max-width:480px){.psk-feat-grid{grid-template-columns:1fr;}.psk-feat-cell,.psk-feat-cell.psk-featured{grid-column:span 1;}}
+  </style>
+  <section class="psk-feat" id="features">
+    <div class="psk-feat-inner">
+      <div class="psk-feat-head">
+        <div>
+          <span class="psk-feat-eyebrow">Features — ฟีเจอร์ทั้งหมด</span>
+          <h2>ครบทุกฟีเจอร์ที่<br/><span class="psk-accent">โรงเรียนต้องใช้จริง</span></h2>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon blue">👨‍🎓</div>
-          <h3>จัดการนักเรียน</h3>
-          <p>ทะเบียนนักเรียน ห้องเรียน เช็คชื่อ พร้อมระบบสำหรับผู้ปกครองดูข้อมูลลูก</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon purple">💰</div>
-          <h3>การเงิน + รับเงิน</h3>
-          <p>ออกใบแจ้งหนี้ รับเงินผ่าน PromptPay/บัตรเครดิต รายงานการเงินสมบูรณ์</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon orange">📜</div>
-          <h3>เกรด + ใบประกาศ</h3>
-          <p>บันทึกเกรด ออกใบรายงานผลการเรียน ใบประกาศนียบัตร พร้อม QR Code ตรวจสอบ</p>
+        <p>ตั้งแต่รับสมัคร เช็คชื่อ ออกเกรด ไปจนถึงเก็บค่าเทอม — ทุกอย่างอยู่ในระบบเดียว ไม่ต้องเชื่อมหลายระบบ ไม่ต้องลงทุนซอฟต์แวร์เพิ่ม</p>
+      </div>
+      <div class="psk-feat-grid">
+        <article class="psk-feat-cell"><span class="psk-feat-cat">People</span><h3 class="psk-feat-title">จัดการนักเรียน</h3><p class="psk-feat-body">ทะเบียนนักเรียนครบ นำเข้าจาก Excel ในคลิกเดียว แยกชั้น/ห้อง อัตโนมัติ</p><span class="psk-feat-tag"><span class="psk-pip">Excel Import</span></span></article>
+        <article class="psk-feat-cell"><span class="psk-feat-cat">People</span><h3 class="psk-feat-title">จัดการครู</h3><p class="psk-feat-body">ข้อมูลครู วิชาที่สอน และระดับชั้น พร้อมจัดสิทธิ์เข้าระบบ</p><span class="psk-feat-tag"><span class="psk-pip">Role-based</span></span></article>
+        <article class="psk-feat-cell psk-featured"><span class="psk-feat-cat">People</span><h3 class="psk-feat-title">เช็คชื่อ + แจ้งเตือน LINE</h3><p class="psk-feat-body">เช็คชื่อเร็วในไม่กี่วินาที แจ้งผู้ปกครองทาง LINE อัตโนมัติเมื่อขาด/สาย</p><span class="psk-feat-tag"><span class="psk-pip psk-green">LINE Official</span></span></article>
+        <article class="psk-feat-cell"><span class="psk-feat-cat">Academic</span><h3 class="psk-feat-title">เกรด + ใบรายงานผล</h3><p class="psk-feat-body">คำนวณเกรดอัตโนมัติตามสูตร ออกใบรายงานผลเป็น PDF พร้อมส่ง</p><span class="psk-feat-tag"><span class="psk-pip">PDF Export</span></span></article>
+        <article class="psk-feat-cell"><span class="psk-feat-cat">Academic</span><h3 class="psk-feat-title">เอกสาร ปพ.1 / ปพ.5 / ปพ.6</h3><p class="psk-feat-body">ออกเอกสาร ปพ. ครบทุกชุด ตามมาตรฐานกระทรวงศึกษาธิการล่าสุด</p><span class="psk-feat-tag"><span class="psk-pip">ตามกระทรวงฯ</span></span></article>
+        <article class="psk-feat-cell"><span class="psk-feat-cat">Academic</span><h3 class="psk-feat-title">ตารางเรียน</h3><p class="psk-feat-body">รองรับครูสอนคู่ ห้องเรียนหลายระดับ พร้อมแจ้งเตือนคาบซ้อนอัตโนมัติ</p><span class="psk-feat-tag"><span class="psk-pip">Conflict-aware</span></span></article>
+        <article class="psk-feat-cell psk-featured"><span class="psk-feat-cat">Operations</span><h3 class="psk-feat-title">ค่าเทอม + PromptPay</h3><p class="psk-feat-body">เก็บค่าเทอมด้วย QR PromptPay สแกนจ่ายได้ทันที — รับเงินเต็มจำนวน</p><span class="psk-feat-tag"><span class="psk-pip psk-green">0% ค่าธรรมเนียม</span></span></article>
+        <article class="psk-feat-cell"><span class="psk-feat-cat">Operations</span><h3 class="psk-feat-title">รายงานภาพรวม</h3><p class="psk-feat-body">Dashboard สรุปจำนวนนักเรียน เกรด การเงิน แบบ real-time ดูได้ทุกที่</p><span class="psk-feat-tag"><span class="psk-pip">Real-time</span></span></article>
+        <article class="psk-feat-cell"><span class="psk-feat-cat">Platform</span><h3 class="psk-feat-title">2 ภาษา — ไทย / อังกฤษ</h3><p class="psk-feat-body">สลับภาษาได้ทุกหน้า เหมาะกับโรงเรียนสองภาษาและนานาชาติ</p><span class="psk-feat-tag"><span class="psk-pip">TH · EN</span></span></article>
+        <article class="psk-feat-cell"><span class="psk-feat-cat">Platform</span><h3 class="psk-feat-title">ใช้บนมือถือได้</h3><p class="psk-feat-body">เปิดเบราว์เซอร์ก็ใช้งานได้ทันที — ไม่ต้องลงแอป รองรับทุกอุปกรณ์</p><span class="psk-feat-tag"><span class="psk-pip">Browser-based</span></span></article>
+      </div>
+      <div class="psk-feat-foot">
+        <div class="psk-feat-foot-text"><strong>เริ่มต้นเพียง 1,299 บาท/เดือน</strong> <span>· ทดลองฟรี 14 วัน · ไม่มีค่าติดตั้ง · ยกเลิกได้ทุกเมื่อ</span></div>
+        <div class="psk-feat-foot-cta">
+          <a href="#pricing" class="psk-btn psk-btn-primary">เริ่มทดลองฟรี 14 วัน</a>
+          <a href="#pricing" class="psk-btn psk-btn-outline">ดูราคาทั้งหมด</a>
         </div>
       </div>
     </div>
   </section>
+  <script>
+    (function(){var cells=document.querySelectorAll('.psk-feat .psk-feat-cell');cells.forEach(function(el,i){el.style.transitionDelay=(i*50)+'ms';});if('IntersectionObserver' in window){var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('psk-in');io.unobserve(e.target);}});},{threshold:0.12});cells.forEach(function(c){io.observe(c);});}else{cells.forEach(function(c){c.classList.add('psk-in');});}})();
+  </script>
+
+  <!-- ============= WHY US (Premium drop-in) ============= -->
+  <style>
+    .psk-why{--psk-ink:#0F1A36;--psk-ink-2:#2A375E;--psk-muted:#5A6788;--psk-line:#E1E7F5;--psk-line-strong:#C9D4EE;--psk-surface:#FFFFFF;--psk-blue:#2563EB;--psk-blue-deep:#1E3A8A;--psk-blue-700:#1E40AF;--psk-blue-50:#EEF3FF;--psk-green:#16A34A;--psk-green-50:#E7F7EC;--psk-shadow-sm:0 1px 2px rgba(15,26,54,.04),0 1px 1px rgba(15,26,54,.03);--psk-shadow-md:0 2px 4px rgba(15,26,54,.04),0 8px 24px rgba(15,26,54,.06);font-family:"Sarabun","IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;color:var(--psk-ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;background:radial-gradient(1000px 500px at 90% -10%,#DCE6FB 0%,rgba(220,230,251,0) 60%),linear-gradient(180deg,#EEF3FF 0%,#EBF0FA 100%);}
+    .psk-why *,.psk-why *::before,.psk-why *::after{box-sizing:border-box;}
+    .psk-why h2,.psk-why h3{font-family:"Prompt","IBM Plex Sans Thai",sans-serif;color:var(--psk-ink);margin:0;letter-spacing:-0.01em;}
+    .psk-why p{margin:0;}
+    .psk-why .psk-mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-feature-settings:"tnum";}
+    .psk-why-inner{max-width:1240px;margin:0 auto;padding:80px 32px;}
+    .psk-why-head{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:end;gap:48px;margin-bottom:44px;}
+    .psk-why-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--psk-blue-50);color:var(--psk-blue-deep);font-family:"Prompt",sans-serif;font-weight:600;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;}
+    .psk-why-eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--psk-blue);}
+    .psk-why-head h2{margin-top:14px;font-size:clamp(28px,3.4vw,42px);font-weight:700;line-height:1.12;}
+    .psk-why-head h2 .psk-accent{background:linear-gradient(135deg,#2563EB 10%,#1E3A8A 90%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .psk-why-head p{font-size:16px;line-height:1.65;color:var(--psk-muted);max-width:52ch;}
+    .psk-why-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;align-items:stretch;}
+    .psk-why-cell{position:relative;background:var(--psk-surface);border:1px solid var(--psk-line);border-radius:18px;padding:22px 20px 24px;box-shadow:var(--psk-shadow-sm);transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s,opacity .55s ease;display:flex;flex-direction:column;min-height:280px;overflow:hidden;opacity:0;transform:translateY(10px);}
+    .psk-why-cell.psk-in{opacity:1;transform:translateY(0);}
+    .psk-why-cell:hover{transform:translateY(-3px);box-shadow:var(--psk-shadow-md);border-color:var(--psk-line-strong);}
+    .psk-why-cell-top{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--psk-line);}
+    .psk-why-cell-num{font-family:"Prompt",sans-serif;font-size:44px;font-weight:700;line-height:1;letter-spacing:-0.04em;background:linear-gradient(135deg,#2563EB 0%,#1E3A8A 90%);-webkit-background-clip:text;background-clip:text;color:transparent;display:block;}
+    .psk-why-cell-title{font-family:"Prompt",sans-serif;font-weight:600;font-size:17.5px;line-height:1.32;color:var(--psk-ink);letter-spacing:-0.005em;text-wrap:pretty;}
+    .psk-why-cell-body{margin-top:8px;font-size:13.5px;line-height:1.55;color:var(--psk-muted);text-wrap:pretty;}
+    .psk-why-cell-foot{margin-top:auto;padding-top:14px;display:flex;align-items:center;gap:8px;font-family:"Prompt",sans-serif;font-weight:500;font-size:12.5px;color:var(--psk-blue-deep);}
+    .psk-why-badge{background:var(--psk-blue-50);padding:3px 9px;border-radius:999px;font-size:11.5px;letter-spacing:0.04em;}
+    .psk-why-cell.psk-featured{background:linear-gradient(160deg,#1E3A8A 0%,#1E40AF 60%,#2563EB 100%);color:white;border-color:transparent;}
+    .psk-why-cell.psk-featured::before{content:"";position:absolute;inset:0;background:radial-gradient(280px 200px at 100% 100%,rgba(255,255,255,.16),transparent 60%),radial-gradient(220px 160px at 0% 0%,rgba(255,255,255,.10),transparent 60%);pointer-events:none;}
+    .psk-why-cell.psk-featured:hover{box-shadow:0 16px 36px rgba(37,99,235,.32);}
+    .psk-why-cell.psk-featured .psk-why-cell-num{background:none;-webkit-background-clip:initial;background-clip:initial;color:rgba(255,255,255,.92);}
+    .psk-why-cell.psk-featured .psk-why-cell-top{border-bottom-color:rgba(255,255,255,.16);}
+    .psk-why-cell.psk-featured .psk-why-cell-title{color:white;}
+    .psk-why-cell.psk-featured .psk-why-cell-body{color:rgba(255,255,255,.78);}
+    .psk-why-cell.psk-featured .psk-why-cell-foot{color:rgba(255,255,255,.92);}
+    .psk-why-cell.psk-featured .psk-why-badge{background:rgba(255,255,255,.16);color:white;}
+    .psk-price-chip{margin-top:12px;background:linear-gradient(180deg,#FFFFFF,#F5F8FF);border:1.5px solid var(--psk-blue);box-shadow:0 0 0 4px rgba(37,99,235,.06);border-radius:12px;padding:10px 12px;display:flex;align-items:baseline;justify-content:space-between;gap:6px;}
+    .psk-price-chip .psk-num{font-family:"Prompt",sans-serif;font-weight:700;font-size:22px;color:var(--psk-ink);}
+    .psk-price-chip .psk-unit{font-size:12px;color:var(--psk-muted);}
+    .psk-price-chip .psk-tag{font-family:"Prompt",sans-serif;font-size:10.5px;font-weight:600;color:var(--psk-blue);background:var(--psk-blue-50);padding:3px 8px;border-radius:999px;letter-spacing:.04em;}
+    .psk-zero-chip{margin-top:12px;background:linear-gradient(135deg,#16A34A,#15803D);color:white;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 8px 18px rgba(22,163,74,.22);}
+    .psk-zero-chip .psk-big{font-family:"Prompt",sans-serif;font-weight:700;font-size:22px;}
+    .psk-zero-chip .psk-lbl{font-size:12px;opacity:.9;}
+    .psk-timer-chip{margin-top:12px;border:1.5px dashed var(--psk-line-strong);border-radius:12px;padding:10px 12px;display:flex;align-items:baseline;gap:6px;justify-content:space-between;}
+    .psk-timer-chip .psk-big{font-family:"Prompt",sans-serif;font-weight:700;background:linear-gradient(135deg,#2563EB,#1E3A8A);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:26px;letter-spacing:-0.02em;}
+    .psk-timer-chip .psk-lbl{font-size:12px;color:var(--psk-muted);font-family:"Prompt",sans-serif;}
+    .psk-timer-chip .psk-trial{font-size:11.5px;color:var(--psk-green);font-weight:600;}
+    .psk-ping-chip{margin-top:12px;background:var(--psk-blue-50);border-radius:12px;padding:9px 11px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--psk-blue-deep);border-left:3px solid var(--psk-blue);}
+    .psk-pulse{width:7px;height:7px;border-radius:50%;background:var(--psk-green);position:relative;flex-shrink:0;}
+    .psk-pulse::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(22,163,74,.4);animation:psk-pulse 1.8s ease-out infinite;}
+    @keyframes psk-pulse{0%{transform:scale(.7);opacity:1;}100%{transform:scale(1.9);opacity:0;}}
+    .psk-cloud-mini{margin-top:12px;height:48px;position:relative;display:flex;align-items:center;justify-content:center;}
+    .psk-cloud-mini .psk-laptop{width:80px;height:44px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#fff,#F5F8FF);border:1.5px solid var(--psk-line-strong);padding:4px;position:relative;}
+    .psk-cloud-mini .psk-laptop::after{content:"";position:absolute;left:-8px;right:-8px;bottom:-3px;height:3px;border-radius:0 0 6px 6px;background:var(--psk-line-strong);}
+    .psk-cloud-mini .psk-laptop .psk-screen{width:100%;height:100%;border-radius:3px;background:linear-gradient(135deg,#EEF3FF,#DCE6FB);display:flex;flex-direction:column;gap:2px;padding:3px;}
+    .psk-cloud-mini .psk-laptop .psk-b{height:3px;border-radius:1.5px;background:rgba(30,58,138,.3);}
+    .psk-cloud-mini .psk-laptop .psk-b.psk-big{background:linear-gradient(90deg,#2563EB,#1E3A8A);width:40%;}
+    .psk-cloud-mini .psk-laptop .psk-b.psk-m{width:70%;}
+    .psk-cloud-mini .psk-laptop .psk-b.psk-s{width:50%;}
+    .psk-cloud-mini .psk-phone{width:24px;height:42px;border-radius:5px;background:linear-gradient(180deg,#1E3A8A,#2563EB);position:absolute;right:12px;bottom:2px;transform:rotate(8deg);box-shadow:0 6px 14px rgba(15,26,54,.18);padding:4px 3px;display:flex;flex-direction:column;gap:2px;}
+    .psk-cloud-mini .psk-phone .psk-ln{height:2px;border-radius:1px;background:rgba(255,255,255,.5);}
+    .psk-cloud-mini .psk-phone .psk-ln.psk-s{width:60%;}
+    .psk-why-trust{margin-top:40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:40px;padding:32px 36px;background:white;border:1px solid var(--psk-line);border-radius:20px;box-shadow:var(--psk-shadow-sm);align-items:center;position:relative;overflow:hidden;}
+    .psk-why-trust::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#2563EB,#1E3A8A);}
+    .psk-why-trust-head h3{font-family:"Prompt",sans-serif;font-weight:600;font-size:clamp(20px,1.9vw,24px);line-height:1.3;color:var(--psk-ink);letter-spacing:-0.005em;}
+    .psk-why-trust-head p{margin-top:10px;font-size:15px;line-height:1.65;color:var(--psk-muted);max-width:44ch;}
+    .psk-why-trust-items{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:12px;}
+    .psk-why-trust-items li{display:flex;align-items:flex-start;gap:12px;font-size:14.5px;line-height:1.5;color:var(--psk-ink-2);font-weight:500;}
+    .psk-why-trust-items li::before{content:"✓";width:18px;height:18px;margin-top:2px;border-radius:50%;background:var(--psk-blue-50);color:var(--psk-blue-deep);display:grid;place-items:center;font-family:"Prompt",sans-serif;font-weight:700;font-size:11px;flex-shrink:0;}
+    @media (max-width:1100px){.psk-why-strip{grid-template-columns:repeat(3,minmax(0,1fr));}.psk-why-head{grid-template-columns:1fr;gap:16px;align-items:start;}}
+    @media (max-width:720px){.psk-why-inner{padding:56px 20px;}.psk-why-strip{grid-template-columns:repeat(6,78%);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;margin:0 -20px;padding-left:20px;padding-right:20px;gap:12px;}.psk-why-cell{scroll-snap-align:start;min-height:260px;}}
+    @media (max-width:720px){.psk-why-trust{grid-template-columns:1fr;gap:18px;padding:24px;}.psk-why-trust::before{width:100%;height:4px;bottom:auto;}}
+  </style>
+  <section class="psk-why" id="why-us">
+    <div class="psk-why-inner">
+      <div class="psk-why-head">
+        <div>
+          <span class="psk-why-eyebrow">Why Panya — ทำไมต้องเรา</span>
+          <h2>6 เหตุผลที่โรงเรียน<br/><span class="psk-accent">เลือกใช้ Panya School Kit</span></h2>
+        </div>
+        <p>สร้างโดยคนทำโรงเรียนจริง · ราคาโปร่งใส · ไม่ต้องนัด demo ก่อน — เริ่มใช้เองได้ใน 15 นาที พร้อมทดลองฟรี 14 วัน</p>
+      </div>
+      <div class="psk-why-strip">
+        <article class="psk-why-cell psk-featured"><div class="psk-why-cell-top"><span class="psk-why-cell-num">01</span></div><h3 class="psk-why-cell-title">พัฒนาโดยผู้มีประสบการณ์บริหารโรงเรียน</h3><p class="psk-why-cell-body">ทุกฟีเจอร์เกิดจากปัญหาที่เราเจอเองในการบริหาร — ไม่ใช่ทีมขายเดา</p><div class="psk-why-cell-foot"><span class="psk-why-badge">เข้าใจโรงเรียนจริง</span></div></article>
+        <article class="psk-why-cell"><div class="psk-why-cell-top"><span class="psk-why-cell-num">02</span></div><h3 class="psk-why-cell-title">ฟังเสียงโรงเรียน พัฒนาต่อเนื่อง</h3><p class="psk-why-cell-body">รับ feature request ปล่อยอัปเดตสม่ำเสมอ ทีมไทยตอบเร็ว</p><div class="psk-ping-chip"><span class="psk-pulse"></span><span>กำลังพัฒนาต่อเนื่อง</span></div></article>
+        <article class="psk-why-cell"><div class="psk-why-cell-top"><span class="psk-why-cell-num">03</span></div><h3 class="psk-why-cell-title">ไม่ต้องซื้อฮาร์ดแวร์ ใช้บนมือถือได้</h3><p class="psk-why-cell-body">เปิดเบราว์เซอร์ก็พร้อมใช้ ครูทำงานจากที่ไหนก็ได้</p><div class="psk-cloud-mini"><div class="psk-laptop"><div class="psk-screen"><div class="psk-b psk-big"></div><div class="psk-b psk-m"></div><div class="psk-b psk-s"></div><div class="psk-b psk-m"></div></div></div><div class="psk-phone"><div class="psk-ln psk-s"></div><div class="psk-ln"></div><div class="psk-ln psk-s"></div></div></div></article>
+        <article class="psk-why-cell"><div class="psk-why-cell-top"><span class="psk-why-cell-num">04</span></div><h3 class="psk-why-cell-title">ราคาโปร่งใส ไม่ต้องคุย sales</h3><p class="psk-why-cell-body">เห็นราคาบนเว็บ ไม่มีค่า setup ซ่อน ยกเลิกได้ทุกเมื่อ</p><div class="psk-price-chip"><div><span class="psk-num psk-mono">฿1,299</span> <span class="psk-unit">/เดือน</span></div><span class="psk-tag">เริ่มต้น</span></div></article>
+        <article class="psk-why-cell"><div class="psk-why-cell-top"><span class="psk-why-cell-num">05</span></div><h3 class="psk-why-cell-title">PromptPay รับเงิน ไม่หักค่าธรรมเนียม</h3><p class="psk-why-cell-body">เก็บค่าเทอมผ่าน QR ได้เต็มจำนวน ไม่เสีย 2.5–3% เหมือนบัตรเครดิต</p><div class="psk-zero-chip"><span class="psk-big psk-mono">0%</span><span class="psk-lbl">ค่าธรรมเนียม</span></div></article>
+        <article class="psk-why-cell"><div class="psk-why-cell-top"><span class="psk-why-cell-num">06</span></div><h3 class="psk-why-cell-title">เริ่มใช้เองได้ใน 15 นาที</h3><p class="psk-why-cell-body">ทดลองฟรี 14 วัน ไม่ต้องผูกบัตร — สมัครเองได้ไม่ต้องรอ sales</p><div class="psk-timer-chip"><div><span class="psk-big psk-mono">15</span> <span class="psk-lbl">นาที</span></div><span class="psk-trial">ทดลองฟรี 14 วัน</span></div></article>
+      </div>
+      <div class="psk-why-trust">
+        <div class="psk-why-trust-head">
+          <h3>ข้อมูลโรงเรียน — ปลอดภัย เป็นความลับ 100%</h3>
+          <p>เราถือว่าข้อมูลของลูกค้าเป็นสิ่งสำคัญที่สุด เก็บในไทย เข้ารหัสทุกชั้น และเป็นไปตามกฎหมาย PDPA</p>
+        </div>
+        <ul class="psk-why-trust-items">
+          <li>PDPA Compliant — เป็นไปตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล</li>
+          <li>Servers อยู่ในประเทศไทย — ไม่ส่งออกนอกประเทศ</li>
+          <li>เข้ารหัส TLS 1.3 ทั้งระบบ</li>
+          <li>Backup รายวัน + Audit log ทุกการเข้าถึง</li>
+          <li>ผู้ใช้ควบคุมสิทธิ์ — แยกบทบาทผู้บริหาร / ครู / ผู้ปกครอง</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <script>
+    (function(){var cells=document.querySelectorAll('.psk-why-cell');cells.forEach(function(el,i){el.style.transitionDelay=(i*70)+'ms';});if('IntersectionObserver' in window){var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('psk-in');io.unobserve(e.target);}});},{threshold:0.15});cells.forEach(function(c){io.observe(c);});}else{cells.forEach(function(c){c.classList.add('psk-in');});}})();
+  </script>
 
   <!-- ============= PRICING ============= -->
   <section class="section pricing-bg" id="pricing">
@@ -445,8 +606,8 @@
         <div class="pricing-card">
           <h3>Starter</h3>
           <p style="color:#6B7280;font-size:13px;margin:0;">โรงเรียนขนาดเล็ก</p>
-          <div class="price">฿1,990 <small>/เดือน</small></div>
-          <div class="price-yearly">หรือ ฿19,104/ปี (ประหยัด ฿4,776)</div>
+          <div class="price">฿1,299 <small>/เดือน</small></div>
+          <div class="price-yearly">หรือ ฿12,470/ปี (ประหยัด ฿3,118)</div>
           <ul class="feature-list">
             <li>นักเรียน ≤100 คน</li>
             <li>ครู ≤10 คน</li>
@@ -465,8 +626,8 @@
           <div class="popular-badge">⭐ POPULAR</div>
           <h3>Pro</h3>
           <p style="color:#6B7280;font-size:13px;margin:0;">โรงเรียนขนาดกลาง</p>
-          <div class="price">฿3,990 <small>/เดือน</small></div>
-          <div class="price-yearly">หรือ ฿38,304/ปี (ประหยัด ฿9,576)</div>
+          <div class="price">฿2,990 <small>/เดือน</small></div>
+          <div class="price-yearly">หรือ ฿28,704/ปี (ประหยัด ฿7,176)</div>
           <ul class="feature-list">
             <li>นักเรียน ≤500 คน</li>
             <li>ครู ≤30 คน</li>
@@ -484,8 +645,8 @@
         <div class="pricing-card">
           <h3>Premium</h3>
           <p style="color:#6B7280;font-size:13px;margin:0;">โรงเรียนขนาดใหญ่</p>
-          <div class="price">฿7,990 <small>/เดือน</small></div>
-          <div class="price-yearly">หรือ ฿76,704/ปี (ประหยัด ฿19,176)</div>
+          <div class="price">฿4,990 <small>/เดือน</small></div>
+          <div class="price-yearly">หรือ ฿47,904/ปี (ประหยัด ฿11,976)</div>
           <ul class="feature-list">
             <li>นักเรียนไม่จำกัด</li>
             <li>ครูไม่จำกัด</li>

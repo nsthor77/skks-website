@@ -1105,6 +1105,27 @@
     return value;
   }
 
+  // Strict lookup: returns the translation, or undefined if the key is missing.
+  // applyToDom() uses this so a missing key keeps the element's existing HTML
+  // default text instead of overwriting it with the raw key string.
+  function tStrict(key, params) {
+    if (!key) return undefined;
+    const parts = key.split('.');
+    let node = TRANSLATIONS;
+    for (const p of parts) {
+      if (node && typeof node === 'object' && p in node) node = node[p];
+      else return undefined;
+    }
+    if (!node || typeof node !== 'object' || !(currentLang in node)) return undefined;
+    let value = node[currentLang];
+    if (params && typeof params === 'object') {
+      for (const k in params) {
+        value = value.replace(new RegExp('\\{' + k + '\\}', 'g'), params[k]);
+      }
+    }
+    return value;
+  }
+
   function getLang() { return currentLang; }
 
   function setLang(lang) {
@@ -1120,12 +1141,14 @@
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       const params = parseParams(el.getAttribute('data-i18n-params'));
-      el.textContent = t(key, params);
+      const val = tStrict(key, params);
+      if (val !== undefined) el.textContent = val;   // missing key → keep HTML default
     });
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
       const key = el.getAttribute('data-i18n-html');
       const params = parseParams(el.getAttribute('data-i18n-params'));
-      el.innerHTML = t(key, params);
+      const val = tStrict(key, params);
+      if (val !== undefined) el.innerHTML = val;
     });
     document.querySelectorAll('[data-i18n-attr]').forEach(el => {
       const spec = el.getAttribute('data-i18n-attr');
@@ -1133,7 +1156,8 @@
         const [attr, key] = pair.split(':').map(s => s.trim());
         if (attr && key) {
           const params = parseParams(el.getAttribute('data-i18n-params'));
-          el.setAttribute(attr, t(key, params));
+          const val = tStrict(key, params);
+          if (val !== undefined) el.setAttribute(attr, val);
         }
       });
     });

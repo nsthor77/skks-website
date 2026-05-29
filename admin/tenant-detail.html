@@ -235,6 +235,21 @@
         </div>
       </div>
 
+      <!-- Custom Domain -->
+      <div class="card" style="margin-bottom:20px;">
+        <h3>🌐 Custom Domain</h3>
+        <p style="font-size:13px;color:#6B7280;margin:-6px 0 12px;">
+          โดเมนเริ่มต้น: <code>${s.slug}.panyaschoolkit.com</code> (ใช้ได้ทันที ไม่ต้องตั้งค่า) · ถ้าโรงเรียนมีโดเมนเอง ใส่ด้านล่าง — ระบบจะผูกกับ Vercel + ออก SSL ให้อัตโนมัติ
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <input id="domainInput" value="${s.custom_domain || ''}" placeholder="app.suansonkk.ac.th"
+            style="flex:1;min-width:220px;padding:9px 12px;border:1px solid #D8DEE9;border-radius:8px;font-size:14px;font-family:inherit;" />
+          <button class="btn btn-primary" onclick="saveDomain()">💾 บันทึก + ผูก Vercel</button>
+          ${s.custom_domain ? '<button class="btn btn-danger" onclick="removeDomain()">ลบโดเมน</button>' : ''}
+        </div>
+        <div id="domainResult" style="margin-top:12px;"></div>
+      </div>
+
       <!-- Payment + Card -->
       <div class="card" style="margin-bottom:20px;">
         <h3>💳 Payment Method</h3>
@@ -298,6 +313,85 @@
         `).join('') : '<p style="color:#9CA3AF;">ไม่มี activity</p>'}
       </div>
     `;
+
+    // show current DNS instructions for an already-set custom domain
+    if (s.custom_domain) {
+      document.getElementById('domainResult').innerHTML =
+        '<div style="color:#6B7280;font-size:13px;">โดเมนปัจจุบัน: <code>https://' + s.custom_domain + '</code> — กด “บันทึก + ผูก Vercel” เพื่อตรวจสอบสถานะ/ดู DNS อีกครั้ง</div>'
+        + dnsBoxHtml(dnsForDomain(s.custom_domain));
+    }
+  }
+
+  // ---- Custom domain management ----
+  // Thai-aware apex detection (mirror of lib/vercel-domains.js for the DNS hint)
+  const MULTI_SUF = ['ac.th','co.th','go.th','or.th','in.th','net.th','mi.th','re.th','co.uk','com.au','co.nz','com.sg','edu.sg'];
+  function isApexDomain(d){
+    d = String(d).toLowerCase().replace(/\.$/,'');
+    const labels = d.split('.');
+    for (const suf of MULTI_SUF){ if (d === suf || d.endsWith('.'+suf)) return labels.length === suf.split('.').length + 1; }
+    return labels.length === 2;
+  }
+  function dnsForDomain(d){
+    return isApexDomain(d)
+      ? { type:'A', name:'@', value:'76.76.21.21' }
+      : { type:'CNAME', name:String(d).split('.')[0], value:'cname.vercel-dns.com' };
+  }
+  function dnsBoxHtml(dns){
+    if(!dns || !dns.type) return '';
+    return `<div style="background:#F8FAFF;border:1px dashed #C9D4EE;border-radius:8px;padding:12px;margin-top:8px;font-size:13px;">
+      <div style="color:#6B7280;margin-bottom:6px;">📌 ส่งให้ฝ่าย IT โรงเรียนเพิ่ม DNS record นี้ (ที่ผู้ให้บริการโดเมนของเขา):</div>
+      <table style="border-collapse:collapse;font-size:13px;">
+        <tr><td style="padding:2px 12px 2px 0;color:#6B7280;">Type</td><td><code>${dns.type}</code></td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:#6B7280;">Name / Host</td><td><code>${dns.name}</code></td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:#6B7280;">Value</td><td><code>${dns.value}</code></td></tr>
+      </table>
+    </div>`;
+  }
+  function renderDomainResult(data){
+    const d = data.vercel || {}; const dns = data.dns || dnsForDomain(data.custom_domain || '');
+    const status = d.verified
+      ? '<div style="color:#065F46;font-weight:600;">✅ เชื่อมต่อแล้ว (DNS + SSL พร้อมใช้)</div>'
+      : (d.configured && d.ok
+          ? '<div style="color:#92400E;font-weight:600;">⏳ ผูกกับ Vercel แล้ว — รอโรงเรียนตั้ง DNS (5 นาที–24 ชม.) แล้วกด “บันทึก” ซ้ำเพื่อเช็ค</div>'
+          : '<div style="color:#92400E;font-weight:600;">📝 บันทึกในระบบแล้ว — เพิ่มโดเมนใน Vercel dashboard เอง (ยังไม่ตั้ง VERCEL_API_TOKEN)</div>');
+    return status + (d.error ? `<div style="color:#DC2626;">⚠️ ${d.error}</div>` : '') + dnsBoxHtml(dns);
+  }
+
+  async function saveDomain(){
+    if (!currentTenant?.school) return;
+    const domain = (document.getElementById('domainInput').value || '').trim().toLowerCase();
+    if (!domain){ alert('ใส่โดเมนก่อน หรือกด “ลบโดเมน” เพื่อยกเลิก'); return; }
+    const box = document.getElementById('domainResult');
+    box.innerHTML = '<span style="color:#9CA3AF;">⏳ กำลังผูกโดเมน...</span>';
+    const { data:{ session } } = await supabaseClient.auth.getSession();
+    if (!session){ box.innerHTML = '<span style="color:#DC2626;">เซสชันหมดอายุ — ล็อกอินใหม่</span>'; return; }
+    try {
+      const r = await fetch('/api/admin/set-domain', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+session.access_token },
+        body: JSON.stringify({ school_id: currentTenant.school.id, custom_domain: domain })
+      });
+      const data = await r.json();
+      if (!r.ok || !data.success) throw new Error(data.error || 'ผูกโดเมนไม่สำเร็จ');
+      box.innerHTML = renderDomainResult(data);
+      currentTenant.school.custom_domain = data.custom_domain;
+    } catch(e){ box.innerHTML = '<span style="color:#DC2626;">❌ '+e.message+'</span>'; }
+  }
+
+  async function removeDomain(){
+    if (!currentTenant?.school) return;
+    if (!confirm('ลบ custom domain นี้? โรงเรียนจะกลับไปใช้ '+currentTenant.school.slug+'.panyaschoolkit.com')) return;
+    const { data:{ session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    const r = await fetch('/api/admin/set-domain', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+session.access_token },
+      body: JSON.stringify({ school_id: currentTenant.school.id, action:'remove' })
+    });
+    const data = await r.json();
+    if (!r.ok || !data.success){ alert(data.error || 'ลบไม่สำเร็จ'); return; }
+    alert('✅ ลบโดเมนแล้ว');
+    loadTenant(currentTenant.school.id);
   }
 
   async function toggleSuspend(suspend) {

@@ -10,6 +10,7 @@
 // ==========================================================================
 
 const { createClient } = require('@supabase/supabase-js');
+const { addDomainToVercel, dnsInstructionsFor, isValidDomain, normDomain } = require('../../lib/vercel-domains');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -117,6 +118,25 @@ module.exports = async (req, res) => {
     // best-effort: activate subscription row if present
     try { await supabaseAdmin.from('subscriptions').update({ status: 'active' }).eq('school_id', schoolId); } catch (e) {}
 
+    // ---- 5) optional custom domain (set in DB + register with Vercel, auto SSL) ----
+    let customDomain = null;
+    let domainResult = null;
+    const reqDomain = normDomain(b.customDomain);
+    if (reqDomain) {
+      if (!isValidDomain(reqDomain)) {
+        domainResult = { ok: false, error: 'รูปแบบโดเมนไม่ถูกต้อง (ข้ามการตั้ง custom domain) — ตั้งทีหลังได้ที่หน้า tenant' };
+      } else {
+        try {
+          await supabaseAdmin.from('schools').update({ custom_domain: reqDomain }).eq('id', schoolId);
+          customDomain = reqDomain;
+          domainResult = await addDomainToVercel(reqDomain);
+          domainResult.dns = dnsInstructionsFor(reqDomain);
+        } catch (e) {
+          domainResult = { ok: false, error: 'ตั้ง custom domain ไม่สำเร็จ: ' + e.message };
+        }
+      }
+    }
+
     return res.status(200).json({
       success: true,
       school_id: schoolId,
@@ -124,7 +144,9 @@ module.exports = async (req, res) => {
       slug,
       login_email: ownerEmail,
       comp: billing.comp,
-      discount_percent: billing.discount_percent
+      discount_percent: billing.discount_percent,
+      custom_domain: customDomain,
+      domain: domainResult
     });
   } catch (err) {
     console.error('[admin/create-school] error', err);

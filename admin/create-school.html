@@ -63,6 +63,11 @@
         <div class="field"><label>ส่วนลดพิเศษ (%)</label><input id="discountPercent" type="number" min="0" max="100" value="0" /></div>
       </div>
       <label class="chk"><input type="checkbox" id="comp" checked /> เปิดใช้ฟรี / Comp (ข้ามการจ่ายเงิน — สำหรับทดลอง)</label>
+      <hr style="border:none;border-top:1px solid #EEF0F5;margin:6px 0 16px;" />
+      <div class="field"><label>Custom Domain ของโรงเรียน (ถ้ามี)</label>
+        <input id="customDomain" placeholder="app.suansonkk.ac.th" />
+        <div class="hint">ถ้าโรงเรียนมีโดเมนเอง ใส่ที่นี่ — ระบบจะผูกกับ Vercel + ออก SSL ให้อัตโนมัติ แล้วจะบอก DNS ที่โรงเรียนต้องเพิ่ม · เว้นว่างได้ (จะใช้ <span id="slugPreview2">slug</span>.panyaschoolkit.com)</div>
+      </div>
       <div class="field"><label>หมายเหตุ (ภายใน)</label><textarea id="notes" rows="2" placeholder="เช่น โรงเรียนทดลอง ติดต่อโดยครูสมศรี"></textarea></div>
 
       <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" style="width:100%;">➕ สร้างโรงเรียน + เปิดใช้</button>
@@ -85,7 +90,7 @@
     function autoSlug(){ if(slugTouched) return; const v=document.getElementById('schoolNameEn').value||document.getElementById('schoolName').value;
       const s=String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
       document.getElementById('slug').value=s; updateSlugPreview(); }
-    function updateSlugPreview(){ document.getElementById('slugPreview').textContent=document.getElementById('slug').value||'slug'; }
+    function updateSlugPreview(){ const v=document.getElementById('slug').value||'slug'; document.getElementById('slugPreview').textContent=v; const p2=document.getElementById('slugPreview2'); if(p2) p2.textContent=v; }
     function genPass(){ const c='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let p=''; for(let i=0;i<10;i++)p+=c[Math.floor(Math.random()*c.length)]; document.getElementById('ownerPassword').value=p; }
 
     function showAlert(msg, ok){ const a=document.getElementById('alert'); a.className='alert show '+(ok?'ok':'err'); a.textContent=msg; a.scrollIntoView({behavior:'smooth',block:'center'}); }
@@ -96,7 +101,8 @@
         schoolName: val('schoolName'), schoolNameEn: val('schoolNameEn'), slug: val('slug').toLowerCase(),
         ownerEmail: val('ownerEmail').toLowerCase(), ownerPassword: val('ownerPassword'),
         ownerFirstName: val('ownerFirstName'), ownerLastName: val('ownerLastName'),
-        discountPercent: Number(val('discountPercent'))||0, comp: document.getElementById('comp').checked, notes: val('notes')
+        discountPercent: Number(val('discountPercent'))||0, comp: document.getElementById('comp').checked, notes: val('notes'),
+        customDomain: val('customDomain').toLowerCase()
       };
       if(!payload.schoolName||!payload.slug||!payload.ownerEmail||!payload.ownerPassword){ showAlert('กรอกช่องที่มี * ให้ครบ',false); return; }
       if(payload.ownerPassword.length<8){ showAlert('รหัสผ่านอย่างน้อย 8 ตัว',false); return; }
@@ -120,16 +126,40 @@
           <div class="kv">เว็บ: <code>https://${esc(data.slug)}.panyaschoolkit.com</code></div>
           <div class="kv">ล็อกอิน: <code>${esc(data.login_email)}</code> / <code>${esc(payload.ownerPassword)}</code></div>
           <div class="kv">สถานะ: <strong>เปิดใช้แล้ว</strong>${data.comp?' · Comp (ฟรี)':''}${data.discount_percent?(' · ส่วนลด '+data.discount_percent+'%'):''}</div>
+          ${domainResultHtml(data)}
           <div class="kv" style="color:var(--ash);margin-top:8px;">📋 ส่งลิงก์ + อีเมล + รหัสผ่านนี้ให้โรงเรียน แล้วให้เปลี่ยนรหัสเมื่อเข้าใช้ครั้งแรก</div>`;
         res.scrollIntoView({behavior:'smooth',block:'center'});
         // reset form
-        ['schoolName','schoolNameEn','slug','ownerEmail','ownerPassword','ownerFirstName','ownerLastName','notes'].forEach(id=>document.getElementById(id).value='');
+        ['schoolName','schoolNameEn','slug','ownerEmail','ownerPassword','ownerFirstName','ownerLastName','notes','customDomain'].forEach(id=>document.getElementById(id).value='');
         document.getElementById('discountPercent').value='0'; slugTouched=false;
       } catch(err){ showAlert('❌ '+err.message, false); }
       finally { btn.disabled=false; btn.textContent='➕ สร้างโรงเรียน + เปิดใช้'; }
     }
     function val(id){ return (document.getElementById(id).value||'').trim(); }
     function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // Render the custom-domain DNS instructions block (shown only if a domain was set)
+    function domainResultHtml(data){
+      if(!data.custom_domain) return '';
+      const d=data.domain||{}; const dns=d.dns||{};
+      const auto = d.configured && d.ok;
+      const verified = d.verified;
+      const statusLine = verified
+        ? '<span style="color:var(--success);font-weight:600;">✅ เชื่อมต่อแล้ว (DNS + SSL พร้อม)</span>'
+        : (auto
+            ? '<span style="color:#92400E;font-weight:600;">⏳ ผูกกับ Vercel แล้ว — รอโรงเรียนตั้ง DNS ด้านล่าง (5 นาที–24 ชม.)</span>'
+            : '<span style="color:#92400E;font-weight:600;">📝 บันทึกแล้ว — ผู้ดูแลต้องเพิ่มโดเมนใน Vercel เอง (ยังไม่ตั้ง VERCEL_API_TOKEN)</span>');
+      const dnsBox = dns.type ? `
+        <div style="background:#fff;border:1px dashed #C9D4EE;border-radius:8px;padding:10px;margin-top:6px;font-size:12.5px;">
+          <div style="color:var(--ash);margin-bottom:6px;">📌 ให้ฝ่าย IT โรงเรียนเพิ่ม DNS record นี้ (ที่ผู้ให้บริการโดเมนของเขา):</div>
+          <div>Type: <code>${esc(dns.type)}</code> · Name/Host: <code>${esc(dns.name)}</code> · Value: <code>${esc(dns.value)}</code></div>
+        </div>` : '';
+      return `<div class="kv" style="margin-top:10px;border-top:1px solid #E3E9F5;padding-top:10px;">
+          🌐 Custom domain: <code>https://${esc(data.custom_domain)}</code></div>
+        <div class="kv">${statusLine}</div>
+        ${d.error?`<div class="kv" style="color:var(--danger);">⚠️ ${esc(d.error)}</div>`:''}
+        ${dnsBox}`;
+    }
   </script>
 </body>
 </html>

@@ -344,6 +344,18 @@ const roleGuard = {
 };
 
 window.roleGuard = roleGuard;
+
+// ── Back-compat globals ──────────────────────────────────────────────────────
+// Several pages call guard methods BARE (e.g. `await requireStaff()`) instead of
+// `roleGuard.requireStaff()`. Without a global they throw ReferenceError, which
+// rejects the page's init() and leaves it stuck on "Loading...". Expose every
+// require* method as a global (bound to roleGuard) so those pages work.
+Object.keys(roleGuard).forEach(function (k) {
+  if (k.indexOf('require') === 0 && typeof roleGuard[k] === 'function' && typeof window[k] === 'undefined') {
+    window[k] = roleGuard[k].bind(roleGuard);
+  }
+});
+
 console.log('✅ Role guard loaded');
 
 // ── Auto-load the shared left sidebar nav on every app page ──────────────────

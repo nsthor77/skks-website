@@ -68,7 +68,8 @@
       { href: 'custom-tables.html',    tier: 'admin', en: 'Custom Tables',    th: 'ตารางกำหนดเอง' },
       { href: 'users.html',            tier: 'admin', en: 'Users',            th: 'ผู้ใช้' },
       { href: 'manage-invites.html',   tier: 'admin', en: 'Invites',          th: 'คำเชิญ' },
-      { href: 'school-settings.html',  tier: 'admin', en: 'School',           th: 'โรงเรียน' }
+      { href: 'school-settings.html',  tier: 'admin', en: 'School',           th: 'โรงเรียน' },
+      { href: 'brand-setup.html',      tier: 'admin', en: 'Branding',         th: 'แบรนด์/โลโก้' }
     ]}
   ];
 
@@ -239,7 +240,84 @@
 
     document.body.classList.add('pk-has-sb');
     render();
+    applyBrand();
     document.addEventListener('langchange', render);
+  }
+
+  // ---- Tenant branding: show the SCHOOL's own name + logo (not hardcoded) ----
+  // So a tenant's students/parents/staff see THEIR school, never "SKKS".
+  // Falls back silently to the default lockup if the RPC isn't deployed yet.
+  async function applyBrand() {
+    try {
+      if (!sb || !window.supabaseClient) return;
+      var brandEl = sb.querySelector('.pk-sb-brand');
+      if (!brandEl) return;
+      if (window.getTenant) { try { await window.getTenant(); } catch (e) {} }
+      var res = await window.supabaseClient.rpc('get_school_branding');
+      var b = (res && res.data) || null;
+      if (!b) return;
+      var name = b.name || b.name_en || '';
+      var img = brandEl.querySelector('img');
+      if (b.logo_url) {
+        if (img) { img.src = b.logo_url; img.alt = name || 'School'; img.style.display = ''; }
+      } else if (img) {
+        img.style.display = 'none';   // no school logo → show name text only (hide product lockup)
+      }
+      if (name) {
+        var nameEl = brandEl.querySelector('.pk-sb-name');
+        if (!nameEl) {
+          nameEl = document.createElement('span');
+          nameEl.className = 'pk-sb-name';
+          nameEl.style.cssText = 'font-family:inherit;font-weight:700;font-size:13.5px;line-height:1.2;color:#0F1A36;';
+          brandEl.appendChild(nameEl);
+        }
+        nameEl.textContent = name;
+        try {
+          var pageTitle = (document.title.split('—')[0] || '').trim();
+          document.title = (pageTitle ? pageTitle + ' — ' : '') + name;
+        } catch (e) {}
+      }
+      // theme color → CSS variable + accent override (sidebar active link + primary buttons)
+      if (b.theme_color) {
+        try {
+          document.documentElement.style.setProperty('--brand', b.theme_color);
+          var st = document.getElementById('pk-brand-style');
+          if (!st) { st = document.createElement('style'); st.id = 'pk-brand-style'; document.head.appendChild(st); }
+          var c = b.theme_color;
+          st.textContent =
+            '#pk-sb a.pk-sb-link.active{background:' + c + '1a;color:' + c + ';}' +
+            '.btn-primary,.pk-btn-primary,.btn.btn-primary{background:' + c + ' !important;border-color:' + c + ' !important;}';
+        } catch (e) {}
+      }
+      // gentle reminder (NOT a lock): owner with no branding yet → dismissible banner
+      try {
+        var path = location.pathname || '';
+        if (!b.theme_color && path.indexOf('brand-setup') < 0 && path.indexOf('/admin/') < 0
+            && !sessionStorage.getItem('pk-brand-reminded') && window.auth && window.auth.getProfile) {
+          var prof = await window.auth.getProfile();
+          if (prof && prof.role === 'owner') showBrandReminder(path);
+        }
+      } catch (e) {}
+    } catch (e) { /* keep default branding on any error (e.g. RPC not deployed yet) */ }
+  }
+
+  // Small dismissible toast nudging the owner to set up branding (no forced redirect).
+  function showBrandReminder(path) {
+    if (document.getElementById('pk-brand-reminder')) return;
+    var setupHref = (path.indexOf('/pages/') > -1 ? 'brand-setup.html' : 'pages/brand-setup.html');
+    var bar = document.createElement('div');
+    bar.id = 'pk-brand-reminder';
+    bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9998;'
+      + 'background:#0F1A36;color:#fff;border-radius:12px;padding:11px 12px 11px 16px;display:flex;align-items:center;gap:12px;'
+      + 'box-shadow:0 12px 30px -10px rgba(0,0,0,.4);font-family:"IBM Plex Sans Thai",sans-serif;font-size:13.5px;max-width:94vw;';
+    bar.innerHTML = '<span>ตั้งสี + โลโก้ของโรงเรียน ให้ดูเป็นแบรนด์ของคุณเอง</span>'
+      + '<a href="' + setupHref + '" style="background:#2563EB;color:#fff;text-decoration:none;padding:7px 14px;border-radius:8px;font-weight:600;white-space:nowrap;">ตั้งค่า</a>'
+      + '<button type="button" aria-label="ปิด" style="background:transparent;border:none;color:#9AA3B5;font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>';
+    bar.querySelector('button').onclick = function () {
+      try { sessionStorage.setItem('pk-brand-reminded', '1'); } catch (e) {}
+      bar.remove();
+    };
+    document.body.appendChild(bar);
   }
 
   // ---- Init -----------------------------------------------------------------

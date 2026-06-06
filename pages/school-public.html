@@ -53,6 +53,21 @@
     footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);}
     footer a{color:var(--blue);}
     .state{text-align:center;padding:90px 24px;color:var(--muted);}
+    .apply{background:var(--blue-50);}
+    .apply-form{max-width:720px;margin:28px auto 0;background:#fff;border:1px solid var(--line);border-radius:18px;padding:32px;box-shadow:0 12px 30px -18px rgba(15,26,54,.2);}
+    .af-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .af-grid .full{grid-column:1/-1;}
+    .af-sec{font-family:'Prompt';font-weight:600;color:var(--blue-deep);font-size:15px;margin:18px 0 4px;padding-bottom:8px;border-bottom:2px solid var(--blue);}
+    .af-sec:first-child{margin-top:0;}
+    .apply-form label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin:10px 0 5px;}
+    .apply-form .req{color:#DC2626;}
+    .apply-form input,.apply-form select,.apply-form textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px;outline:none;}
+    .apply-form input:focus,.apply-form select:focus,.apply-form textarea:focus{border-color:var(--blue);}
+    .apply-btn{width:100%;margin-top:18px;padding:14px;border:none;border-radius:10px;background:linear-gradient(180deg,var(--blue),var(--blue-700));color:#fff;font-family:'Prompt';font-weight:600;font-size:15px;cursor:pointer;}
+    .apply-btn:disabled{opacity:.6;cursor:not-allowed;}
+    .apply-ok{display:none;background:#D1FAE5;color:#065F46;border-left:4px solid #16A34A;padding:14px 18px;border-radius:10px;margin-bottom:18px;font-size:14px;}
+    .apply-ok.show{display:block;}
+    @media(max-width:560px){.af-grid{grid-template-columns:1fr;}.apply-form{padding:22px;}}
     .hidden{display:none;}
     @media(max-width:640px){.nav .links a:not(.lang){display:none;}}
   </style>
@@ -80,7 +95,7 @@
       <h1 id="heroName"></h1>
       <p class="motto" id="heroMotto"></p>
       <div class="cta">
-        <a href="#contact" class="btn btn-primary" data-i18n="pub.apply">สมัครเรียน / สอบถาม</a>
+        <a href="#apply" class="btn btn-primary" data-i18n="pub.apply">สมัครเรียน / สอบถาม</a>
         <a href="#news" class="btn btn-outline" data-i18n="pub.seeNews">ดูข่าวสาร</a>
       </div>
     </section>
@@ -98,6 +113,42 @@
     <section class="section" id="events">
       <h2 data-i18n="pub.events">กิจกรรม</h2>
       <div id="eventsWrap" style="margin-top:28px;"></div>
+    </section>
+
+    <section class="section apply" id="apply" style="max-width:none;">
+      <div style="max-width:1080px;margin:0 auto;">
+        <h2 data-i18n="pub.applyTitle">สมัครเรียน</h2>
+        <p class="lead" data-i18n="pub.applyLead">กรอกแบบฟอร์มด้านล่าง ใช้เวลาประมาณ 5 นาที</p>
+        <form class="apply-form" id="applyForm" onsubmit="submitApp(event)">
+          <div class="apply-ok" id="applyOk" data-i18n="pub.applyOk">✅ ส่งใบสมัครแล้ว!</div>
+
+          <div class="af-sec" data-i18n="pub.secStudent">ข้อมูลนักเรียน</div>
+          <div class="af-grid">
+            <div><label><span data-i18n="pub.fFirst">ชื่อ</span> <span class="req">*</span></label><input type="text" id="af_first" required /></div>
+            <div><label data-i18n="pub.fLast">นามสกุล</label><input type="text" id="af_last" /></div>
+            <div><label data-i18n="pub.fNick">ชื่อเล่น</label><input type="text" id="af_nick" /></div>
+            <div><label data-i18n="pub.fBirth">วันเกิด</label><input type="date" id="af_birth" /></div>
+            <div><label data-i18n="pub.fGender">เพศ</label>
+              <select id="af_gender"><option value="">—</option><option value="male" data-i18n="pub.gMale">ชาย</option><option value="female" data-i18n="pub.gFemale">หญิง</option></select>
+            </div>
+            <div><label data-i18n="pub.fNationality">สัญชาติ</label><input type="text" id="af_nat" value="Thai" /></div>
+            <div class="full"><label data-i18n="pub.fProgram">หลักสูตร / ระดับชั้นที่สนใจ</label><input type="text" id="af_grade" placeholder="EP / ป.1 ..." /></div>
+          </div>
+
+          <div class="af-sec" data-i18n="pub.secParent">ข้อมูลผู้ปกครอง</div>
+          <div class="af-grid">
+            <div><label><span data-i18n="pub.fParentName">ชื่อผู้ปกครอง</span> <span class="req">*</span></label><input type="text" id="af_pname" required /></div>
+            <div><label data-i18n="pub.fRelation">ความสัมพันธ์</label>
+              <select id="af_rel"><option value="father" data-i18n="pub.rFather">บิดา</option><option value="mother" data-i18n="pub.rMother">มารดา</option><option value="guardian" data-i18n="pub.rGuardian">ผู้ปกครอง</option></select>
+            </div>
+            <div><label><span data-i18n="pub.fPhone">เบอร์โทร</span> <span class="req">*</span></label><input type="tel" id="af_phone" /></div>
+            <div><label data-i18n="pub.fEmail">อีเมล</label><input type="email" id="af_email" /></div>
+            <div class="full"><label data-i18n="pub.fNotes">หมายเหตุ / คำถาม</label><textarea id="af_notes" rows="3"></textarea></div>
+          </div>
+
+          <button type="submit" class="apply-btn" id="applyBtn" data-i18n="pub.submit">ส่งใบสมัคร</button>
+        </form>
+      </div>
     </section>
 
     <section class="section contact" id="contact" style="max-width:none;">
@@ -124,7 +175,27 @@
       'pub.about':{th:'เกี่ยวกับโรงเรียน',en:'About'}, 'pub.noNews':{th:'ยังไม่มีข่าวสาร',en:'No news yet'},
       'pub.noEvents':{th:'ยังไม่มีกิจกรรม',en:'No events yet'}, 'pub.addr':{th:'ที่อยู่',en:'Address'},
       'pub.phone':{th:'โทรศัพท์',en:'Phone'}, 'pub.email':{th:'อีเมล',en:'Email'}, 'pub.web':{th:'เว็บไซต์',en:'Website'},
-      'pub.contactTitle':{th:'ติดต่อโรงเรียน',en:'Contact us'}
+      'pub.contactTitle':{th:'ติดต่อโรงเรียน',en:'Contact us'},
+      'pub.applyTitle':{th:'สมัครเรียน',en:'Apply / Admission'},
+      'pub.applyLead':{th:'กรอกแบบฟอร์มด้านล่าง ใช้เวลาประมาณ 5 นาที — ทางโรงเรียนจะติดต่อกลับ',en:'Fill in the form below (about 5 minutes) — the school will contact you'},
+      'pub.secStudent':{th:'ข้อมูลนักเรียน',en:'Student Information'},
+      'pub.secParent':{th:'ข้อมูลผู้ปกครอง',en:'Parent / Guardian'},
+      'pub.fFirst':{th:'ชื่อ',en:'First Name'}, 'pub.fLast':{th:'นามสกุล',en:'Last Name'},
+      'pub.fNick':{th:'ชื่อเล่น',en:'Nickname'}, 'pub.fBirth':{th:'วันเกิด',en:'Date of Birth'},
+      'pub.fGender':{th:'เพศ',en:'Gender'}, 'pub.gMale':{th:'ชาย',en:'Male'}, 'pub.gFemale':{th:'หญิง',en:'Female'},
+      'pub.fNationality':{th:'สัญชาติ',en:'Nationality'},
+      'pub.fProgram':{th:'หลักสูตร / ระดับชั้นที่สนใจ',en:'Program / Grade of interest'},
+      'pub.fParentName':{th:'ชื่อผู้ปกครอง',en:'Parent Name'},
+      'pub.fRelation':{th:'ความสัมพันธ์',en:'Relationship'},
+      'pub.rFather':{th:'บิดา',en:'Father'}, 'pub.rMother':{th:'มารดา',en:'Mother'}, 'pub.rGuardian':{th:'ผู้ปกครอง',en:'Guardian'},
+      'pub.fPhone':{th:'เบอร์โทร',en:'Phone'}, 'pub.fEmail':{th:'อีเมล',en:'Email'},
+      'pub.fNotes':{th:'หมายเหตุ / คำถาม',en:'Notes / Questions'},
+      'pub.required':{th:'จำเป็น',en:'required'},
+      'pub.submit':{th:'ส่งใบสมัคร',en:'Submit Application'},
+      'pub.submitting':{th:'กำลังส่ง...',en:'Submitting...'},
+      'pub.applyOk':{th:'✅ ส่งใบสมัครแล้ว! ทางโรงเรียนจะติดต่อกลับเร็วๆ นี้',en:'✅ Application submitted! The school will contact you soon'},
+      'pub.applyErr':{th:'ส่งไม่สำเร็จ กรุณาลองใหม่',en:'Submission failed, please try again'},
+      'pub.needFields':{th:'กรุณากรอกชื่อนักเรียน และเบอร์โทรหรืออีเมล',en:'Please enter the student name and a phone or email'}
     };
     function tr(k){ return (T[k]&&T[k][lang])||k; }
     function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
@@ -217,6 +288,37 @@
     function toggleLang(){ lang= lang==='th'?'en':'th'; try{localStorage.setItem('pk_lang',lang);}catch(e){} document.documentElement.lang=lang; if(SCHOOL){render(SCHOOL); loadNews(SCHOOL.id); loadEvents(SCHOOL.id);} }
     function fmt(d){ if(!d)return''; try{return new Date(d).toLocaleDateString(lang==='en'?'en-GB':'th-TH',{day:'numeric',month:'short',year:'numeric'});}catch(e){return'';} }
     function monShort(d){ try{return d.toLocaleDateString(lang==='en'?'en-GB':'th-TH',{month:'short'});}catch(e){return'';} }
+
+    async function submitApp(e){
+      e.preventDefault();
+      if(!SCHOOL||!SCHOOL.id) return;
+      var v=function(id){return (document.getElementById(id).value||'').trim();};
+      var first=v('af_first'), phone=v('af_phone'), email=v('af_email');
+      if(!first || (!phone && !email)){ alert(tr('pub.needFields')); return; }
+      var btn=document.getElementById('applyBtn');
+      btn.disabled=true; btn.textContent=tr('pub.submitting');
+      var payload={
+        student_first_name:first, student_last_name:v('af_last'),
+        student_nickname:v('af_nick'), student_birth_date:v('af_birth')||null,
+        student_gender:v('af_gender'), student_nationality:v('af_nat')||'Thai',
+        grade:v('af_grade'),
+        parent_name:v('af_pname'), parent_relation:v('af_rel'),
+        parent_phone:phone, parent_email:email, notes:v('af_notes')
+      };
+      try{
+        var { data, error } = await sb.rpc('submit_application',{ p_school_id:SCHOOL.id, p_payload:payload });
+        if(error) throw error;
+        if(!data || !data.success) throw new Error((data&&data.error)||'failed');
+        document.getElementById('applyOk').classList.add('show');
+        document.getElementById('applyForm').reset();
+        document.getElementById('af_nat').value='Thai';
+        document.getElementById('applyOk').scrollIntoView({behavior:'smooth',block:'center'});
+      }catch(err){
+        alert(tr('pub.applyErr'));
+      }finally{
+        btn.disabled=false; btn.textContent=tr('pub.submit');
+      }
+    }
   </script>
 </body>
 </html>

@@ -307,36 +307,34 @@
       event.preventDefault();
       const btn=document.getElementById('submitBtn');
       btn.disabled=true;btn.textContent='⏳ SUBMITTING...';
-      
-      const {count}=await supabaseClient.from('applications').select('*',{count:'exact',head:true});
-      const yr=new Date().getFullYear();
-      const seq=String((count||0)+1).padStart(4,'0');
-      
-      const appData={
-        application_number:`APP-${yr}-${seq}`,
-        status:'pending',
+
+      // tenant-aware: resolve which school this form belongs to (by hostname)
+      let schoolId = window.CURRENT_SCHOOL_ID;
+      try { if (window.getTenant) { const tt = await window.getTenant(); schoolId = tt.schoolId || schoolId; } } catch(e){}
+
+      const payload={
         student_first_name:document.getElementById('firstName').value.trim(),
         student_last_name:document.getElementById('lastName').value.trim(),
-        student_nickname:document.getElementById('nickname').value.trim()||null,
+        student_nickname:document.getElementById('nickname').value.trim(),
         student_birth_date:document.getElementById('birthDate').value||null,
-        student_gender:document.getElementById('gender').value||null,
+        student_gender:document.getElementById('gender').value,
         student_nationality:document.getElementById('nationality').value.trim()||'Thai',
         program:document.getElementById('program').value,
         grade:document.getElementById('grade').value.trim(),
         parent_name:document.getElementById('parentName').value.trim(),
-        parent_relation:document.getElementById('parentRelation').value||null,
+        parent_relation:document.getElementById('parentRelation').value,
         parent_phone:document.getElementById('parentPhone').value.trim(),
         parent_email:document.getElementById('parentEmail').value.trim(),
-        parent_address:document.getElementById('parentAddress').value.trim()||null,
-        notes:document.getElementById('notes').value.trim()||null
+        parent_address:document.getElementById('parentAddress').value.trim(),
+        notes:document.getElementById('notes').value.trim()
       };
-      
-      const {error}=await supabaseClient.from('applications').insert(appData);
-      
+
+      const {data,error}=await supabaseClient.rpc('submit_application',{ p_school_id:schoolId, p_payload:payload });
+
       btn.disabled=false;btn.textContent='📨 SUBMIT APPLICATION';
-      
-      if(error){alert('❌ Submission failed: '+error.message);return;}
-      
+
+      if(error || !data || !data.success){ alert('❌ Submission failed: '+((data&&data.error)||(error&&error.message)||'')); return; }
+
       document.getElementById('successMsg').classList.add('show');
       document.getElementById('applicationForm').reset();
       window.scrollTo({top:document.getElementById('successMsg').offsetTop-100,behavior:'smooth'});

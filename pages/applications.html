@@ -559,6 +559,7 @@
       const studentNumber = `STD-${yr}-${seq}`;
       
       const studentData = {
+        school_id: window.CURRENT_SCHOOL_ID,   // tenant isolation
         student_number: studentNumber,
         first_name: app.student_first_name,
         last_name: app.student_last_name,

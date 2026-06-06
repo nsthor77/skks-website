@@ -858,7 +858,7 @@
           <td><span class="status-badge status-${r.status || 'active'}">${esc(t('teachers.status' + ({active:'Active',inactive:'Inactive',on_leave:'OnLeave',resigned:'Resigned'}[r.status] || 'Active')))}</span></td>
           <td class="action-cell">
             <button class="btn btn-sm btn-secondary" onclick="editTeacher('${r.id}')">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteTeacher('${r.id}', ${JSON.stringify(r.employee_id || displayName)})">🗑️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteTeacher('${r.id}', ${JSON.stringify(r.employee_id || displayName).replace(/"/g,'&quot;')})">🗑️</button>
           </td>
         </tr>`;
       }).join('');

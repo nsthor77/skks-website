@@ -299,7 +299,7 @@
           ${f.required ? '<span class="field-required">*</span>' : '<span></span>'}
           <span class="field-status ${f.is_active ? 'active' : ''}">${f.is_active ? '● ' + t('common.active') : '○ ' + t('common.inactive')}</span>
           <button class="btn btn-sm btn-secondary" onclick="editField('${f.id}')">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteField('${f.id}', ${JSON.stringify(displayLabel)})">🗑️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteField('${f.id}', ${JSON.stringify(displayLabel).replace(/"/g,'&quot;')})">🗑️</button>
         </div>`;
       }).join('');
     }

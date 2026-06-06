@@ -604,7 +604,7 @@
           ${f.required ? `<span class="field-required" title="${t('requiredTitle')}">*</span>` : '<span></span>'}
           <span class="field-status ${f.is_active ? 'active' : ''}">${f.is_active ? '● ' + (currentLang === 'en' ? 'Active' : 'ใช้งาน') : '○ ' + (currentLang === 'en' ? 'Off' : 'ปิด')}</span>
           <button class="btn btn-sm btn-secondary" onclick="editField('${f.id}')">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteField('${f.id}', ${JSON.stringify(displayLabel)})">🗑️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteField('${f.id}', ${JSON.stringify(displayLabel).replace(/"/g,'&quot;')})">🗑️</button>
         </div>`;
       }).join('');
     }

@@ -23,7 +23,8 @@ BEGIN
     'address', s.school_address, 'phone', s.school_phone, 'email', s.school_email,
     'website', s.school_website, 'motto', COALESCE(s.motto_th, s.motto),
     'principal', COALESCE(s.principal_name_th, s.principal_name),
-    'about', s.description
+    'about', s.description,
+    'logo_url', s.logo_url, 'theme_color', s.theme_color
   ) INTO v
   FROM public.schools s
   WHERE (NULLIF(p_slug,'') IS NOT NULL AND lower(s.slug) = lower(p_slug))

@@ -247,7 +247,7 @@
           <td><span class="${s.is_active ? 'status-active' : 'status-inactive'}">${s.is_active ? '● ' + t('common.active') : '○ ' + t('common.inactive')}</span></td>
           <td class="action-cell">
             <button class="btn btn-sm btn-secondary" onclick="editSubject('${s.id}')">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteSubject('${s.id}', ${JSON.stringify(displayName)})">🗑️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSubject('${s.id}', ${JSON.stringify(displayName).replace(/"/g,'&quot;')})">🗑️</button>
           </td>
         </tr>`;
       }).join('');

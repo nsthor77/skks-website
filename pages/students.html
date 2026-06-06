@@ -540,11 +540,11 @@
             <h4 data-i18n="students.sectionGeneral">General Info</h4>
             <div class="form-grid">
               <div class="form-group">
-                <label>รหัสนักเรียน <span class="req">*</span></label>
+                <label><span data-i18n="students.fldStudentNumber">รหัสนักเรียน</span> <span class="req">*</span></label>
                 <input type="text" id="fStudentNumber" required placeholder="เช่น 2569-EP-0001" />
               </div>
               <div class="form-group">
-                <label>สถานะ</label>
+                <label data-i18n="students.colStatus">สถานะ</label>
                 <select id="fStatus">
                   <option value="active">กำลังเรียน</option>
                   <option value="inactive">หยุดเรียน</option>
@@ -553,27 +553,27 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>ชื่อ (ไทย)</label>
+                <label data-i18n="students.fldFirstNameTh">ชื่อ (ไทย)</label>
                 <input type="text" id="fFirstNameTh" placeholder="สมชาย" />
               </div>
               <div class="form-group">
-                <label>นามสกุล (ไทย)</label>
+                <label data-i18n="students.fldLastNameTh">นามสกุล (ไทย)</label>
                 <input type="text" id="fLastNameTh" placeholder="ใจดี" />
               </div>
               <div class="form-group">
-                <label>First Name (EN)</label>
+                <label data-i18n="students.fldFirstNameEn">First Name (EN)</label>
                 <input type="text" id="fFirstNameEn" placeholder="Somchai" />
               </div>
               <div class="form-group">
-                <label>Last Name (EN)</label>
+                <label data-i18n="students.fldLastNameEn">Last Name (EN)</label>
                 <input type="text" id="fLastNameEn" placeholder="Jaidee" />
               </div>
               <div class="form-group">
-                <label>ชื่อเล่น</label>
+                <label data-i18n="students.fldNickname">ชื่อเล่น</label>
                 <input type="text" id="fNickname" placeholder="ต้น" />
               </div>
               <div class="form-group">
-                <label>เพศ</label>
+                <label data-i18n="students.fldGender">เพศ</label>
                 <select id="fGender">
                   <option value="">—</option>
                   <option value="male">ชาย</option>
@@ -582,16 +582,16 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>วันเกิด</label>
+                <label data-i18n="students.fldBirthDate">วันเกิด</label>
                 <input type="date" id="fBirthDate" />
               </div>
               <div class="form-group">
-                <label>สัญชาติ</label>
+                <label data-i18n="students.fldNationality">สัญชาติ</label>
                 <input type="text" id="fNationality" value="Thai" />
               </div>
               <div class="form-group">
-                <label>เลขบัตรประชาชน</label>
-                <input type="text" id="fNationalId" placeholder="1234567890123" maxlength="13" />
+                <label data-i18n="students.fldNationalId">เลขบัตรประชาชน / Passport</label>
+                <input type="text" id="fNationalId" placeholder="เลขบัตร 13 หลัก หรือ passport" maxlength="30" />
               </div>
               <div class="form-group">
                 <label>หมู่เลือด</label>
@@ -605,7 +605,7 @@
           </div>
 
           <div class="form-section">
-            <h4>การศึกษา</h4>
+            <h4 data-i18n="students.sectionAcademic">การศึกษา</h4>
             <div class="form-grid">
               <div class="form-group">
                 <label>หลักสูตร</label>
@@ -646,7 +646,7 @@
           </div>
 
           <div class="form-section">
-            <h4>ผู้ปกครอง #1</h4>
+            <h4 data-i18n="students.sectionParent1">ผู้ปกครอง #1</h4>
             <div class="form-grid">
               <div class="form-group">
                 <label>ชื่อ-นามสกุล</label>
@@ -1042,7 +1042,7 @@
           <td><span class="status-badge status-${s.status || 'active'}">${statusLabel(s.status)}</span></td>
           <td class="action-cell">
             <button class="btn btn-sm btn-secondary" onclick="editStudent('${s.id}')" title="แก้ไข">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}', ${JSON.stringify(s.student_number || '')})" title="ลบ">🗑️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}', ${JSON.stringify(s.student_number || '').replace(/"/g,'&quot;')})" title="ลบ">🗑️</button>
           </td>
         </tr>`;
       }).join('');

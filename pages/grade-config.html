@@ -300,7 +300,7 @@
             </div>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-sm btn-secondary" onclick="editScale('${s.id}')">✏️ ${t('common.edit')}</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteScale('${s.id}', ${JSON.stringify(s.name)})">🗑️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteScale('${s.id}', ${JSON.stringify(s.name).replace(/"/g,'&quot;')})">🗑️</button>
             </div>
           </div>
           <div class="grades-row">

@@ -217,11 +217,8 @@
     }
     
     async function loadSchool() {
-      const { data } = await supabaseClient
-        .from('school_settings')
-        .select('*')
-        .limit(1)
-        .single();
+      // Tenant-aware branding (name/logo/principal/domain of THE LOGGED-IN school) — never hardcoded SKKS
+      const { data } = await supabaseClient.rpc('get_school_branding');
       schoolSettings = data || {};
     }
     
@@ -259,7 +256,7 @@
       page.innerHTML = `
         <div class="certificate cert-${currentTemplate}" id="certElement">
           <div class="cert-content">
-            <div class="cert-logo">🌲</div>
+            <div class="cert-logo">${schoolSettings.logo_url ? `<img src="${schoolSettings.logo_url}" alt="" style="max-height:64px;max-width:140px;object-fit:contain;" />` : '🎓'}</div>
             <div class="cert-title">Certificate</div>
             <div class="cert-subtitle">${titles[type].en}</div>
             <div class="cert-presented">This certificate is proudly presented to</div>
@@ -269,15 +266,15 @@
               ${titles[type].th}<br>
               ${currentStudent.first_name} ${currentStudent.last_name} of ${(currentStudent.program||'').toUpperCase()} ${currentStudent.grade||''}<br>
               has successfully demonstrated outstanding achievement and dedication<br>
-              at ${schoolSettings.school_name || 'Suanson Khon Kaen School'}
+              at ${schoolSettings.name || schoolSettings.name_en || 'the school'}
             </div>
             <div class="cert-date">Issued on ${today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
             
             <div class="cert-signatures">
               <div class="cert-sig">
                 <div class="line"></div>
-                <div class="name">${schoolSettings.principal_name_th || 'คุณนิติธาดา สุวรรณรงค์'}</div>
-                <div class="title">${schoolSettings.principal_title_th || 'ผู้อำนวยการ'}</div>
+                <div class="name">${schoolSettings.principal || '_______________'}</div>
+                <div class="title">${schoolSettings.principal_title || 'ผู้อำนวยการ'}</div>
               </div>
               <div class="cert-sig">
                 <div class="line"></div>
@@ -296,8 +293,12 @@
         </div>
       `;
       
-      QRCode.toCanvas(document.getElementById('certQR'), 
-        `https://suansonkk.com/verify?type=cert&code=${verifyCode}`, 
+      // verify URL points to THIS school's own domain (custom domain → slug subdomain → current origin)
+      const verifyBase = schoolSettings.custom_domain
+        ? `https://${schoolSettings.custom_domain}`
+        : (schoolSettings.slug ? `https://${schoolSettings.slug}.panyaschoolkit.com` : location.origin);
+      QRCode.toCanvas(document.getElementById('certQR'),
+        `${verifyBase}/verify.html?code=${verifyCode}`,
         { width: 70, margin: 1 });
       
       window._lastVerifyCode = verifyCode;
@@ -339,7 +340,8 @@
         title: title,
         template: currentTemplate,
         qr_verification_code: window._lastVerifyCode,
-        status: 'issued'
+        status: 'issued',
+        school_id: window.CURRENT_SCHOOL_ID    // tenant isolation
       });
       
       if (error) {

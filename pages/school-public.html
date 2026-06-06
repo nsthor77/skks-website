@@ -161,9 +161,28 @@
       SCHOOL=s;
       var nm = s.name || s.name_en || '';
       document.title = nm + ' — โรงเรียน';
-      document.getElementById('navBrand').textContent = nm;
+      // apply the school's own theme color (falls back to default blue)
+      if(s.theme_color && /^#[0-9A-Fa-f]{6}$/.test(s.theme_color)){
+        var r=document.documentElement.style;
+        r.setProperty('--blue', s.theme_color);
+        r.setProperty('--blue-deep', s.theme_color);
+        r.setProperty('--blue-700', s.theme_color);
+      }
+      // nav brand: logo image if available, else school name text
+      var navB=document.getElementById('navBrand');
+      navB.innerHTML = s.logo_url
+        ? '<img src="'+esc(s.logo_url)+'" alt="'+esc(nm)+'" style="height:30px;width:auto;vertical-align:middle;" onerror="this.outerHTML='+"'"+esc(nm)+"'"+'" />'
+        : '';
+      if(!s.logo_url) navB.textContent = nm;
       document.getElementById('heroName').textContent = nm;
-      document.getElementById('heroMark').textContent = (nm[0]||'โ');
+      // hero mark: school logo if available, else first letter
+      var hm=document.getElementById('heroMark');
+      if(s.logo_url){
+        hm.style.background='#fff';
+        hm.innerHTML='<img src="'+esc(s.logo_url)+'" alt="'+esc(nm)+'" style="width:100%;height:100%;object-fit:contain;border-radius:14px;" onerror="this.parentNode.textContent='+"'"+esc((nm[0]||'โ'))+"'"+';this.parentNode.style.background='+"''"+'" />';
+      } else {
+        hm.textContent = (nm[0]||'โ');
+      }
       document.getElementById('heroMotto').textContent = s.motto || '';
       document.getElementById('footName').textContent = nm;
       if(s.about){ document.getElementById('about-sec').style.display=''; document.getElementById('aboutText').textContent=s.about; }

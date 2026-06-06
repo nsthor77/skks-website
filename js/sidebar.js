@@ -65,7 +65,7 @@
     ]},
     { label: { en: 'Settings', th: 'ตั้งค่า' }, items: [
       { href: 'payment-settings.html', tier: 'owner', en: 'Payment Settings', th: 'ตั้งค่าชำระเงิน' },
-      { href: 'custom-tables.html',    tier: 'admin', en: 'Custom Tables',    th: 'ตารางกำหนดเอง' },
+      // custom-tables.html hidden: generic table builder needs custom_tables/custom_table_rows SQL (not deployed) — errors on load. Use student/teacher Custom Fields instead.
       { href: 'users.html',            tier: 'admin', en: 'Users',            th: 'ผู้ใช้' },
       { href: 'manage-invites.html',   tier: 'admin', en: 'Invites',          th: 'คำเชิญ' },
       { href: 'school-settings.html',  tier: 'admin', en: 'School',           th: 'โรงเรียน' },

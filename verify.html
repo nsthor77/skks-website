@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ตรวจสอบใบประกาศ — Verify Certificate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--ink:#0F1A36;--muted:#5A6788;--line:#E1E7F5;--blue:#2563EB;--blue-deep:#1E3A8A;--ok:#047857;--ok-bg:#D1FAE5;--bad:#991B1B;--bad-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Sarabun',system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#EEF3FF,#fff);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .card{background:#fff;border:1px solid var(--line);border-radius:20px;max-width:480px;width:100%;padding:34px 30px;box-shadow:0 20px 50px -20px rgba(15,26,54,.25);text-align:center;}
+    h1{font-family:'Prompt';font-size:20px;margin-bottom:6px;}
+    .sub{color:var(--muted);font-size:13.5px;margin-bottom:22px;}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;font-family:'Prompt';font-weight:600;font-size:14px;margin-bottom:20px;}
+    .badge.ok{background:var(--ok-bg);color:var(--ok);}
+    .badge.bad{background:var(--bad-bg);color:var(--bad);}
+    .rows{text-align:left;border-top:1px solid var(--line);padding-top:16px;}
+    .row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #F2F5FB;font-size:14px;}
+    .row:last-child{border-bottom:none;}
+    .row .l{color:var(--muted);} .row .v{font-weight:600;text-align:right;}
+    .state{color:var(--muted);font-size:14px;padding:20px;}
+    .foot{margin-top:22px;font-size:12px;color:#9AA3B5;}
+    .foot a{color:var(--blue);text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>ตรวจสอบใบประกาศ</h1>
+    <div class="sub">Certificate Verification</div>
+    <div id="result"><div class="state">⏳ กำลังตรวจสอบ...</div></div>
+    <div class="foot">Powered by <a href="https://panyaschoolkit.com" target="_blank" rel="noopener">Panya School Kit</a></div>
+  </div>
+
+  <script>
+    var SB_URL='https://nuzhkhchimemuetoewzn.supabase.co';
+    var SB_KEY='sb_publishable_prRghlKfBE1VqrpJDZmmSA_1XifObOJ';
+    var sb=window.supabase.createClient(SB_URL,SB_KEY);
+    function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    function fmt(d){ if(!d)return'-'; try{return new Date(d).toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});}catch(e){return'-';} }
+
+    (async function(){
+      var code=new URLSearchParams(location.search).get('code')||'';
+      var box=document.getElementById('result');
+      if(!code){ box.innerHTML='<div class="badge bad">⚠️ ไม่พบรหัสใบประกาศ</div><div class="state">ลิงก์ไม่ถูกต้อง</div>'; return; }
+      try{
+        var { data, error } = await sb.rpc('verify_certificate',{ p_code: code });
+        if(error) throw error;
+        if(!data || !data.found){
+          box.innerHTML='<div class="badge bad">✕ ไม่พบใบประกาศนี้</div><div class="state">รหัสอาจไม่ถูกต้อง หรือใบประกาศถูกยกเลิก</div>';
+          return;
+        }
+        box.innerHTML=''
+          +'<div class="badge ok">✓ ใบประกาศนี้ถูกต้อง</div>'
+          +'<div class="rows">'
+          +'<div class="row"><span class="l">เลขที่</span><span class="v">'+esc(data.certificate_number)+'</span></div>'
+          +'<div class="row"><span class="l">ชื่อ</span><span class="v">'+esc(data.student_name||'-')+'</span></div>'
+          +(data.title?'<div class="row"><span class="l">รายการ</span><span class="v">'+esc(data.title)+'</span></div>':'')
+          +'<div class="row"><span class="l">โรงเรียน</span><span class="v">'+esc(data.school_name||'-')+'</span></div>'
+          +'<div class="row"><span class="l">ออกเมื่อ</span><span class="v">'+fmt(data.issued_at)+'</span></div>'
+          +'</div>';
+      }catch(e){
+        box.innerHTML='<div class="badge bad">⚠️ ตรวจสอบไม่สำเร็จ</div><div class="state">'+esc(e.message||'')+'</div>';
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -63,6 +63,7 @@
       { href: 'create-bills.html',      tier: 'owner', en: 'Bills',     th: 'ออกบิล' },
       { href: 'tuition-admin.html',     tier: 'owner', en: 'Tuition',   th: 'ค่าเทอม' },
       { href: 'finance.html',           tier: 'owner', en: 'Finance',   th: 'การเงินรวม' },
+      { href: 'budget.html',            tier: 'owner', en: 'Budget',    th: 'งบประมาณ' },
       { href: 'scholarships.html',      tier: 'owner', en: 'Scholarships', th: 'ทุนการศึกษา' }
     ]},
     { label: { en: 'Communicate', th: 'ข่าวสาร' }, items: [

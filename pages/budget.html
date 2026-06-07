@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>งบประมาณ — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:920px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;margin-bottom:16px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);} .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:5px 11px;font-size:12px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+    label.fl{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    input,select{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+    .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+    .scard{flex:1;min-width:140px;background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:14px 16px;}
+    .scard .n{font-size:22px;font-weight:800;} .scard .l{font-size:12.5px;color:var(--pk-ash);margin-top:2px;}
+    table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;overflow:hidden;}
+    th,td{padding:10px 12px;border-bottom:1px solid #EEF2F7;text-align:left;} th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;background:#F8FAFC;}
+    td.num{text-align:right;font-variant-numeric:tabular-nums;}
+    .track{height:8px;background:#EEF2F7;border-radius:4px;overflow:hidden;margin-top:4px;} .fill{height:100%;background:#10B981;} .fill.warn{background:#F59E0B;} .fill.over{background:#DC2626;}
+    .empty{text-align:center;color:var(--pk-ash);padding:30px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}input,select{font-size:16px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title"><h1>📐 งบประมาณรายหมวด</h1><p>ตั้งงบประมาณแต่ละหมวด แล้วเทียบกับรายจ่ายจริง (ดึงจากการเงินรวม)</p></div>
+
+    <div class="card">
+      <div class="row">
+        <div><label class="fl">ปีการศึกษา</label><input id="year" style="width:120px;" oninput="reload()" placeholder="2567" /></div>
+        <div style="flex:1;"></div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <div style="flex:2;min-width:180px;"><label class="fl">หมวด</label>
+          <input id="cat" list="catList" placeholder="เช่น ค่าวัสดุ" style="width:100%;" />
+          <datalist id="catList">
+            <option value="งบบุคลากร"></option><option value="งบดำเนินงาน"></option><option value="ค่าวัสดุ"></option>
+            <option value="ค่าครุภัณฑ์"></option><option value="ค่าสาธารณูปโภค"></option><option value="ค่าซ่อมบำรุง"></option>
+            <option value="กิจกรรมพัฒนาผู้เรียน"></option><option value="งบลงทุน/สิ่งก่อสร้าง"></option><option value="งบอุดหนุน"></option>
+          </datalist>
+        </div>
+        <div><label class="fl">งบประมาณ (บาท)</label><input type="number" id="amt" min="0" style="width:160px;" /></div>
+        <button class="btn btn-primary" onclick="saveBudget()">💾 ตั้งงบ</button>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="scard"><div class="n" id="sBudget">฿0</div><div class="l">งบประมาณรวม</div></div>
+      <div class="scard"><div class="n" id="sSpent" style="color:#DC2626;">฿0</div><div class="l">ใช้จริงรวม</div></div>
+      <div class="scard"><div class="n" id="sLeft" style="color:#065F46;">฿0</div><div class="l">คงเหลือรวม</div></div>
+    </div>
+
+    <div id="tbl"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let budgets = [], spentMap = {};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireOwner(); if (!prof) return;
+      try { const { data } = await supabaseClient.rpc('get_current_term'); if (data && data.year) document.getElementById('year').value = data.year; } catch(e){}
+      reload();
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function baht(n){ return '฿'+Number(n||0).toLocaleString('en-US'); }
+
+    async function reload(){
+      const year = document.getElementById('year').value.trim() || null;
+      const [b, e] = await Promise.all([
+        supabaseClient.rpc('list_budgets', { p_year: year }),
+        supabaseClient.rpc('get_expense_by_category', { p_year: year })
+      ]);
+      budgets = (b && b.data) || [];
+      spentMap = {}; ((e && e.data) || []).forEach(r => { spentMap[r.category] = Number(r.spent||0); });
+      render();
+    }
+
+    function render(){
+      // merge categories from budgets + any expense category not budgeted
+      const cats = {};
+      budgets.forEach(x => cats[x.category] = { id:x.id, category:x.category, budget:Number(x.amount||0), spent:0 });
+      Object.keys(spentMap).forEach(c => { if(!cats[c]) cats[c] = { id:null, category:c, budget:0, spent:0 }; cats[c].spent = spentMap[c]; });
+      const rows = Object.values(cats).sort((a,b)=>a.category.localeCompare(b.category,'th'));
+
+      let tB=0, tS=0;
+      const box = document.getElementById('tbl');
+      if (!rows.length) { box.innerHTML='<div class="empty">ยังไม่มีงบประมาณ — ตั้งงบด้านบน</div>'; document.getElementById('sBudget').textContent='฿0'; document.getElementById('sSpent').textContent='฿0'; document.getElementById('sLeft').textContent='฿0'; return; }
+      box.innerHTML = '<table><thead><tr><th>หมวด</th><th class="num">งบประมาณ</th><th class="num">ใช้จริง</th><th class="num">คงเหลือ</th><th style="width:150px;">ใช้ไป</th><th></th></tr></thead><tbody>'
+        + rows.map(r => {
+          tB+=r.budget; tS+=r.spent;
+          const left = r.budget - r.spent;
+          const pct = r.budget>0 ? Math.min(100, Math.round(r.spent/r.budget*100)) : (r.spent>0?100:0);
+          const cls = r.budget>0 && r.spent>r.budget ? 'over' : (pct>=80?'warn':'');
+          return `<tr>
+            <td><b>${esc(r.category)}</b>${r.id?'':' <span style="font-size:11px;color:#9AA3B5;">(ยังไม่ตั้งงบ)</span>'}</td>
+            <td class="num">${baht(r.budget)}</td>
+            <td class="num">${baht(r.spent)}</td>
+            <td class="num" style="color:${left<0?'#DC2626':'#065F46'};">${baht(left)}</td>
+            <td><div class="track"><div class="fill ${cls}" style="width:${pct}%"></div></div><span style="font-size:11px;color:var(--pk-ash);">${pct}%</span></td>
+            <td>${r.id?`<button class="btn btn-secondary btn-sm" onclick="editB('${esc(r.category)}',${r.budget})">✏️</button>
+                 <button class="btn btn-danger btn-sm" onclick="delB('${r.id}')">🗑️</button>`:`<button class="btn btn-secondary btn-sm" onclick="editB('${esc(r.category)}',0)">+ ตั้งงบ</button>`}</td>
+          </tr>`;
+        }).join('') + '</tbody></table>';
+      document.getElementById('sBudget').textContent=baht(tB);
+      document.getElementById('sSpent').textContent=baht(tS);
+      const leftTot=tB-tS; const el=document.getElementById('sLeft'); el.textContent=baht(leftTot); el.style.color=leftTot<0?'#DC2626':'#065F46';
+    }
+
+    function editB(cat, amt){ document.getElementById('cat').value=cat; document.getElementById('amt').value=amt||''; document.getElementById('amt').focus(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+    async function saveBudget(){
+      const cat=document.getElementById('cat').value.trim(); if(!cat){ toast('ใส่หมวด','error'); return; }
+      const amt=parseFloat(document.getElementById('amt').value); if(isNaN(amt)){ toast('ใส่จำนวนงบ','error'); return; }
+      const { data, error } = await supabaseClient.rpc('save_budget', { p_category:cat, p_year:document.getElementById('year').value.trim()||null, p_amount:amt, p_note:null });
+      if(error||!data||!data.success){ toast((data&&data.error)||'บันทึกไม่สำเร็จ','error'); return; }
+      toast('ตั้งงบแล้ว','success'); document.getElementById('cat').value=''; document.getElementById('amt').value=''; reload();
+    }
+    async function delB(id){ if(!confirm('ลบงบหมวดนี้?')) return;
+      const { data } = await supabaseClient.rpc('delete_budget',{p_id:id}); if(data&&data.success){ toast('ลบแล้ว','success'); reload(); } else toast('ลบไม่สำเร็จ','error'); }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2600); }
+  </script>
+</body>
+</html>

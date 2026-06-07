@@ -13,16 +13,16 @@
   <style>
     body{background:linear-gradient(135deg, #F0FDF4 0%, #DBEAFE 100%); min-height:100vh; padding-bottom:40px;}
     .parent-topbar{background:white;padding:14px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-    .parent-topbar h1{color:#1B5E3F;margin:0;font-size:18px}
+    .parent-topbar h1{color:var(--brand,#1B5E3F);margin:0;font-size:18px}
     .container{max-width:900px;margin:0 auto;padding:0 20px}
     
     .bill-card{background:white;border-radius:14px;padding:22px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 4px 12px rgba(0,0,0,0.04);flex-wrap:wrap}
     .bill-info{flex:1;min-width:220px}
-    .bill-info h3{color:#1B5E3F;margin:0 0 6px;font-size:17px}
+    .bill-info h3{color:var(--brand,#1B5E3F);margin:0 0 6px;font-size:17px}
     .bill-info .student{font-size:13px;color:#5BB8E0;font-weight:600;margin-bottom:4px}
     .bill-info .meta{font-size:12px;color:#6B7280;line-height:1.6}
     .bill-amount{text-align:right;min-width:140px}
-    .bill-amount .num{font-size:28px;font-weight:800;color:#1B5E3F;line-height:1}
+    .bill-amount .num{font-size:28px;font-weight:800;color:var(--brand,#1B5E3F);line-height:1}
     .bill-amount .unit{font-size:11px;color:#9CA3AF;letter-spacing:1px;margin-top:2px}
     .status-tag{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:1px;border-radius:6px;text-transform:uppercase}
     .s-unpaid{background:#FEE2E2;color:#991B1B}
@@ -33,12 +33,12 @@
     .pay-modal-content{max-width:700px}
     .qr-display{text-align:center;background:#F9FAFB;padding:24px;border-radius:12px;margin:14px 0}
     .qr-display img{max-width:280px;height:auto;border-radius:8px}
-    .qr-display .amount-big{font-size:36px;font-weight:800;color:#1B5E3F;margin:10px 0}
-    .bank-info{background:#F0FDF4;padding:14px 18px;border-radius:10px;border-left:4px solid #1B5E3F;margin:14px 0}
+    .qr-display .amount-big{font-size:36px;font-weight:800;color:var(--brand,#1B5E3F);margin:10px 0}
+    .bank-info{background:#F0FDF4;padding:14px 18px;border-radius:10px;border-left:4px solid var(--brand,#1B5E3F);margin:14px 0}
     .bank-info p{margin:6px 0;font-size:14px;color:#374151}
-    .bank-info strong{color:#1B5E3F}
+    .bank-info strong{color:var(--brand,#1B5E3F)}
     
-    .slip-upload-area{border:2px dashed #1B5E3F;border-radius:12px;padding:30px;text-align:center;cursor:pointer;background:#F0FDF4;transition:all 0.15s}
+    .slip-upload-area{border:2px dashed var(--brand,#1B5E3F);border-radius:12px;padding:30px;text-align:center;cursor:pointer;background:#F0FDF4;transition:all 0.15s}
     .slip-upload-area:hover{background:#DCFCE7}
     .slip-upload-area.has-file{padding:14px}
     .slip-preview{max-width:200px;max-height:200px;border-radius:8px}
@@ -74,7 +74,7 @@
     <div class="loading-state" id="loadingMsg" style="text-align:center;padding:60px;">⏳ Loading...</div>
     
     <div id="content" style="display:none;">
-      <h2 style="color:#1B5E3F; margin-bottom:6px;" data-i18n="parentBills.title">📄 บิลและการชำระเงิน</h2>
+      <h2 style="color:var(--brand,#1B5E3F); margin-bottom:6px;" data-i18n="parentBills.title">📄 บิลและการชำระเงิน</h2>
       <p style="color:#6B7280; margin-bottom:20px;" data-i18n="parentBills.subtitle">รายการบิลค้างชำระและประวัติการจ่ายเงิน</p>
 
       <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
@@ -92,15 +92,15 @@
         </div>
       </div>
 
-      <h3 style="color:#1B5E3F; margin:24px 0 12px;" data-i18n="parentBills.secToPay">⏰ บิลที่ต้องชำระ</h3>
+      <h3 style="color:var(--brand,#1B5E3F); margin:24px 0 12px;" data-i18n="parentBills.secToPay">⏰ บิลที่ต้องชำระ</h3>
       <div id="unpaidList"></div>
 
-      <h3 style="color:#1B5E3F; margin:32px 0 12px;" data-i18n="parentBills.secPaid">✅ ชำระแล้ว</h3>
+      <h3 style="color:var(--brand,#1B5E3F); margin:32px 0 12px;" data-i18n="parentBills.secPaid">✅ ชำระแล้ว</h3>
       <div id="paidList"></div>
 
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
         <div style="font-size:64px;">📭</div>
-        <h3 style="color:#1B5E3F;" data-i18n="parentBills.emptyTitle">ยังไม่มีบิล</h3>
+        <h3 style="color:var(--brand,#1B5E3F);" data-i18n="parentBills.emptyTitle">ยังไม่มีบิล</h3>
         <p data-i18n="parentBills.emptyDesc">เมื่อโรงเรียนออกบิลให้ จะปรากฏที่นี่</p>
       </div>
     </div>
@@ -109,20 +109,20 @@
   <div class="modal" id="payModal" style="display:none;">
     <div class="modal-content pay-modal-content">
       <div class="modal-header">
-        <h3 style="color:#1B5E3F; margin:0;" data-i18n="parentBills.modalPay">💳 ชำระเงิน</h3>
+        <h3 style="color:var(--brand,#1B5E3F); margin:0;" data-i18n="parentBills.modalPay">💳 ชำระเงิน</h3>
         <button class="modal-close" onclick="closePay()">×</button>
       </div>
       <div class="modal-body">
         <div id="paymentDetails"></div>
 
-        <h4 style="color:#1B5E3F; margin:20px 0 10px;" data-i18n="parentBills.uploadSlip">📤 อัปโหลดสลิป</h4>
+        <h4 style="color:var(--brand,#1B5E3F); margin:20px 0 10px;" data-i18n="parentBills.uploadSlip">📤 อัปโหลดสลิป</h4>
         <p style="font-size:13px; color:#6B7280; margin-bottom:14px;" data-i18n="parentBills.uploadHint">หลังโอนเงินแล้ว อัปโหลดสลิปที่นี่ — ครูจะตรวจสอบและส่งใบเสร็จกลับให้</p>
 
         <form id="slipForm" onsubmit="submitSlip(event)">
           <div class="slip-upload-area" id="slipUploadArea" onclick="document.getElementById('slipInput').click()">
             <div id="slipPlaceholder">
               <div style="font-size:48px;">📤</div>
-              <h4 style="margin:8px 0 4px; color:#1B5E3F;" data-i18n="parentBills.clickUpload">คลิกเพื่ออัปโหลดสลิป</h4>
+              <h4 style="margin:8px 0 4px; color:var(--brand,#1B5E3F);" data-i18n="parentBills.clickUpload">คลิกเพื่ออัปโหลดสลิป</h4>
               <p style="margin:0; font-size:12px; color:#6B7280;" data-i18n="parentBills.fileLimit">JPG, PNG — สูงสุด 5MB</p>
             </div>
             <img id="slipPreview" class="slip-preview" style="display:none;" />
@@ -314,7 +314,7 @@
       }
 
       document.getElementById('paymentDetails').innerHTML = `
-        <h4 style="color:#1B5E3F; margin:0 0 10px;">${t('parentBills.amount')}</h4>
+        <h4 style="color:var(--brand,#1B5E3F); margin:0 0 10px;">${t('parentBills.amount')}</h4>
         <div class="qr-display">
           <div class="amount-big">฿${Number(currentBill.amount).toLocaleString('en-US')}</div>
           <div style="color:#6B7280; font-size:13px;">${currentBill.description}<br>${s.first_name} ${s.last_name}</div>
@@ -322,7 +322,7 @@
         </div>
 
         <div class="bank-info">
-          <h4 style="color:#1B5E3F; margin:0 0 10px;">${t('parentBills.orBank')}</h4>
+          <h4 style="color:var(--brand,#1B5E3F); margin:0 0 10px;">${t('parentBills.orBank')}</h4>
           <p><strong>${t('parentBills.bank')}:</strong> ${paymentSettings.bank_name}</p>
           <p><strong>${t('parentBills.accountNo')}:</strong> <span style="font-family:monospace;letter-spacing:1px;font-size:16px;">${paymentSettings.account_number}</span></p>
           <p><strong>${t('parentBills.accountName')}:</strong> ${paymentSettings.account_name}</p>

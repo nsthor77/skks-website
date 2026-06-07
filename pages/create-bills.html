@@ -12,11 +12,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .bill-row{display:grid;grid-template-columns:1fr 1.5fr 1fr 1fr auto;gap:14px;align-items:center;padding:14px;background:white;border:1px solid #E5E7EB;border-radius:10px;margin-bottom:10px;transition:all 0.15s}
-    .bill-row:hover{box-shadow:0 4px 12px rgba(0,0,0,0.06);border-color:#1B5E3F}
-    .bill-num{font-family:monospace;font-size:13px;color:#1B5E3F;font-weight:700}
-    .bill-info h4{margin:0 0 4px;color:#1B5E3F;font-size:14px}
+    .bill-row:hover{box-shadow:0 4px 12px rgba(0,0,0,0.06);border-color:var(--brand,#1B5E3F)}
+    .bill-num{font-family:monospace;font-size:13px;color:var(--brand,#1B5E3F);font-weight:700}
+    .bill-info h4{margin:0 0 4px;color:var(--brand,#1B5E3F);font-size:14px}
     .bill-info p{margin:0;font-size:12px;color:#6B7280}
-    .bill-amount{text-align:right;font-size:18px;font-weight:700;color:#1B5E3F}
+    .bill-amount{text-align:right;font-size:18px;font-weight:700;color:var(--brand,#1B5E3F)}
     .bill-status{padding:4px 12px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;text-align:center}
     .status-unpaid{background:#FEE2E2;color:#991B1B}
     .status-pending{background:#FEF3C7;color:#A16207}
@@ -102,7 +102,7 @@
       
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
         <div style="font-size:64px;">📄</div>
-        <h3 style="color:#1B5E3F;">No bills yet</h3>
+        <h3 style="color:var(--brand,#1B5E3F);">No bills yet</h3>
         <p>Click "+ New Bill" to create your first bill</p>
       </div>
     </div>
@@ -111,7 +111,7 @@
   <div class="modal" id="billModal" style="display:none;">
     <div class="modal-content" style="max-width:600px;">
       <div class="modal-header">
-        <h3 id="modalTitle" style="color:#1B5E3F; margin:0;">📄 New Bill</h3>
+        <h3 id="modalTitle" style="color:var(--brand,#1B5E3F); margin:0;">📄 New Bill</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       <div class="modal-body">
@@ -194,7 +194,7 @@
   <div class="modal" id="bulkModal" style="display:none;">
     <div class="modal-content" style="max-width:600px;">
       <div class="modal-header">
-        <h3 style="color:#1B5E3F; margin:0;">📋 Bulk Create Bills</h3>
+        <h3 style="color:var(--brand,#1B5E3F); margin:0;">📋 Bulk Create Bills</h3>
         <button class="modal-close" onclick="closeBulk()">×</button>
       </div>
       <div class="modal-body">
@@ -241,7 +241,7 @@
               <input type="text" id="bulkTerm" placeholder="1/2026" />
             </div>
           </div>
-          <div id="bulkPreview" style="background:#F0FDF4; padding:14px; border-radius:8px; margin-top:14px; font-size:13px; color:#1B5E3F;">
+          <div id="bulkPreview" style="background:#F0FDF4; padding:14px; border-radius:8px; margin-top:14px; font-size:13px; color:var(--brand,#1B5E3F);">
             <strong>Will create:</strong> <span id="bulkCount">0</span> bills
           </div>
           <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">

@@ -15,13 +15,13 @@
     .side-menu{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:14px;height:fit-content;position:sticky;top:80px}
     .side-menu a{display:block;padding:10px 12px;color:#374151;text-decoration:none;border-radius:8px;font-size:13px;margin-bottom:4px;cursor:pointer}
     .side-menu a:hover{background:#F9FAFB}
-    .side-menu a.active{background:#1B5E3F;color:white}
+    .side-menu a.active{background:var(--brand,#1B5E3F);color:white}
     .setting-section{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:24px;margin-bottom:18px;display:none}
     .setting-section.active{display:block}
-    .setting-section h3{color:#1B5E3F;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid #1B5E3F;font-size:17px}
+    .setting-section h3{color:var(--brand,#1B5E3F);margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--brand,#1B5E3F);font-size:17px}
     .line-card{background:#F9FAFB;border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid #E5E7EB}
     .line-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px}
-    .line-card-header h4{margin:0;color:#1B5E3F;font-size:14px}
+    .line-card-header h4{margin:0;color:var(--brand,#1B5E3F);font-size:14px}
     .line-card-desc{font-size:12px;color:#6B7280;margin-bottom:10px}
     .line-template{background:white;padding:10px;border-radius:6px;font-size:12px;color:#374151;font-family:monospace;border:1px solid #E5E7EB;margin-bottom:10px}
     .switch{position:relative;display:inline-block;width:48px;height:24px}
@@ -161,11 +161,11 @@
           <div class="setting-section" id="tab-line">
             <h3>📱 LINE Notify Settings</h3>
             <p style="font-size:13px;color:#6B7280;background:#FEF3C7;padding:14px;border-radius:8px;margin-bottom:18px;">
-              💡 LINE Notify ส่ง notification ฟรีให้ผู้ปกครอง — ตั้งค่า token ที่ <a href="https://notify-bot.line.me" target="_blank" style="color:#1B5E3F;font-weight:600;">notify-bot.line.me</a>
+              💡 LINE Notify ส่ง notification ฟรีให้ผู้ปกครอง — ตั้งค่า token ที่ <a href="https://notify-bot.line.me" target="_blank" style="color:var(--brand,#1B5E3F);font-weight:600;">notify-bot.line.me</a>
             </p>
             
-            <div class="form-group" style="background:#F0FDF4;padding:14px;border-radius:10px;border:1px solid #1B5E3F;margin-bottom:18px;">
-              <label style="font-weight:700;color:#1B5E3F;">🔑 LINE Notify Token (Global)</label>
+            <div class="form-group" style="background:#F0FDF4;padding:14px;border-radius:10px;border:1px solid var(--brand,#1B5E3F);margin-bottom:18px;">
+              <label style="font-weight:700;color:var(--brand,#1B5E3F);">🔑 LINE Notify Token (Global)</label>
               <input type="text" id="lineGlobalToken" placeholder="kxXXXXXXXXXXXXXXXXXXXX" style="font-family:monospace;" />
               <p style="font-size:11px;color:#6B7280;margin-top:6px;">หาได้ที่ notify-bot.line.me → My Page → Generate Token</p>
             </div>
@@ -176,7 +176,7 @@
           <div class="setting-section" id="tab-payment">
             <h3>💳 Payment Account</h3>
             <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">
-              ตั้งค่าบัญชีสำหรับรับชำระเงิน — <a href="payment-settings.html" style="color:#1B5E3F;font-weight:600;">ไปที่ Payment Settings →</a>
+              ตั้งค่าบัญชีสำหรับรับชำระเงิน — <a href="payment-settings.html" style="color:var(--brand,#1B5E3F);font-weight:600;">ไปที่ Payment Settings →</a>
             </p>
           </div>
         </div>

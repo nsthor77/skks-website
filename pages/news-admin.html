@@ -13,20 +13,20 @@
   <style>
     .news-card-admin{background:white;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;transition:all 0.2s;display:flex;gap:0}
     .news-card-admin:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px)}
-    .news-thumb{width:200px;height:140px;background:linear-gradient(135deg,#1B5E3F,#4A90B8);display:flex;align-items:center;justify-content:center;font-size:48px;color:white;flex-shrink:0;position:relative;overflow:hidden}
+    .news-thumb{width:200px;height:140px;background:linear-gradient(135deg,var(--brand,#1B5E3F),#4A90B8);display:flex;align-items:center;justify-content:center;font-size:48px;color:white;flex-shrink:0;position:relative;overflow:hidden}
     .news-thumb img{width:100%;height:100%;object-fit:cover}
     .news-info{padding:18px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
-    .news-info h3{color:#1B5E3F;margin:0 0 6px;font-size:17px}
+    .news-info h3{color:var(--brand,#1B5E3F);margin:0 0 6px;font-size:17px}
     .news-info .meta{font-size:12px;color:#6B7280;margin-bottom:8px}
     .news-info p{font-size:13px;color:#374151;line-height:1.5;margin-bottom:12px}
     .news-actions{display:flex;gap:8px;align-items:center}
-    .badge-tag{background:#1B5E3F;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:600;letter-spacing:1px}
+    .badge-tag{background:var(--brand,#1B5E3F);color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:600;letter-spacing:1px}
     .badge-featured{background:#F59E0B;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:600;letter-spacing:1px}
     .badge-draft{background:#9CA3AF;color:white;padding:3px 10px;font-size:10px;border-radius:4px;font-weight:600;letter-spacing:1px}
     
     .upload-area{border:2px dashed #D1D5DB;border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all 0.15s;background:#F9FAFB}
-    .upload-area:hover{border-color:#1B5E3F;background:#F0FDF4}
-    .upload-area.drag{border-color:#1B5E3F;background:#ECFDF5}
+    .upload-area:hover{border-color:var(--brand,#1B5E3F);background:#F0FDF4}
+    .upload-area.drag{border-color:var(--brand,#1B5E3F);background:#ECFDF5}
     .upload-area .icon{font-size:36px;margin-bottom:8px}
     .upload-area p{margin:0;font-size:13px;color:#6B7280}
     .preview-image{max-width:100%;max-height:240px;border-radius:8px;margin-top:12px;display:block}
@@ -101,7 +101,7 @@
       
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px; color:#6B7280;">
         <div style="font-size:64px; margin-bottom:14px;">📭</div>
-        <h3 style="color:#1B5E3F;">No news articles yet</h3>
+        <h3 style="color:var(--brand,#1B5E3F);">No news articles yet</h3>
         <p>Click "+ New Article" to create your first news</p>
       </div>
     </div>
@@ -110,14 +110,14 @@
   <div class="modal" id="newsModal" style="display:none;">
     <div class="modal-content" style="max-width:760px;">
       <div class="modal-header">
-        <h3 id="modalTitle" style="color:#1B5E3F; margin:0;">📰 New Article</h3>
+        <h3 id="modalTitle" style="color:var(--brand,#1B5E3F); margin:0;">📰 New Article</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       <div class="modal-body">
         <form id="newsForm" onsubmit="saveNews(event)">
           <input type="hidden" id="newsId" />
           
-          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin-bottom:14px;">
+          <div class="form-section-title" style="font-size:15px; color:var(--brand,#1B5E3F); padding-bottom:8px; border-bottom:2px solid var(--brand,#1B5E3F); margin-bottom:14px;">
             📸 Featured Image
           </div>
           
@@ -130,7 +130,7 @@
           <img id="imagePreview" class="preview-image" style="display:none;" />
           <input type="hidden" id="newsImageUrl" />
           
-          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+          <div class="form-section-title" style="font-size:15px; color:var(--brand,#1B5E3F); padding-bottom:8px; border-bottom:2px solid var(--brand,#1B5E3F); margin:20px 0 14px;">
             🇬🇧 English Content
           </div>
           
@@ -149,7 +149,7 @@
             <textarea id="newsContent" rows="5" placeholder="Full article content"></textarea>
           </div>
           
-          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+          <div class="form-section-title" style="font-size:15px; color:var(--brand,#1B5E3F); padding-bottom:8px; border-bottom:2px solid var(--brand,#1B5E3F); margin:20px 0 14px;">
             🇹🇭 Thai Content (Optional)
           </div>
           
@@ -163,7 +163,7 @@
             <textarea id="newsExcerptTh" rows="2" maxlength="200" placeholder="คำโปรยภาษาไทย"></textarea>
           </div>
           
-          <div class="form-section-title" style="font-size:15px; color:#1B5E3F; padding-bottom:8px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+          <div class="form-section-title" style="font-size:15px; color:var(--brand,#1B5E3F); padding-bottom:8px; border-bottom:2px solid var(--brand,#1B5E3F); margin:20px 0 14px;">
             ⚙️ Settings
           </div>
           

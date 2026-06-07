@@ -123,6 +123,14 @@ module.exports = async (req, res) => {
       try { await supabaseAdmin.from('waitlist').update({ status: 'converted' }).eq('id', b.waitlistId); } catch (e) {}
     }
 
+    // best-effort: register the default {slug}.panyaschoolkit.com with Vercel so it gets SSL
+    // automatically (DNS wildcard already resolves; Vercel needs each subdomain added to issue a cert).
+    // Avoids the risky NS migration (#66) — no effect on email/marketing DNS.
+    let subdomainResult = null;
+    try {
+      subdomainResult = await addDomainToVercel(slug + '.panyaschoolkit.com');
+    } catch (e) { subdomainResult = { ok: false, error: e.message }; }
+
     // ---- 5) optional custom domain (set in DB + register with Vercel, auto SSL) ----
     let customDomain = null;
     let domainResult = null;
@@ -151,7 +159,8 @@ module.exports = async (req, res) => {
       comp: billing.comp,
       discount_percent: billing.discount_percent,
       custom_domain: customDomain,
-      domain: domainResult
+      domain: domainResult,
+      subdomain: subdomainResult
     });
   } catch (err) {
     console.error('[admin/create-school] error', err);

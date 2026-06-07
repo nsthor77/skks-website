@@ -9,20 +9,20 @@
   <link rel="icon" type="image/png" href="../images/logo.png" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    .ai-card{background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);border:1px solid #1B5E3F;border-radius:14px;padding:20px;margin-bottom:18px}
-    .ai-card h3{color:#1B5E3F;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+    .ai-card{background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);border:1px solid var(--brand,#1B5E3F);border-radius:14px;padding:20px;margin-bottom:18px}
+    .ai-card h3{color:var(--brand,#1B5E3F);margin:0 0 10px;display:flex;align-items:center;gap:8px}
     
     .grader-layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}
     @media(max-width:900px){.grader-layout{grid-template-columns:1fr}}
     
     .panel{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:20px}
-    .panel h3{color:#1B5E3F;margin:0 0 14px;font-size:16px;padding-bottom:8px;border-bottom:2px solid #1B5E3F}
+    .panel h3{color:var(--brand,#1B5E3F);margin:0 0 14px;font-size:16px;padding-bottom:8px;border-bottom:2px solid var(--brand,#1B5E3F)}
     
     .answer-key{background:#F9FAFB;padding:14px;border-radius:8px;font-family:monospace;font-size:13px;line-height:1.8;white-space:pre-wrap;min-height:120px}
     
     .results-list{max-height:500px;overflow-y:auto}
-    .result-item{background:#F9FAFB;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid #1B5E3F}
-    .result-item .score{font-size:20px;font-weight:800;color:#1B5E3F}
+    .result-item{background:#F9FAFB;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid var(--brand,#1B5E3F)}
+    .result-item .score{font-size:20px;font-weight:800;color:var(--brand,#1B5E3F)}
     .result-item .name{font-weight:700;color:#374151;margin-bottom:4px}
     .result-item .breakdown{font-size:11px;color:#6B7280;margin-top:4px}
     
@@ -300,7 +300,7 @@
             </div>
             <div style="text-align:right;">
               <div class="score">${r.score}/${r.maxScore}</div>
-              <div style="font-size:14px;color:#1B5E3F;font-weight:700;">${r.percent}%</div>
+              <div style="font-size:14px;color:var(--brand,#1B5E3F);font-weight:700;">${r.percent}%</div>
             </div>
           </div>
         </div>

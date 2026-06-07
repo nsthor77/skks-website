@@ -10,11 +10,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+    @media(max-width:560px){.summary{grid-template-columns:1fr}}
     .sum-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center}
     .sum-card.unpaid{border-color:#EF4444;background:#FEF2F2}
     .sum-card.paid{border-color:#10B981;background:#F0FDF4}
     .sum-card.pending{border-color:#F59E0B;background:#FEF3C7}
-    .sum-num{font-size:24px;font-weight:800;color:#1B5E3F}
+    .sum-num{font-size:24px;font-weight:800;color:var(--brand,#1B5E3F)}
     .sum-card.unpaid .sum-num{color:#991B1B}
     .sum-card.paid .sum-num{color:#15803D}
     .sum-card.pending .sum-num{color:#A16207}
@@ -25,15 +26,15 @@
     .bill-card.paid{border-left:4px solid #10B981}
     .bill-card.pending{border-left:4px solid #F59E0B}
     .bill-info{flex:1}
-    .bill-title{font-weight:700;color:#1B5E3F;font-size:15px;margin-bottom:4px}
+    .bill-title{font-weight:700;color:var(--brand,#1B5E3F);font-size:15px;margin-bottom:4px}
     .bill-meta{font-size:11px;color:#6B7280}
-    .bill-amount{font-size:22px;font-weight:800;color:#1B5E3F}
+    .bill-amount{font-size:22px;font-weight:800;color:var(--brand,#1B5E3F)}
     .bill-status{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
     .status-unpaid{background:#FEE2E2;color:#991B1B}
     .status-paid{background:#DCFCE7;color:#15803D}
     .status-pending{background:#FEF3C7;color:#A16207}
     
-    .pay-btn{padding:10px 20px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+    .pay-btn{padding:10px 20px;background:linear-gradient(135deg,var(--brand,#1B5E3F),#5BB8E0);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
   </style>
 </head>
 <body>

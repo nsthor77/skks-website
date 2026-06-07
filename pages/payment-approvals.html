@@ -12,13 +12,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .slip-card{background:white;border:1px solid #E5E7EB;border-radius:14px;padding:18px;display:grid;grid-template-columns:140px 1fr auto;gap:18px;align-items:center;margin-bottom:14px;transition:all 0.2s}
-    .slip-card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.08);border-color:#1B5E3F}
+    .slip-card:hover{box-shadow:0 6px 18px rgba(0,0,0,0.08);border-color:var(--brand,#1B5E3F)}
     .slip-thumb{width:140px;height:140px;background:#F9FAFB;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;border:1px solid #E5E7EB}
     .slip-thumb img{width:100%;height:100%;object-fit:cover}
-    .slip-info h3{color:#1B5E3F;margin:0 0 6px;font-size:16px}
+    .slip-info h3{color:var(--brand,#1B5E3F);margin:0 0 6px;font-size:16px}
     .slip-info .student{font-size:13px;color:#374151;margin-bottom:4px}
     .slip-info .bill-ref{font-size:12px;color:#9CA3AF;font-family:monospace;margin-bottom:8px}
-    .slip-info .amount{font-size:24px;font-weight:800;color:#1B5E3F;margin:4px 0}
+    .slip-info .amount{font-size:24px;font-weight:800;color:var(--brand,#1B5E3F);margin:4px 0}
     .slip-info .meta{font-size:12px;color:#6B7280;line-height:1.6}
     .slip-actions{display:flex;flex-direction:column;gap:8px;min-width:120px}
     .status-pending{background:#FEF3C7;color:#A16207;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px}
@@ -29,7 +29,7 @@
     .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
     .lightbox.show{display:flex}
     .lightbox img{max-width:90%;max-height:90vh;border-radius:8px}
-    .lightbox-close{position:absolute;top:20px;right:30px;background:white;color:#1B5E3F;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;font-weight:700}
+    .lightbox-close{position:absolute;top:20px;right:30px;background:white;color:var(--brand,#1B5E3F);border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;font-weight:700}
   </style>
 </head>
 <body>
@@ -102,7 +102,7 @@
       
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
         <div style="font-size:64px;">📭</div>
-        <h3 style="color:#1B5E3F;">No slips to review</h3>
+        <h3 style="color:var(--brand,#1B5E3F);">No slips to review</h3>
         <p>เมื่อผู้ปกครองอัปสลิป จะปรากฏที่นี่</p>
       </div>
     </div>

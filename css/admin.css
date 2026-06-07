@@ -505,6 +505,10 @@ table.data-table tr:last-child td {
   .admin-nav { display: none; }
   .page-header { flex-direction: column; align-items: flex-start; }
   .card { padding: 16px; }
+  /* iOS auto-zooms when focusing a <16px field — force 16px on touch screens */
+  input, select, textarea { font-size: 16px !important; }
+  /* comfortable tap targets for small/icon action buttons */
+  .btn-sm { min-height: 40px; min-width: 40px; padding: 8px 12px; }
 }
 
 /* ============ PRINT ============ */

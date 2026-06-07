@@ -12,16 +12,16 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .setting-card{background:white;border:1px solid #E5E7EB;border-radius:14px;padding:28px;margin-bottom:20px}
-    .setting-card h3{color:#1B5E3F;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid #1B5E3F;font-size:17px}
+    .setting-card h3{color:var(--brand,#1B5E3F);margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--brand,#1B5E3F);font-size:17px}
     .qr-preview-area{background:#F9FAFB;border:2px dashed #D1D5DB;border-radius:12px;padding:24px;text-align:center;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s}
-    .qr-preview-area:hover{border-color:#1B5E3F;background:#F0FDF4}
+    .qr-preview-area:hover{border-color:var(--brand,#1B5E3F);background:#F0FDF4}
     .qr-preview-area img{max-width:280px;max-height:280px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
     .qr-preview-area .icon{font-size:64px;color:#9CA3AF;margin-bottom:12px}
-    .qr-preview-area h4{color:#1B5E3F;margin:8px 0;font-size:16px}
+    .qr-preview-area h4{color:var(--brand,#1B5E3F);margin:8px 0;font-size:16px}
     .qr-preview-area p{margin:0;color:#6B7280;font-size:13px}
     .info-box{background:#EFF6FF;border-left:4px solid #5BB8E0;padding:16px;border-radius:8px;margin-bottom:20px}
     .info-box .ic{font-size:24px;margin-bottom:6px}
-    .info-box h4{color:#1B5E3F;margin:0 0 6px;font-size:15px}
+    .info-box h4{color:var(--brand,#1B5E3F);margin:0 0 6px;font-size:15px}
     .info-box p{margin:0;font-size:13px;color:#374151;line-height:1.6}
     .layout-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
     @media(max-width:900px){.layout-grid{grid-template-columns:1fr}}
@@ -151,8 +151,8 @@
               <input type="hidden" id="qrCodeUrl" />
             </div>
             
-            <div class="setting-card" style="background:#F0FDF4; border-color:#1B5E3F;">
-              <h3 style="color:#1B5E3F;">📋 วิธีรับ QR Code</h3>
+            <div class="setting-card" style="background:#F0FDF4; border-color:var(--brand,#1B5E3F);">
+              <h3 style="color:var(--brand,#1B5E3F);">📋 วิธีรับ QR Code</h3>
               <ol style="margin:0; padding-left:20px; line-height:1.8; font-size:13px; color:#374151;">
                 <li>เปิดแอปธนาคารของบัญชีโรงเรียน</li>
                 <li>เมนู <strong>"PromptPay"</strong> หรือ <strong>"QR รับเงิน"</strong></li>
@@ -160,7 +160,7 @@
                 <li>กด <strong>บันทึก/Share</strong> เป็นรูป</li>
                 <li>มาที่หน้านี้ → คลิกอัปโหลด</li>
               </ol>
-              <p style="margin-top:12px; font-size:12px; color:#1B5E3F; font-weight:600;">
+              <p style="margin-top:12px; font-size:12px; color:var(--brand,#1B5E3F); font-weight:600;">
                 💡 ตอนนี้ใช้ Placeholder ก่อน — ค่อยอัปจริงตอนพร้อม
               </p>
             </div>

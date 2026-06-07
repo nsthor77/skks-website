@@ -15,21 +15,21 @@
     .import-container{display:grid;grid-template-columns:1fr 1.5fr;gap:24px;margin-top:20px}
     @media(max-width:900px){.import-container{grid-template-columns:1fr}}
     .step-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:24px;margin-bottom:16px}
-    .step-card h3{color:#1B5E3F;margin:0 0 12px;display:flex;align-items:center;gap:10px}
-    .step-num{display:inline-flex;width:28px;height:28px;background:#1B5E3F;color:white;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+    .step-card h3{color:var(--brand,#1B5E3F);margin:0 0 12px;display:flex;align-items:center;gap:10px}
+    .step-num{display:inline-flex;width:28px;height:28px;background:var(--brand,#1B5E3F);color:white;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:14px}
     
     .download-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#2D7551;color:white;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;border:none;cursor:pointer;transition:all 0.15s;font-family:inherit}
-    .download-btn:hover{background:#1B5E3F;transform:translateY(-1px);color:white}
+    .download-btn:hover{background:var(--brand,#1B5E3F);transform:translateY(-1px);color:white}
     
     .upload-zone{border:2px dashed #D1D5DB;border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.15s;background:#F9FAFB}
-    .upload-zone:hover{border-color:#1B5E3F;background:#F0FDF4}
-    .upload-zone.drag{border-color:#1B5E3F;background:#ECFDF5;border-style:solid}
+    .upload-zone:hover{border-color:var(--brand,#1B5E3F);background:#F0FDF4}
+    .upload-zone.drag{border-color:var(--brand,#1B5E3F);background:#ECFDF5;border-style:solid}
     .upload-zone .big-icon{font-size:54px;margin-bottom:12px}
-    .upload-zone h4{margin:0 0 6px;color:#1B5E3F;font-size:16px}
+    .upload-zone h4{margin:0 0 6px;color:var(--brand,#1B5E3F);font-size:16px}
     .upload-zone p{margin:0;font-size:13px;color:#6B7280}
     
     .preview-table{width:100%;border-collapse:collapse;font-size:12px;background:white;border-radius:8px;overflow:hidden;border:1px solid #E5E7EB}
-    .preview-table th{background:#F0FDF4;color:#1B5E3F;padding:10px 8px;text-align:left;font-weight:600;border-bottom:2px solid #1B5E3F;position:sticky;top:0;white-space:nowrap}
+    .preview-table th{background:#F0FDF4;color:var(--brand,#1B5E3F);padding:10px 8px;text-align:left;font-weight:600;border-bottom:2px solid var(--brand,#1B5E3F);position:sticky;top:0;white-space:nowrap}
     .preview-table td{padding:8px;border-bottom:1px solid #F3F4F6;font-size:12px;vertical-align:top}
     .preview-table tr.invalid td{background:#FEF2F2}
     .preview-table tr.valid td{background:#F0FDF4}
@@ -46,7 +46,7 @@
     .stat-pill.green{border-color:#10B981;background:#ECFDF5}
     .stat-pill.red{border-color:#EF4444;background:#FEF2F2}
     .stat-pill.gray{border-color:#9CA3AF;background:#F9FAFB}
-    .stat-pill .num{font-size:24px;font-weight:700;color:#1B5E3F;display:block}
+    .stat-pill .num{font-size:24px;font-weight:700;color:var(--brand,#1B5E3F);display:block}
     .stat-pill.green .num{color:#10B981}
     .stat-pill.red .num{color:#EF4444}
     .stat-pill .lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px;display:block}
@@ -54,7 +54,7 @@
     .scroll-table{max-height:400px;overflow-y:auto;overflow-x:auto;border-radius:8px;border:1px solid #E5E7EB}
     
     .progress-bar{height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden;margin:12px 0}
-    .progress-fill{height:100%;background:#1B5E3F;transition:width 0.3s}
+    .progress-fill{height:100%;background:var(--brand,#1B5E3F);transition:width 0.3s}
   </style>
 </head>
 <body>
@@ -225,7 +225,7 @@
             <div id="resultMessage" style="background:#ECFDF5;padding:16px;border-radius:8px;color:#065F46;margin-bottom:16px;line-height:1.6;">
             </div>
             <div style="display:flex;gap:10px;">
-              <a href="applications.html" class="btn btn-primary" style="background:#1B5E3F;">📝 View Applications</a>
+              <a href="applications.html" class="btn btn-primary" style="background:var(--brand,#1B5E3F);">📝 View Applications</a>
               <button class="btn btn-secondary" onclick="resetImport()">📥 Import More</button>
             </div>
           </div>

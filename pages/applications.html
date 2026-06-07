@@ -498,7 +498,7 @@
       const programs = { prek: 'Pre-Kindergarten', k: 'Kindergarten', ep: 'English Program (EP)', mep: 'Mini English Program (MEP)' };
       
       document.getElementById('enrollSummary').innerHTML = `
-        <strong style="color:#1B5E3F; font-size:15px;">${fullName}${nick}</strong><br>
+        <strong style="color:var(--brand,#1B5E3F); font-size:15px;">${fullName}${nick}</strong><br>
         <span style="color:#6B7280; font-size:12px;">App #: ${app.application_number}</span><br>
         <div style="margin-top:8px; font-size:13px;">
           <strong>Program:</strong> ${programs[app.program] || app.program}<br>
@@ -621,7 +621,7 @@
   <div class="modal" id="enrollModal" style="display:none;">
     <div class="modal-content" style="max-width:560px;">
       <div class="modal-header" style="border-bottom:1px solid #E5E7EB; padding-bottom:16px;">
-        <h3 style="margin:0; color:#1B5E3F;">🎓 Enroll as Student</h3>
+        <h3 style="margin:0; color:var(--brand,#1B5E3F);">🎓 Enroll as Student</h3>
         <button class="modal-close" onclick="closeEnrollModal()">×</button>
       </div>
       <div class="modal-body" style="padding:20px 0;">

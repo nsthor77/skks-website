@@ -12,8 +12,8 @@
     body{font-family:'Sarabun',sans-serif;background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);min-height:100vh;display:flex;flex-direction:column}
     
     .header{background:white;padding:14px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;gap:12px}
-    .header .avatar{width:42px;height:42px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
-    .header h1{color:#1B5E3F;font-size:18px;margin:0}
+    .header .avatar{width:42px;height:42px;background:linear-gradient(135deg,var(--brand,#1B5E3F),#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+    .header h1{color:var(--brand,#1B5E3F);font-size:18px;margin:0}
     .header .status{font-size:12px;color:#10B981;display:flex;align-items:center;gap:4px;margin-top:2px}
     .header .status::before{content:'';width:8px;height:8px;background:#10B981;border-radius:50%}
     
@@ -22,10 +22,10 @@
     .msg{display:flex;gap:10px;max-width:80%}
     .msg.user{align-self:flex-end;flex-direction:row-reverse}
     .msg-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-    .msg.ai .msg-avatar{background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white}
+    .msg.ai .msg-avatar{background:linear-gradient(135deg,var(--brand,#1B5E3F),#5BB8E0);color:white}
     .msg.user .msg-avatar{background:#E5E7EB;color:#374151}
     .msg-content{background:white;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6;color:#374151;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
-    .msg.user .msg-content{background:#1B5E3F;color:white}
+    .msg.user .msg-content{background:var(--brand,#1B5E3F);color:white}
     .msg-time{font-size:10px;color:#9CA3AF;margin-top:4px}
     
     .typing{display:flex;gap:4px;padding:4px}
@@ -37,13 +37,13 @@
     .input-bar{background:white;padding:14px 20px;box-shadow:0 -2px 8px rgba(0,0,0,0.06)}
     .input-wrap{max-width:800px;margin:0 auto;display:flex;gap:10px}
     .input-wrap input{flex:1;padding:12px 16px;border:2px solid #E5E7EB;border-radius:24px;font-size:14px;outline:none;font-family:'Sarabun',sans-serif}
-    .input-wrap input:focus{border-color:#1B5E3F}
-    .input-wrap button{padding:12px 24px;background:#1B5E3F;color:white;border:none;border-radius:24px;font-weight:700;cursor:pointer;font-size:14px}
+    .input-wrap input:focus{border-color:var(--brand,#1B5E3F)}
+    .input-wrap button{padding:12px 24px;background:var(--brand,#1B5E3F);color:white;border:none;border-radius:24px;font-weight:700;cursor:pointer;font-size:14px}
     .input-wrap button:hover{background:#0F2A3F}
     
     .suggestions{display:flex;gap:8px;padding:10px 20px 0;flex-wrap:wrap;max-width:800px;margin:0 auto;width:100%}
-    .suggestion{padding:8px 14px;background:white;border:1px solid #1B5E3F;color:#1B5E3F;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.15s}
-    .suggestion:hover{background:#1B5E3F;color:white}
+    .suggestion{padding:8px 14px;background:white;border:1px solid var(--brand,#1B5E3F);color:var(--brand,#1B5E3F);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.15s}
+    .suggestion:hover{background:var(--brand,#1B5E3F);color:white}
   </style>
   <script src="../js/i18n.js"></script>
 </head>
@@ -98,11 +98,11 @@
     const knowledge = {
       tuition: {
         keywords: ['ค่าเทอม','ค่าเรียน','tuition','ราคา','เงิน','จ่าย','ค่าสมัคร'],
-        answer: '💰 <strong>ค่าเทอม SKKS</strong><br><br>• Pre-Kindergarten: ฿28,000 / เทอม<br>• Kindergarten: ฿32,000 / เทอม<br>• EP (English Program): ฿45,000 / เทอม<br>• MEP (Mini EP): ฿35,000 / เทอม<br><br>📌 <strong>ค่าใช้จ่ายอื่นๆ:</strong><br>• ค่าสมัคร: ฿1,500 (ครั้งเดียว)<br>• ค่าอาหารกลางวัน: ฿3,500/เดือน<br>• ค่ารถรับ-ส่ง: ฿2,500/เดือน<br>• ค่าหนังสือ: ฿5,000/ปี<br><br>ดูรายละเอียดเพิ่มเติม: <a href="../index.html#admissions" style="color:#1B5E3F;">หน้ารับสมัคร →</a>'
+        answer: '💰 <strong>ค่าเทอม SKKS</strong><br><br>• Pre-Kindergarten: ฿28,000 / เทอม<br>• Kindergarten: ฿32,000 / เทอม<br>• EP (English Program): ฿45,000 / เทอม<br>• MEP (Mini EP): ฿35,000 / เทอม<br><br>📌 <strong>ค่าใช้จ่ายอื่นๆ:</strong><br>• ค่าสมัคร: ฿1,500 (ครั้งเดียว)<br>• ค่าอาหารกลางวัน: ฿3,500/เดือน<br>• ค่ารถรับ-ส่ง: ฿2,500/เดือน<br>• ค่าหนังสือ: ฿5,000/ปี<br><br>ดูรายละเอียดเพิ่มเติม: <a href="../index.html#admissions" style="color:var(--brand,#1B5E3F);">หน้ารับสมัคร →</a>'
       },
       admission: {
         keywords: ['สมัคร','รับสมัคร','admission','apply','enroll'],
-        answer: '📝 <strong>ขั้นตอนการสมัคร</strong><br><br>1. กรอกใบสมัครออนไลน์<br>2. นัดเยี่ยมชมโรงเรียน<br>3. สอบสัมภาษณ์ + วัดระดับ<br>4. ชำระค่าสมัคร ฿1,500<br>5. รอผลภายใน 7 วัน<br><br>📌 <strong>เอกสารที่ต้องใช้:</strong><br>• สำเนาทะเบียนบ้าน<br>• สำเนาสูติบัตร<br>• รูปถ่าย 1 นิ้ว 2 ใบ<br>• ใบเกรดเดิม (ถ้ามี)<br><br>สมัครออนไลน์: <a href="../admissions.html" style="color:#1B5E3F;">คลิกที่นี่ →</a>'
+        answer: '📝 <strong>ขั้นตอนการสมัคร</strong><br><br>1. กรอกใบสมัครออนไลน์<br>2. นัดเยี่ยมชมโรงเรียน<br>3. สอบสัมภาษณ์ + วัดระดับ<br>4. ชำระค่าสมัคร ฿1,500<br>5. รอผลภายใน 7 วัน<br><br>📌 <strong>เอกสารที่ต้องใช้:</strong><br>• สำเนาทะเบียนบ้าน<br>• สำเนาสูติบัตร<br>• รูปถ่าย 1 นิ้ว 2 ใบ<br>• ใบเกรดเดิม (ถ้ามี)<br><br>สมัครออนไลน์: <a href="../admissions.html" style="color:var(--brand,#1B5E3F);">คลิกที่นี่ →</a>'
       },
       ep: {
         keywords: ['ep','english program','สองภาษา','bilingual'],
@@ -118,7 +118,7 @@
       },
       holiday: {
         keywords: ['หยุด','วันหยุด','holiday','ปิดเทอม'],
-        answer: '📅 <strong>ปฏิทินวันหยุด 2026</strong><br><br>🌸 <strong>ปิดเทอม 1:</strong> ตุลาคม 2026<br>🌺 <strong>ปิดเทอม 2:</strong> มีนาคม-เมษายน 2026<br><br>📌 <strong>วันหยุดสำคัญ:</strong><br>• สงกรานต์: 13-15 เมษายน<br>• วันแม่: 12 สิงหาคม<br>• วันพ่อ: 5 ธันวาคม<br>• ปีใหม่: 31 ธ.ค. - 2 ม.ค.<br><br>ดูปฏิทินเต็ม: <a href="../index.html#events" style="color:#1B5E3F;">หน้าหลัก →</a>'
+        answer: '📅 <strong>ปฏิทินวันหยุด 2026</strong><br><br>🌸 <strong>ปิดเทอม 1:</strong> ตุลาคม 2026<br>🌺 <strong>ปิดเทอม 2:</strong> มีนาคม-เมษายน 2026<br><br>📌 <strong>วันหยุดสำคัญ:</strong><br>• สงกรานต์: 13-15 เมษายน<br>• วันแม่: 12 สิงหาคม<br>• วันพ่อ: 5 ธันวาคม<br>• ปีใหม่: 31 ธ.ค. - 2 ม.ค.<br><br>ดูปฏิทินเต็ม: <a href="../index.html#events" style="color:var(--brand,#1B5E3F);">หน้าหลัก →</a>'
       },
       contact: {
         keywords: ['ติดต่อ','contact','โทร','phone','email'],

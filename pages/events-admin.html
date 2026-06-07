@@ -12,13 +12,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .event-card{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:18px;display:flex;gap:18px;transition:all 0.2s;align-items:center;flex-wrap:wrap}
-    .event-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px);border-color:#1B5E3F}
-    .event-date{text-align:center;background:#F0FDF4;border:1px solid #1B5E3F;border-radius:10px;padding:14px 18px;min-width:90px;position:relative}
-    .event-date::before{content:'';position:absolute;top:0;left:14px;right:14px;height:3px;background:#1B5E3F}
-    .event-date .day{font-size:32px;font-weight:800;color:#1B5E3F;line-height:1;display:block}
+    .event-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px);border-color:var(--brand,#1B5E3F)}
+    .event-date{text-align:center;background:#F0FDF4;border:1px solid var(--brand,#1B5E3F);border-radius:10px;padding:14px 18px;min-width:90px;position:relative}
+    .event-date::before{content:'';position:absolute;top:0;left:14px;right:14px;height:3px;background:var(--brand,#1B5E3F)}
+    .event-date .day{font-size:32px;font-weight:800;color:var(--brand,#1B5E3F);line-height:1;display:block}
     .event-date .month{font-size:11px;color:#374151;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-top:4px;display:block}
     .event-info{flex:1;min-width:280px}
-    .event-info h3{color:#1B5E3F;margin:0 0 6px;font-size:17px}
+    .event-info h3{color:var(--brand,#1B5E3F);margin:0 0 6px;font-size:17px}
     .event-info .meta{font-size:12px;color:#6B7280;margin-bottom:8px}
     .event-info .desc{font-size:13px;color:#374151;line-height:1.6}
     .event-icon-display{font-size:48px;min-width:60px;text-align:center}
@@ -92,7 +92,7 @@
       
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
         <div style="font-size:64px;">📅</div>
-        <h3 style="color:#1B5E3F;">No events yet</h3>
+        <h3 style="color:var(--brand,#1B5E3F);">No events yet</h3>
         <p>Click "+ New Event" to create your first event</p>
       </div>
     </div>
@@ -101,14 +101,14 @@
   <div class="modal" id="eventModal" style="display:none;">
     <div class="modal-content" style="max-width:680px;">
       <div class="modal-header">
-        <h3 id="modalTitle" style="color:#1B5E3F; margin:0;">📅 New Event</h3>
+        <h3 id="modalTitle" style="color:var(--brand,#1B5E3F); margin:0;">📅 New Event</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       <div class="modal-body">
         <form id="eventForm" onsubmit="saveEvent(event)">
           <input type="hidden" id="eventId" />
           
-          <div class="form-section-title" style="font-size:14px; color:#1B5E3F; padding-bottom:6px; border-bottom:2px solid #1B5E3F; margin-bottom:14px;">
+          <div class="form-section-title" style="font-size:14px; color:var(--brand,#1B5E3F); padding-bottom:6px; border-bottom:2px solid var(--brand,#1B5E3F); margin-bottom:14px;">
             🇬🇧 English
           </div>
           
@@ -122,7 +122,7 @@
             <textarea id="evDesc" rows="3" placeholder="Brief description of the event"></textarea>
           </div>
           
-          <div class="form-section-title" style="font-size:14px; color:#1B5E3F; padding-bottom:6px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+          <div class="form-section-title" style="font-size:14px; color:var(--brand,#1B5E3F); padding-bottom:6px; border-bottom:2px solid var(--brand,#1B5E3F); margin:20px 0 14px;">
             🇹🇭 Thai (Optional)
           </div>
           
@@ -136,7 +136,7 @@
             <textarea id="evDescTh" rows="3"></textarea>
           </div>
           
-          <div class="form-section-title" style="font-size:14px; color:#1B5E3F; padding-bottom:6px; border-bottom:2px solid #1B5E3F; margin:20px 0 14px;">
+          <div class="form-section-title" style="font-size:14px; color:var(--brand,#1B5E3F); padding-bottom:6px; border-bottom:2px solid var(--brand,#1B5E3F); margin:20px 0 14px;">
             📍 Details
           </div>
           

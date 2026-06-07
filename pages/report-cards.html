@@ -13,36 +13,36 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     @media print{.admin-topbar,.page-header,.action-bar{display:none!important}.report-card{box-shadow:none!important;page-break-after:always}}
-    .report-card{background:white;border:2px solid #1B5E3F;border-radius:14px;padding:30px;margin-bottom:20px;font-family:'Sarabun',sans-serif;position:relative;max-width:800px;margin:0 auto 20px}
-    .rc-header{display:flex;align-items:center;gap:18px;border-bottom:3px solid #1B5E3F;padding-bottom:18px;margin-bottom:20px}
-    .rc-logo{width:80px;height:80px;background:linear-gradient(135deg,#1B5E3F,#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px}
-    .rc-school h2{color:#1B5E3F;margin:0;font-size:22px;font-weight:800}
+    .report-card{background:white;border:2px solid var(--brand,#1B5E3F);border-radius:14px;padding:30px;margin-bottom:20px;font-family:'Sarabun',sans-serif;position:relative;max-width:800px;margin:0 auto 20px}
+    .rc-header{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--brand,#1B5E3F);padding-bottom:18px;margin-bottom:20px}
+    .rc-logo{width:80px;height:80px;background:linear-gradient(135deg,var(--brand,#1B5E3F),#5BB8E0);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px}
+    .rc-school h2{color:var(--brand,#1B5E3F);margin:0;font-size:22px;font-weight:800}
     .rc-school p{margin:4px 0 0;color:#6B7280;font-size:13px;line-height:1.4}
-    .rc-title{text-align:center;background:#F0FDF4;color:#1B5E3F;padding:10px;border-radius:8px;margin-bottom:18px;font-weight:700;font-size:15px;letter-spacing:1px}
+    .rc-title{text-align:center;background:#F0FDF4;color:var(--brand,#1B5E3F);padding:10px;border-radius:8px;margin-bottom:18px;font-weight:700;font-size:15px;letter-spacing:1px}
     .rc-info{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;font-size:13px}
     .rc-info-row{display:flex;border-bottom:1px solid #E5E7EB;padding:8px 0}
     .rc-info-row .label{color:#6B7280;width:120px;font-weight:600}
-    .rc-info-row .value{color:#1B5E3F;font-weight:700;flex:1}
+    .rc-info-row .value{color:var(--brand,#1B5E3F);font-weight:700;flex:1}
     .rc-grades{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px}
-    .rc-grades th{background:#1B5E3F;color:white;padding:10px 8px;text-align:left;font-size:11px;letter-spacing:1px}
+    .rc-grades th{background:var(--brand,#1B5E3F);color:white;padding:10px 8px;text-align:left;font-size:11px;letter-spacing:1px}
     .rc-grades th:not(:first-child){text-align:center}
     .rc-grades td{padding:8px;border-bottom:1px solid #E5E7EB}
     .rc-grades td:not(:first-child){text-align:center}
     .rc-grades tr:nth-child(even){background:#F9FAFB}
-    .rc-grades .total-row{background:#F0FDF4;font-weight:800;color:#1B5E3F}
+    .rc-grades .total-row{background:#F0FDF4;font-weight:800;color:var(--brand,#1B5E3F)}
     .rc-grade-A{color:#15803D;font-weight:800}
     .rc-grade-B{color:#1E40AF;font-weight:800}
     .rc-grade-C{color:#A16207;font-weight:800}
     .rc-grade-D{color:#C2410C;font-weight:800}
     .rc-grade-F{color:#991B1B;font-weight:800}
     .rc-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
-    .rc-stat{background:#F0FDF4;padding:12px;border-radius:8px;text-align:center;border:1px solid #1B5E3F}
-    .rc-stat .label{font-size:10px;color:#1B5E3F;text-transform:uppercase;letter-spacing:1px;font-weight:700}
-    .rc-stat .value{font-size:22px;font-weight:800;color:#1B5E3F;margin-top:4px}
+    .rc-stat{background:#F0FDF4;padding:12px;border-radius:8px;text-align:center;border:1px solid var(--brand,#1B5E3F)}
+    .rc-stat .label{font-size:10px;color:var(--brand,#1B5E3F);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .rc-stat .value{font-size:22px;font-weight:800;color:var(--brand,#1B5E3F);margin-top:4px}
     .rc-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;padding-top:18px;border-top:2px solid #E5E7EB}
     .rc-signature{text-align:center}
-    .rc-signature .line{border-bottom:1px solid #1B5E3F;width:200px;margin:30px auto 6px}
-    .rc-signature .name{font-weight:700;color:#1B5E3F;font-size:13px}
+    .rc-signature .line{border-bottom:1px solid var(--brand,#1B5E3F);width:200px;margin:30px auto 6px}
+    .rc-signature .name{font-weight:700;color:var(--brand,#1B5E3F);font-size:13px}
     .rc-signature .title{color:#6B7280;font-size:11px;margin-top:2px}
     .rc-qr{text-align:center}
     .rc-qr canvas{border-radius:4px}
@@ -105,7 +105,7 @@
       <div id="reportContainer">
         <div style="text-align:center;padding:60px 20px;color:#6B7280;">
           <div style="font-size:64px;">📄</div>
-          <h3 style="color:#1B5E3F;">เลือกนักเรียนเพื่อดูใบเกรด</h3>
+          <h3 style="color:var(--brand,#1B5E3F);">เลือกนักเรียนเพื่อดูใบเกรด</h3>
         </div>
       </div>
     </div>
@@ -223,7 +223,7 @@
             </div>
             <div style="text-align:right;font-size:11px;color:#6B7280;">
               <div>Report No.</div>
-              <div style="font-family:monospace;color:#1B5E3F;font-weight:800;font-size:14px;">${reportNum}</div>
+              <div style="font-family:monospace;color:var(--brand,#1B5E3F);font-weight:800;font-size:14px;">${reportNum}</div>
             </div>
           </div>
           
@@ -246,7 +246,7 @@
             </div>
           </div>
           
-          <h3 style="color:#1B5E3F; margin:0 0 10px;">📊 Academic Performance</h3>
+          <h3 style="color:var(--brand,#1B5E3F); margin:0 0 10px;">📊 Academic Performance</h3>
           
           <table class="rc-grades">
             <thead>
@@ -285,7 +285,7 @@
               <div class="label">Credits</div>
               <div class="value">${totalCredits.toFixed(1)}</div>
             </div>
-            <div class="rc-stat" style="background:#1B5E3F;color:white;border:none;">
+            <div class="rc-stat" style="background:var(--brand,#1B5E3F);color:white;border:none;">
               <div class="label" style="color:white;">Term GPA</div>
               <div class="value" style="color:white;">${totalGPA}</div>
             </div>

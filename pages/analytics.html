@@ -13,13 +13,13 @@
   <style>
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
     .stat-box{background:white;border-radius:12px;padding:18px;border:1px solid #E5E7EB;position:relative;overflow:hidden}
-    .stat-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:#1B5E3F}
+    .stat-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand,#1B5E3F)}
     .stat-box.blue::before{background:#5BB8E0}
     .stat-box.amber::before{background:#F59E0B}
     .stat-box.purple::before{background:#7F77DD}
     .stat-box.coral::before{background:#D85A30}
     .stat-icon{font-size:24px;margin-bottom:6px}
-    .stat-num{font-size:28px;font-weight:800;color:#1B5E3F;line-height:1.1}
+    .stat-num{font-size:28px;font-weight:800;color:var(--brand,#1B5E3F);line-height:1.1}
     .stat-lbl{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:600}
     .stat-trend{font-size:11px;margin-top:6px;display:inline-block;padding:2px 8px;border-radius:4px;font-weight:600}
     .trend-up{background:#DCFCE7;color:#15803D}
@@ -35,11 +35,11 @@
       .stat-num{font-size:24px}
     }
     .chart-card{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:20px}
-    .chart-card h3{color:#1B5E3F;margin:0 0 14px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+    .chart-card h3{color:var(--brand,#1B5E3F);margin:0 0 14px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
     .chart-wrap{position:relative;height:280px}
     
-    .insight-card{background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);border-radius:12px;padding:18px;border:1px solid #1B5E3F;margin-bottom:18px}
-    .insight-card h3{color:#1B5E3F;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+    .insight-card{background:linear-gradient(135deg,#F0FDF4 0%,#DBEAFE 100%);border-radius:12px;padding:18px;border:1px solid var(--brand,#1B5E3F);margin-bottom:18px}
+    .insight-card h3{color:var(--brand,#1B5E3F);margin:0 0 10px;display:flex;align-items:center;gap:8px}
     .insight-list{list-style:none;padding:0;margin:0;font-size:13px;color:#374151;line-height:1.8}
     .insight-list li::before{content:'💡 ';margin-right:4px}
   </style>

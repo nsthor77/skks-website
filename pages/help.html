@@ -55,6 +55,30 @@
     .empty{text-align:center;padding:40px;color:var(--pk-mist);}
     .foot{text-align:center;color:var(--pk-mist);font-size:12px;padding:18px;}
     @media(max-width:560px){ .tab{min-width:0;flex-basis:calc(50% - 4px);} .wrap{padding:16px;} .search{min-width:120px;} }
+
+    /* print-only document header (hidden on screen) */
+    #printHead{display:none;}
+
+    /* ============ PRINT — clean handout ============ */
+    @media print{
+      @page{ margin:16mm 14mm; }
+      .topbar,.tabs,.foot,#search,.lang-btn,.topbar-right{ display:none !important; }
+      body{ background:#fff; color:#000; font-size:12pt; }
+      .wrap{ max-width:100%; padding:0; margin:0; }
+      .hero{ display:none; }
+      #printHead{ display:block; border-bottom:2px solid #1E40AF; padding-bottom:8px; margin-bottom:14px; }
+      #printHead h1{ font-size:18pt; color:#1E40AF; margin-bottom:2px; }
+      #printHead .ph-sub{ font-size:10pt; color:#444; }
+      #printHead .ph-line{ font-size:9.5pt; color:#666; margin-top:6px; }
+      .sec{ border:1px solid #C7CDD9; border-radius:8px; box-shadow:none; padding:12px 14px; margin-bottom:9px;
+            break-inside:avoid; page-break-inside:avoid; }
+      .sec h2{ color:#1E40AF; font-size:13.5pt; }
+      .sec h3{ font-size:11.5pt; }
+      .sec p,.sec li{ font-size:11pt; color:#111; }
+      .tip,.warn{ border:1px solid #CBD5E1; color:#222 !important; background:#F8FAFC !important; }
+      .sec code{ background:#EEF2F9; color:#1E3A8A; }
+      a[href]:after{ content:""; }  /* don't print raw URLs */
+    }
   </style>
 </head>
 <body>
@@ -65,6 +89,7 @@
     </div>
     <div class="topbar-right">
       <input class="search" id="search" placeholder="🔍 ค้นหา..." oninput="render()" />
+      <button class="lang-btn" id="printBtn" onclick="printGuide()" title="พิมพ์ / Print">🖨️</button>
       <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
     </div>
   </div>
@@ -73,6 +98,12 @@
     <div class="hero">
       <h1 id="heroTitle">📖 คู่มือการใช้งาน</h1>
       <p id="heroSub">เลือกบทบาทของคุณด้านล่าง — คู่มือจะแสดงเฉพาะสิ่งที่เกี่ยวกับคุณ</p>
+    </div>
+
+    <div id="printHead">
+      <h1 id="phTitle">คู่มือการใช้งาน PanyaSchoolKit</h1>
+      <div class="ph-sub" id="phSub"></div>
+      <div class="ph-line">โรงเรียน / School: ________________________________     วันที่ / Date: ______________</div>
     </div>
 
     <div class="tabs" id="tabs"></div>
@@ -350,7 +381,15 @@
       return '<section class="sec"><h2>'+s.icon+' '+c.t+'</h2>'+c.b+'</section>';
     }).join('');
     document.getElementById('content').innerHTML = html || '<div class="empty">'+L(UI.noResult)+'</div>';
+    setPrintHead();
   }
+
+  function setPrintHead(){
+    var tab = TABS.filter(function(t){ return t.id===activeTab; })[0];
+    document.getElementById('phTitle').textContent = (lang==='th'?'คู่มือการใช้งาน PanyaSchoolKit':'PanyaSchoolKit User Guide');
+    document.getElementById('phSub').textContent = (lang==='th'?'สำหรับ: ':'For: ') + (tab? L(tab.nm) : '');
+  }
+  function printGuide(){ window.print(); }
 
   function applyUI(){
     document.documentElement.lang = lang;

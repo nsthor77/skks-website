@@ -33,6 +33,9 @@
     { label: { en: 'People', th: 'บุคลากร' }, items: [
       { href: 'students.html',    tier: 'teacher', en: 'Students',     th: 'นักเรียน' },
       { href: 'health.html',      tier: 'teacher', en: 'Health',       th: 'ห้องพยาบาล' },
+      { href: 'sdq.html',         tier: 'teacher', en: 'SDQ',          th: 'ประเมิน SDQ' },
+      { href: 'poverty.html',     tier: 'teacher', en: 'Poverty Screen', th: 'คัดกรองยากจน' },
+      { href: 'home-visit.html',  tier: 'teacher', en: 'Home Visit',   th: 'เยี่ยมบ้าน' },
       { href: 'teachers.html',    tier: 'admin',   en: 'Teachers',     th: 'ครู' },
       { href: 'applications.html',tier: 'admin',   en: 'Applications', th: 'ใบสมัคร' },
       { href: 'id-cards.html',    tier: 'admin',   en: 'ID Cards',     th: 'บัตรนักเรียน' },

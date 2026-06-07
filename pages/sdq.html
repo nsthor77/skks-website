@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SDQ แบบประเมินจุดแข็งจุดอ่อน — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:900px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;margin-bottom:16px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 12px;font-size:12px;} .btn[disabled]{opacity:.5;cursor:not-allowed;}
+    label.fl{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    input,select{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+    .q{display:flex;gap:12px;align-items:flex-start;padding:9px 4px;border-bottom:1px solid #F1F5F9;font-size:13.5px;}
+    .q .n{font-weight:700;color:var(--pk-ash);min-width:22px;}
+    .q .txt{flex:1;line-height:1.5;}
+    .q .opts{display:flex;gap:4px;flex-shrink:0;}
+    .q .opts label{font-size:11px;padding:5px 8px;border:1px solid var(--pk-border);border-radius:7px;cursor:pointer;text-align:center;min-width:54px;user-select:none;}
+    .q .opts input{display:none;}
+    .q .opts input:checked + span{font-weight:700;}
+    .q .opts label:has(input:checked){background:var(--pk-blue-50);border-color:var(--pk-blue-800);color:var(--pk-blue-800);}
+    .scorebar{position:sticky;bottom:0;background:#0F1A36;color:#fff;border-radius:12px;padding:14px 18px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 6px 20px rgba(0,0,0,.18);}
+    .scorebar .sc{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;}
+    .scorebar .sc b{font-size:18px;}
+    .badge{padding:4px 12px;border-radius:20px;font-weight:700;font-size:13px;}
+    .b-ok{background:#D1FAE5;color:#065F46;} .b-risk{background:#FEF3C7;color:#92400E;} .b-bad{background:#FEE2E2;color:#991B1B;}
+    table.hist{width:100%;border-collapse:collapse;font-size:13px;} table.hist th,table.hist td{padding:8px;border-bottom:1px solid #EEF2F7;text-align:left;}
+    table.hist th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;}
+    .empty{color:var(--pk-ash);font-size:13px;padding:10px 0;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}
+    .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}input,select{font-size:16px;}.q{flex-wrap:wrap;}.q .opts{width:100%;justify-content:flex-start;margin-top:4px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title">
+      <h1>🧩 SDQ — แบบประเมินจุดแข็งและจุดอ่อน</h1>
+      <p>เครื่องมือคัดกรองพฤติกรรมเด็ก (กรมสุขภาพจิต) 25 ข้อ · ใช้ในระบบดูแลช่วยเหลือนักเรียน · คิดคะแนน + แปลผลอัตโนมัติ</p>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div style="flex:2;min-width:200px;"><label class="fl">นักเรียน</label>
+          <select id="student" onchange="loadHistory()" style="width:100%;"><option value="">— เลือกนักเรียน —</option></select>
+        </div>
+        <div><label class="fl">ผู้ประเมิน</label>
+          <select id="version" onchange="rescore()">
+            <option value="teacher">ครู</option>
+            <option value="parent">ผู้ปกครอง</option>
+            <option value="self">นักเรียน (ตนเอง)</option>
+          </select>
+        </div>
+        <div><label class="fl">ชื่อผู้ประเมิน</label><input id="assessor" placeholder="ชื่อ-สกุล" style="width:150px;" /></div>
+        <div><label class="fl">วันที่ประเมิน</label><input type="date" id="adate" /></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:12.5px;color:var(--pk-ash);margin-bottom:8px;">ในช่วง 6 เดือนที่ผ่านมา — เลือกระดับที่ตรงที่สุดของแต่ละข้อ</div>
+      <div id="items"></div>
+    </div>
+
+    <div class="scorebar">
+      <div class="sc">
+        <span>อารมณ์ <b id="sE">0</b></span>
+        <span>เกเร <b id="sC">0</b></span>
+        <span>สมาธิสั้น <b id="sH">0</b></span>
+        <span>เพื่อน <b id="sP">0</b></span>
+        <span>คะแนนรวมปัญหา <b id="sTotal">0</b>/40</span>
+        <span>จุดแข็ง <b id="sPro">0</b>/10</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="overall" class="badge b-ok">—</span>
+        <span style="font-size:12px;opacity:.8;" id="answeredHint">ตอบ 0/25</span>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveSdq()">💾 บันทึกผล</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h2 style="font-size:15px;font-weight:700;margin-bottom:8px;">📋 ประวัติการประเมินของนักเรียนคนนี้</h2>
+      <div id="hist"><div class="empty">เลือกนักเรียนเพื่อดูประวัติ</div></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    // 25 standard SDQ items (observer phrasing). sub: E/C/H/P/Pro
+    const ITEMS = [
+      {n:1, sub:'Pro', t:'ห่วงใยความรู้สึกของผู้อื่น'},
+      {n:2, sub:'H',   t:'อยู่ไม่นิ่ง นั่งนิ่งๆ ไม่ค่อยได้'},
+      {n:3, sub:'E',   t:'มักบ่นปวดศีรษะ ปวดท้อง หรือไม่สบาย'},
+      {n:4, sub:'Pro', t:'เต็มใจแบ่งปันสิ่งของให้เพื่อน (ขนม ของเล่น ดินสอ)'},
+      {n:5, sub:'C',   t:'มักอาละวาด หรือโมโหร้าย'},
+      {n:6, sub:'P',   t:'ค่อนข้างแยกตัว ชอบเล่นคนเดียว'},
+      {n:7, sub:'C',   t:'เชื่อฟัง มักทำตามที่ผู้ใหญ่บอก'},
+      {n:8, sub:'E',   t:'กังวลใจหลายเรื่อง ดูวิตกกังวลเสมอ'},
+      {n:9, sub:'Pro', t:'ชอบช่วยเหลือถ้ามีใครเจ็บ ไม่สบายใจ หรือเจ็บป่วย'},
+      {n:10,sub:'H',   t:'อยู่ไม่สุข ขยุกขยิกอยู่ตลอดเวลา'},
+      {n:11,sub:'P',   t:'มีเพื่อนสนิทอย่างน้อยหนึ่งคน'},
+      {n:12,sub:'C',   t:'มักมีเรื่องทะเลาะวิวาท หรือรังแกผู้อื่น'},
+      {n:13,sub:'E',   t:'ดูไม่มีความสุข ท้อแท้ ร้องไห้บ่อย'},
+      {n:14,sub:'P',   t:'เป็นที่ชื่นชอบของเพื่อนๆ'},
+      {n:15,sub:'H',   t:'วอกแวกง่าย สมาธิสั้น'},
+      {n:16,sub:'E',   t:'เครียด ไม่ยอมห่างผู้ใหญ่ที่คุ้นเคย ขาดความมั่นใจ'},
+      {n:17,sub:'Pro', t:'ใจดีกับเด็กที่เล็กกว่า'},
+      {n:18,sub:'C',   t:'ชอบโกหก หรือขี้โกง'},
+      {n:19,sub:'P',   t:'ถูกเด็กอื่นล้อเลียน หรือรังแก'},
+      {n:20,sub:'Pro', t:'ชอบอาสาช่วยเหลือผู้อื่น (พ่อแม่ ครู เด็กอื่น)'},
+      {n:21,sub:'H',   t:'คิดก่อนทำ'},
+      {n:22,sub:'C',   t:'ขโมยของที่บ้าน ที่โรงเรียน หรือที่อื่น'},
+      {n:23,sub:'P',   t:'เข้ากับผู้ใหญ่ได้ดีกว่าเด็กวัยเดียวกัน'},
+      {n:24,sub:'E',   t:'ขี้กลัว รู้สึกหวาดกลัวง่าย'},
+      {n:25,sub:'H',   t:'ทำงานได้จนเสร็จ มีความตั้งใจในการทำงาน'}
+    ];
+    const REVERSE = new Set([7,11,14,21,25]); // 0/1/2 -> 2/1/0
+    const SUBNAME = {E:'อารมณ์', C:'เกเร', H:'สมาธิสั้น', P:'เพื่อน', Pro:'จุดแข็ง'};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireTeacher();
+      if (!prof) return;
+      document.getElementById('adate').valueAsDate = new Date();
+      if (prof.first_name || prof.last_name) document.getElementById('assessor').value = ((prof.first_name||'')+' '+(prof.last_name||'')).trim();
+      renderItems();
+      await loadStudents();
+    });
+
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    async function loadStudents() {
+      let all=[], from=0; const size=1000;
+      while(true){
+        const { data, error } = await supabaseClient.from('students').select('id,first_name_th,last_name_th,grade,classroom,status').range(from,from+size-1);
+        if(error) break;
+        all=all.concat(data||[]); if(!data||data.length<size) break; from+=size; if(from>20000) break;
+      }
+      all = all.filter(s => !s.status || s.status==='active')
+        .sort((a,b)=>((a.grade||'')+(a.classroom||'')).localeCompare((b.grade||'')+(b.classroom||''),'th',{numeric:true}));
+      const sel = document.getElementById('student');
+      sel.insertAdjacentHTML('beforeend', all.map(s =>
+        `<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))} · ${esc(s.grade||'')}${s.classroom?('/'+esc(s.classroom)):''}</option>`).join(''));
+    }
+
+    function renderItems() {
+      document.getElementById('items').innerHTML = ITEMS.map(it => `
+        <div class="q">
+          <span class="n">${it.n}</span>
+          <span class="txt">${esc(it.t)}</span>
+          <span class="opts">
+            <label><input type="radio" name="q${it.n}" value="0" onchange="rescore()"><span>ไม่จริง</span></label>
+            <label><input type="radio" name="q${it.n}" value="1" onchange="rescore()"><span>ค่อนข้างจริง</span></label>
+            <label><input type="radio" name="q${it.n}" value="2" onchange="rescore()"><span>จริง</span></label>
+          </span>
+        </div>`).join('');
+    }
+
+    function getVal(n){ const el=document.querySelector(`input[name="q${n}"]:checked`); return el?parseInt(el.value,10):null; }
+
+    function computeScores() {
+      const sub={E:0,C:0,H:0,P:0,Pro:0}; let answered=0;
+      ITEMS.forEach(it=>{
+        const v=getVal(it.n); if(v==null) return; answered++;
+        sub[it.sub] += REVERSE.has(it.n) ? (2-v) : v;
+      });
+      return {emotional:sub.E,conduct:sub.C,hyperactivity:sub.H,peer:sub.P,prosocial:sub.Pro,total:sub.E+sub.C+sub.H+sub.P,answered};
+    }
+    function interpret(sc, version) {
+      const self = version==='self';
+      const total = sc.total<=15 ? 'ปกติ' : (self ? (sc.total<=19?'เสี่ยง':'มีปัญหา') : (sc.total<=17?'เสี่ยง':'มีปัญหา'));
+      const prosocial = sc.prosocial>=6 ? 'ปกติ' : (sc.prosocial===5 ? 'เสี่ยง' : 'ควรพัฒนา');
+      return {total, prosocial, overall: total};
+    }
+    function badgeClass(label){ return label==='ปกติ'?'b-ok':(label==='เสี่ยง'?'b-risk':'b-bad'); }
+
+    function rescore() {
+      const sc = computeScores();
+      document.getElementById('sE').textContent=sc.emotional;
+      document.getElementById('sC').textContent=sc.conduct;
+      document.getElementById('sH').textContent=sc.hyperactivity;
+      document.getElementById('sP').textContent=sc.peer;
+      document.getElementById('sTotal').textContent=sc.total;
+      document.getElementById('sPro').textContent=sc.prosocial;
+      document.getElementById('answeredHint').textContent='ตอบ '+sc.answered+'/25';
+      const ip = interpret(sc, document.getElementById('version').value);
+      const ov = document.getElementById('overall');
+      ov.textContent = sc.answered<25 ? '(ตอบยังไม่ครบ)' : ip.overall;
+      ov.className = 'badge ' + (sc.answered<25 ? 'b-risk' : badgeClass(ip.overall));
+    }
+
+    async function saveSdq() {
+      const sid = document.getElementById('student').value;
+      if (!sid) { toast('เลือกนักเรียนก่อน','error'); return; }
+      const sc = computeScores();
+      if (sc.answered < 25) { toast('กรุณาตอบให้ครบ 25 ข้อ','error'); return; }
+      const version = document.getElementById('version').value;
+      const answers={}; ITEMS.forEach(it=>answers[it.n]=getVal(it.n));
+      const btn=document.getElementById('saveBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
+      const { data, error } = await supabaseClient.rpc('save_sdq', {
+        p_id:null, p_student_id:sid, p_version:version, p_assessor_name:document.getElementById('assessor').value.trim()||null,
+        p_answers:answers, p_scores:sc, p_interpretation:interpret(sc,version),
+        p_year:null, p_term:null, p_assessed_on:document.getElementById('adate').value||null, p_note:null
+      });
+      btn.disabled=false; btn.textContent=old;
+      if (error || !data || !data.success) { toast((data&&data.error)||(error&&error.message)||'บันทึกไม่สำเร็จ','error'); return; }
+      toast('บันทึกผล SDQ แล้ว','success');
+      clearForm();
+      loadHistory();
+    }
+    function clearForm(){ ITEMS.forEach(it=>{ const el=document.querySelector(`input[name="q${it.n}"]:checked`); if(el) el.checked=false; }); rescore(); }
+
+    const VNAME={self:'นักเรียน',teacher:'ครู',parent:'ผู้ปกครอง'};
+    async function loadHistory() {
+      const sid = document.getElementById('student').value;
+      const box = document.getElementById('hist');
+      if (!sid) { box.innerHTML='<div class="empty">เลือกนักเรียนเพื่อดูประวัติ</div>'; return; }
+      const { data, error } = await supabaseClient.rpc('get_sdq', { p_student_id: sid });
+      if (error) { box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      if (!data || !data.length) { box.innerHTML='<div class="empty">ยังไม่เคยประเมิน</div>'; return; }
+      box.innerHTML = `<table class="hist"><thead><tr><th>วันที่</th><th>ผู้ประเมิน</th><th>รวมปัญหา</th><th>จุดแข็ง</th><th>ผล</th><th></th></tr></thead><tbody>`
+        + data.map(r => {
+          const ov=(r.interpretation&&r.interpretation.overall)||'-';
+          return `<tr>
+            <td>${new Date(r.assessed_on).toLocaleDateString('th-TH')}</td>
+            <td>${VNAME[r.version]||r.version} ${r.assessor_name?('· '+esc(r.assessor_name)):''}</td>
+            <td>${(r.scores&&r.scores.total)??'-'}/40</td>
+            <td>${(r.scores&&r.scores.prosocial)??'-'}/10</td>
+            <td><span class="badge ${badgeClass(ov)}">${esc(ov)}</span></td>
+            <td><button class="btn btn-danger btn-sm" onclick="delSdq('${r.id}')">ลบ</button></td>
+          </tr>`;
+        }).join('') + '</tbody></table>';
+    }
+    async function delSdq(id){
+      if(!confirm('ลบผลการประเมินนี้?')) return;
+      const { data } = await supabaseClient.rpc('delete_sdq', { p_id:id });
+      if(data&&data.success){ toast('ลบแล้ว','success'); loadHistory(); } else toast('ลบไม่สำเร็จ','error');
+    }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2600); }
+  </script>
+</body>
+</html>

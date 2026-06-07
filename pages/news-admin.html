@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>News Management — SKKS</title>
+  <title>News Management — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -171,7 +171,7 @@
             <div class="form-group">
               <label>Tag</label>
               <select id="newsTag">
-                <option value="SKKS">SKKS</option>
+                <option value="News">News</option>
                 <option value="Featured">Featured</option>
                 <option value="Update">Update</option>
                 <option value="Admissions">Admissions</option>
@@ -276,7 +276,7 @@
           <div class="news-info">
             <div>
               <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
-                <span class="badge-tag">${n.tag || 'SKKS'}</span>
+                <span class="badge-tag">${n.tag || 'News'}</span>
                 ${n.featured ? '<span class="badge-featured">⭐ FEATURED</span>' : ''}
                 ${!n.published ? '<span class="badge-draft">📝 DRAFT</span>' : ''}
               </div>
@@ -319,7 +319,7 @@
       document.getElementById('newsExcerpt').value = news.excerpt || '';
       document.getElementById('newsExcerptTh').value = news.excerpt_th || '';
       document.getElementById('newsContent').value = news.content || '';
-      document.getElementById('newsTag').value = news.tag || 'SKKS';
+      document.getElementById('newsTag').value = news.tag || 'News';
       document.getElementById('newsDate').value = news.publish_date || '';
       document.getElementById('newsFeatured').checked = !!news.featured;
       document.getElementById('newsPublished').checked = !!news.published;

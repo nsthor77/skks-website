@@ -66,6 +66,7 @@
     ]},
     { label: { en: 'Communicate', th: 'ข่าวสาร' }, items: [
       { href: 'announcements.html',tier: 'admin', en: 'Announcements', th: 'ประกาศ' },
+      { href: 'consent-admin.html',tier: 'teacher', en: 'Consent Forms', th: 'หนังสือขออนุญาต' },
       { href: 'messages.html',     tier: 'teacher', en: 'Messages', th: 'ข้อความ' },
       { href: 'events-admin.html', tier: 'admin', en: 'Events', th: 'กิจกรรม' },
       { href: 'news-admin.html',   tier: 'admin', en: 'News',   th: 'ข่าว' }
@@ -95,6 +96,7 @@
       { href: 'my-attendance.html',     en: 'Attendance', th: 'เช็คชื่อ' }
     ]},
     { label: { en: 'General', th: 'ทั่วไป' }, items: [
+      { href: 'my-consent.html',      en: 'Consent Forms', th: 'หนังสือขออนุญาต' },
       { href: 'leave-requests.html',  en: 'Leave',        th: 'ขอลา' },
       { href: 'library.html',         en: 'Library',      th: 'ห้องสมุด' },
       { href: 'health.html',          en: 'Health',       th: 'สุขภาพ' },

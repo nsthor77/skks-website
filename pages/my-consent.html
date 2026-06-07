@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>หนังสือถึงผู้ปกครอง — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:760px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;margin-bottom:16px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:18px 20px;margin-bottom:14px;}
+    .card.done{border-left:4px solid #10B981;}
+    .card h3{font-size:16px;font-weight:700;} .card .body{font-size:14px;color:var(--pk-ink);margin-top:8px;line-height:1.65;white-space:pre-wrap;}
+    .for{font-size:13px;color:var(--pk-ash);margin-top:8px;} .for b{color:var(--pk-ink);}
+    .resprow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:14px;padding-top:14px;border-top:1px solid #EEF2F7;}
+    label.fl{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    input,select{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .btn{padding:10px 18px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;}
+    .btn-ok{background:#065F46;color:#fff;} .btn-no{background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;} .btn-ack{background:var(--pk-blue-800);color:#fff;}
+    .badge{padding:4px 12px;border-radius:20px;font-weight:700;font-size:13px;}
+    .b-ap{background:#D1FAE5;color:#065F46;}.b-de{background:#FEE2E2;color:#991B1B;}.b-ac{background:#DBEAFE;color:#1E40AF;}
+    .deadline{font-size:12.5px;color:#92400E;background:#FFFBEB;border:1px solid #FDE68A;border-radius:7px;padding:3px 9px;display:inline-block;margin-top:8px;}
+    .empty{text-align:center;color:var(--pk-ash);padding:50px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}input,select{font-size:16px;}.resprow .btn{flex:1;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="student-dashboard.html" class="back-link">← หน้าหลัก</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title">
+      <h1>📩 หนังสือถึงผู้ปกครอง</h1>
+      <p>หนังสือขออนุญาต / แจ้งเพื่อทราบ จากโรงเรียน — กรุณาตอบกลับให้ครบ</p>
+    </div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      load();
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    const DEC = { approved:['อนุญาต','b-ap'], declined:['ไม่อนุญาต','b-de'], acknowledged:['รับทราบ','b-ac'] };
+
+    async function load() {
+      const box = document.getElementById('list');
+      const { data, error } = await supabaseClient.rpc('get_my_consents');
+      if (error) { box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      const rows = data || [];
+      if (!rows.length) { box.innerHTML='<div class="empty">🎉 ไม่มีหนังสือที่ต้องตอบ</div>'; return; }
+      box.innerHTML = rows.map((r,i) => {
+        const done = !!r.decision; const d = DEC[r.decision];
+        const ack = r.mode === 'acknowledge';
+        return `<div class="card ${done?'done':''}" id="c${i}">
+          <h3>${ack?'📢 ':'✍️ '}${esc(r.title)}</h3>
+          ${r.body?`<div class="body">${esc(r.body)}</div>`:''}
+          <div class="for">สำหรับ: <b>${esc(r.student_name)}</b></div>
+          ${r.deadline?`<div class="deadline">⏰ ภายใน ${new Date(r.deadline).toLocaleDateString('th-TH')}</div>`:''}
+          ${done?`<div style="margin-top:12px;">ตอบแล้ว: <span class="badge ${d[1]}">${d[0]}</span>${r.signer_name?(' โดย '+esc(r.signer_name)):''}
+                    <button class="btn btn-no" style="padding:5px 12px;font-size:12px;margin-left:8px;" onclick="document.getElementById('c${i}').querySelector('.resprow').style.display='flex'">เปลี่ยนคำตอบ</button></div>`:''}
+          <div class="resprow" style="${done?'display:none;':''}">
+            ${r.require_signature?`
+              <div><label class="fl">ชื่อผู้ปกครอง (ลงชื่อ)</label><input class="sn" value="${esc(r.signer_name||'')}" placeholder="ชื่อ-สกุล" /></div>
+              <div><label class="fl">ความสัมพันธ์</label><select class="rel"><option>บิดา</option><option>มารดา</option><option>ผู้ปกครอง</option></select></div>`:''}
+            ${ack
+              ? `<button class="btn btn-ack" onclick="respond(${i},'${r.form_id}','${r.student_id}','acknowledged',${r.require_signature})">✓ รับทราบ</button>`
+              : `<button class="btn btn-ok" onclick="respond(${i},'${r.form_id}','${r.student_id}','approved',${r.require_signature})">✓ อนุญาต</button>
+                 <button class="btn btn-no" onclick="respond(${i},'${r.form_id}','${r.student_id}','declined',${r.require_signature})">✕ ไม่อนุญาต</button>`}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function respond(i, formId, studentId, decision, requireSig) {
+      const card = document.getElementById('c'+i);
+      const snEl = card.querySelector('.sn'); const relEl = card.querySelector('.rel');
+      const signer = snEl ? snEl.value.trim() : null;
+      const relation = relEl ? relEl.value : null;
+      if (requireSig && !signer) { toast('กรุณาลงชื่อผู้ปกครองก่อน','error'); return; }
+      const { data, error } = await supabaseClient.rpc('submit_consent', {
+        p_form_id:formId, p_student_id:studentId, p_decision:decision,
+        p_signer_name:signer, p_relation:relation, p_note:null
+      });
+      if (error || !data || !data.success) { toast((data&&data.error)||(error&&error.message)||'ส่งไม่สำเร็จ','error'); return; }
+      toast('ส่งคำตอบแล้ว ขอบคุณครับ','success');
+      load();
+    }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2800); }
+  </script>
+</body>
+</html>

@@ -69,6 +69,14 @@
     </div>
 
     <div id="rows"></div>
+
+    <div class="all-card" style="background:linear-gradient(135deg,#065F46,#10B981);">
+      <div>
+        <h3>🏛️ ส่งออกสำหรับราชการ (DMC / SGS)</h3>
+        <p>รายชื่อนักเรียนในรูปแบบคอลัมน์มาตรฐาน เพื่อเตรียมนำเข้าระบบกระทรวง — ปรับให้ตรงเทมเพลตจริงได้ภายหลัง</p>
+      </div>
+      <button class="btn" id="dmcBtn" onclick="exportDMC()">⬇️ ส่งออก DMC</button>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -193,6 +201,28 @@
       } finally {
         btn.disabled = false; btn.textContent = old;
       }
+    }
+
+    // government student roster (DMC/SGS-style column layout)
+    async function exportDMC() {
+      const btn = document.getElementById('dmcBtn'); btn.disabled = true; const old = btn.textContent; btn.textContent = '⏳';
+      try {
+        const rows = await fetchAll('students');
+        const active = rows.filter(s => !s.status || s.status === 'active');
+        if (!active.length) { toast('ยังไม่มีนักเรียน','error'); return; }
+        const header = ['เลขประจำตัวนักเรียน','เลขประจำตัวประชาชน','คำนำหน้า','ชื่อ','นามสกุล','ชื่อ(อังกฤษ)','นามสกุล(อังกฤษ)','เพศ','วันเกิด','สัญชาติ','ระดับชั้น','ห้อง','ปีการศึกษา','สถานะ'];
+        const gmap = { male:'ชาย', female:'หญิง', 'ชาย':'ชาย', 'หญิง':'หญิง' };
+        const aoa = [header].concat(active.map(s => [
+          s.student_number||'', s.national_id||'', '', s.first_name_th||'', s.last_name_th||'',
+          s.first_name_en||'', s.last_name_en||'', gmap[s.gender]||s.gender||'', s.birth_date||'',
+          s.nationality||'', s.grade||'', s.classroom||'', s.academic_year||'', s.status||'active'
+        ]));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'students');
+        XLSX.writeFile(wb, `${SCHOOL}-DMC-students-${stamp()}.xlsx`);
+        toast('ส่งออกไฟล์ DMC แล้ว','success');
+      } catch (e) { toast('ส่งออกไม่สำเร็จ: ' + (e.message||e), 'error'); }
+      finally { btn.disabled = false; btn.textContent = old; }
     }
 
     function downloadBlob(content, filename, mime) {

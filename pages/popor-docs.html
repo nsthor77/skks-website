@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เอกสาร ปพ. — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--brand:#1B5E3F;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Sarabun',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:900px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;margin-bottom:16px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+    label.fl{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    input,select,textarea{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink);border:1px solid var(--pk-border-em);}
+    .doc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+    .doc-tabs button{padding:9px 16px;border-radius:10px;border:1px solid var(--pk-border-em);background:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;}
+    .doc-tabs button.active{background:var(--pk-blue-800);color:#fff;border-color:var(--pk-blue-800);}
+
+    /* ---- printable A4 document ---- */
+    #printArea{background:#fff;border:1px solid var(--pk-border);border-radius:8px;margin-top:16px;padding:40px 48px;min-height:520px;font-family:'Sarabun',serif;color:#111;}
+    .doc-head{text-align:center;margin-bottom:18px;}
+    .doc-head img{height:74px;margin-bottom:8px;}
+    .doc-head .sname{font-size:21px;font-weight:700;}
+    .doc-head .stitle{font-size:26px;font-weight:700;margin-top:14px;letter-spacing:1px;}
+    .doc-no{text-align:right;font-size:14px;color:#444;margin-bottom:10px;}
+    .doc-body{font-size:17px;line-height:2.1;text-align:justify;text-indent:2.5em;margin-top:10px;}
+    .doc-body .uline{border-bottom:1px dotted #555;padding:0 6px;font-weight:600;}
+    .sign{margin-top:54px;text-align:center;float:right;width:300px;}
+    .sign .line{margin-bottom:4px;}
+    .clear{clear:both;}
+    table.poporlist{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px;}
+    table.poporlist th,table.poporlist td{border:1px solid #333;padding:6px 8px;text-align:center;}
+    table.poporlist th{background:#f0f0f0;}
+    table.poporlist td.l{text-align:left;}
+    .muted{color:#9AA3B5;}
+    @media print {
+      body{background:#fff;}
+      .topbar,.container > .page-title,.container > .card,.no-print{display:none !important;}
+      .container{max-width:100%;padding:0;margin:0;}
+      #printArea{border:none;border-radius:0;margin:0;padding:0;}
+      @page{size:A4;margin:18mm;}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title">
+      <h1>📄 เอกสาร ปพ.</h1>
+      <p>ออกเอกสารราชการ ปพ.2 (ประกาศนียบัตร) · ปพ.3 (ผู้สำเร็จการศึกษา) · ปพ.7 (ใบรับรอง) — พิมพ์ได้ทันที พร้อมโลโก้+ผอ.ของโรงเรียน</p>
+    </div>
+
+    <div class="card">
+      <div class="doc-tabs">
+        <button id="tab-p7" class="active" onclick="setDoc('p7')">ปพ.7 ใบรับรอง</button>
+        <button id="tab-p2" onclick="setDoc('p2')">ปพ.2 ประกาศนียบัตร</button>
+        <button id="tab-p3" onclick="setDoc('p3')">ปพ.3 ผู้สำเร็จการศึกษา</button>
+      </div>
+
+      <!-- per-student docs (ปพ.7 / ปพ.2) -->
+      <div id="studentCtl">
+        <div class="row">
+          <div style="flex:2;min-width:200px;"><label class="fl">นักเรียน</label>
+            <select id="student" style="width:100%;"><option value="">— เลือกนักเรียน —</option></select>
+          </div>
+          <div id="purposeWrap"><label class="fl">เพื่อใช้ในการ (ปพ.7)</label><input id="purpose" placeholder="สมัครเรียนต่อ / ขอทุน ฯลฯ" style="width:220px;" /></div>
+          <div><label class="fl">เลขที่เอกสาร</label><input id="docno" style="width:130px;" /></div>
+        </div>
+      </div>
+
+      <!-- ปพ.3 controls -->
+      <div id="gradCtl" style="display:none;">
+        <div class="row">
+          <div><label class="fl">ปีการศึกษาที่จบ</label><input id="gradYear" placeholder="2567" style="width:120px;" /></div>
+          <div style="flex:1;color:var(--pk-ash);font-size:12.5px;align-self:center;">แสดงนักเรียนที่สถานะ "จบการศึกษา" ทั้งหมด (กรองตามปีถ้ากรอก)</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:14px;">
+        <button class="btn btn-primary" onclick="generate()">📝 สร้างเอกสาร</button>
+        <button class="btn btn-secondary no-print" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF</button>
+      </div>
+    </div>
+
+    <div id="printArea"><div class="muted" style="text-align:center;padding:40px;">เลือกประเภทเอกสารและกด "สร้างเอกสาร"</div></div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let DOC='p7', BRAND={}, students=[];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireTeacher();
+      if (!prof) return;
+      document.getElementById('docno').value = autoNo('ปพ.7');
+      try { const { data } = await supabaseClient.rpc('get_school_branding'); if (data) BRAND = data; } catch(e){}
+      await loadStudents();
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function autoNo(prefix){ const d=new Date(); return prefix+'-'+(d.getFullYear()+543)+'-'+String(Math.floor(Math.random()*900)+100); }
+    function thaiDate(d){ d=d?new Date(d):new Date(); const m=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม']; return d.getDate()+' '+m[d.getMonth()]+' พ.ศ. '+(d.getFullYear()+543); }
+
+    async function loadStudents() {
+      let all=[], from=0; const size=1000;
+      while(true){ const { data, error } = await supabaseClient.from('students').select('id,student_number,first_name_th,last_name_th,national_id,birth_date,grade,classroom,status,academic_year').range(from,from+size-1);
+        if(error) break; all=all.concat(data||[]); if(!data||data.length<size) break; from+=size; if(from>20000) break; }
+      students = all.sort((a,b)=>((a.grade||'')+(a.classroom||'')).localeCompare((b.grade||'')+(b.classroom||''),'th',{numeric:true}));
+      document.getElementById('student').insertAdjacentHTML('beforeend', students.filter(s=>!s.status||s.status==='active'||s.status==='graduated').map(s=>
+        `<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))} · ${esc(s.grade||'')}${s.classroom?('/'+esc(s.classroom)):''}${s.status==='graduated'?' (จบแล้ว)':''}</option>`).join(''));
+    }
+    function getStudent(id){ return students.find(s=>s.id===id)||{}; }
+
+    function setDoc(d){
+      DOC=d;
+      ['p7','p2','p3'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===d));
+      document.getElementById('studentCtl').style.display = (d==='p3')?'none':'block';
+      document.getElementById('gradCtl').style.display = (d==='p3')?'block':'none';
+      document.getElementById('purposeWrap').style.display = (d==='p7')?'block':'none';
+      document.getElementById('docno').value = autoNo(d==='p2'?'ปพ.2':(d==='p7'?'ปพ.7':'ปพ.3'));
+    }
+
+    function head(title){
+      const logo = BRAND.logo_url ? `<img src="${esc(BRAND.logo_url)}" onerror="this.style.display='none'"/>` : '';
+      return `<div class="doc-head">${logo}<div class="sname">${esc(BRAND.name||'โรงเรียน')}</div>
+        <div class="stitle">${esc(title)}</div></div>`;
+    }
+    function signBlock(){
+      const p = BRAND.principal || '';
+      return `<div class="sign">
+        <div class="line">ลงชื่อ ........................................................</div>
+        <div class="line">( ${esc(p||'.......................................')} )</div>
+        <div class="line">ผู้อำนวยการ${esc(BRAND.name||'โรงเรียน')}</div>
+      </div><div class="clear"></div>`;
+    }
+
+    function generate(){
+      const area = document.getElementById('printArea');
+      if (DOC==='p3') return renderP3(area);
+      const sid = document.getElementById('student').value;
+      if (!sid) { area.innerHTML='<div class="muted" style="text-align:center;padding:40px;">เลือกนักเรียนก่อน</div>'; return; }
+      const s = getStudent(sid);
+      const name = ((s.first_name_th||'')+' '+(s.last_name_th||'')).trim();
+      const klass = (s.grade||'') + (s.classroom?('/'+s.classroom):'');
+      const docno = esc(document.getElementById('docno').value);
+      if (DOC==='p7') {
+        const purpose = document.getElementById('purpose').value.trim();
+        area.innerHTML = head('ใบรับรอง (ปพ.7)')
+          + `<div class="doc-no">เลขที่ ${docno}</div>`
+          + `<div class="doc-body">หนังสือฉบับนี้ให้ไว้เพื่อรับรองว่า <span class="uline">${esc(name)}</span>`
+          + ` ${s.national_id?('เลขประจำตัวประชาชน <span class="uline">'+esc(s.national_id)+'</span> '):''}`
+          + `เลขประจำตัวนักเรียน <span class="uline">${esc(s.student_number||'-')}</span>`
+          + ` เป็นนักเรียนระดับชั้น <span class="uline">${esc(klass||'-')}</span>`
+          + ` ปีการศึกษา <span class="uline">${esc(s.academic_year||'-')}</span> ของ${esc(BRAND.name||'โรงเรียน')} จริง`
+          + (purpose?` เอกสารฉบับนี้ออกให้เพื่อ <span class="uline">${esc(purpose)}</span>`:'')
+          + `</div>`
+          + `<div class="doc-body" style="text-indent:0;margin-top:18px;">ออกให้ ณ วันที่ ${thaiDate()}</div>`
+          + signBlock();
+      } else if (DOC==='p2') {
+        area.innerHTML = head('ประกาศนียบัตร (ปพ.2)')
+          + `<div class="doc-no">เลขที่ ${docno}</div>`
+          + `<div class="doc-body" style="text-align:center;text-indent:0;">ประกาศนียบัตรฉบับนี้ให้ไว้เพื่อแสดงว่า</div>`
+          + `<div style="text-align:center;font-size:24px;font-weight:700;margin:14px 0;">${esc(name)}</div>`
+          + `<div class="doc-body" style="text-align:center;text-indent:0;">เลขประจำตัวนักเรียน ${esc(s.student_number||'-')}<br>`
+          + `ได้สำเร็จการศึกษาตามหลักสูตร ระดับชั้น ${esc(s.grade||'-')}<br>`
+          + `ปีการศึกษา ${esc(s.academic_year||'-')} ของ${esc(BRAND.name||'โรงเรียน')}</div>`
+          + `<div class="doc-body" style="text-indent:0;text-align:center;margin-top:18px;">ให้ไว้ ณ วันที่ ${thaiDate()}</div>`
+          + signBlock();
+      }
+    }
+
+    function renderP3(area){
+      const yr = document.getElementById('gradYear').value.trim();
+      let grads = students.filter(s=>s.status==='graduated');
+      if (yr) grads = grads.filter(s=>(s.academic_year||'')===yr);
+      if (!grads.length){ area.innerHTML = head('แบบรายงานผู้สำเร็จการศึกษา (ปพ.3)') + '<div class="muted" style="text-align:center;padding:30px;">ยังไม่มีนักเรียนสถานะ "จบการศึกษา"'+(yr?(' ปี '+esc(yr)):'')+'<br><span style="font-size:12px;">ตั้งสถานะนักเรียนเป็น "จบการศึกษา" ได้ที่หน้าเลื่อนชั้น หรือแก้ไขนักเรียน</span></div>'; return; }
+      area.innerHTML = head('แบบรายงานผู้สำเร็จการศึกษา (ปพ.3)')
+        + `<div style="text-align:center;font-size:15px;margin-bottom:6px;">ปีการศึกษา ${esc(yr||'(ทั้งหมด)')} · จำนวน ${grads.length} คน</div>`
+        + `<table class="poporlist"><thead><tr><th>ที่</th><th>เลขประจำตัว</th><th>ชื่อ-สกุล</th><th>เลขบัตรประชาชน</th><th>วันเกิด</th><th>ชั้น</th><th>หมายเหตุ</th></tr></thead><tbody>`
+        + grads.map((s,i)=>`<tr>
+            <td>${i+1}</td><td>${esc(s.student_number||'')}</td>
+            <td class="l">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))}</td>
+            <td>${esc(s.national_id||'')}</td>
+            <td>${s.birth_date?new Date(s.birth_date).toLocaleDateString('th-TH'):''}</td>
+            <td>${esc(s.grade||'')}</td><td></td></tr>`).join('')
+        + `</tbody></table>`
+        + `<div style="margin-top:40px;">${signBlock()}</div>`;
+    }
+  </script>
+</body>
+</html>

@@ -50,6 +50,7 @@
       { href: 'materials.html',       tier: 'teacher', en: 'Materials',  th: 'สื่อการสอน' },
       { href: 'quiz.html',            tier: 'teacher', en: 'Quizzes',    th: 'ข้อสอบ' },
       { href: 'grades-admin.html',    tier: 'teacher', en: 'Grades',     th: 'เกรด' },
+      { href: 'popor-docs.html',      tier: 'teacher', en: 'ปพ. Docs',   th: 'เอกสาร ปพ.' },
       { href: 'exam-schedule.html',   tier: 'teacher', en: 'Exams',      th: 'ตารางสอบ' },
       { href: 'schedule-admin.html',  tier: 'admin',   en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'teacher-schedule.html',tier: 'teacher', en: 'My Schedule',th: 'ตารางสอนของฉัน' },

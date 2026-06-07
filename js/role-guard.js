@@ -391,3 +391,19 @@ console.log('✅ Role guard loaded');
     }
   } catch (e) { /* pwa is non-critical */ }
 })();
+
+// ── Auto-load the notification bell on every app page ───────────────────────
+(function () {
+  try {
+    if (window.__pkNotifLoaded) return;
+    var ss = document.getElementsByTagName('script');
+    for (var i = 0; i < ss.length; i++) {
+      if (ss[i].src && ss[i].src.indexOf('role-guard.js') > -1) {
+        var s = document.createElement('script');
+        s.src = ss[i].src.replace('role-guard.js', 'notif-bell.js');
+        document.head.appendChild(s);
+        break;
+      }
+    }
+  } catch (e) { /* notifications are non-critical */ }
+})();

@@ -112,6 +112,22 @@
           <button class="btn btn-primary" id="saveBtn" onclick="saveBrand()">บันทึก แล้วเริ่มใช้งาน</button>
         </div>
       </div>
+
+      <!-- ===== Connect your domain (owner only) ===== -->
+      <div class="card" id="domainCard" style="display:none;margin-top:18px;">
+        <div class="label" style="margin-top:0;">🌐 เว็บไซต์ & โดเมนของโรงเรียน</div>
+        <p style="font-size:13px;color:var(--ash);margin:2px 0 12px;">
+          เว็บของคุณพร้อมใช้แล้วที่ <a id="defaultUrl" href="#" target="_blank" style="color:var(--brand);font-weight:600;">slug.panyaschoolkit.com</a>
+          (ใช้ได้ทันที ไม่ต้องตั้งค่า) · ถ้าอยากใช้โดเมนของโรงเรียนเอง ใส่ด้านล่าง — ระบบจะผูก + ออก SSL ให้อัตโนมัติ
+        </p>
+        <div id="domainAlert" style="display:none;padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <input id="domainInput" placeholder="app.suansonkk.ac.th" style="flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px;" />
+          <button class="btn btn-primary" id="domainBtn" onclick="connectDomain()" style="white-space:nowrap;">เชื่อมโดเมน</button>
+          <button id="domainRemoveBtn" onclick="removeDomain()" style="display:none;background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;border-radius:9px;padding:10px 14px;font-family:inherit;font-size:13px;cursor:pointer;">ลบ</button>
+        </div>
+        <div id="domainDns" style="margin-top:12px;"></div>
+      </div>
     </div>
   </div>
 
@@ -143,6 +159,8 @@
           document.getElementById('pvName').textContent = schoolName;
           if (data.logo_url) { document.getElementById('logoUrl').value = data.logo_url; }
           if (data.theme_color) { setColor(data.theme_color); }
+          // ---- domain section (owner only) ----
+          initDomain(data, prof);
         }
       } catch (e) {}
 
@@ -215,6 +233,129 @@
       } catch (e) {
         showAlert('❌ ' + (e.message || e), false);
         btn.disabled = false; btn.textContent = 'บันทึก แล้วเริ่มใช้งาน';
+      }
+    }
+
+    // =====================  DOMAIN (owner self-serve)  =====================
+    var CURRENT_DOMAIN = null;
+
+    function initDomain(data, prof) {
+      const card = document.getElementById('domainCard');
+      // domain = owner-only (admin manages branding but not domain)
+      const role = prof && prof.role;
+      if (role !== 'owner' && role !== 'developer') { card.style.display = 'none'; return; }
+      card.style.display = 'block';
+
+      // default {slug}.panyaschoolkit.com
+      const slug = data.slug || '';
+      const a = document.getElementById('defaultUrl');
+      if (slug) { a.textContent = slug + '.panyaschoolkit.com'; a.href = 'https://' + slug + '.panyaschoolkit.com'; }
+      else { a.textContent = '— (ยังไม่มี slug)'; a.removeAttribute('href'); }
+
+      CURRENT_DOMAIN = data.custom_domain || null;
+      const input = document.getElementById('domainInput');
+      if (CURRENT_DOMAIN) {
+        input.value = CURRENT_DOMAIN;
+        document.getElementById('domainRemoveBtn').style.display = '';
+        renderDns(CURRENT_DOMAIN, true);
+      }
+    }
+
+    // client mirror of lib/vercel-domains apex logic (Thai-aware)
+    function dnsForDomain(domain) {
+      const MULTI_SUF = ['ac.th','co.th','go.th','or.th','in.th','net.th','mi.th','re.th','co.uk','com.au','co.nz','com.sg','edu.sg'];
+      const d = (domain || '').toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'').trim();
+      const parts = d.split('.');
+      let isApex;
+      const last2 = parts.slice(-2).join('.');
+      if (MULTI_SUF.indexOf(last2) >= 0) { isApex = parts.length === 3; }
+      else { isApex = parts.length === 2; }
+      if (isApex) return { type: 'A', name: '@', value: '76.76.21.21' };
+      return { type: 'CNAME', name: parts[0], value: 'cname.vercel-dns.com' };
+    }
+
+    function renderDns(domain, connected) {
+      const rec = dnsForDomain(domain);
+      const box = document.getElementById('domainDns');
+      box.innerHTML =
+        '<div style="background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:14px;">' +
+          '<div style="font-weight:700;font-size:13px;margin-bottom:8px;">📋 ขั้นตอนถัดไป: ไปที่ผู้ให้บริการโดเมนของคุณ (เช่น Namecheap, GoDaddy, .th registrar) แล้วเพิ่ม DNS record นี้:</div>' +
+          '<table style="width:100%;border-collapse:collapse;font-size:13px;">' +
+            '<tr style="background:#EFF6FF;"><th style="text-align:left;padding:7px 9px;border:1px solid #DBEAFE;">Type</th><th style="text-align:left;padding:7px 9px;border:1px solid #DBEAFE;">Name / Host</th><th style="text-align:left;padding:7px 9px;border:1px solid #DBEAFE;">Value / Points to</th></tr>' +
+            '<tr><td style="padding:7px 9px;border:1px solid #E5E7EB;font-family:monospace;font-weight:700;">' + rec.type + '</td>' +
+                '<td style="padding:7px 9px;border:1px solid #E5E7EB;font-family:monospace;">' + rec.name + '</td>' +
+                '<td style="padding:7px 9px;border:1px solid #E5E7EB;font-family:monospace;">' + rec.value + '</td></tr>' +
+          '</table>' +
+          '<div style="font-size:12px;color:var(--ash);margin-top:9px;line-height:1.6;">' +
+            'ใส่ค่าเป๊ะๆ ตามตาราง · DNS อาจใช้เวลา 5 นาที–1 ชม.จึงจะมีผล · SSL (https) ระบบออกให้อัตโนมัติเมื่อ DNS ชี้ถูก' +
+            (connected ? '<br>✅ บันทึกโดเมนนี้แล้ว — กำลังรอ DNS ชี้มา' : '') +
+          '</div>' +
+        '</div>';
+    }
+
+    function domainAlert(msg, ok) {
+      const a = document.getElementById('domainAlert');
+      a.style.display = 'block';
+      a.style.background = ok ? '#ECFDF5' : '#FEF2F2';
+      a.style.color = ok ? '#065F46' : '#991B1B';
+      a.style.border = '1px solid ' + (ok ? '#A7F3D0' : '#FECACA');
+      a.innerHTML = msg;
+    }
+
+    async function connectDomain() {
+      const input = document.getElementById('domainInput');
+      const domain = (input.value || '').trim().toLowerCase();
+      if (!domain) { domainAlert('กรุณาใส่โดเมน เช่น app.suansonkk.ac.th', false); return; }
+      if (/\.panyaschoolkit\.com$/.test(domain)) { domainAlert('โดเมน *.panyaschoolkit.com มีให้อัตโนมัติแล้ว ไม่ต้องเพิ่มเอง', false); return; }
+      const btn = document.getElementById('domainBtn');
+      btn.disabled = true; btn.textContent = '⏳ กำลังเชื่อม...';
+      try {
+        const { data: sess } = await supabaseClient.auth.getSession();
+        const token = sess && sess.session && sess.session.access_token;
+        const r = await fetch('/api/school/connect-domain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ custom_domain: domain, action: 'set' })
+        });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error(j.error || 'เชื่อมโดเมนไม่สำเร็จ');
+        CURRENT_DOMAIN = j.custom_domain;
+        document.getElementById('domainRemoveBtn').style.display = '';
+        const vNote = (j.vercel && j.vercel.configured === false)
+          ? '<br><span style="color:#92400E;">⚠️ ระบบบันทึกโดเมนแล้ว แต่ยังต้องเพิ่มในแดชบอร์ด Vercel เอง (ติดต่อทีมงานได้)</span>'
+          : '';
+        domainAlert('✅ บันทึกโดเมน <b>' + j.custom_domain + '</b> แล้ว! ทำตามขั้นตอน DNS ด้านล่าง' + vNote, true);
+        renderDns(j.custom_domain, true);
+      } catch (e) {
+        domainAlert('❌ ' + (e.message || e), false);
+      } finally {
+        btn.disabled = false; btn.textContent = 'เชื่อมโดเมน';
+      }
+    }
+
+    async function removeDomain() {
+      if (!confirm('ต้องการลบโดเมนนี้ออกใช่ไหม? นักเรียน/ผู้ปกครองจะกลับไปใช้ลิงก์ slug.panyaschoolkit.com')) return;
+      const btn = document.getElementById('domainRemoveBtn');
+      btn.disabled = true; btn.textContent = '⏳';
+      try {
+        const { data: sess } = await supabaseClient.auth.getSession();
+        const token = sess && sess.session && sess.session.access_token;
+        const r = await fetch('/api/school/connect-domain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ action: 'remove' })
+        });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error(j.error || 'ลบไม่สำเร็จ');
+        CURRENT_DOMAIN = null;
+        document.getElementById('domainInput').value = '';
+        document.getElementById('domainDns').innerHTML = '';
+        btn.style.display = 'none';
+        domainAlert('✅ ลบโดเมนแล้ว — กลับไปใช้ slug.panyaschoolkit.com', true);
+      } catch (e) {
+        domainAlert('❌ ' + (e.message || e), false);
+      } finally {
+        btn.disabled = false; btn.textContent = 'ลบ';
       }
     }
   </script>

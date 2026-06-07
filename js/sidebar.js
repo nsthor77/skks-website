@@ -32,6 +32,7 @@
     ]},
     { label: { en: 'People', th: 'บุคลากร' }, items: [
       { href: 'students.html',    tier: 'teacher', en: 'Students',     th: 'นักเรียน' },
+      { href: 'care-hub.html',    tier: 'teacher', en: 'Care System',  th: 'ดูแลช่วยเหลือ' },
       { href: 'health.html',      tier: 'teacher', en: 'Health',       th: 'ห้องพยาบาล' },
       { href: 'sdq.html',         tier: 'teacher', en: 'SDQ',          th: 'ประเมิน SDQ' },
       { href: 'poverty.html',     tier: 'teacher', en: 'Poverty Screen', th: 'คัดกรองยากจน' },

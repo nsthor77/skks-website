@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบดูแลช่วยเหลือนักเรียน — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:1080px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;margin-bottom:16px;}
+    .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+    .scard{flex:1;min-width:130px;background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:14px 16px;}
+    .scard .n{font-size:26px;font-weight:800;} .scard .l{font-size:12.5px;color:var(--pk-ash);margin-top:2px;}
+    .scard.ok{border-left:4px solid #10B981;} .scard.risk{border-left:4px solid #D97706;} .scard.bad{border-left:4px solid #DC2626;} .scard.ref{border-left:4px solid #2563EB;}
+    .bar{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .bar select{padding:8px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .btn{padding:8px 14px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);} .btn-sm{padding:5px 10px;font-size:12px;}
+    .tablewrap{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px;}
+    th,td{padding:9px 10px;border-bottom:1px solid #EEF2F7;text-align:left;vertical-align:middle;}
+    th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;letter-spacing:.3px;background:#F8FAFC;position:sticky;top:0;}
+    td select,td input{padding:6px 8px;border:1px solid var(--pk-border);border-radius:7px;font-family:inherit;font-size:12.5px;}
+    .badge{padding:3px 9px;border-radius:20px;font-weight:700;font-size:11.5px;white-space:nowrap;}
+    .b-ok{background:#D1FAE5;color:#065F46;}.b-risk{background:#FEF3C7;color:#92400E;}.b-bad{background:#FEE2E2;color:#991B1B;}.b-none{background:#F1F5F9;color:#64748B;}
+    .b-poor{background:#FEF3C7;color:#92400E;}.b-extra{background:#FEE2E2;color:#991B1B;}
+    .empty{text-align:center;color:var(--pk-ash);padding:40px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}
+    .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title">
+      <h1>🛟 ระบบดูแลช่วยเหลือนักเรียน</h1>
+      <p>รวมสัญญาณ SDQ + คัดกรองยากจน → จัดกลุ่ม กลุ่มปกติ / เสี่ยง / มีปัญหา และบันทึกการส่งต่อ (ส่งต่อ)</p>
+    </div>
+
+    <div class="summary">
+      <div class="scard ok"><div class="n" id="cOk">0</div><div class="l">กลุ่มปกติ</div></div>
+      <div class="scard risk"><div class="n" id="cRisk">0</div><div class="l">กลุ่มเสี่ยง</div></div>
+      <div class="scard bad"><div class="n" id="cBad">0</div><div class="l">กลุ่มมีปัญหา</div></div>
+      <div class="scard ref"><div class="n" id="cRef">0</div><div class="l">ส่งต่อแล้ว</div></div>
+    </div>
+
+    <div class="bar">
+      <label style="font-size:13px;color:var(--pk-ash);font-weight:600;">ห้องเรียน:</label>
+      <select id="classFilter" onchange="render()"><option value="">ทุกห้อง</option></select>
+      <button class="btn btn-secondary btn-sm" onclick="autoSuggestAll()">✨ จัดกลุ่มอัตโนมัติ (จากสัญญาณ)</button>
+      <span style="font-size:12px;color:var(--pk-ash);">— ระบบเดาให้ตามผล SDQ/ยากจน แล้วครูปรับ + กดบันทึกแต่ละแถว</span>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>นักเรียน</th><th>SDQ</th><th>คัดกรองยากจน</th><th>กลุ่มดูแล</th><th>ส่งต่อไป</th><th>หมายเหตุ</th><th></th>
+        </tr></thead>
+        <tbody id="rows"><tr><td colspan="7" class="empty">⏳ กำลังโหลด...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let students = [], sdqMap = {}, povMap = {}, careMap = {};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireTeacher();
+      if (!prof) return;
+      await loadAll();
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    async function loadAll() {
+      // students
+      let all=[], from=0; const size=1000;
+      while(true){ const { data, error } = await supabaseClient.from('students').select('id,first_name_th,last_name_th,grade,classroom,status').range(from,from+size-1);
+        if(error) break; all=all.concat(data||[]); if(!data||data.length<size) break; from+=size; if(from>20000) break; }
+      students = all.filter(s=>!s.status||s.status==='active')
+        .sort((a,b)=>((a.grade||'')+(a.classroom||'')).localeCompare((b.grade||'')+(b.classroom||''),'th',{numeric:true}));
+
+      // classroom filter options
+      const classes = [...new Set(students.map(s=>s.classroom).filter(Boolean))]
+        .sort((a,b)=>a.localeCompare(b,'th',{numeric:true}));
+      document.getElementById('classFilter').insertAdjacentHTML('beforeend',
+        classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join(''));
+
+      // signals
+      try { const { data } = await supabaseClient.rpc('list_sdq_latest'); (data||[]).forEach(r=>sdqMap[r.student_id]={overall:r.overall,total:r.total}); } catch(e){}
+      try { const { data } = await supabaseClient.rpc('list_poverty_latest'); (data||[]).forEach(r=>povMap[r.student_id]={cls:r.classification}); } catch(e){}
+      try { const { data } = await supabaseClient.rpc('list_care'); (data||[]).forEach(r=>careMap[r.student_id]=r); } catch(e){}
+
+      render();
+    }
+
+    function badge(label, kind){ return `<span class="badge ${kind}">${esc(label)}</span>`; }
+    function sdqBadge(o){ if(!o) return '<span style="color:#9AA3B5;">—</span>'; return badge(o, o==='ปกติ'?'b-ok':(o==='เสี่ยง'?'b-risk':'b-bad')); }
+    function povBadge(c){ if(!c||c==='ไม่เข้าเกณฑ์') return '<span style="color:#9AA3B5;">—</span>'; return badge(c, c==='ยากจนพิเศษ'?'b-extra':'b-poor'); }
+
+    function suggest(sid){
+      const o=(sdqMap[sid]||{}).overall, p=(povMap[sid]||{}).cls;
+      if (o==='มีปัญหา' || p==='ยากจนพิเศษ') return 'มีปัญหา';
+      if (o==='เสี่ยง' || p==='ยากจน') return 'เสี่ยง';
+      return 'ปกติ';
+    }
+
+    function render() {
+      const cls = document.getElementById('classFilter').value;
+      const list = students.filter(s => !cls || s.classroom===cls);
+      const body = document.getElementById('rows');
+      if (!list.length) { body.innerHTML='<tr><td colspan="7" class="empty">ไม่มีนักเรียน</td></tr>'; updateCounts(); return; }
+      body.innerHTML = list.map(s => {
+        const c = careMap[s.id] || {};
+        const grp = c.care_group || '';
+        const opt = g => `<option value="${g}" ${grp===g?'selected':''}>${g}</option>`;
+        return `<tr data-id="${s.id}">
+          <td><b>${esc((s.first_name_th||'')+' '+(s.last_name_th||''))}</b><br><span style="color:#9AA3B5;font-size:11.5px;">${esc(s.grade||'')}${s.classroom?('/'+esc(s.classroom)):''}</span></td>
+          <td>${sdqBadge((sdqMap[s.id]||{}).overall)}</td>
+          <td>${povBadge((povMap[s.id]||{}).cls)}</td>
+          <td><select class="g">
+            <option value="" ${!grp?'selected':''}>—</option>
+            ${opt('ปกติ')}${opt('เสี่ยง')}${opt('มีปัญหา')}
+          </select></td>
+          <td><input class="rt" value="${esc(c.referral_to||'')}" placeholder="ครูแนะแนว/รพ." style="width:120px;" /></td>
+          <td><input class="rn" value="${esc(c.risk_note||'')}" placeholder="หมายเหตุ" style="width:150px;" /></td>
+          <td><button class="btn btn-primary btn-sm" onclick="saveRow('${s.id}', this)">💾</button></td>
+        </tr>`;
+      }).join('');
+      updateCounts();
+    }
+
+    function updateCounts() {
+      let ok=0,risk=0,bad=0,ref=0;
+      Object.values(careMap).forEach(c=>{
+        if(c.care_group==='ปกติ')ok++; else if(c.care_group==='เสี่ยง')risk++; else if(c.care_group==='มีปัญหา')bad++;
+        if(c.referred) ref++;
+      });
+      document.getElementById('cOk').textContent=ok;
+      document.getElementById('cRisk').textContent=risk;
+      document.getElementById('cBad').textContent=bad;
+      document.getElementById('cRef').textContent=ref;
+    }
+
+    function autoSuggestAll() {
+      const cls = document.getElementById('classFilter').value;
+      document.querySelectorAll('#rows tr[data-id]').forEach(tr=>{
+        const sid=tr.dataset.id; const sel=tr.querySelector('.g');
+        if (sel && !sel.value) sel.value = suggest(sid);
+      });
+      toast('เดากลุ่มให้แล้ว — ตรวจสอบและกดบันทึกแต่ละแถว','success');
+    }
+
+    async function saveRow(sid, btn) {
+      const tr = btn.closest('tr');
+      const grp = tr.querySelector('.g').value || null;
+      const rt = tr.querySelector('.rt').value.trim() || null;
+      const rn = tr.querySelector('.rn').value.trim() || null;
+      btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
+      const { data, error } = await supabaseClient.rpc('save_care', {
+        p_student_id:sid, p_care_group:grp, p_risk_note:rn,
+        p_referred: !!rt, p_referral_to:rt, p_referral_note:null, p_status:'active'
+      });
+      btn.disabled=false; btn.textContent=old;
+      if (error || !data || !data.success) { toast((data&&data.error)||(error&&error.message)||'บันทึกไม่สำเร็จ','error'); return; }
+      careMap[sid] = { student_id:sid, care_group:grp, risk_note:rn, referred:!!rt, referral_to:rt };
+      updateCounts();
+      toast('บันทึกแล้ว','success');
+    }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2600); }
+  </script>
+</body>
+</html>

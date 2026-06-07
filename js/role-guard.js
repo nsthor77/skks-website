@@ -375,3 +375,19 @@ console.log('✅ Role guard loaded');
     }
   } catch (e) { /* sidebar is non-critical */ }
 })();
+
+// ── Auto-load PWA support (manifest + service worker + install banner) ───────
+(function () {
+  try {
+    if (window.__pkPwaLoaded) return;
+    var ss = document.getElementsByTagName('script');
+    for (var i = 0; i < ss.length; i++) {
+      if (ss[i].src && ss[i].src.indexOf('role-guard.js') > -1) {
+        var s = document.createElement('script');
+        s.src = ss[i].src.replace('role-guard.js', 'pwa.js');
+        document.head.appendChild(s);
+        break;
+      }
+    }
+  } catch (e) { /* pwa is non-critical */ }
+})();

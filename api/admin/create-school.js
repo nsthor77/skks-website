@@ -118,6 +118,11 @@ module.exports = async (req, res) => {
     // best-effort: activate subscription row if present
     try { await supabaseAdmin.from('subscriptions').update({ status: 'active' }).eq('school_id', schoolId); } catch (e) {}
 
+    // best-effort: if approved from a waitlist entry, mark it converted (service role → bypasses RLS)
+    if (b.waitlistId) {
+      try { await supabaseAdmin.from('waitlist').update({ status: 'converted' }).eq('id', b.waitlistId); } catch (e) {}
+    }
+
     // ---- 5) optional custom domain (set in DB + register with Vercel, auto SSL) ----
     let customDomain = null;
     let domainResult = null;

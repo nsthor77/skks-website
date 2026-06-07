@@ -262,6 +262,40 @@
     </main>
   </div>
 
+  <!-- Approve modal: create school + owner (comp/free) from a waitlist entry -->
+  <div id="approveModal" style="display:none;position:fixed;inset:0;background:rgba(15,26,54,.45);z-index:100;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <h2 style="font-size:19px;margin:0;">✅ อนุมัติ + เปิดโรงเรียน</h2>
+        <button onclick="closeApprove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#9AA3B5;">×</button>
+      </div>
+      <p style="color:#6B7280;font-size:13px;margin:0 0 16px;">สร้างโรงเรียน + บัญชี <strong>Owner</strong> (ฟรี/Demo) — Owner เอาไปตั้ง admin เอง</p>
+
+      <div id="apvAlert" style="display:none;padding:11px 14px;border-radius:9px;font-size:13.5px;margin-bottom:14px;background:#FEE2E2;color:#991B1B;"></div>
+
+      <div id="apvForm">
+        <label style="display:block;font-size:12.5px;font-weight:600;color:#4B5670;margin:8px 0 5px;">ชื่อโรงเรียน *</label>
+        <input id="apvName" style="width:100%;padding:10px 12px;border:1px solid #D8DEE9;border-radius:8px;font-family:inherit;font-size:14px;" />
+        <label style="display:block;font-size:12.5px;font-weight:600;color:#4B5670;margin:12px 0 5px;">Subdomain (slug) *</label>
+        <input id="apvSlug" oninput="apvSlugTouched=true" style="width:100%;padding:10px 12px;border:1px solid #D8DEE9;border-radius:8px;font-family:inherit;font-size:14px;" />
+        <div style="font-size:11.5px;color:#9AA3B5;margin-top:4px;">→ <span id="apvSlugPrev">slug</span>.panyaschoolkit.com · a-z 0-9 -</div>
+        <label style="display:block;font-size:12.5px;font-weight:600;color:#4B5670;margin:12px 0 5px;">อีเมล Owner (ใช้ล็อกอิน) *</label>
+        <input id="apvEmail" type="email" style="width:100%;padding:10px 12px;border:1px solid #D8DEE9;border-radius:8px;font-family:inherit;font-size:14px;" />
+        <label style="display:block;font-size:12.5px;font-weight:600;color:#4B5670;margin:12px 0 5px;">รหัสผ่านชั่วคราว *</label>
+        <div style="display:flex;gap:8px;">
+          <input id="apvPass" style="flex:1;padding:10px 12px;border:1px solid #D8DEE9;border-radius:8px;font-family:inherit;font-size:14px;" />
+          <button onclick="apvGenPass()" style="background:#fff;border:1px solid #A8B2C4;border-radius:8px;padding:0 14px;cursor:pointer;font-size:12px;">สุ่ม</button>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;margin:14px 0;cursor:pointer;">
+          <input type="checkbox" id="apvComp" checked /> เปิดใช้ฟรี / Demo (ข้ามการจ่ายเงิน)
+        </label>
+        <button class="btn btn-primary" id="apvBtn" onclick="submitApprove()" style="width:100%;padding:12px;justify-content:center;">➕ สร้างโรงเรียน + เปิดใช้</button>
+      </div>
+
+      <div id="apvResult" style="display:none;background:#EEF3FF;border:1px solid #C9D4EE;border-radius:12px;padding:16px;font-size:13.5px;line-height:1.7;"></div>
+    </div>
+  </div>
+
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
@@ -325,9 +359,12 @@
       const html = [`<table>
         <thead><tr>
           <th>Email</th><th>โรงเรียน</th><th>ขนาด</th><th>ผู้ติดต่อ</th><th>เบอร์โทร</th>
-          <th>Notes</th><th>Source</th><th>Status</th><th>วันที่สมัคร</th>
+          <th>Notes</th><th>Source</th><th>Status</th><th>วันที่สมัคร</th><th>จัดการ</th>
         </tr></thead><tbody>`];
       for (const r of rows) {
+        const action = r.status === 'converted'
+          ? '<span style="color:#065F46;font-size:12px;font-weight:600;">✅ เปิดแล้ว</span>'
+          : `<button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="openApprove('${r.id}')">✅ อนุมัติ + เปิดใช้</button>`;
         html.push(`<tr>
           <td><a class="email-link" href="mailto:${esc(r.email)}">${esc(r.email)}</a></td>
           <td>${esc(r.school_name || '—')}</td>
@@ -338,6 +375,7 @@
           <td>${esc(r.source || 'marketing')}</td>
           <td><span class="status-badge status-${r.status}">${r.status}</span></td>
           <td class="ts">${formatDate(r.created_at)}</td>
+          <td>${action}</td>
         </tr>`);
       }
       html.push('</tbody></table>');
@@ -377,6 +415,74 @@
       if (v === null || v === undefined) return '';
       const s = String(v).replace(/"/g, '""');
       return /[,"\n]/.test(s) ? `"${s}"` : s;
+    }
+
+    // ===== Approve → create school + owner (Demo mode) =====
+    let apvSlugTouched = false;
+    let apvWaitlistId = null;
+
+    function openApprove(id) {
+      const r = allRows.find(x => x.id === id);
+      if (!r) return;
+      apvWaitlistId = id;
+      apvSlugTouched = false;
+      document.getElementById('apvAlert').style.display = 'none';
+      document.getElementById('apvForm').style.display = '';
+      document.getElementById('apvResult').style.display = 'none';
+      document.getElementById('apvBtn').disabled = false;
+      document.getElementById('apvBtn').textContent = '➕ สร้างโรงเรียน + เปิดใช้';
+      document.getElementById('apvName').value = r.school_name || '';
+      document.getElementById('apvEmail').value = r.email || '';
+      // auto slug from school name (en chars) or email local-part
+      const base = (r.school_name || (r.email || '').split('@')[0] || '');
+      document.getElementById('apvSlug').value = String(base).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+      apvGenPass();
+      updateApvSlugPrev();
+      document.getElementById('apvComp').checked = true;
+      document.getElementById('approveModal').style.display = 'flex';
+    }
+    function closeApprove() { document.getElementById('approveModal').style.display = 'none'; if (document.getElementById('apvResult').style.display !== 'none') loadWaitlist(); }
+    function apvGenPass() { const c = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let p = ''; for (let i = 0; i < 10; i++) p += c[Math.floor(Math.random() * c.length)]; document.getElementById('apvPass').value = p; }
+    function updateApvSlugPrev() { document.getElementById('apvSlugPrev').textContent = document.getElementById('apvSlug').value || 'slug'; }
+    document.addEventListener('input', e => { if (e.target && e.target.id === 'apvSlug') updateApvSlugPrev(); });
+    function apvAlert(msg) { const a = document.getElementById('apvAlert'); a.style.display = 'block'; a.textContent = msg; }
+
+    async function submitApprove() {
+      const name = document.getElementById('apvName').value.trim();
+      const slug = document.getElementById('apvSlug').value.trim().toLowerCase();
+      const email = document.getElementById('apvEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('apvPass').value;
+      const comp = document.getElementById('apvComp').checked;
+      if (!name || !slug || !email || !pass) { apvAlert('กรอกช่องที่มี * ให้ครบ'); return; }
+      if (!/^[a-z0-9-]{3,40}$/.test(slug)) { apvAlert('slug ต้องเป็น a-z 0-9 - (3-40 ตัว)'); return; }
+      if (pass.length < 8) { apvAlert('รหัสผ่านอย่างน้อย 8 ตัว'); return; }
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { apvAlert('เซสชันหมดอายุ — ล็อกอินใหม่'); return; }
+
+      const btn = document.getElementById('apvBtn');
+      btn.disabled = true; btn.textContent = '⏳ กำลังสร้าง...';
+      document.getElementById('apvAlert').style.display = 'none';
+      try {
+        const r = await fetch('/api/admin/create-school', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ schoolName: name, slug, ownerEmail: email, ownerPassword: pass, comp, waitlistId: apvWaitlistId, notes: 'อนุมัติจาก waitlist' })
+        });
+        const data = await r.json();
+        if (!r.ok || !data.success) throw new Error(data.error || 'สร้างไม่สำเร็จ');
+        document.getElementById('apvForm').style.display = 'none';
+        const res = document.getElementById('apvResult');
+        res.style.display = 'block';
+        res.innerHTML = `<strong style="color:#065F46;">✅ เปิดโรงเรียนสำเร็จ!</strong><br>
+          เว็บ: <code>https://${esc(data.slug)}.panyaschoolkit.com</code><br>
+          ล็อกอิน: <code>${esc(data.login_email)}</code><br>
+          รหัสผ่าน: <code>${esc(pass)}</code><br>
+          <span style="color:#4B5670;">📋 ส่ง 3 อย่างนี้ให้โรงเรียน — เขาล็อกอินเป็น Owner แล้วตั้ง admin เองได้</span>`;
+      } catch (e) {
+        apvAlert('❌ ' + e.message);
+        btn.disabled = false; btn.textContent = '➕ สร้างโรงเรียน + เปิดใช้';
+      }
     }
 
     async function signOut() {

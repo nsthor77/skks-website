@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ทุนการศึกษาของฉัน — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+    .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:680px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;margin-bottom:16px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-left:4px solid #D97706;border-radius:14px;padding:18px 20px;margin-bottom:12px;}
+    .card h3{font-size:16px;font-weight:700;color:#92400E;} .card .meta{font-size:13px;color:var(--pk-ash);margin-top:6px;}
+    .amt{font-size:22px;font-weight:800;color:#065F46;margin-top:8px;}
+    .empty{text-align:center;color:var(--pk-ash);padding:50px;}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+    <a href="student-dashboard.html" class="back-link">← หน้าหลัก</a>
+  </div>
+  <div class="container">
+    <div class="page-title"><h1>🎓 ทุนการศึกษาของฉัน</h1><p>ทุนที่ได้รับจากโรงเรียน</p></div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession(); if (!session) { window.location.href='../login.html'; return; }
+      const box = document.getElementById('list');
+      const { data, error } = await supabaseClient.rpc('get_my_scholarships');
+      if (error) { box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      const rows = data || [];
+      if (!rows.length) { box.innerHTML='<div class="empty">ยังไม่มีทุนการศึกษา</div>'; return; }
+      box.innerHTML = rows.map(r=>`<div class="card">
+        <h3>🎓 ${esc(r.scholarship_name)}</h3>
+        <div class="amt">฿${r.amount!=null?Number(r.amount).toLocaleString('en-US'):'-'}</div>
+        <div class="meta">สำหรับ: <b>${esc(r.student_name)}</b>${r.sponsor?(' · โดย '+esc(r.sponsor)):''}<br>
+          ${r.award_date?('วันที่ '+new Date(r.award_date).toLocaleDateString('th-TH')):''} · ${r.status==='disbursed'?'จ่ายเงินแล้ว ✓':'อนุมัติแล้ว'}</div>
+      </div>`).join('');
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  </script>
+</body>
+</html>

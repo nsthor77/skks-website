@@ -62,7 +62,8 @@
       { href: 'payment-approvals.html', tier: 'owner', en: 'Approvals', th: 'อนุมัติสลิป' },
       { href: 'create-bills.html',      tier: 'owner', en: 'Bills',     th: 'ออกบิล' },
       { href: 'tuition-admin.html',     tier: 'owner', en: 'Tuition',   th: 'ค่าเทอม' },
-      { href: 'finance.html',           tier: 'owner', en: 'Finance',   th: 'การเงินรวม' }
+      { href: 'finance.html',           tier: 'owner', en: 'Finance',   th: 'การเงินรวม' },
+      { href: 'scholarships.html',      tier: 'owner', en: 'Scholarships', th: 'ทุนการศึกษา' }
     ]},
     { label: { en: 'Communicate', th: 'ข่าวสาร' }, items: [
       { href: 'announcements.html',tier: 'admin', en: 'Announcements', th: 'ประกาศ' },
@@ -99,6 +100,7 @@
     { label: { en: 'General', th: 'ทั่วไป' }, items: [
       { href: 'my-consent.html',      en: 'Consent Forms', th: 'หนังสือขออนุญาต' },
       { href: 'my-surveys.html',      en: 'Surveys',       th: 'แบบสอบถาม' },
+      { href: 'my-scholarships.html', en: 'Scholarships',  th: 'ทุนการศึกษา' },
       { href: 'leave-requests.html',  en: 'Leave',        th: 'ขอลา' },
       { href: 'library.html',         en: 'Library',      th: 'ห้องสมุด' },
       { href: 'health.html',          en: 'Health',       th: 'สุขภาพ' },

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ทุนการศึกษา — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:880px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);} .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 12px;font-size:12px;} .btn-gold{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:15px 18px;margin-bottom:12px;border-left:4px solid #D97706;}
+    .card.off{opacity:.6;border-left-color:#9AA3B5;}
+    .card h3{font-size:15.5px;font-weight:700;} .card .meta{font-size:12.5px;color:var(--pk-ash);margin-top:5px;}
+    .m{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;} .m-actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;} .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;} .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;} .row2>div{flex:1;}
+    .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;} .chk input{width:auto;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    table.aw{width:100%;border-collapse:collapse;font-size:13px;} table.aw th,table.aw td{padding:7px 8px;border-bottom:1px solid #EEF2F7;text-align:left;} table.aw th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;}
+    .empty{text-align:center;color:var(--pk-ash);padding:40px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.modal input,.modal select,.modal textarea{font-size:16px;}.row2{flex-direction:column;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title"><h1>🎓 ทุนการศึกษา</h1><p>จัดการกองทุน + มอบทุนให้นักเรียน + ติดตามการมอบ</p></div>
+      <button class="btn btn-primary" onclick="openCreate()">➕ เพิ่มทุน</button>
+    </div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <!-- scholarship form -->
+  <div class="modal-bd" id="formModal"><div class="modal">
+    <h2 id="formTitle">➕ เพิ่มทุน</h2>
+    <input type="hidden" id="fId" />
+    <div class="field"><label>ชื่อทุน *</label><input id="fName" placeholder="เช่น ทุนเรียนดี" /></div>
+    <div class="field"><label>แหล่งทุน/ผู้สนับสนุน</label><input id="fSponsor" placeholder="เช่น สมาคมศิษย์เก่า" /></div>
+    <div class="row2">
+      <div class="field"><label>เงินต่อทุน (บาท)</label><input type="number" id="fAmount" min="0" /></div>
+      <div class="field"><label>งบรวม (บาท)</label><input type="number" id="fBudget" min="0" /></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>ปีการศึกษา</label><input id="fYear" placeholder="2567" /></div>
+      <div class="field" style="display:flex;align-items:flex-end;"><label class="chk"><input type="checkbox" id="fActive" checked> เปิดใช้งาน</label></div>
+    </div>
+    <div class="field"><label>รายละเอียด/เงื่อนไข</label><textarea id="fDesc" rows="2"></textarea></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeForm()">ยกเลิก</button><button class="btn btn-primary" id="saveBtn" onclick="saveSch()">💾 บันทึก</button></div>
+  </div></div>
+
+  <!-- award form -->
+  <div class="modal-bd" id="awModal"><div class="modal">
+    <h2>🏅 มอบทุน <span id="awSchName" style="font-weight:400;font-size:14px;color:var(--pk-ash);"></span></h2>
+    <input type="hidden" id="awSchId" />
+    <div class="field"><label>นักเรียน *</label><select id="awStudent"><option value="">— เลือกนักเรียน —</option></select></div>
+    <div class="row2">
+      <div class="field"><label>จำนวนเงิน (บาท)</label><input type="number" id="awAmount" min="0" /></div>
+      <div class="field"><label>วันที่มอบ</label><input type="date" id="awDate" /></div>
+    </div>
+    <div class="field"><label>สถานะ</label><select id="awStatus"><option value="awarded">อนุมัติแล้ว</option><option value="disbursed">จ่ายเงินแล้ว</option></select></div>
+    <div class="field"><label>หมายเหตุ</label><input id="awNote" /></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="document.getElementById('awModal').classList.remove('show')">ยกเลิก</button><button class="btn btn-primary" id="awSaveBtn" onclick="saveAward()">🏅 มอบทุน</button></div>
+  </div></div>
+
+  <!-- awards list -->
+  <div class="modal-bd" id="listModal"><div class="modal" style="max-width:620px;">
+    <h2>📋 ผู้ได้รับทุน <span id="lmName" style="font-weight:400;font-size:14px;color:var(--pk-ash);"></span></h2>
+    <div id="lmBody"><div class="empty">⏳</div></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="document.getElementById('listModal').classList.remove('show')">ปิด</button></div>
+  </div></div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let schs = [], students = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireOwner(); if (!prof) return;
+      await loadStudents(); load();
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function baht(n){ return n!=null ? '฿'+Number(n).toLocaleString('en-US') : '-'; }
+    function getSch(id){ return schs.find(s=>s.id===id)||{}; }
+
+    async function loadStudents(){
+      let all=[], from=0; const size=1000;
+      while(true){ const { data, error } = await supabaseClient.from('students').select('id,first_name_th,last_name_th,grade,classroom,status').range(from,from+size-1);
+        if(error) break; all=all.concat(data||[]); if(!data||data.length<size) break; from+=size; if(from>20000) break; }
+      students = all.filter(s=>!s.status||s.status==='active').sort((a,b)=>((a.grade||'')+(a.classroom||'')).localeCompare((b.grade||'')+(b.classroom||''),'th',{numeric:true}));
+      document.getElementById('awStudent').insertAdjacentHTML('beforeend', students.map(s=>
+        `<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))} · ${esc(s.grade||'')}${s.classroom?('/'+esc(s.classroom)):''}</option>`).join(''));
+    }
+
+    async function load(){
+      const { data, error } = await supabaseClient.rpc('list_scholarships');
+      const box = document.getElementById('list');
+      if (error) { box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      schs = data || [];
+      if (!schs.length) { box.innerHTML='<div class="empty">ยังไม่มีทุน — กด “➕ เพิ่มทุน”</div>'; return; }
+      box.innerHTML = schs.map(s=>`<div class="card ${s.active?'':'off'}"><div class="m">
+        <div style="flex:1;min-width:0;"><h3>🎓 ${esc(s.name)}</h3>
+          <div class="meta">${s.sponsor?('โดย '+esc(s.sponsor)+' · '):''}ทุนละ ${baht(s.amount)}${s.total_budget?(' · งบ '+baht(s.total_budget)):''}
+            · มอบแล้ว <b>${s.awarded_count||0}</b> คน (${baht(s.awarded_total)})${s.academic_year?(' · ปี '+esc(s.academic_year)):''}</div></div>
+        <div class="m-actions">
+          <button class="btn btn-gold btn-sm" onclick="openAward('${s.id}')">🏅 มอบทุน</button>
+          <button class="btn btn-secondary btn-sm" onclick="viewAwards('${s.id}')">📋</button>
+          <button class="btn btn-secondary btn-sm" onclick="openEdit('${s.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delSch('${s.id}')">🗑️</button>
+        </div></div></div>`).join('');
+    }
+
+    function openCreate(){ document.getElementById('fId').value=''; document.getElementById('formTitle').textContent='➕ เพิ่มทุน';
+      ['fName','fSponsor','fAmount','fBudget','fYear','fDesc'].forEach(i=>document.getElementById(i).value=''); document.getElementById('fActive').checked=true;
+      document.getElementById('formModal').classList.add('show'); }
+    function openEdit(id){ const s=getSch(id); document.getElementById('fId').value=s.id; document.getElementById('formTitle').textContent='✏️ แก้ไขทุน';
+      document.getElementById('fName').value=s.name||''; document.getElementById('fSponsor').value=s.sponsor||''; document.getElementById('fAmount').value=s.amount||'';
+      document.getElementById('fBudget').value=s.total_budget||''; document.getElementById('fYear').value=s.academic_year||''; document.getElementById('fDesc').value=s.description||'';
+      document.getElementById('fActive').checked=s.active!==false; document.getElementById('formModal').classList.add('show'); }
+    function closeForm(){ document.getElementById('formModal').classList.remove('show'); }
+
+    async function saveSch(){ const name=document.getElementById('fName').value.trim(); if(!name){ toast('ใส่ชื่อทุน','error'); return; }
+      const btn=document.getElementById('saveBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
+      const { data, error } = await supabaseClient.rpc('save_scholarship', { p_id:document.getElementById('fId').value||null, p_name:name,
+        p_sponsor:document.getElementById('fSponsor').value.trim()||null, p_description:document.getElementById('fDesc').value.trim()||null,
+        p_amount:parseFloat(document.getElementById('fAmount').value)||null, p_total_budget:parseFloat(document.getElementById('fBudget').value)||null,
+        p_year:document.getElementById('fYear').value.trim()||null, p_active:document.getElementById('fActive').checked });
+      btn.disabled=false; btn.textContent=old;
+      if(error||!data||!data.success){ toast((data&&data.error)||'บันทึกไม่สำเร็จ','error'); return; }
+      toast('บันทึกแล้ว','success'); closeForm(); load(); }
+    async function delSch(id){ if(!confirm('ลบทุนนี้? (รายการมอบทุนจะถูกลบด้วย)')) return;
+      const { data } = await supabaseClient.rpc('delete_scholarship',{p_id:id}); if(data&&data.success){ toast('ลบแล้ว','success'); load(); } else toast('ลบไม่สำเร็จ','error'); }
+
+    function openAward(id){ const s=getSch(id); document.getElementById('awSchId').value=id; document.getElementById('awSchName').textContent='— '+s.name;
+      document.getElementById('awStudent').value=''; document.getElementById('awAmount').value=s.amount||''; document.getElementById('awDate').valueAsDate=new Date();
+      document.getElementById('awStatus').value='awarded'; document.getElementById('awNote').value=''; document.getElementById('awModal').classList.add('show'); }
+    async function saveAward(){ const sid=document.getElementById('awStudent').value; if(!sid){ toast('เลือกนักเรียน','error'); return; }
+      const btn=document.getElementById('awSaveBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
+      const { data, error } = await supabaseClient.rpc('award_scholarship', { p_id:null, p_scholarship_id:document.getElementById('awSchId').value, p_student_id:sid,
+        p_amount:parseFloat(document.getElementById('awAmount').value)||null, p_award_date:document.getElementById('awDate').value||null,
+        p_status:document.getElementById('awStatus').value, p_note:document.getElementById('awNote').value.trim()||null });
+      btn.disabled=false; btn.textContent=old;
+      if(error||!data||!data.success){ toast((data&&data.error)||'มอบทุนไม่สำเร็จ','error'); return; }
+      toast('มอบทุนแล้ว','success'); document.getElementById('awModal').classList.remove('show'); load(); }
+
+    async function viewAwards(id){ const s=getSch(id); document.getElementById('lmName').textContent='— '+s.name;
+      document.getElementById('listModal').classList.add('show'); document.getElementById('lmBody').innerHTML='<div class="empty">⏳</div>';
+      const { data, error } = await supabaseClient.rpc('list_awards',{p_scholarship_id:id});
+      if(error){ document.getElementById('lmBody').innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      const rows=data||[]; if(!rows.length){ document.getElementById('lmBody').innerHTML='<div class="empty">ยังไม่มีผู้ได้รับทุน</div>'; return; }
+      document.getElementById('lmBody').innerHTML='<table class="aw"><thead><tr><th>นักเรียน</th><th>ชั้น</th><th>จำนวน</th><th>วันที่</th><th>สถานะ</th><th></th></tr></thead><tbody>'
+        + rows.map(r=>`<tr><td>${esc(r.student_name)}</td><td>${esc(r.grade||'')}${r.classroom?('/'+esc(r.classroom)):''}</td>
+          <td>${baht(r.amount)}</td><td>${r.award_date?new Date(r.award_date).toLocaleDateString('th-TH'):''}</td>
+          <td>${r.status==='disbursed'?'จ่ายแล้ว':'อนุมัติ'}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="delAward('${r.id}','${id}')">ลบ</button></td></tr>`).join('') + '</tbody></table>';
+    }
+    async function delAward(id, schId){ if(!confirm('ลบการมอบทุนนี้?')) return;
+      const { data } = await supabaseClient.rpc('delete_award',{p_id:id}); if(data&&data.success){ toast('ลบแล้ว','success'); viewAwards(schId); load(); } else toast('ลบไม่สำเร็จ','error'); }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2600); }
+  </script>
+</body>
+</html>

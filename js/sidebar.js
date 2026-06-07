@@ -94,6 +94,7 @@
       { href: 'messages.html',        en: 'Messages',     th: 'ข้อความ' },
       { href: 'my-bills.html',        en: 'My Bills',     th: 'ค่าเทอม' },
       { href: 'my-certificates.html', en: 'Certificates', th: 'เกียรติบัตร' },
+      { href: 'help.html',            en: 'User Guide',   th: 'คู่มือใช้งาน' },
       { href: 'profile.html',         en: 'Profile',      th: 'โปรไฟล์' }
     ]}
   ];

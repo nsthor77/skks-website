@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบสอบถาม — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:880px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);} .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 12px;font-size:12px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:15px 18px;margin-bottom:12px;}
+    .card h3{font-size:15.5px;font-weight:700;} .card .meta{font-size:12.5px;color:var(--pk-ash);margin-top:5px;}
+    .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--pk-blue-50);color:var(--pk-blue-800);font-weight:600;margin-right:5px;} .tag.off{background:#F1F5F9;color:#64748B;}
+    .m{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;} .m-actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;} .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;} .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;} .row2>div{flex:1;}
+    .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;} .chk input{width:auto;}
+    .qblock{border:1px solid var(--pk-border);border-radius:10px;padding:12px;margin-bottom:10px;background:#FAFBFD;}
+    .qhead{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+    .opt{display:flex;gap:6px;align-items:center;margin-top:5px;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .bar{height:18px;background:var(--pk-blue-800);border-radius:4px;}
+    .barrow{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px;}
+    .barrow .lbl{width:120px;flex-shrink:0;} .barrow .track{flex:1;background:#EEF2F7;border-radius:4px;}
+    .empty{text-align:center;color:var(--pk-ash);padding:40px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.modal input,.modal select,.modal textarea{font-size:16px;}.row2{flex-direction:column;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title"><h1>📊 แบบสอบถาม / โพล</h1><p>สอบถามความคิดเห็นผู้ปกครอง ครู หรือนักเรียน — ดูผลสรุปอัตโนมัติ</p></div>
+      <button class="btn btn-primary" onclick="openCreate()">➕ สร้างแบบสอบถาม</button>
+    </div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <!-- builder -->
+  <div class="modal-bd" id="formModal"><div class="modal">
+    <h2 id="formTitle">➕ สร้างแบบสอบถาม</h2>
+    <input type="hidden" id="fId" />
+    <div class="field"><label>ชื่อแบบสอบถาม *</label><input id="fTitle" placeholder="เช่น ความพึงพอใจต่อกิจกรรมกีฬาสี" /></div>
+    <div class="field"><label>คำอธิบาย</label><textarea id="fDesc" rows="2"></textarea></div>
+    <div class="row2">
+      <div class="field"><label>ส่งถึง</label><select id="fAudience"><option value="all">ทุกคน</option><option value="parents">ผู้ปกครอง</option><option value="students">นักเรียน</option><option value="staff">ครู/บุคลากร</option></select></div>
+      <div class="field"><label>ปิดรับ (เว้นว่าง=ไม่จำกัด)</label><input type="date" id="fDeadline" /></div>
+    </div>
+    <div class="field"><label class="chk"><input type="checkbox" id="fAnon"> ไม่ระบุตัวตนผู้ตอบ (anonymous)</label></div>
+    <div class="field"><label class="chk"><input type="checkbox" id="fActive" checked> เปิดใช้งาน</label></div>
+
+    <div style="border-top:1px solid #EEF2F7;margin:6px 0 12px;"></div>
+    <div style="font-weight:700;font-size:14px;margin-bottom:8px;">คำถาม</div>
+    <div id="questions"></div>
+    <button class="btn btn-secondary btn-sm" onclick="addQ()">➕ เพิ่มคำถาม</button>
+
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeForm()">ยกเลิก</button><button class="btn btn-primary" id="saveBtn" onclick="saveSurvey()">💾 บันทึก</button></div>
+  </div></div>
+
+  <!-- results -->
+  <div class="modal-bd" id="resModal"><div class="modal" style="max-width:640px;">
+    <h2 id="resTitle">📈 ผลแบบสอบถาม</h2>
+    <div id="resBody"><div class="empty">⏳</div></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="document.getElementById('resModal').classList.remove('show')">ปิด</button></div>
+  </div></div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let surveys = [], qs = [], qSeq = 0;
+    const AUD = { all:'ทุกคน', parents:'ผู้ปกครอง', students:'นักเรียน', staff:'ครู/บุคลากร' };
+    const QT = { choice:'ตัวเลือก', rating:'ให้คะแนน 1-5', text:'พิมพ์ตอบ' };
+
+    document.addEventListener('DOMContentLoaded', async () => { const p = await roleGuard.requireTeacher(); if(!p) return; load(); });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function getSurvey(id){ return surveys.find(s=>s.id===id)||{}; }
+
+    async function load() {
+      const { data, error } = await supabaseClient.rpc('list_surveys');
+      const box = document.getElementById('list');
+      if (error) { box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      surveys = data || [];
+      if (!surveys.length) { box.innerHTML='<div class="empty">ยังไม่มีแบบสอบถาม — กด “➕ สร้างแบบสอบถาม”</div>'; return; }
+      box.innerHTML = surveys.map(s => `<div class="card"><div class="m">
+        <div style="flex:1;min-width:0;"><h3>${esc(s.title)}</h3>
+          <div class="meta"><span class="tag">${esc(AUD[s.audience]||s.audience)}</span>
+            <span class="tag ${s.active?'':'off'}">${s.active?'เปิด':'ปิด'}</span>
+            · ${(s.questions||[]).length} คำถาม · ตอบแล้ว <b>${s.responses||0}</b></div></div>
+        <div class="m-actions">
+          <button class="btn btn-secondary btn-sm" onclick="viewResults('${s.id}')">📈 ผล</button>
+          <button class="btn btn-secondary btn-sm" onclick="openEdit('${s.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delSurvey('${s.id}')">🗑️</button>
+        </div></div></div>`).join('');
+    }
+
+    // ---- builder ----
+    function renderQs(){
+      document.getElementById('questions').innerHTML = qs.map((q,i)=>`
+        <div class="qblock">
+          <div class="qhead">
+            <b style="color:var(--pk-ash);">${i+1}.</b>
+            <select onchange="setType(${i},this.value)" style="width:140px;padding:6px;border:1px solid var(--pk-border);border-radius:7px;">
+              ${Object.keys(QT).map(t=>`<option value="${t}" ${q.type===t?'selected':''}>${QT[t]}</option>`).join('')}
+            </select>
+            <button class="btn btn-danger btn-sm" style="margin-left:auto;" onclick="rmQ(${i})">ลบ</button>
+          </div>
+          <input value="${esc(q.text||'')}" oninput="setText(${i},this.value)" placeholder="ข้อความคำถาม" style="width:100%;padding:8px;border:1px solid var(--pk-border);border-radius:7px;" />
+          ${q.type==='choice'?`<div style="margin-top:6px;">${(q.options||[]).map((o,oi)=>`
+            <div class="opt"><input value="${esc(o)}" oninput="setOpt(${i},${oi},this.value)" placeholder="ตัวเลือก ${oi+1}" style="flex:1;padding:6px;border:1px solid var(--pk-border);border-radius:7px;" />
+            <button class="btn btn-danger btn-sm" onclick="rmOpt(${i},${oi})">×</button></div>`).join('')}
+            <button class="btn btn-secondary btn-sm" style="margin-top:5px;" onclick="addOpt(${i})">+ ตัวเลือก</button></div>`:''}
+        </div>`).join('');
+    }
+    function addQ(){ qs.push({id:'q'+(++qSeq), type:'choice', text:'', options:['','']}); renderQs(); }
+    function rmQ(i){ qs.splice(i,1); renderQs(); }
+    function setType(i,t){ qs[i].type=t; if(t==='choice'&&!(qs[i].options&&qs[i].options.length)) qs[i].options=['','']; renderQs(); }
+    function setText(i,v){ qs[i].text=v; }
+    function addOpt(i){ qs[i].options=qs[i].options||[]; qs[i].options.push(''); renderQs(); }
+    function rmOpt(i,oi){ qs[i].options.splice(oi,1); renderQs(); }
+    function setOpt(i,oi,v){ qs[i].options[oi]=v; }
+
+    function openCreate(){
+      document.getElementById('fId').value=''; document.getElementById('formTitle').textContent='➕ สร้างแบบสอบถาม';
+      ['fTitle','fDesc','fDeadline'].forEach(x=>document.getElementById(x).value='');
+      document.getElementById('fAudience').value='all'; document.getElementById('fAnon').checked=false; document.getElementById('fActive').checked=true;
+      qs=[{id:'q'+(++qSeq),type:'choice',text:'',options:['','']}]; renderQs();
+      document.getElementById('formModal').classList.add('show');
+    }
+    function openEdit(id){
+      const s=getSurvey(id); document.getElementById('fId').value=s.id; document.getElementById('formTitle').textContent='✏️ แก้ไขแบบสอบถาม';
+      document.getElementById('fTitle').value=s.title||''; document.getElementById('fDesc').value=s.description||'';
+      document.getElementById('fAudience').value=s.audience||'all'; document.getElementById('fAnon').checked=!!s.anonymous; document.getElementById('fActive').checked=s.active!==false;
+      document.getElementById('fDeadline').value=s.deadline||'';
+      qs = JSON.parse(JSON.stringify(s.questions||[])); if(!qs.length) qs=[{id:'q'+(++qSeq),type:'choice',text:'',options:['','']}];
+      renderQs(); document.getElementById('formModal').classList.add('show');
+    }
+    function closeForm(){ document.getElementById('formModal').classList.remove('show'); }
+
+    async function saveSurvey(){
+      const title=document.getElementById('fTitle').value.trim(); if(!title){ toast('ใส่ชื่อแบบสอบถาม','error'); return; }
+      const clean = qs.filter(q=>q.text && q.text.trim()).map(q=>({ id:q.id, type:q.type, text:q.text.trim(),
+        options: q.type==='choice' ? (q.options||[]).map(o=>o.trim()).filter(Boolean) : [] }));
+      if(!clean.length){ toast('เพิ่มอย่างน้อย 1 คำถาม','error'); return; }
+      const btn=document.getElementById('saveBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
+      const { data, error } = await supabaseClient.rpc('save_survey', {
+        p_id:document.getElementById('fId').value||null, p_title:title, p_description:document.getElementById('fDesc').value.trim()||null,
+        p_audience:document.getElementById('fAudience').value, p_questions:clean, p_anonymous:document.getElementById('fAnon').checked,
+        p_active:document.getElementById('fActive').checked, p_deadline:document.getElementById('fDeadline').value||null
+      });
+      btn.disabled=false; btn.textContent=old;
+      if(error||!data||!data.success){ toast((data&&data.error)||'บันทึกไม่สำเร็จ','error'); return; }
+      toast('บันทึกแล้ว','success'); closeForm(); load();
+    }
+    async function delSurvey(id){ if(!confirm('ลบแบบสอบถามนี้? (คำตอบจะถูกลบด้วย)')) return;
+      const { data } = await supabaseClient.rpc('delete_survey',{p_id:id}); if(data&&data.success){ toast('ลบแล้ว','success'); load(); } else toast('ลบไม่สำเร็จ','error'); }
+
+    // ---- results ----
+    async function viewResults(id){
+      const s=getSurvey(id);
+      document.getElementById('resTitle').textContent='📈 '+s.title;
+      document.getElementById('resModal').classList.add('show');
+      document.getElementById('resBody').innerHTML='<div class="empty">⏳</div>';
+      const { data, error } = await supabaseClient.rpc('get_survey_results',{p_survey_id:id});
+      if(error){ document.getElementById('resBody').innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      const resp = data||[]; const N = resp.length;
+      if(!N){ document.getElementById('resBody').innerHTML='<div class="empty">ยังไม่มีผู้ตอบ</div>'; return; }
+      let html = `<div style="font-size:13px;color:var(--pk-ash);margin-bottom:10px;">ผู้ตอบทั้งหมด ${N} คน</div>`;
+      (s.questions||[]).forEach((q,qi)=>{
+        html += `<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:14px;margin-bottom:6px;">${qi+1}. ${esc(q.text)}</div>`;
+        const vals = resp.map(r => (r.answers||{})[q.id]).filter(v=>v!==undefined && v!==null && v!=='');
+        if(q.type==='choice'){
+          (q.options||[]).forEach(opt=>{ const c=vals.filter(v=>v===opt).length; const pct=N?Math.round(c/N*100):0;
+            html += `<div class="barrow"><span class="lbl">${esc(opt)}</span><span class="track"><span class="bar" style="width:${pct}%"></span></span><span>${c} (${pct}%)</span></div>`; });
+        } else if(q.type==='rating'){
+          const nums=vals.map(Number).filter(n=>!isNaN(n)); const avg=nums.length?(nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(2):'-';
+          html += `<div style="font-size:13px;margin-bottom:4px;">คะแนนเฉลี่ย <b style="font-size:18px;color:var(--pk-blue-800);">${avg}</b> / 5 (${nums.length} คน)</div>`;
+          for(let r=5;r>=1;r--){ const c=nums.filter(n=>n===r).length; const pct=nums.length?Math.round(c/nums.length*100):0;
+            html += `<div class="barrow"><span class="lbl">${'★'.repeat(r)}</span><span class="track"><span class="bar" style="width:${pct}%"></span></span><span>${c}</span></div>`; }
+        } else {
+          html += vals.length ? '<div style="font-size:13px;">'+vals.map(v=>`<div style="padding:6px 10px;background:#F8FAFC;border-radius:7px;margin-top:4px;">“${esc(v)}”</div>`).join('')+'</div>' : '<div style="color:#9AA3B5;font-size:13px;">ไม่มีคำตอบ</div>';
+        }
+        html += '</div>';
+      });
+      document.getElementById('resBody').innerHTML = html;
+    }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2600); }
+  </script>
+</body>
+</html>

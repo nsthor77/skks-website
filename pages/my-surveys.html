@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบสอบถาม — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:720px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;margin-bottom:16px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:18px 20px;margin-bottom:14px;}
+    .card.done{border-left:4px solid #10B981;}
+    .card h3{font-size:16px;font-weight:700;} .card .desc{font-size:13.5px;color:var(--pk-ash);margin-top:6px;}
+    .q{margin-top:14px;} .q .qt{font-weight:600;font-size:14px;margin-bottom:6px;}
+    .opts label{display:block;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:14px;}
+    .opts label:has(input:checked){background:var(--pk-blue-50);border-color:var(--pk-blue-800);}
+    .opts input{margin-right:8px;}
+    .stars{display:flex;gap:6px;} .stars button{font-size:24px;background:none;border:none;cursor:pointer;color:#CBD5E1;} .stars button.on{color:#F59E0B;}
+    textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .btn{padding:10px 18px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink);border:1px solid var(--pk-border-em);}
+    .badge{padding:4px 12px;border-radius:20px;font-weight:700;font-size:13px;background:#D1FAE5;color:#065F46;}
+    .empty{text-align:center;color:var(--pk-ash);padding:50px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}textarea{font-size:16px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="student-dashboard.html" class="back-link">← หน้าหลัก</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title"><h1>📊 แบบสอบถาม</h1><p>แบบสอบถามจากโรงเรียน — ความเห็นของคุณมีค่า</p></div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    let surveys = [], answers = {};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession(); if (!session) { window.location.href='../login.html'; return; }
+      load();
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function getSurvey(id){ return surveys.find(s=>s.id===id)||{}; }
+
+    async function load() {
+      const box = document.getElementById('list');
+      const { data, error } = await supabaseClient.rpc('get_my_surveys');
+      if (error) { box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      surveys = data || [];
+      if (!surveys.length) { box.innerHTML='<div class="empty">🎉 ไม่มีแบบสอบถามที่ต้องตอบ</div>'; return; }
+      box.innerHTML = surveys.map(s => `<div class="card ${s.responded?'done':''}" id="s_${s.id}">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="flex:1;min-width:0;"><h3>${esc(s.title)}</h3>${s.description?`<div class="desc">${esc(s.description)}</div>`:''}
+            ${s.deadline?`<div class="desc">⏰ ปิดรับ ${new Date(s.deadline).toLocaleDateString('th-TH')}</div>`:''}</div>
+          ${s.responded?'<span class="badge">✓ ตอบแล้ว</span>':`<button class="btn btn-primary" onclick="openFill('${s.id}')">ตอบเลย</button>`}
+        </div>
+        <div class="fillarea" id="fill_${s.id}"></div>
+      </div>`).join('');
+    }
+
+    function openFill(id){
+      const s=getSurvey(id); answers={};
+      const area=document.getElementById('fill_'+id);
+      area.innerHTML = (s.questions||[]).map(q=>{
+        let inner='';
+        if(q.type==='choice'){ inner=`<div class="opts">`+(q.options||[]).map(o=>
+          `<label><input type="radio" name="${q.id}" value="${esc(o)}" onchange="setA('${q.id}',this.value)">${esc(o)}</label>`).join('')+`</div>`; }
+        else if(q.type==='rating'){ inner=`<div class="stars" id="st_${q.id}">`+[1,2,3,4,5].map(n=>
+          `<button type="button" onclick="setStar('${q.id}',${n})">★</button>`).join('')+`</div>`; }
+        else { inner=`<textarea rows="2" oninput="setA('${q.id}',this.value)" placeholder="พิมพ์คำตอบ"></textarea>`; }
+        return `<div class="q"><div class="qt">${esc(q.text)}</div>${inner}</div>`;
+      }).join('') + `<div style="margin-top:14px;text-align:right;"><button class="btn btn-primary" onclick="submitS('${id}')">📨 ส่งคำตอบ</button></div>`;
+    }
+    function setA(qid,val){ answers[qid]=val; }
+    function setStar(qid,n){ answers[qid]=n; const box=document.getElementById('st_'+qid); [...box.children].forEach((b,i)=>b.classList.toggle('on',i<n)); }
+
+    async function submitS(id){
+      const { data, error } = await supabaseClient.rpc('submit_survey',{ p_survey_id:id, p_answers:answers });
+      if(error||!data||!data.success){ toast((data&&data.error)||(error&&error.message)||'ส่งไม่สำเร็จ','error'); return; }
+      toast('ส่งคำตอบแล้ว ขอบคุณครับ','success'); load();
+    }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2800); }
+  </script>
+</body>
+</html>

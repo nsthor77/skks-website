@@ -216,10 +216,11 @@
       const fullName = ((s.first_name_th || '') + ' ' + (s.last_name_th || '')).trim() || '(ไม่ระบุชื่อ)';
       const enName = ((s.first_name_en || '') + ' ' + (s.last_name_en || '')).trim();
       const initial = (s.first_name_th?.[0] || s.first_name_en?.[0] || '?').toUpperCase();
+      const photoUrl = (s.photo_url || '').trim();
 
       document.getElementById('content').innerHTML = `
         <div class="profile-header">
-          <div class="photo-circle">${esc(initial)}</div>
+          <div class="photo-circle"${photoUrl ? ` style="background-image:url('${esc(photoUrl)}');background-size:cover;background-position:center;color:transparent;"` : ''}>${photoUrl ? '' : esc(initial)}</div>
           <div class="profile-info">
             <h1>${esc(fullName)}${s.nickname ? ` <span style="color:#7B8497;font-weight:500;font-size:18px;">(${esc(s.nickname)})</span>` : ''}</h1>
             ${enName ? `<div class="eng">${esc(enName)}</div>` : ''}

@@ -59,6 +59,7 @@
       { href: 'finance.html',           tier: 'owner', en: 'Finance',   th: 'การเงินรวม' }
     ]},
     { label: { en: 'Communicate', th: 'ข่าวสาร' }, items: [
+      { href: 'announcements.html',tier: 'admin', en: 'Announcements', th: 'ประกาศ' },
       { href: 'messages.html',     tier: 'teacher', en: 'Messages', th: 'ข้อความ' },
       { href: 'events-admin.html', tier: 'admin', en: 'Events', th: 'กิจกรรม' },
       { href: 'news-admin.html',   tier: 'admin', en: 'News',   th: 'ข่าว' }
@@ -69,7 +70,8 @@
       { href: 'users.html',            tier: 'admin', en: 'Users',            th: 'ผู้ใช้' },
       { href: 'manage-invites.html',   tier: 'admin', en: 'Invites',          th: 'คำเชิญ' },
       { href: 'school-settings.html',  tier: 'admin', en: 'School',           th: 'โรงเรียน' },
-      { href: 'brand-setup.html',      tier: 'admin', en: 'Branding',         th: 'แบรนด์/โลโก้' }
+      { href: 'brand-setup.html',      tier: 'admin', en: 'Branding',         th: 'แบรนด์/โลโก้' },
+      { href: 'data-export.html',      tier: 'owner', en: 'Export Data',      th: 'ส่งออกข้อมูล' }
     ]}
   ];
 

@@ -538,6 +538,19 @@
 
           <div class="form-section">
             <h4 data-i18n="students.sectionGeneral">General Info</h4>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+              <div id="fPhotoPrev" title="ลากรูปมาวางได้"
+                   style="width:74px;height:74px;border-radius:50%;background:#F1F5F9;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 auto;color:#94A3B8;font-size:26px;background-size:cover;background-position:center;">👤</div>
+              <div>
+                <button type="button" id="fPhotoBtn"
+                  style="display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">
+                  📷 อัปโหลดรูปนักเรียน
+                </button>
+                <input type="file" id="fPhotoFile" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+                <input type="hidden" id="fPhotoUrl" />
+                <div id="fPhotoStatus" style="font-size:11.5px;margin-top:4px;color:#6B7280;min-height:14px;">ใช้บนบัตรนักเรียน / ปพ. · ไม่เกิน 3MB</div>
+              </div>
+            </div>
             <div class="form-grid">
               <div class="form-group">
                 <label><span data-i18n="students.fldStudentNumber">รหัสนักเรียน</span> <span class="req">*</span></label>
@@ -802,6 +815,7 @@
 
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
+  <script src="../js/upload.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
   <script src="../js/smart-import.js"></script>
@@ -864,6 +878,7 @@
 
       bindFilters();
       bindDragDrop();
+      bindPhotoUpload();
       loadCustomFieldDefs();
       loadStats();
       loadStudents();
@@ -1088,6 +1103,10 @@
       const yr = (new Date().getFullYear() + 543).toString().slice(-2);
       const seq = String(totalRows + 1).padStart(4, '0');
       document.getElementById('fStudentNumber').value = `${yr}-${seq}`;
+      document.getElementById('fPhotoUrl').value = '';
+      document.getElementById('fPhotoStatus').textContent = 'ใช้บนบัตรนักเรียน / ปพ. · ไม่เกิน 3MB';
+      document.getElementById('fPhotoStatus').style.color = '#6B7280';
+      syncPhotoPreview();
       // Render custom fields (empty values)
       renderCustomFields({});
       document.getElementById('editModal').classList.add('show');
@@ -1098,14 +1117,44 @@
       if (error) return toast('โหลดข้อมูลไม่ได้: ' + error.message, 'error');
       document.getElementById('modalTitle').textContent = '✏️ แก้ไขนักเรียน';
       document.getElementById('fId').value = data.id;
-      const fields = ['student_number','first_name_th','last_name_th','first_name_en','last_name_en','nickname','gender','birth_date','nationality','national_id','blood_type','address','program','academic_year','grade','classroom','enrollment_date','phone','email','parent1_name','parent1_relation','parent1_phone','parent1_email','parent1_occupation','parent2_name','parent2_relation','parent2_phone','parent2_email','parent2_occupation','emergency_name','emergency_relation','emergency_phone','medical_conditions','allergies','medications','notes','status'];
+      const fields = ['student_number','first_name_th','last_name_th','first_name_en','last_name_en','nickname','gender','birth_date','nationality','national_id','blood_type','address','program','academic_year','grade','classroom','enrollment_date','phone','email','parent1_name','parent1_relation','parent1_phone','parent1_email','parent1_occupation','parent2_name','parent2_relation','parent2_phone','parent2_email','parent2_occupation','emergency_name','emergency_relation','emergency_phone','medical_conditions','allergies','medications','notes','photo_url','status'];
       fields.forEach(f => {
         const el = document.getElementById('f' + f.split('_').map(s => s[0].toUpperCase() + s.slice(1)).join(''));
         if (el) el.value = data[f] ?? '';
       });
+      syncPhotoPreview();
       // Sprint 10.5: load custom_data values
       renderCustomFields(data.custom_data || {});
       document.getElementById('editModal').classList.add('show');
+    }
+
+    // wire the student photo upload (file picker + drag onto the round preview)
+    function bindPhotoUpload() {
+      if (!window.skUpload) return;
+      const stat = document.getElementById('fPhotoStatus');
+      skUpload.attachPicker({
+        button: document.getElementById('fPhotoBtn'),
+        fileInput: document.getElementById('fPhotoFile'),
+        dropZone: document.getElementById('fPhotoPrev'),
+        subfolder: 'students',
+        onStart: () => { stat.textContent = '⏳ กำลังอัปโหลด...'; stat.style.color = '#6B7280'; },
+        onDone: (url) => {
+          document.getElementById('fPhotoUrl').value = url;
+          syncPhotoPreview();
+          stat.textContent = '✅ อัปโหลดรูปแล้ว';
+          stat.style.color = '#059669';
+        },
+        onError: (m) => { stat.textContent = '❌ ' + m; stat.style.color = '#DC2626'; }
+      });
+    }
+
+    // reflect the hidden fPhotoUrl into the round preview
+    function syncPhotoPreview() {
+      const url = (document.getElementById('fPhotoUrl').value || '').trim();
+      const box = document.getElementById('fPhotoPrev');
+      if (!box) return;
+      if (url) { box.style.backgroundImage = `url("${url}")`; box.textContent = ''; }
+      else { box.style.backgroundImage = ''; box.textContent = '👤'; }
     }
 
     function closeEditModal() {
@@ -1160,6 +1209,11 @@
 
       // Empty strings → null for cleanliness
       Object.keys(payload).forEach(k => { if (payload[k] === '') payload[k] = null; });
+
+      // photo_url: only include when set, so saves still work even if the
+      // sprint-29 column migration hasn't been run yet (graceful degrade)
+      const _photo = val('fPhotoUrl');
+      if (_photo) payload.photo_url = _photo;
 
       // Sprint 10.5: include custom field values
       payload.custom_data = collectCustomData();

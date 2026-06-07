@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ประกาศ — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --pk-blue-800:#1E40AF;--pk-blue-600:#2563EB;--pk-blue-50:#EEF3FF;
+      --pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-mist:#7B8497;
+      --pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:920px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+    .page-title h1{font-size:24px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:14px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 12px;font-size:12px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-left:4px solid var(--pk-blue-800);border-radius:12px;padding:15px 18px;margin-bottom:12px;}
+    .card.pin{background:#FFFBEB;border-left-color:#D97706;}
+    .card.off{opacity:.6;border-left-color:#9AA3B5;}
+    .m{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;}
+    .m-info{flex:1;min-width:0;}
+    .m-info h3{font-size:15.5px;font-weight:700;color:var(--pk-ink);}
+    .m-info .body{font-size:13px;color:var(--pk-ink-soft);margin-top:6px;white-space:pre-wrap;line-height:1.6;}
+    .m-info .meta{font-size:12px;color:var(--pk-ash);margin-top:8px;}
+    .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--pk-blue-50);color:var(--pk-blue-800);margin-right:6px;font-weight:600;}
+    .tag.off{background:#F1F5F9;color:#64748B;}
+    .m-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+    .empty{text-align:center;padding:50px 20px;color:var(--pk-ash);} .empty .icon{font-size:44px;margin-bottom:10px;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+    .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;}
+    .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;} .row2>div{flex:1;}
+    .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--pk-ink-soft);cursor:pointer;}
+    .chk input{width:auto;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}
+    .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.modal input,.modal select,.modal textarea{font-size:16px;}.row2{flex-direction:column;}.m-actions{width:100%;}.m-actions .btn{flex:1;text-align:center;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title">
+        <h1>📢 ประกาศ</h1>
+        <p>ข่าวสารที่จะเด้งให้ครู นักเรียน หรือผู้ปกครองเห็นตอนเข้าระบบ</p>
+      </div>
+      <button class="btn btn-primary" onclick="openCreate()">➕ ประกาศใหม่</button>
+    </div>
+
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <!-- create/edit modal -->
+  <div class="modal-bd" id="formModal">
+    <div class="modal">
+      <h2 id="formTitle">➕ ประกาศใหม่</h2>
+      <input type="hidden" id="aId" />
+      <div class="field"><label>หัวข้อ *</label><input type="text" id="aTitle" placeholder="เช่น ปิดเรียนวันที่ 12 มิ.ย." /></div>
+      <div class="field"><label>รายละเอียด</label><textarea id="aBody" rows="4" placeholder="ข้อความที่อยากให้เห็น..."></textarea></div>
+      <div class="row2">
+        <div class="field"><label>แสดงให้ใครเห็น</label>
+          <select id="aAudience">
+            <option value="all">ทุกคน</option>
+            <option value="staff">บุคลากร (ครู/แอดมิน)</option>
+            <option value="students">นักเรียน + ผู้ปกครอง</option>
+            <option value="parents">ผู้ปกครองเท่านั้น</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>เริ่มแสดง (เว้นว่าง = ทันที)</label><input type="datetime-local" id="aStarts" /></div>
+        <div class="field"><label>หยุดแสดง (เว้นว่าง = ตลอด)</label><input type="datetime-local" id="aEnds" /></div>
+      </div>
+      <div class="field"><label class="chk"><input type="checkbox" id="aPinned" /> 📌 ปักหมุด (เด่นขึ้น สีเหลือง)</label></div>
+      <div class="field"><label class="chk"><input type="checkbox" id="aActive" checked /> เปิดใช้งาน (เอาเครื่องหมายออก = ซ่อนชั่วคราว)</label></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeForm()">ยกเลิก</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveAnnouncement()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let rows = [];
+    const AUD = { all:'ทุกคน', staff:'บุคลากร', students:'นักเรียน+ผู้ปกครอง', parents:'ผู้ปกครอง' };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireStaff();   // admin tier (owner/admin) — teachers excluded
+      if (!prof) return;
+      load();
+    });
+
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function getRow(id){ return rows.find(r => r.id === id) || {}; }
+
+    async function load() {
+      document.getElementById('list').innerHTML = '<div class="empty">⏳ กำลังโหลด...</div>';
+      const { data, error } = await supabaseClient.rpc('list_announcements');
+      if (error) { document.getElementById('list').innerHTML = '<div class="empty">'+esc(error.message)+'</div>'; return; }
+      rows = Array.isArray(data) ? data : [];
+      render();
+    }
+
+    function fmt(ts){ if(!ts) return ''; try { return new Date(ts).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}); } catch(e){ return ''; } }
+
+    function render() {
+      const list = document.getElementById('list');
+      if (!rows.length) {
+        list.innerHTML = '<div class="empty"><div class="icon">📢</div><h3>ยังไม่มีประกาศ</h3><p>กด “➕ ประกาศใหม่” เพื่อแจ้งข่าวให้ทุกคน</p></div>';
+        return;
+      }
+      list.innerHTML = rows.map(r => {
+        const window = [r.starts_at?('เริ่ม '+fmt(r.starts_at)):'', r.ends_at?('ถึง '+fmt(r.ends_at)):''].filter(Boolean).join(' · ');
+        return `<div class="card ${r.pinned?'pin':''} ${r.active?'':'off'}">
+          <div class="m">
+            <div class="m-info">
+              <h3>${r.pinned?'📌 ':''}${esc(r.title)}</h3>
+              ${r.body?`<div class="body">${esc(r.body)}</div>`:''}
+              <div class="meta">
+                <span class="tag">${esc(AUD[r.audience]||r.audience)}</span>
+                ${r.active?'':'<span class="tag off">ซ่อนอยู่</span>'}
+                ${window?('· '+esc(window)):''}
+              </div>
+            </div>
+            <div class="m-actions">
+              <button class="btn btn-secondary btn-sm" onclick="openEdit('${r.id}')">✏️ แก้ไข</button>
+              <button class="btn btn-danger btn-sm" onclick="del('${r.id}')">🗑️ ลบ</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // datetime-local <-> ISO helpers
+    function toLocalInput(ts){
+      if(!ts) return '';
+      const d = new Date(ts);
+      const pad = n => String(n).padStart(2,'0');
+      return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+    }
+    function fromLocalInput(v){ return v ? new Date(v).toISOString() : null; }
+
+    function openCreate() {
+      document.getElementById('aId').value='';
+      document.getElementById('formTitle').textContent='➕ ประกาศใหม่';
+      document.getElementById('aTitle').value='';
+      document.getElementById('aBody').value='';
+      document.getElementById('aAudience').value='all';
+      document.getElementById('aStarts').value='';
+      document.getElementById('aEnds').value='';
+      document.getElementById('aPinned').checked=false;
+      document.getElementById('aActive').checked=true;
+      document.getElementById('formModal').classList.add('show');
+    }
+    function openEdit(id) {
+      const r = getRow(id);
+      document.getElementById('aId').value=r.id;
+      document.getElementById('formTitle').textContent='✏️ แก้ไขประกาศ';
+      document.getElementById('aTitle').value=r.title||'';
+      document.getElementById('aBody').value=r.body||'';
+      document.getElementById('aAudience').value=r.audience||'all';
+      document.getElementById('aStarts').value=toLocalInput(r.starts_at);
+      document.getElementById('aEnds').value=toLocalInput(r.ends_at);
+      document.getElementById('aPinned').checked=!!r.pinned;
+      document.getElementById('aActive').checked=r.active!==false;
+      document.getElementById('formModal').classList.add('show');
+    }
+    function closeForm(){ document.getElementById('formModal').classList.remove('show'); }
+
+    async function saveAnnouncement() {
+      const title = document.getElementById('aTitle').value.trim();
+      if (!title) { toast('กรุณาใส่หัวข้อ','error'); return; }
+      const btn = document.getElementById('saveBtn');
+      btn.disabled=true; btn.textContent='⏳ กำลังบันทึก...';
+      const { data, error } = await supabaseClient.rpc('save_announcement', {
+        p_id: document.getElementById('aId').value || null,
+        p_title: title,
+        p_body: document.getElementById('aBody').value.trim() || null,
+        p_audience: document.getElementById('aAudience').value,
+        p_pinned: document.getElementById('aPinned').checked,
+        p_active: document.getElementById('aActive').checked,
+        p_starts_at: fromLocalInput(document.getElementById('aStarts').value),
+        p_ends_at: fromLocalInput(document.getElementById('aEnds').value)
+      });
+      btn.disabled=false; btn.textContent='💾 บันทึก';
+      if (error || !data || !data.success) { toast((data&&data.error)||(error&&error.message)||'บันทึกไม่สำเร็จ','error'); return; }
+      toast('บันทึกแล้ว','success');
+      closeForm();
+      load();
+    }
+
+    async function del(id) {
+      if (!confirm('ลบประกาศนี้?')) return;
+      const { data, error } = await supabaseClient.rpc('delete_announcement', { p_id: id });
+      if (error || !data || !data.success) { toast('ลบไม่สำเร็จ','error'); return; }
+      toast('ลบแล้ว','success');
+      load();
+    }
+
+    let toastTimer=null;
+    function toast(msg, type){
+      const el=document.getElementById('toast');
+      el.textContent=msg; el.className='toast show '+(type||'');
+      clearTimeout(toastTimer);
+      toastTimer=setTimeout(()=>{ el.className='toast'; }, 2600);
+    }
+  </script>
+</body>
+</html>

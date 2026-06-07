@@ -35,7 +35,8 @@
       { href: 'health.html',      tier: 'teacher', en: 'Health',       th: 'ห้องพยาบาล' },
       { href: 'teachers.html',    tier: 'admin',   en: 'Teachers',     th: 'ครู' },
       { href: 'applications.html',tier: 'admin',   en: 'Applications', th: 'ใบสมัคร' },
-      { href: 'id-cards.html',    tier: 'admin',   en: 'ID Cards',     th: 'บัตรนักเรียน' }
+      { href: 'id-cards.html',    tier: 'admin',   en: 'ID Cards',     th: 'บัตรนักเรียน' },
+      { href: 'promotion.html',   tier: 'owner',   en: 'Promotion',    th: 'เลื่อนชั้น/ปีการศึกษา' }
     ]},
     { label: { en: 'Academic', th: 'วิชาการ' }, items: [
       { href: 'attendance.html',      tier: 'teacher', en: 'Attendance', th: 'เช็คชื่อ' },

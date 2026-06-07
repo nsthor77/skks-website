@@ -864,6 +864,7 @@
     let searchTimer = null;
     let csvParsedRows = [];
     let customFieldDefs = []; // Sprint 10.5: school-defined custom fields
+    let currentTermYear = null; // Sprint 32: default academic year for new students
 
     // ============ Init ============
     document.addEventListener('DOMContentLoaded', async () => {
@@ -879,6 +880,7 @@
       bindFilters();
       bindDragDrop();
       bindPhotoUpload();
+      loadCurrentTerm();
       loadCustomFieldDefs();
       loadStats();
       loadStudents();
@@ -1107,6 +1109,8 @@
       document.getElementById('fPhotoStatus').textContent = 'ใช้บนบัตรนักเรียน / ปพ. · ไม่เกิน 3MB';
       document.getElementById('fPhotoStatus').style.color = '#6B7280';
       syncPhotoPreview();
+      // default academic year to the school's current term (Sprint 32)
+      if (currentTermYear) { const ay = document.getElementById('fAcademicYear'); if (ay && !ay.value) ay.value = currentTermYear; }
       // Render custom fields (empty values)
       renderCustomFields({});
       document.getElementById('editModal').classList.add('show');
@@ -1126,6 +1130,14 @@
       // Sprint 10.5: load custom_data values
       renderCustomFields(data.custom_data || {});
       document.getElementById('editModal').classList.add('show');
+    }
+
+    // Sprint 32: cache the school's current academic year to default new students
+    async function loadCurrentTerm() {
+      try {
+        const { data } = await supabaseClient.rpc('get_current_term');
+        if (data && data.year) currentTermYear = data.year;
+      } catch (e) {}
     }
 
     // wire the student photo upload (file picker + drag onto the round preview)

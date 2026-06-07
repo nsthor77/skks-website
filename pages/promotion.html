@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ปีการศึกษา & เลื่อนชั้น — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;
+      --pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;
+      --pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;--pk-warn:#92400E;--pk-warn-bg:#FFFBEB;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;border-radius:8px;}
+    .container{max-width:880px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:24px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:14px;margin-top:4px;margin-bottom:16px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+    .card h2{font-size:16.5px;font-weight:700;margin-bottom:4px;} .card .sub{font-size:13px;color:var(--pk-ash);margin-bottom:14px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);}
+    .btn-warn{background:#D97706;color:#fff;} .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 12px;font-size:12.5px;}
+    .btn[disabled]{opacity:.5;cursor:not-allowed;}
+    label.fl{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    input,select{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+    .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
+    .chip{background:var(--pk-blue-50);color:var(--pk-blue-800);border-radius:20px;padding:5px 12px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;}
+    .chip.cur{background:#065F46;color:#fff;}
+    .chip .x{cursor:pointer;opacity:.7;} .chip .x:hover{opacity:1;}
+    table.map{width:100%;border-collapse:collapse;margin-top:6px;}
+    table.map th,table.map td{padding:8px 8px;border-bottom:1px solid #EEF2F7;font-size:13px;text-align:left;vertical-align:middle;}
+    table.map th{font-size:11.5px;color:var(--pk-ash);text-transform:uppercase;letter-spacing:.4px;}
+    table.map input,table.map select{padding:6px 8px;font-size:13px;width:100%;}
+    .from-cell{font-weight:600;white-space:nowrap;} .cnt{color:var(--pk-ash);font-size:12px;}
+    .warn{background:var(--pk-warn-bg);border:1px solid #FDE68A;color:var(--pk-warn);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.65;margin:14px 0;}
+    .preview{background:#F8FAFC;border:1px solid var(--pk-border);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.7;margin-top:12px;white-space:pre-wrap;}
+    .run{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 0;border-bottom:1px solid #EEF2F7;font-size:13px;}
+    .run:last-child{border-bottom:none;}
+    .empty{color:var(--pk-ash);font-size:13px;padding:8px 0;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}
+    .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}input,select{font-size:16px;}table.map th:nth-child(2),table.map td:nth-child(2){display:none;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title">
+      <h1>🎓 ปีการศึกษา & เลื่อนชั้น</h1>
+      <p>ตั้งปีการศึกษาปัจจุบัน และเลื่อนนักเรียนขึ้นชั้นเมื่อขึ้นปีใหม่ (ย้อนกลับได้)</p>
+    </div>
+
+    <!-- A) current term -->
+    <div class="card">
+      <h2>📅 ปีการศึกษาปัจจุบัน</h2>
+      <div class="sub">ค่านี้จะเป็นค่าเริ่มต้นของระบบ (ตอนนี้ใช้กำหนดปีปัจจุบันให้ชัดเจน)</div>
+      <div class="row">
+        <div><label class="fl">ปีการศึกษา (พ.ศ.)</label><input id="tYear" placeholder="2567" style="width:120px;" /></div>
+        <div><label class="fl">ภาคเรียน</label>
+          <select id="tTerm"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+        </div>
+        <button class="btn btn-primary" onclick="saveTerm()">บันทึกเป็นปัจจุบัน</button>
+      </div>
+      <div class="chips" id="termChips"></div>
+    </div>
+
+    <!-- B) promotion -->
+    <div class="card">
+      <h2>⬆️ เลื่อนชั้น (ขึ้นปีการศึกษาใหม่)</h2>
+      <div class="sub">เลือกว่าแต่ละห้องจะเลื่อนไปชั้นไหน หรือจบการศึกษา แล้วกดดูตัวอย่างก่อนยืนยัน</div>
+      <div class="row" style="margin-bottom:6px;">
+        <div><label class="fl">ปีการศึกษาใหม่ (พ.ศ.)</label><input id="newYear" placeholder="2568" style="width:120px;" /></div>
+        <button class="btn btn-secondary btn-sm" onclick="loadGroups()">↻ โหลดห้องเรียนใหม่</button>
+      </div>
+
+      <div id="mapWrap"><div class="empty">⏳ กำลังโหลดห้องเรียน...</div></div>
+
+      <div class="warn">
+        ⚠️ การเลื่อนชั้นจะเปลี่ยน <b>ชั้น/ห้อง/ปีการศึกษา</b> ของนักเรียนที่กำลังเรียนอยู่ทั้งหมดตามที่ตั้งไว้
+        — แนะนำให้ <b>ส่งออกข้อมูล (สำรอง)</b> ก่อน · ทำเสร็จแล้ว <b>ย้อนกลับได้</b> จากประวัติด้านล่าง
+      </div>
+
+      <div class="row" style="justify-content:space-between;">
+        <button class="btn btn-secondary" onclick="doPreview()">👁️ ดูตัวอย่าง</button>
+        <button class="btn btn-warn" id="applyBtn" onclick="applyPromotion()" disabled>✅ ยืนยันเลื่อนชั้น</button>
+      </div>
+      <div class="preview" id="previewBox" style="display:none;"></div>
+    </div>
+
+    <!-- C) history / undo -->
+    <div class="card">
+      <h2>🕘 ประวัติการเลื่อนชั้น</h2>
+      <div class="sub">ย้อนกลับการเลื่อนชั้นได้ที่นี่ (คืนค่าชั้น/ห้อง/ปี/สถานะเดิมให้นักเรียนทุกคนในรอบนั้น)</div>
+      <div id="runs"><div class="empty">—</div></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let groups = [];   // [{from_grade, from_classroom, count}]
+    let previewed = false;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireOwner();   // bulk student mutation = owner
+      if (!prof) return;
+      await loadTerm();
+      await loadGroups();
+      await loadRuns();
+    });
+
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function bump(str){ if(!str) return str; return String(str).replace(/\d+/, m => String(parseInt(m,10)+1)); }
+
+    // ---- A) term ----
+    async function loadTerm() {
+      try {
+        const { data } = await supabaseClient.rpc('get_current_term');
+        if (data && data.year) {
+          document.getElementById('tYear').value = data.year;
+          document.getElementById('tTerm').value = String(data.term || 1);
+          if (!document.getElementById('newYear').value) {
+            const n = parseInt(data.year, 10);
+            document.getElementById('newYear').value = isNaN(n) ? '' : String(n + 1);
+          }
+        }
+      } catch (e) {}
+      loadTermChips();
+    }
+    async function loadTermChips() {
+      try {
+        const { data } = await supabaseClient.rpc('list_terms');
+        const box = document.getElementById('termChips');
+        if (!data || !data.length) { box.innerHTML = ''; return; }
+        box.innerHTML = data.map(t => `<span class="chip ${t.is_current?'cur':''}">${esc(t.year)}/${esc(t.term)}${t.is_current?' • ปัจจุบัน':''}
+          <span class="x" onclick="delTerm('${t.id}')">×</span></span>`).join('');
+      } catch (e) {}
+    }
+    async function saveTerm() {
+      const year = document.getElementById('tYear').value.trim();
+      if (!year) { toast('ใส่ปีการศึกษา','error'); return; }
+      const { data, error } = await supabaseClient.rpc('set_current_term', {
+        p_year: year, p_term: parseInt(document.getElementById('tTerm').value,10), p_label: null, p_starts: null, p_ends: null
+      });
+      if (error || !data || !data.success) { toast((data&&data.error)||'บันทึกไม่สำเร็จ','error'); return; }
+      toast('บันทึกปีการศึกษาแล้ว','success');
+      loadTermChips();
+    }
+    async function delTerm(id) {
+      if (!confirm('ลบปีการศึกษานี้?')) return;
+      await supabaseClient.rpc('delete_term', { p_id: id });
+      loadTermChips();
+    }
+
+    // ---- B) promotion ----
+    async function fetchActive() {
+      let all = [], from = 0; const size = 1000;
+      while (true) {
+        const { data, error } = await supabaseClient.from('students').select('grade,classroom,status').range(from, from+size-1);
+        if (error) throw error;
+        all = all.concat(data || []);
+        if (!data || data.length < size) break;
+        from += size; if (from > 50000) break;
+      }
+      return all.filter(s => !s.status || s.status === 'active');
+    }
+
+    async function loadGroups() {
+      const wrap = document.getElementById('mapWrap');
+      wrap.innerHTML = '<div class="empty">⏳ กำลังโหลดห้องเรียน...</div>';
+      previewed = false; document.getElementById('applyBtn').disabled = true;
+      document.getElementById('previewBox').style.display = 'none';
+      let rows;
+      try { rows = await fetchActive(); }
+      catch (e) { wrap.innerHTML = '<div class="empty">โหลดไม่สำเร็จ: '+esc(e.message)+'</div>'; return; }
+
+      const map = {};
+      rows.forEach(s => {
+        const g = s.grade || '', c = s.classroom || '';
+        const k = g + '' + c;
+        map[k] = map[k] || { from_grade: g, from_classroom: c, count: 0 };
+        map[k].count++;
+      });
+      groups = Object.values(map).sort((a,b) =>
+        (a.from_grade+a.from_classroom).localeCompare(b.from_grade+b.from_classroom, 'th', {numeric:true}));
+
+      if (!groups.length) { wrap.innerHTML = '<div class="empty">ยังไม่มีนักเรียนที่กำลังเรียนอยู่</div>'; return; }
+
+      wrap.innerHTML = `<table class="map">
+        <thead><tr><th>ชั้น/ห้อง ปัจจุบัน</th><th>จำนวน</th><th>ทำอะไร</th><th>เลื่อนไป (ชั้น)</th><th>ห้องใหม่</th></tr></thead>
+        <tbody>${groups.map((g,i) => `
+          <tr>
+            <td class="from-cell">${esc(g.from_grade||'(ไม่ระบุชั้น)')} ${g.from_classroom?('/ '+esc(g.from_classroom)):''}</td>
+            <td class="cnt">${g.count} คน</td>
+            <td>
+              <select id="act-${i}" onchange="toggleTo(${i})">
+                <option value="promote">⬆️ เลื่อนขึ้น</option>
+                <option value="graduate">🎓 จบการศึกษา</option>
+                <option value="keep">⏸️ คงเดิม</option>
+              </select>
+            </td>
+            <td><input id="tg-${i}" value="${esc(bump(g.from_grade))}" /></td>
+            <td><input id="tc-${i}" value="${esc(bump(g.from_classroom))}" /></td>
+          </tr>`).join('')}</tbody></table>`;
+    }
+
+    function toggleTo(i) {
+      const act = document.getElementById('act-'+i).value;
+      const on = act === 'promote';
+      document.getElementById('tg-'+i).disabled = !on;
+      document.getElementById('tc-'+i).disabled = !on;
+      document.getElementById('tg-'+i).style.opacity = on ? '1' : '.4';
+      document.getElementById('tc-'+i).style.opacity = on ? '1' : '.4';
+      previewed = false; document.getElementById('applyBtn').disabled = true;
+    }
+
+    function buildMapping() {
+      return groups.map((g,i) => ({
+        from_grade: g.from_grade,
+        from_classroom: g.from_classroom,
+        action: document.getElementById('act-'+i).value,
+        to_grade: document.getElementById('tg-'+i).value.trim(),
+        to_classroom: document.getElementById('tc-'+i).value.trim()
+      }));
+    }
+
+    function doPreview() {
+      if (!groups.length) { toast('ยังไม่มีห้องเรียน','error'); return; }
+      const m = buildMapping();
+      const newYear = document.getElementById('newYear').value.trim();
+      let promo=0, grad=0, keep=0, lines=[];
+      m.forEach((x,i) => {
+        const c = groups[i].count;
+        if (x.action==='promote'){ promo+=c; lines.push(`⬆️ ${x.from_grade||'?'}${x.from_classroom?('/'+x.from_classroom):''}  →  ${x.to_grade||'?'}${x.to_classroom?('/'+x.to_classroom):''}  (${c} คน)`); }
+        else if (x.action==='graduate'){ grad+=c; lines.push(`🎓 ${x.from_grade||'?'}${x.from_classroom?('/'+x.from_classroom):''}  →  จบการศึกษา  (${c} คน)`); }
+        else { keep+=c; lines.push(`⏸️ ${x.from_grade||'?'}${x.from_classroom?('/'+x.from_classroom):''}  →  คงเดิม  (${c} คน)`); }
+      });
+      const box = document.getElementById('previewBox');
+      box.style.display = 'block';
+      box.textContent = `ปีการศึกษาใหม่: ${newYear||'(ไม่เปลี่ยน)'}\n`
+        + `เลื่อนขึ้น ${promo} คน · จบการศึกษา ${grad} คน · คงเดิม ${keep} คน\n\n`
+        + lines.join('\n');
+      previewed = true;
+      document.getElementById('applyBtn').disabled = false;
+    }
+
+    async function applyPromotion() {
+      if (!previewed) { toast('กดดูตัวอย่างก่อน','error'); return; }
+      const newYear = document.getElementById('newYear').value.trim();
+      const total = groups.reduce((s,g)=>s+g.count,0);
+      if (!confirm(`ยืนยันเลื่อนชั้นนักเรียน ${total} คน ขึ้นปีการศึกษา ${newYear||'(เดิม)'}?\n\nย้อนกลับได้จากประวัติด้านล่าง`)) return;
+      const btn = document.getElementById('applyBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳ กำลังเลื่อนชั้น...';
+      const { data, error } = await supabaseClient.rpc('promote_students', { p_mapping: buildMapping(), p_new_year: newYear || null });
+      btn.textContent=old;
+      if (error || !data || !data.success) { toast((data&&data.error)||(error&&error.message)||'ไม่สำเร็จ','error'); btn.disabled=false; return; }
+      toast(`เลื่อนชั้นสำเร็จ ${data.affected} คน`,'success');
+      document.getElementById('previewBox').style.display='none';
+      previewed=false;
+      await loadGroups();
+      await loadRuns();
+    }
+
+    // ---- C) history / undo ----
+    function fmt(ts){ try { return new Date(ts).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}); } catch(e){ return ''; } }
+    async function loadRuns() {
+      const box = document.getElementById('runs');
+      try {
+        const { data } = await supabaseClient.rpc('list_promotion_runs');
+        if (!data || !data.length) { box.innerHTML = '<div class="empty">ยังไม่เคยเลื่อนชั้น</div>'; return; }
+        box.innerHTML = data.map(r => `<div class="run">
+          <div>📦 ${fmt(r.created_at)} · ปีใหม่ ${esc(r.new_year||'-')} · <b>${r.affected} คน</b> ${r.undone?'<span style="color:#991B1B;">(ย้อนกลับแล้ว)</span>':''}</div>
+          ${r.undone?'':`<button class="btn btn-danger btn-sm" onclick="undoRun('${r.id}')">↩️ ย้อนกลับ</button>`}
+        </div>`).join('');
+      } catch (e) { box.innerHTML = '<div class="empty">โหลดประวัติไม่ได้</div>'; }
+    }
+    async function undoRun(id) {
+      if (!confirm('ย้อนกลับการเลื่อนชั้นรอบนี้? นักเรียนจะกลับไปชั้น/ห้อง/ปี/สถานะเดิม')) return;
+      const { data, error } = await supabaseClient.rpc('undo_promotion', { p_run_id: id });
+      if (error || !data || !data.success) { toast((data&&data.error)||'ย้อนกลับไม่สำเร็จ','error'); return; }
+      toast(`ย้อนกลับแล้ว (${data.restored} คน)`,'success');
+      await loadGroups();
+      await loadRuns();
+    }
+
+    let toastTimer=null;
+    function toast(msg, type){
+      const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||'');
+      clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ el.className='toast'; }, 3000);
+    }
+  </script>
+</body>
+</html>

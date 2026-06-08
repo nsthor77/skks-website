@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เช็คชื่อประตู (QR) — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-danger:#991B1B;}
+    *{box-sizing:border-box;margin:0;padding:0;} body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;} .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:560px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:22px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin:4px 0 16px;}
+    .seg{display:flex;gap:8px;margin-bottom:14px;} .seg button{flex:1;padding:11px;border-radius:10px;border:1px solid var(--pk-border-em);background:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;}
+    .seg button.on-in{background:#065F46;color:#fff;border-color:#065F46;} .seg button.on-out{background:#B45309;color:#fff;border-color:#B45309;}
+    #reader{width:100%;border-radius:14px;overflow:hidden;border:1px solid var(--pk-border);background:#000;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:16px 18px;margin-top:14px;}
+    .result{text-align:center;padding:18px;border-radius:12px;margin-top:12px;display:none;}
+    .result.ok{display:block;background:#D1FAE5;color:#065F46;} .result.out{display:block;background:#FEF3C7;color:#92400E;} .result.err{display:block;background:#FEE2E2;color:#991B1B;}
+    .result .nm{font-size:20px;font-weight:800;}
+    .manual{display:flex;gap:8px;margin-top:12px;} .manual input{flex:1;padding:10px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:15px;}
+    .btn{padding:10px 16px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;background:var(--pk-blue-800);color:#fff;}
+    .log{font-size:13px;display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F1F5F9;}
+    .log .d-in{color:#065F46;font-weight:700;} .log .d-out{color:#B45309;font-weight:700;}
+    .empty{text-align:center;color:var(--pk-ash);padding:16px;}
+  </style>
+</head>
+<body>
+  <div class="topbar"><a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a><a href="dashboard.html" class="back-link">← แดชบอร์ด</a></div>
+  <div class="container">
+    <div class="page-title"><h1>📷 เช็คชื่อประตู (สแกน QR บัตรนักเรียน)</h1><p>สแกน QR บนบัตรนักเรียนเพื่อบันทึกเข้า–ออกโรงเรียน</p></div>
+    <div class="seg">
+      <button id="btnIn" class="on-in" onclick="setDir('in')">🟢 เข้าโรงเรียน</button>
+      <button id="btnOut" onclick="setDir('out')">🟠 ออกโรงเรียน</button>
+    </div>
+    <div id="reader"></div>
+    <div class="result" id="result"></div>
+    <div class="manual"><input id="manual" placeholder="หรือพิมพ์รหัสนักเรียน" /><button class="btn" onclick="manualScan()">ตรวจ</button></div>
+
+    <div class="card"><div style="font-weight:700;font-size:14px;margin-bottom:6px;">ล่าสุด</div><div id="recent"><div class="empty">—</div></div></div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let dir='in', lastCode='', lastTime=0, scanner=null;
+    document.addEventListener('DOMContentLoaded', async () => {
+      const p=await roleGuard.requireTeacher(); if(!p) return; startCam(); loadRecent();
+    });
+    function setDir(d){ dir=d; document.getElementById('btnIn').className=d==='in'?'on-in':''; document.getElementById('btnOut').className=d==='out'?'on-out':''; }
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    function startCam(){
+      try {
+        scanner = new Html5Qrcode('reader');
+        scanner.start({ facingMode:'environment' }, { fps:10, qrbox:{width:220,height:220} },
+          onScan, ()=>{}).catch(e=>{ document.getElementById('reader').innerHTML='<div style="color:#fff;padding:30px;text-align:center;font-size:13px;">ไม่สามารถเปิดกล้อง — ใช้ช่องพิมพ์รหัสด้านล่างแทนได้</div>'; });
+      } catch(e){ document.getElementById('reader').innerHTML='<div style="color:#fff;padding:30px;text-align:center;">โหลดตัวสแกนไม่ได้</div>'; }
+    }
+    function onScan(text){
+      const now=Date.now();
+      if(text===lastCode && now-lastTime<3000) return;  // debounce duplicate
+      lastCode=text; lastTime=now; doScan(text);
+    }
+    function manualScan(){ const v=document.getElementById('manual').value.trim(); if(v) doScan(v); }
+
+    async function doScan(code){
+      const { data, error } = await supabaseClient.rpc('gate_scan',{ p_code:code, p_direction:dir });
+      const r=document.getElementById('result');
+      if(error||!data||!data.success){ r.className='result err'; r.innerHTML='❌ '+esc((data&&data.error)||'ไม่พบนักเรียน'); beep(220); return; }
+      r.className='result '+(data.direction==='out'?'out':'ok');
+      r.innerHTML=`${data.direction==='out'?'🟠 ออก':'🟢 เข้า'}<div class="nm">${esc(data.student_name)}</div>
+        <div style="font-size:13px;">${esc(data.grade||'')}${data.classroom?('/'+esc(data.classroom)):''} · ${new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</div>`;
+      beep(880);
+      document.getElementById('manual').value='';
+      loadRecent();
+    }
+    function beep(f){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); const o=a.createOscillator(); o.frequency.value=f; o.connect(a.destination); o.start(); setTimeout(()=>{o.stop();a.close();},120); }catch(e){} }
+
+    async function loadRecent(){
+      const { data } = await supabaseClient.rpc('recent_gate_logs',{ p_limit:15 });
+      const rows=data||[]; const box=document.getElementById('recent');
+      box.innerHTML = rows.length ? rows.map(r=>`<div class="log"><span>${esc(r.student_name)} <span style="color:#9AA3B5;">${esc(r.grade||'')}${r.classroom?('/'+esc(r.classroom)):''}</span></span>
+        <span class="${r.direction==='out'?'d-out':'d-in'}">${r.direction==='out'?'ออก':'เข้า'} ${new Date(r.scanned_at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('') : '<div class="empty">ยังไม่มีการสแกน</div>';
+    }
+  </script>
+</body>
+</html>

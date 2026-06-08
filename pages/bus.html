@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รถรับส่ง — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;} body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;} .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:860px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;} .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);} .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 12px;font-size:12px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-left:4px solid #F59E0B;border-radius:12px;padding:15px 18px;margin-bottom:12px;} .card.off{opacity:.6;border-left-color:#9AA3B5;}
+    .card h3{font-size:15.5px;font-weight:700;} .card .meta{font-size:12.5px;color:var(--pk-ash);margin-top:5px;}
+    .m{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;} .m-actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;} .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;} .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;} .row2>div{flex:1;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    table.st{width:100%;border-collapse:collapse;font-size:13px;} table.st th,table.st td{padding:7px 8px;border-bottom:1px solid #EEF2F7;text-align:left;} table.st th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;}
+    .empty{text-align:center;color:var(--pk-ash);padding:30px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.modal input,.modal select{font-size:16px;}.row2{flex-direction:column;}}
+  </style>
+</head>
+<body>
+  <div class="topbar"><div class="topbar-left"><a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a><a href="dashboard.html" class="back-link">← แดชบอร์ด</a></div><div></div></div>
+  <div class="container">
+    <div class="page-header"><div class="page-title"><h1>🚌 รถรับส่งนักเรียน</h1><p>จัดการสายรถ + คนขับ + นักเรียนแต่ละสาย</p></div>
+      <button class="btn btn-primary" onclick="openCreate()">➕ เพิ่มสายรถ</button></div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <div class="modal-bd" id="formModal"><div class="modal">
+    <h2 id="formTitle">➕ เพิ่มสายรถ</h2><input type="hidden" id="fId" />
+    <div class="field"><label>ชื่อสาย *</label><input id="fName" placeholder="เช่น สาย 1 ตัวเมือง" /></div>
+    <div class="row2"><div class="field"><label>คนขับ</label><input id="fDriver" /></div><div class="field"><label>เบอร์โทร</label><input id="fPhone" /></div></div>
+    <div class="row2"><div class="field"><label>ทะเบียน/รถ</label><input id="fVehicle" /></div></div>
+    <div class="row2"><div class="field"><label>เวลาออก (เช้า)</label><input id="fDep" placeholder="06:30" /></div><div class="field"><label>เวลากลับ (เย็น)</label><input id="fRet" placeholder="16:00" /></div></div>
+    <div class="field"><label class="chk" style="font-size:13.5px;"><input type="checkbox" id="fActive" checked style="width:auto;margin-right:8px;"> เปิดใช้งาน</label></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeForm()">ยกเลิก</button><button class="btn btn-primary" id="saveBtn" onclick="saveRoute()">💾 บันทึก</button></div>
+  </div></div>
+
+  <div class="modal-bd" id="stuModal"><div class="modal" style="max-width:620px;">
+    <h2>👦 นักเรียนในสาย <span id="smName" style="font-weight:400;font-size:14px;color:var(--pk-ash);"></span></h2>
+    <input type="hidden" id="smRouteId" />
+    <div class="row2" style="align-items:flex-end;">
+      <div class="field"><label>เพิ่มนักเรียน</label><select id="smStudent"><option value="">— เลือก —</option></select></div>
+      <div class="field"><label>จุดรับ</label><input id="smPickup" placeholder="เช่น หน้าตลาด" /></div>
+      <button class="btn btn-primary" style="margin-bottom:12px;" onclick="addStu()">+ เพิ่ม</button>
+    </div>
+    <div id="smList"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="document.getElementById('stuModal').classList.remove('show')">ปิด</button></div>
+  </div></div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let routes=[], students=[];
+    document.addEventListener('DOMContentLoaded', async () => { const p=await roleGuard.requireTeacher(); if(!p) return; await loadStudents(); load(); });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function getR(id){ return routes.find(r=>r.id===id)||{}; }
+    async function loadStudents(){ let all=[],from=0; const size=1000;
+      while(true){ const {data,error}=await supabaseClient.from('students').select('id,first_name_th,last_name_th,grade,classroom,status').range(from,from+size-1);
+        if(error)break; all=all.concat(data||[]); if(!data||data.length<size)break; from+=size; if(from>20000)break; }
+      students=all.filter(s=>!s.status||s.status==='active').sort((a,b)=>((a.grade||'')+(a.classroom||'')).localeCompare((b.grade||'')+(b.classroom||''),'th',{numeric:true}));
+      document.getElementById('smStudent').insertAdjacentHTML('beforeend', students.map(s=>`<option value="${s.id}">${esc((s.first_name_th||'')+' '+(s.last_name_th||''))} · ${esc(s.grade||'')}${s.classroom?('/'+esc(s.classroom)):''}</option>`).join(''));
+    }
+    async function load(){ const { data, error } = await supabaseClient.rpc('list_routes'); const box=document.getElementById('list');
+      if(error){ box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      routes=data||[]; if(!routes.length){ box.innerHTML='<div class="empty">ยังไม่มีสายรถ — กด “➕ เพิ่มสายรถ”</div>'; return; }
+      box.innerHTML=routes.map(r=>`<div class="card ${r.active?'':'off'}"><div class="m">
+        <div style="flex:1;min-width:0;"><h3>🚌 ${esc(r.name)}</h3>
+          <div class="meta">${r.driver_name?('คนขับ '+esc(r.driver_name)):''}${r.driver_phone?(' ☎ '+esc(r.driver_phone)):''}${r.vehicle?(' · '+esc(r.vehicle)):''}
+            ${r.departure_time?(' · ออก '+esc(r.departure_time)):''}${r.return_time?(' กลับ '+esc(r.return_time)):''} · <b>${r.students||0}</b> คน</div></div>
+        <div class="m-actions"><button class="btn btn-secondary btn-sm" onclick="openStu('${r.id}')">👦 นักเรียน</button>
+          <button class="btn btn-secondary btn-sm" onclick="openEdit('${r.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delRoute('${r.id}')">🗑️</button></div></div></div>`).join('');
+    }
+    function openCreate(){ document.getElementById('fId').value=''; document.getElementById('formTitle').textContent='➕ เพิ่มสายรถ';
+      ['fName','fDriver','fPhone','fVehicle','fDep','fRet'].forEach(i=>document.getElementById(i).value=''); document.getElementById('fActive').checked=true; document.getElementById('formModal').classList.add('show'); }
+    function openEdit(id){ const r=getR(id); document.getElementById('fId').value=r.id; document.getElementById('formTitle').textContent='✏️ แก้ไขสายรถ';
+      document.getElementById('fName').value=r.name||''; document.getElementById('fDriver').value=r.driver_name||''; document.getElementById('fPhone').value=r.driver_phone||'';
+      document.getElementById('fVehicle').value=r.vehicle||''; document.getElementById('fDep').value=r.departure_time||''; document.getElementById('fRet').value=r.return_time||'';
+      document.getElementById('fActive').checked=r.active!==false; document.getElementById('formModal').classList.add('show'); }
+    function closeForm(){ document.getElementById('formModal').classList.remove('show'); }
+    async function saveRoute(){ const name=document.getElementById('fName').value.trim(); if(!name){ toast('ใส่ชื่อสาย','error'); return; }
+      const btn=document.getElementById('saveBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
+      const { data, error } = await supabaseClient.rpc('save_route',{ p_id:document.getElementById('fId').value||null,p_name:name,
+        p_driver:document.getElementById('fDriver').value.trim()||null,p_phone:document.getElementById('fPhone').value.trim()||null,
+        p_vehicle:document.getElementById('fVehicle').value.trim()||null,p_dep:document.getElementById('fDep').value.trim()||null,
+        p_ret:document.getElementById('fRet').value.trim()||null,p_note:null,p_active:document.getElementById('fActive').checked });
+      btn.disabled=false; btn.textContent=old;
+      if(error||!data||!data.success){ toast((data&&data.error)||'บันทึกไม่สำเร็จ','error'); return; }
+      toast('บันทึกแล้ว','success'); closeForm(); load(); }
+    async function delRoute(id){ if(!confirm('ลบสายรถนี้?')) return; const {data}=await supabaseClient.rpc('delete_route',{p_id:id});
+      if(data&&data.success){ toast('ลบแล้ว','success'); load(); } else toast('ลบไม่สำเร็จ','error'); }
+
+    async function openStu(id){ const r=getR(id); document.getElementById('smRouteId').value=id; document.getElementById('smName').textContent='— '+r.name;
+      document.getElementById('smStudent').value=''; document.getElementById('smPickup').value=''; document.getElementById('stuModal').classList.add('show'); loadStu(id); }
+    async function loadStu(id){ const { data } = await supabaseClient.rpc('list_route_students',{p_route_id:id}); const rows=data||[];
+      document.getElementById('smList').innerHTML = rows.length ? '<table class="st"><thead><tr><th>นักเรียน</th><th>ชั้น</th><th>จุดรับ</th><th></th></tr></thead><tbody>'
+        + rows.map(r=>`<tr><td>${esc(r.student_name)}</td><td>${esc(r.grade||'')}${r.classroom?('/'+esc(r.classroom)):''}</td><td>${esc(r.pickup_point||'')}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="rmStu('${r.id}','${document.getElementById('smRouteId').value}')">ลบ</button></td></tr>`).join('')+'</tbody></table>'
+        : '<div class="empty">ยังไม่มีนักเรียนในสายนี้</div>'; }
+    async function addStu(){ const rid=document.getElementById('smRouteId').value; const sid=document.getElementById('smStudent').value; if(!sid){ toast('เลือกนักเรียน','error'); return; }
+      const { data, error } = await supabaseClient.rpc('assign_bus',{p_route_id:rid,p_student_id:sid,p_pickup:document.getElementById('smPickup').value.trim()||null});
+      if(error||!data||!data.success){ toast('เพิ่มไม่สำเร็จ','error'); return; }
+      document.getElementById('smStudent').value=''; document.getElementById('smPickup').value=''; loadStu(rid); load(); }
+    async function rmStu(id,rid){ const {data}=await supabaseClient.rpc('unassign_bus',{p_id:id}); if(data&&data.success){ loadStu(rid); load(); } }
+
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2400); }
+  </script>
+</body>
+</html>

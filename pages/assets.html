@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>พัสดุ/ครุภัณฑ์ — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;} body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;} .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:980px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;} .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);} .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 10px;font-size:12px;}
+    .bar{margin-bottom:14px;} .bar input{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;width:260px;max-width:100%;}
+    table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border:1px solid var(--pk-border);border-radius:12px;overflow:hidden;}
+    th,td{padding:9px 11px;border-bottom:1px solid #EEF2F7;text-align:left;} th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;background:#F8FAFC;}
+    .modal-bd{position:fixed;inset:0;background:rgba(15,26,54,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;} .modal-bd.show{display:flex;}
+    .modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;} .modal h2{font-size:18px;margin-bottom:14px;}
+    .field{margin-bottom:12px;} .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .field input,.field select{width:100%;padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row2{display:flex;gap:10px;} .row2>div{flex:1;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+    .empty{text-align:center;color:var(--pk-ash);padding:30px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.modal input,.modal select{font-size:16px;}.row2{flex-direction:column;}}
+  </style>
+</head>
+<body>
+  <div class="topbar"><div class="topbar-left"><a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a><a href="dashboard.html" class="back-link">← แดชบอร์ด</a></div><div></div></div>
+  <div class="container">
+    <div class="page-header"><div class="page-title"><h1>📦 พัสดุ / ครุภัณฑ์</h1><p>ทะเบียนพัสดุ-ครุภัณฑ์ของโรงเรียน</p></div>
+      <button class="btn btn-primary" onclick="openCreate()">➕ เพิ่มรายการ</button></div>
+    <div class="bar"><input id="q" placeholder="ค้นหา รหัส/ชื่อ/หมวด/ที่ตั้ง..." oninput="render()" /></div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+
+  <div class="modal-bd" id="formModal"><div class="modal">
+    <h2 id="formTitle">➕ เพิ่มรายการ</h2><input type="hidden" id="fId" />
+    <div class="row2"><div class="field"><label>รหัสพัสดุ</label><input id="fCode" /></div><div class="field"><label>หมวด</label><input id="fCat" list="catL" /><datalist id="catL"><option value="ครุภัณฑ์สำนักงาน"></option><option value="ครุภัณฑ์คอมพิวเตอร์"></option><option value="ครุภัณฑ์การศึกษา"></option><option value="วัสดุสำนักงาน"></option><option value="ครุภัณฑ์งานบ้านงานครัว"></option></datalist></div></div>
+    <div class="field"><label>ชื่อรายการ *</label><input id="fName" /></div>
+    <div class="row2"><div class="field"><label>ที่ตั้ง/ห้อง</label><input id="fLoc" /></div><div class="field"><label>สถานะ</label><select id="fStatus"><option>ใช้งานได้</option><option>ชำรุด</option><option>รอซ่อม</option><option>จำหน่ายแล้ว</option></select></div></div>
+    <div class="row2"><div class="field"><label>จำนวน</label><input type="number" id="fQty" value="1" min="0" /></div><div class="field"><label>หน่วย</label><input id="fUnit" placeholder="เครื่อง/ชุด/อัน" /></div><div class="field"><label>มูลค่า (บาท)</label><input type="number" id="fValue" min="0" /></div></div>
+    <div class="field"><label>วันที่ได้มา</label><input type="date" id="fDate" /></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeForm()">ยกเลิก</button><button class="btn btn-primary" id="saveBtn" onclick="save()">💾 บันทึก</button></div>
+  </div></div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let rows=[];
+    document.addEventListener('DOMContentLoaded', async () => { const p=await roleGuard.requireTeacher(); if(!p) return; load(); });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function getR(id){ return rows.find(r=>r.id===id)||{}; }
+    async function load(){ const { data, error } = await supabaseClient.from('assets').select('*').order('category').order('name');
+      if(error){ document.getElementById('list').innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      rows=data||[]; render(); }
+    function render(){ const q=(document.getElementById('q').value||'').trim().toLowerCase();
+      const f=rows.filter(r=>!q || [r.code,r.name,r.category,r.location].some(x=>(x||'').toLowerCase().includes(q)));
+      const box=document.getElementById('list');
+      if(!f.length){ box.innerHTML='<div class="empty">'+(rows.length?'ไม่พบรายการ':'ยังไม่มีพัสดุ — กด “➕ เพิ่มรายการ”')+'</div>'; return; }
+      box.innerHTML='<table><thead><tr><th>รหัส</th><th>ชื่อ</th><th>หมวด</th><th>ที่ตั้ง</th><th>จำนวน</th><th>มูลค่า</th><th>สถานะ</th><th></th></tr></thead><tbody>'
+        + f.map(r=>`<tr><td>${esc(r.code||'')}</td><td><b>${esc(r.name)}</b></td><td>${esc(r.category||'')}</td><td>${esc(r.location||'')}</td>
+          <td>${r.quantity||''} ${esc(r.unit||'')}</td><td>${r.value!=null?'฿'+Number(r.value).toLocaleString('en-US'):''}</td><td>${esc(r.status||'')}</td>
+          <td style="white-space:nowrap;"><button class="btn btn-secondary btn-sm" onclick="openEdit('${r.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="del('${r.id}')">🗑️</button></td></tr>`).join('')+'</tbody></table>';
+    }
+    function openCreate(){ document.getElementById('fId').value=''; document.getElementById('formTitle').textContent='➕ เพิ่มรายการ';
+      ['fCode','fCat','fName','fLoc','fUnit','fValue','fDate'].forEach(i=>document.getElementById(i).value=''); document.getElementById('fQty').value=1; document.getElementById('fStatus').value='ใช้งานได้'; document.getElementById('formModal').classList.add('show'); }
+    function openEdit(id){ const r=getR(id); document.getElementById('fId').value=r.id; document.getElementById('formTitle').textContent='✏️ แก้ไขรายการ';
+      document.getElementById('fCode').value=r.code||''; document.getElementById('fCat').value=r.category||''; document.getElementById('fName').value=r.name||'';
+      document.getElementById('fLoc').value=r.location||''; document.getElementById('fStatus').value=r.status||'ใช้งานได้'; document.getElementById('fQty').value=r.quantity||1;
+      document.getElementById('fUnit').value=r.unit||''; document.getElementById('fValue').value=r.value||''; document.getElementById('fDate').value=r.acquired_date||''; document.getElementById('formModal').classList.add('show'); }
+    function closeForm(){ document.getElementById('formModal').classList.remove('show'); }
+    async function save(){ const name=document.getElementById('fName').value.trim(); if(!name){ toast('ใส่ชื่อรายการ','error'); return; }
+      const payload={ code:document.getElementById('fCode').value.trim()||null, name, category:document.getElementById('fCat').value.trim()||null,
+        location:document.getElementById('fLoc').value.trim()||null, status:document.getElementById('fStatus').value,
+        quantity:parseInt(document.getElementById('fQty').value,10)||null, unit:document.getElementById('fUnit').value.trim()||null,
+        value:parseFloat(document.getElementById('fValue').value)||null, acquired_date:document.getElementById('fDate').value||null };
+      const id=document.getElementById('fId').value; const btn=document.getElementById('saveBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
+      let res; if(id){ res=await supabaseClient.from('assets').update(payload).eq('id',id); }
+      else { res=await supabaseClient.from('assets').insert({ ...payload, school_id:window.CURRENT_SCHOOL_ID, created_by:(await auth.getProfile()).id }); }
+      btn.disabled=false; btn.textContent=old;
+      if(res.error){ toast('บันทึกไม่สำเร็จ: '+res.error.message,'error'); return; }
+      toast('บันทึกแล้ว','success'); closeForm(); load(); }
+    async function del(id){ if(!confirm('ลบรายการนี้?')) return; const { error }=await supabaseClient.from('assets').delete().eq('id',id);
+      if(error){ toast('ลบไม่สำเร็จ','error'); return; } toast('ลบแล้ว','success'); load(); }
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2400); }
+  </script>
+</body>
+</html>

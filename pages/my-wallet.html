@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>กระเป๋าเงิน — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;}
+    *{box-sizing:border-box;margin:0;padding:0;} body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;} .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:600px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin:4px 0 16px;}
+    .wcard{background:linear-gradient(135deg,#1E3A8A,#2563EB);color:#fff;border-radius:16px;padding:22px;margin-bottom:14px;}
+    .wcard .nm{font-size:14px;opacity:.9;} .wcard .b{font-size:36px;font-weight:800;margin-top:4px;}
+    .empty{text-align:center;color:var(--pk-ash);padding:50px;}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+    <a href="student-dashboard.html" class="back-link">← หน้าหลัก</a>
+  </div>
+  <div class="container">
+    <div class="page-title"><h1>💳 กระเป๋าเงินโรงอาหาร</h1><p>ยอดเงินคงเหลือสำหรับค่าอาหาร</p></div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const session = await auth.getSession(); if(!session){ window.location.href='../login.html'; return; }
+      const box=document.getElementById('list');
+      const { data, error } = await supabaseClient.rpc('get_my_wallet');
+      if(error){ box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      const rows=data||[];
+      if(!rows.length){ box.innerHTML='<div class="empty">ยังไม่มีกระเป๋าเงิน</div>'; return; }
+      box.innerHTML=rows.map(r=>`<div class="wcard"><div class="nm">${esc(r.student_name)}</div><div class="b">฿${Number(r.balance||0).toLocaleString('en-US')}</div></div>`).join('');
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  </script>
+</body>
+</html>

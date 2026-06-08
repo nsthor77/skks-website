@@ -64,7 +64,15 @@
       { href: 'tuition-admin.html',     tier: 'owner', en: 'Tuition',   th: 'ค่าเทอม' },
       { href: 'finance.html',           tier: 'owner', en: 'Finance',   th: 'การเงินรวม' },
       { href: 'budget.html',            tier: 'owner', en: 'Budget',    th: 'งบประมาณ' },
-      { href: 'scholarships.html',      tier: 'owner', en: 'Scholarships', th: 'ทุนการศึกษา' }
+      { href: 'scholarships.html',      tier: 'owner', en: 'Scholarships', th: 'ทุนการศึกษา' },
+      { href: 'receipt.html',           tier: 'owner', en: 'Receipts',  th: 'ใบเสร็จ' }
+    ]},
+    { label: { en: 'Operations', th: 'ปฏิบัติการ' }, items: [
+      { href: 'gate-scan.html',    tier: 'teacher', en: 'Gate Scan',   th: 'เช็คชื่อประตู' },
+      { href: 'cafeteria.html',    tier: 'teacher', en: 'Cafeteria',   th: 'โรงอาหาร' },
+      { href: 'visitor-log.html',  tier: 'teacher', en: 'Visitors',    th: 'ผู้มาติดต่อ' },
+      { href: 'bus.html',          tier: 'admin',   en: 'Bus Routes',  th: 'รถรับส่ง' },
+      { href: 'assets.html',       tier: 'admin',   en: 'Assets',      th: 'พัสดุ/ครุภัณฑ์' }
     ]},
     { label: { en: 'Communicate', th: 'ข่าวสาร' }, items: [
       { href: 'announcements.html',tier: 'admin', en: 'Announcements', th: 'ประกาศ' },
@@ -102,6 +110,8 @@
       { href: 'my-consent.html',      en: 'Consent Forms', th: 'หนังสือขออนุญาต' },
       { href: 'my-surveys.html',      en: 'Surveys',       th: 'แบบสอบถาม' },
       { href: 'my-scholarships.html', en: 'Scholarships',  th: 'ทุนการศึกษา' },
+      { href: 'my-wallet.html',       en: 'Wallet',        th: 'กระเป๋าเงิน' },
+      { href: 'my-bus.html',          en: 'Bus',           th: 'รถรับส่ง' },
       { href: 'leave-requests.html',  en: 'Leave',        th: 'ขอลา' },
       { href: 'library.html',         en: 'Library',      th: 'ห้องสมุด' },
       { href: 'health.html',          en: 'Health',       th: 'สุขภาพ' },

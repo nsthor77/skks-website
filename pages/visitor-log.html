@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ผู้มาติดต่อ — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;} body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;} .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:960px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin:4px 0 16px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:16px 18px;margin-bottom:16px;}
+    label.fl{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    input{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+    .btn{padding:10px 18px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;} .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-sm{padding:6px 12px;font-size:12px;font-weight:600;}
+    .btn-out{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;}
+    table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--pk-border);border-radius:12px;overflow:hidden;}
+    th,td{padding:9px 11px;border-bottom:1px solid #EEF2F7;text-align:left;} th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;background:#F8FAFC;}
+    .in{color:#065F46;font-weight:600;} .empty{text-align:center;color:var(--pk-ash);padding:24px;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}input{font-size:16px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar"><a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a><a href="dashboard.html" class="back-link">← แดชบอร์ด</a></div>
+  <div class="container">
+    <div class="page-title"><h1>🪪 ผู้มาติดต่อ</h1><p>ลงทะเบียนผู้มาติดต่อ เข้า-ออก แลกบัตร</p></div>
+    <div class="card">
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px;">ลงทะเบียนเข้า</div>
+      <div class="grid">
+        <div><label class="fl">ชื่อ-สกุล *</label><input id="vName" /></div>
+        <div><label class="fl">เลขบัตร ปชช.</label><input id="vId" /></div>
+        <div><label class="fl">เบอร์โทร</label><input id="vPhone" /></div>
+        <div><label class="fl">มาติดต่อเรื่อง</label><input id="vPurpose" /></div>
+        <div><label class="fl">พบใคร</label><input id="vTo" /></div>
+        <div><label class="fl">เลขบัตรแลก</label><input id="vBadge" /></div>
+      </div>
+      <div style="margin-top:12px;text-align:right;"><button class="btn btn-primary" onclick="checkIn()">✓ ลงทะเบียนเข้า</button></div>
+    </div>
+    <div style="font-weight:700;font-size:15px;margin-bottom:8px;">รายการวันนี้</div>
+    <div id="list"><div class="empty">⏳ กำลังโหลด...</div></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => { const p=await roleGuard.requireTeacher(); if(!p) return; load(); });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function tm(ts){ return ts ? new Date(ts).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) : '—'; }
+
+    async function load(){
+      const today = new Date(); today.setHours(0,0,0,0);
+      const { data, error } = await supabaseClient.from('visitors').select('*').gte('time_in', today.toISOString()).order('time_in',{ascending:false});
+      const box=document.getElementById('list');
+      if(error){ box.innerHTML='<div class="empty">'+esc(error.message)+'</div>'; return; }
+      const rows=data||[];
+      if(!rows.length){ box.innerHTML='<div class="empty">ยังไม่มีผู้มาติดต่อวันนี้</div>'; return; }
+      box.innerHTML='<table><thead><tr><th>ชื่อ</th><th>เรื่อง</th><th>พบ</th><th>บัตร</th><th>เข้า</th><th>ออก</th><th></th></tr></thead><tbody>'
+        + rows.map(r=>`<tr><td><b>${esc(r.visitor_name)}</b>${r.phone?('<br><span style="font-size:11px;color:#9AA3B5;">☎ '+esc(r.phone)+'</span>'):''}</td>
+          <td>${esc(r.purpose||'')}</td><td>${esc(r.to_see||'')}</td><td>${esc(r.badge_no||'')}</td>
+          <td class="in">${tm(r.time_in)}</td><td>${r.time_out?tm(r.time_out):'<span style="color:#B45309;">อยู่ในพื้นที่</span>'}</td>
+          <td>${r.time_out?'':`<button class="btn btn-out btn-sm" onclick="checkOut('${r.id}')">ออก</button>`}</td></tr>`).join('')+'</tbody></table>';
+    }
+
+    async function checkIn(){
+      const name=document.getElementById('vName').value.trim(); if(!name){ toast('ใส่ชื่อผู้มาติดต่อ','error'); return; }
+      const payload={ school_id:window.CURRENT_SCHOOL_ID, visitor_name:name, id_card:document.getElementById('vId').value.trim()||null,
+        phone:document.getElementById('vPhone').value.trim()||null, purpose:document.getElementById('vPurpose').value.trim()||null,
+        to_see:document.getElementById('vTo').value.trim()||null, badge_no:document.getElementById('vBadge').value.trim()||null };
+      try { payload.created_by=(await auth.getProfile()).id; } catch(e){}
+      const { error } = await supabaseClient.from('visitors').insert(payload);
+      if(error){ toast('บันทึกไม่สำเร็จ: '+error.message,'error'); return; }
+      toast('ลงทะเบียนเข้าแล้ว','success');
+      ['vName','vId','vPhone','vPurpose','vTo','vBadge'].forEach(i=>document.getElementById(i).value=''); load();
+    }
+    async function checkOut(id){ const { error } = await supabaseClient.from('visitors').update({ time_out:new Date().toISOString() }).eq('id',id);
+      if(error){ toast('ไม่สำเร็จ','error'); return; } toast('บันทึกเวลาออกแล้ว','success'); load(); }
+    let toastTimer=null;
+    function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+(type||''); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.className='toast',2400); }
+  </script>
+</body>
+</html>

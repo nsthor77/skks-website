@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ใบเสร็จรับเงิน — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'IBM Plex Sans Thai','Sarabun',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;}
+    .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;padding:6px 12px;}
+    .container{max-width:880px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin:4px 0 16px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+    .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink);border:1px solid var(--pk-border-em);} .btn-sm{padding:6px 12px;font-size:12px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;}
+    select,input{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    table.bills{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border:1px solid var(--pk-border);border-radius:12px;overflow:hidden;}
+    table.bills th,table.bills td{padding:9px 11px;border-bottom:1px solid #EEF2F7;text-align:left;} table.bills th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;background:#F8FAFC;}
+    .empty{text-align:center;color:var(--pk-ash);padding:30px;}
+    /* receipt */
+    #rc{background:#fff;border:1px solid var(--pk-border);border-radius:8px;margin-top:16px;padding:40px 46px;display:none;font-family:'Sarabun',serif;color:#111;}
+    #rc.show{display:block;}
+    .rc-head{text-align:center;margin-bottom:14px;} .rc-head img{height:64px;margin-bottom:6px;} .rc-head .sn{font-size:20px;font-weight:700;}
+    .rc-title{text-align:center;font-size:22px;font-weight:700;margin:8px 0 16px;letter-spacing:1px;}
+    .rc-meta{display:flex;justify-content:space-between;font-size:14px;margin-bottom:14px;flex-wrap:wrap;gap:6px;}
+    table.rc-items{width:100%;border-collapse:collapse;font-size:15px;margin:10px 0;}
+    table.rc-items th,table.rc-items td{border:1px solid #333;padding:8px 10px;}
+    table.rc-items th{background:#f0f0f0;} td.r{text-align:right;}
+    .rc-total{text-align:right;font-size:17px;font-weight:700;margin-top:6px;}
+    .rc-words{text-align:center;font-size:14px;margin:8px 0 28px;font-style:italic;}
+    .rc-sign{text-align:center;float:right;width:280px;margin-top:30px;} .rc-sign .l{margin-bottom:3px;}
+    .clear{clear:both;}
+    @media print{ .topbar,.page-title,.controls,.no-print{display:none!important;} .container{max-width:100%;padding:0;} #rc{border:none;border-radius:0;margin:0;} @page{size:A4;margin:18mm;} }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a>
+      <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+    </div><div></div>
+  </div>
+
+  <div class="container">
+    <div class="page-title"><h1>🧾 ใบเสร็จรับเงิน (ค่าเทอม)</h1><p>ออกใบเสร็จจากบิลที่ชำระแล้ว — พิมพ์/บันทึก PDF พร้อมโลโก้โรงเรียน</p></div>
+    <div class="controls">
+      <div class="row">
+        <div><label style="font-size:12px;color:var(--pk-ash);font-weight:600;display:block;margin-bottom:4px;">ค้นหา</label>
+          <input id="q" placeholder="ชื่อนักเรียน..." oninput="render()" style="width:220px;" /></div>
+      </div>
+      <div id="list"><div class="empty">⏳ กำลังโหลดบิลที่ชำระแล้ว...</div></div>
+    </div>
+
+    <div id="rc">
+      <button class="btn btn-primary no-print" style="float:right;" onclick="window.print()">🖨️ พิมพ์ / PDF</button>
+      <div class="clear"></div>
+      <div id="rcContent"></div>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    let BRAND={}, bills=[], smap={};
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const prof = await roleGuard.requireOwner(); if (!prof) return;
+      try { const { data } = await supabaseClient.rpc('get_school_branding'); if (data) BRAND=data; } catch(e){}
+      await loadStudents(); await loadBills();
+    });
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function thaiDate(d){ d=d?new Date(d):new Date(); const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']; return d.getDate()+' '+m[d.getMonth()]+' '+(d.getFullYear()+543); }
+
+    async function loadStudents(){
+      let all=[], from=0; const size=1000;
+      while(true){ const { data, error } = await supabaseClient.from('students').select('id,first_name_th,last_name_th,grade,classroom').range(from,from+size-1);
+        if(error) break; all=all.concat(data||[]); if(!data||data.length<size) break; from+=size; if(from>20000) break; }
+      all.forEach(s=>smap[s.id]=s);
+    }
+    async function loadBills(){
+      const box=document.getElementById('list');
+      const { data, error } = await supabaseClient.from('bills').select('*').eq('status','paid').order('due_date',{ascending:false});
+      if(error){ box.innerHTML='<div class="empty">โหลดบิลไม่ได้: '+esc(error.message)+'</div>'; return; }
+      bills = data||[]; render();
+    }
+    function nameOf(b){ const s=smap[b.student_id]||{}; return ((s.first_name_th||'')+' '+(s.last_name_th||'')).trim()||'-'; }
+
+    function render(){
+      const q=(document.getElementById('q').value||'').trim().toLowerCase();
+      const rows = bills.filter(b=>!q || nameOf(b).toLowerCase().includes(q));
+      const box=document.getElementById('list');
+      if(!rows.length){ box.innerHTML='<div class="empty">ไม่มีบิลที่ชำระแล้ว</div>'; return; }
+      box.innerHTML='<table class="bills"><thead><tr><th>นักเรียน</th><th>รายการ</th><th>จำนวน</th><th>ครบกำหนด</th><th></th></tr></thead><tbody>'
+        + rows.map((b,i)=>`<tr>
+            <td><b>${esc(nameOf(b))}</b></td>
+            <td>${esc(b.title||b.description||'ค่าเทอม')}</td>
+            <td>฿${Number(b.amount||0).toLocaleString('en-US')}</td>
+            <td>${b.due_date?new Date(b.due_date).toLocaleDateString('th-TH'):''}</td>
+            <td><button class="btn btn-secondary btn-sm" onclick="makeRc(${i==-1?'':bills.indexOf(b)})">🧾 ออกใบเสร็จ</button></td>
+          </tr>`).join('') + '</tbody></table>';
+    }
+
+    function bahtText(n){ // simple Thai baht in words
+      n = Math.round(Number(n)||0);
+      const txt = n.toLocaleString('en-US');
+      return txt + ' บาทถ้วน';
+    }
+
+    function makeRc(idx){
+      const b = bills[idx]; if(!b) return;
+      const s = smap[b.student_id]||{};
+      const name = ((s.first_name_th||'')+' '+(s.last_name_th||'')).trim()||'-';
+      const klass = (s.grade||'')+(s.classroom?('/'+s.classroom):'');
+      const recno = 'REC-'+((new Date().getFullYear()+543))+'-'+String(b.id||'').slice(0,6).toUpperCase();
+      const amt = Number(b.amount||0);
+      const logo = BRAND.logo_url ? `<img src="${esc(BRAND.logo_url)}" onerror="this.style.display='none'"/>` : '';
+      document.getElementById('rcContent').innerHTML =
+        `<div class="rc-head">${logo}<div class="sn">${esc(BRAND.name||'โรงเรียน')}</div></div>
+         <div class="rc-title">ใบเสร็จรับเงิน</div>
+         <div class="rc-meta"><div>เลขที่: <b>${esc(recno)}</b></div><div>วันที่: ${thaiDate(b.paid_date||b.updated_at)}</div></div>
+         <div style="font-size:15px;margin-bottom:6px;">ได้รับเงินจาก <b>${esc(name)}</b>${klass?(' ชั้น '+esc(klass)):''}</div>
+         <table class="rc-items"><thead><tr><th>รายการ</th><th style="width:160px;">จำนวนเงิน (บาท)</th></tr></thead>
+         <tbody><tr><td>${esc(b.title||b.description||'ค่าธรรมเนียมการศึกษา')}</td><td class="r">${amt.toLocaleString('en-US')}</td></tr>
+         <tr><td class="r"><b>รวมทั้งสิ้น</b></td><td class="r"><b>${amt.toLocaleString('en-US')}</b></td></tr></tbody></table>
+         <div class="rc-words">(${esc(bahtText(amt))})</div>
+         <div class="rc-sign"><div class="l">ลงชื่อ ............................................ ผู้รับเงิน</div>
+           <div class="l">( ${esc(BRAND.principal||'.......................................')} )</div></div>
+         <div class="clear"></div>`;
+      document.getElementById('rc').classList.add('show');
+      document.getElementById('rc').scrollIntoView({behavior:'smooth'});
+    }
+  </script>
+</body>
+</html>

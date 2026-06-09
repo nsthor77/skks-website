@@ -285,9 +285,9 @@
     <a href="/" class="brand-logo">
       <img src="images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" />
     </a>
-    <div class="school-tag">
+    <div class="school-tag" id="schoolTag" style="display:none;">
       <span class="dot"></span>
-      <span data-i18n="login.subtitle">โรงเรียนสวนสนขอนแก่น</span>
+      <span id="schoolTagName" data-i18n="login.subtitle"></span>
     </div>
   </div>
 
@@ -386,7 +386,7 @@
       th: {
         'login.title': 'เข้าสู่ระบบ',
         'login.welcome': 'ยินดีต้อนรับกลับ',
-        'login.subtitle': 'โรงเรียนสวนสนขอนแก่น',
+        'login.subtitle': '',
         'login.tab.signin': 'เข้าสู่ระบบ',
         'login.tab.signup': 'สมัครสมาชิก',
         'login.email': 'อีเมล',
@@ -412,7 +412,7 @@
       en: {
         'login.title': 'Sign In',
         'login.welcome': 'Welcome back',
-        'login.subtitle': 'Suanson Khon Kaen School',
+        'login.subtitle': '',
         'login.tab.signin': 'Sign In',
         'login.tab.signup': 'Sign Up',
         'login.email': 'Email',
@@ -560,25 +560,51 @@
       }
     })();
 
-    // Load school name dynamically (when tenant resolved)
-    window.addEventListener('tenant-resolved', async () => {
+    // ===== White-label: show THIS school's logo + name + color on its own login =====
+    // Resolves the tenant from the hostname ({slug}.panyaschoolkit.com or a custom domain)
+    // via the public (anon) RPC get_public_school. On the main domain it stays
+    // product-branded (PanyaSchoolKit). Never shows another school's name.
+    async function applyTenantBrand() {
       try {
-        const { schoolId } = await window.getTenant();
-        const { data: school } = await supabaseClient
-          .from('schools')
-          .select('name, name_en')
-          .eq('id', schoolId)
-          .single();
-        if (school) {
-          const lang = getLang();
-          const name = (lang === 'en' && school.name_en) ? school.name_en : school.name;
-          // Update subtitle if school name found
-          document.querySelectorAll('[data-i18n="login.subtitle"]').forEach(el => {
-            el.textContent = name;
-          });
+        const host = (location.hostname || '').toLowerCase();
+        let slug = null, domain = null;
+        if (/\.panyaschoolkit\.com$/.test(host)) {
+          const sub = host.split('.')[0];
+          if (sub && !['www', 'app', 'panyaschoolkit'].includes(sub)) slug = sub;
+        } else if (!/(^localhost$|^127\.|\.vercel\.app$|^$)/.test(host)) {
+          domain = host;  // school's own custom domain
         }
-      } catch (e) { /* fail silently */ }
-    });
+        if (!slug && !domain) return;  // main domain → keep product branding
+
+        const { data } = await supabaseClient.rpc('get_public_school', { p_slug: slug, p_domain: domain });
+        const s = data && data.school;
+        if (!s) return;
+
+        // School name in the tag (Thai-first, English when EN selected)
+        const lang = getLang();
+        const name = (lang === 'en' && s.name_en) ? s.name_en : (s.name || s.name_en);
+        if (name) {
+          const tag = document.getElementById('schoolTag');
+          const nameEl = document.getElementById('schoolTagName');
+          if (nameEl) nameEl.textContent = name;
+          if (tag) tag.style.display = '';
+          document.title = name;
+        }
+        // School's own logo
+        if (s.logo_url) {
+          const img = document.querySelector('.brand-logo img');
+          if (img) { img.src = s.logo_url; img.style.height = 'auto'; img.style.maxHeight = '56px'; }
+        }
+        // School's theme color on the primary button
+        if (s.theme_color) {
+          const r = document.documentElement;
+          r.style.setProperty('--pk-blue-800', s.theme_color);
+          r.style.setProperty('--pk-blue-900', s.theme_color);
+        }
+      } catch (e) { /* fail silently → product branding */ }
+    }
+    window.addEventListener('tenant-resolved', applyTenantBrand);
+    applyTenantBrand();
   </script>
 
   <!-- Cookie consent banner -->

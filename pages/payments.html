@@ -247,9 +247,9 @@
   <!-- Receipt Print Template -->
   <div class="receipt-print" id="receiptPrint">
     <div class="receipt-header">
-      <img src="../images/logo.png" alt="SKKS" />
-      <h1>SUANSON KHON KAEN SCHOOL</h1>
-      <div style="color:#6B7280;">โรงเรียนสวนสนขอนแก่น</div>
+      <img id="rcptLogo" src="" alt="" style="display:none; max-height:64px;" />
+      <h1 id="rcptSchoolTh"></h1>
+      <div id="rcptSchoolEn" style="color:#6B7280;"></div>
       <div style="margin-top:8px; font-size:13px; color:#6B7280;">ใบเสร็จรับเงิน / Receipt</div>
     </div>
     
@@ -514,10 +514,23 @@
       loadPayments();
     }
     
-    function printReceipt(id) {
+    async function printReceipt(id) {
       const p = allPayments.find(x => x.id === id);
       if (!p) return;
-      
+
+      // White-label: fill the receipt header with THIS school's name + logo (cached)
+      try {
+        if (!window._rcptBrand) {
+          const { data } = await supabaseClient.rpc('get_school_branding');
+          window._rcptBrand = data || {};
+        }
+        const b = window._rcptBrand || {};
+        document.getElementById('rcptSchoolTh').textContent = b.school_name_th || b.name || 'ใบเสร็จรับเงิน';
+        document.getElementById('rcptSchoolEn').textContent = b.school_name || '';
+        const lg = document.getElementById('rcptLogo');
+        if (lg && b.logo_url) { lg.src = b.logo_url; lg.style.display = ''; }
+      } catch (e) { /* keep neutral header */ }
+
       document.getElementById('rcptNumber').textContent = p.receipt_number;
       document.getElementById('rcptDate').textContent = dataHelpers.formatDateTime(p.paid_at);
       document.getElementById('rcptStudent').textContent = p.students?.student_number ? 

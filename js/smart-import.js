@@ -355,6 +355,28 @@
       return;
     }
 
+    // Plan cap (students only): block import that would exceed the package limit
+    if (cfg.rpc === 'bulk_insert_students') {
+      try {
+        var plan = 'premium'; try { plan = sessionStorage.getItem('pk_plan') || 'premium'; } catch (e) {}
+        if (['starter', 'pro', 'premium'].indexOf(plan) < 0) {
+          var pr = await global.supabaseClient.rpc('get_my_plan'); plan = (pr && pr.data && pr.data.plan) || 'premium';
+        }
+        var cap = { starter: 150, pro: 800, premium: Infinity }[plan] || Infinity;
+        if (cap !== Infinity) {
+          var cntRes = await global.supabaseClient.from('students').select('*', { count: 'exact', head: true });
+          var cur = cntRes.count || 0;
+          if (cur + clean.length > cap) {
+            var room = Math.max(0, cap - cur);
+            document.getElementById('si-importmsg').innerHTML = '<span style="color:#991B1B;">⚠️ '
+              + L('Exceeds your package limit of ', 'เกินขีดจำกัดแพกเกจ (') + cap + L(' students.', ' คน) ')
+              + L(' You can add ', '— เพิ่มได้อีก ') + room + L(' more — reduce the file or upgrade your package.', ' คน · ลดจำนวนแถว หรืออัปเกรดแพกเกจ') + '</span>';
+            return;
+          }
+        }
+      } catch (e) { /* fail-open: allow import */ }
+    }
+
     const msg = document.getElementById('si-importmsg');
     let inserted = 0, skipped = 0;
     const serverErrors = [];

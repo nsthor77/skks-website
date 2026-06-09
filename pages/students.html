@@ -1177,6 +1177,17 @@
       document.getElementById('editModal').classList.remove('show');
     }
 
+    async function studentPlanCap() {
+      let plan = 'premium'; try { plan = sessionStorage.getItem('pk_plan') || 'premium'; } catch (e) {}
+      if (['starter', 'pro', 'premium'].indexOf(plan) < 0) {
+        try { const r = await supabaseClient.rpc('get_my_plan'); plan = (r && r.data && r.data.plan) || 'premium'; } catch (e) { plan = 'premium'; }
+      }
+      return { starter: 150, pro: 800, premium: Infinity }[plan] || Infinity;
+    }
+    async function studentCount() {
+      try { const { count } = await supabaseClient.from('students').select('*', { count: 'exact', head: true }); return count || 0; } catch (e) { return 0; }
+    }
+
     async function saveStudent(e) {
       e.preventDefault();
       const btn = document.getElementById('btnSave');
@@ -1235,6 +1246,14 @@
       payload.custom_data = collectCustomData();
 
       const id = val('fId');
+      if (!id) {
+        const _cap = await studentPlanCap();
+        if (_cap !== Infinity && (await studentCount()) >= _cap) {
+          btn.disabled = false; btn.textContent = '💾 บันทึก';
+          toast('ถึงขีดจำกัดแพกเกจแล้ว (' + _cap + ' คน) — อัปเกรดแพกเกจเพื่อเพิ่มนักเรียนได้มากขึ้น', 'error');
+          return;
+        }
+      }
       let result;
       if (id) {
         result = await supabaseClient.from('students').update({ ...payload, updated_by: currentProfile.id }).eq('id', id);

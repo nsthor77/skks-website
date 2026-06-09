@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>School Settings — PanyaSchoolKit</title>
+  <title>ตั้งค่าโรงเรียน — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/admin.css" />
@@ -36,8 +36,8 @@
   <div class="admin-topbar">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <img src="../images/panya-mark.png" alt="PanyaSchoolKit" />
+        <h1>ตั้งค่าโรงเรียน</h1>
       </a>
       <nav class="admin-nav">
         <a href="dashboard.html">📊 Dashboard</a>
@@ -52,108 +52,118 @@
       </nav>
     </div>
     <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
 
   <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
     
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>⚙️ School Settings</h2>
-          <p>ตั้งค่าโรงเรียน + LINE Notifications — Owner only</p>
+          <h2>⚙️ ตั้งค่าโรงเรียน</h2>
+          <p>แก้ชื่อโรงเรียน ผู้อำนวยการ ที่อยู่ คำขวัญ — ข้อมูลนี้จะแสดงบนเว็บไซต์โรงเรียน ใบประกาศ และเอกสาร ปพ. (สำหรับเจ้าของ/ผู้ดูแล)</p>
         </div>
       </div>
 
       <div class="layout">
         <div class="side-menu">
-          <a class="tab-link active" onclick="showTab('school')">🏫 School Info</a>
-          <a class="tab-link" onclick="showTab('principal')">👤 Principal</a>
-          <a class="tab-link" onclick="showTab('line')">📱 LINE Notify</a>
-          <a class="tab-link" onclick="showTab('payment')">💳 Payment Account</a>
+          <a class="tab-link active" onclick="showTab('school')">🏫 ข้อมูลโรงเรียน</a>
+          <a class="tab-link" onclick="showTab('principal')">👤 ผู้อำนวยการ</a>
+          <a class="tab-link" onclick="showTab('line')">📱 LINE แจ้งเตือน</a>
+          <a class="tab-link" onclick="showTab('payment')">💳 บัญชีรับเงิน</a>
         </div>
         
         <div>
           <div class="setting-section active" id="tab-school">
-            <h3>🏫 School Information</h3>
+            <h3>🏫 ข้อมูลโรงเรียน</h3>
+            <p style="font-size:12.5px;color:#6B7280;background:#F0F9FF;padding:10px 14px;border-radius:8px;margin-bottom:16px;">
+              ℹ️ ข้อมูลนี้จะแสดงบน <b>เว็บไซต์โรงเรียน</b> ใบประกาศนียบัตร และเอกสาร ปพ. โดยอัตโนมัติ
+            </p>
             <form onsubmit="saveSchool(event)">
               <div class="form-row">
                 <div class="form-group">
-                  <label>School Name (English)</label>
-                  <input type="text" id="schoolName" />
+                  <label>ชื่อโรงเรียน (ไทย)</label>
+                  <input type="text" id="schoolNameTh" placeholder="เช่น โรงเรียนสวนสนขอนแก่น" />
                 </div>
                 <div class="form-group">
-                  <label>ชื่อโรงเรียน (ไทย)</label>
-                  <input type="text" id="schoolNameTh" />
+                  <label>ชื่อโรงเรียน (ภาษาอังกฤษ)</label>
+                  <input type="text" id="schoolName" />
                 </div>
               </div>
               <div class="form-group">
-                <label>Address</label>
+                <label>ที่อยู่</label>
                 <textarea id="schoolAddress" rows="2"></textarea>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Phone</label>
+                  <label>เบอร์โทรศัพท์</label>
                   <input type="tel" id="schoolPhone" />
                 </div>
                 <div class="form-group">
-                  <label>Email</label>
+                  <label>อีเมล</label>
                   <input type="email" id="schoolEmail" />
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Website</label>
-                  <input type="url" id="schoolWebsite" />
+                  <label>เว็บไซต์</label>
+                  <input type="url" id="schoolWebsite" placeholder="https://..." />
                 </div>
                 <div class="form-group">
-                  <label>Registration Number</label>
+                  <label>รหัสสถานศึกษา</label>
                   <input type="text" id="schoolRegNum" />
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Motto (English)</label>
-                  <input type="text" id="motto" />
-                </div>
-                <div class="form-group">
                   <label>คำขวัญ (ไทย)</label>
                   <input type="text" id="mottoTh" />
                 </div>
+                <div class="form-group">
+                  <label>คำขวัญ (ภาษาอังกฤษ)</label>
+                  <input type="text" id="motto" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>เกี่ยวกับโรงเรียน <span style="font-weight:400;color:#9CA3AF;">— ข้อความแนะนำที่แสดงบนหน้าเว็บไซต์โรงเรียน</span></label>
+                <textarea id="schoolAbout" rows="3" placeholder="แนะนำโรงเรียนสั้น ๆ เช่น ประวัติ จุดเด่น หรือวิสัยทัศน์"></textarea>
               </div>
               <div style="text-align:right;">
-                <button class="btn btn-primary" type="submit">💾 Save School Info</button>
+                <button class="btn btn-primary" type="submit">💾 บันทึกข้อมูลโรงเรียน</button>
               </div>
             </form>
           </div>
 
           <div class="setting-section" id="tab-principal">
-            <h3>👤 Principal Information</h3>
+            <h3>👤 ข้อมูลผู้อำนวยการ</h3>
+            <p style="font-size:12.5px;color:#6B7280;background:#F0F9FF;padding:10px 14px;border-radius:8px;margin-bottom:16px;">
+              ℹ️ ชื่อและตำแหน่งนี้จะใช้ลงนามบน <b>ใบประกาศนียบัตร</b> และเอกสารทางการ
+            </p>
             <form onsubmit="saveSchool(event)">
               <div class="form-row">
-                <div class="form-group">
-                  <label>Principal Name (English)</label>
-                  <input type="text" id="principalName" />
-                </div>
                 <div class="form-group">
                   <label>ชื่อผู้อำนวยการ (ไทย)</label>
                   <input type="text" id="principalNameTh" />
                 </div>
+                <div class="form-group">
+                  <label>ชื่อผู้อำนวยการ (ภาษาอังกฤษ)</label>
+                  <input type="text" id="principalName" />
+                </div>
               </div>
               <div class="form-row">
-                <div class="form-group">
-                  <label>Title (English)</label>
-                  <input type="text" id="principalTitle" placeholder="Principal" />
-                </div>
                 <div class="form-group">
                   <label>ตำแหน่ง (ไทย)</label>
                   <input type="text" id="principalTitleTh" placeholder="ผู้อำนวยการ" />
                 </div>
+                <div class="form-group">
+                  <label>ตำแหน่ง (ภาษาอังกฤษ)</label>
+                  <input type="text" id="principalTitle" placeholder="Principal" />
+                </div>
               </div>
               <div style="text-align:right;">
-                <button class="btn btn-primary" type="submit">💾 Save Principal Info</button>
+                <button class="btn btn-primary" type="submit">💾 บันทึกข้อมูลผู้อำนวยการ</button>
               </div>
             </form>
           </div>
@@ -214,10 +224,13 @@
     }
     
     async function loadSchool() {
-      const { data } = await supabaseClient.from('school_settings').select('*').limit(1).single();
+      const { data, error } = await supabaseClient.rpc('get_school_info');
+      if (error || !data || data.error) {
+        dataHelpers.toast('โหลดข้อมูลโรงเรียนไม่สำเร็จ: ' + ((data && data.error) || (error && error.message) || ''), 'error');
+        return;
+      }
       school = data;
-      if (!school) return;
-      
+
       document.getElementById('schoolName').value = school.school_name || '';
       document.getElementById('schoolNameTh').value = school.school_name_th || '';
       document.getElementById('schoolAddress').value = school.school_address || '';
@@ -227,6 +240,7 @@
       document.getElementById('schoolRegNum').value = school.registration_number || '';
       document.getElementById('motto').value = school.motto || '';
       document.getElementById('mottoTh').value = school.motto_th || '';
+      document.getElementById('schoolAbout').value = school.description || '';
       document.getElementById('principalName').value = school.principal_name || '';
       document.getElementById('principalNameTh').value = school.principal_name_th || '';
       document.getElementById('principalTitle').value = school.principal_title || '';
@@ -275,7 +289,7 @@
     
     async function saveSchool(event) {
       event.preventDefault();
-      const data = {
+      const payload = {
         school_name: document.getElementById('schoolName').value,
         school_name_th: document.getElementById('schoolNameTh').value,
         school_address: document.getElementById('schoolAddress').value,
@@ -285,28 +299,28 @@
         registration_number: document.getElementById('schoolRegNum').value,
         motto: document.getElementById('motto').value,
         motto_th: document.getElementById('mottoTh').value,
+        description: document.getElementById('schoolAbout').value,
         principal_name: document.getElementById('principalName').value,
         principal_name_th: document.getElementById('principalNameTh').value,
         principal_title: document.getElementById('principalTitle').value,
-        principal_title_th: document.getElementById('principalTitleTh').value,
-        updated_at: new Date().toISOString()
+        principal_title_th: document.getElementById('principalTitleTh').value
       };
-      
-      const { error } = await supabaseClient
-        .from('school_settings')
-        .update(data)
-        .eq('id', school.id);
-      
-      if (error) {
-        dataHelpers.toast('❌ ' + error.message, 'error');
+
+      const { data, error } = await supabaseClient.rpc('save_school_info', { p: payload });
+
+      if (error || !data || !data.success) {
+        dataHelpers.toast('❌ บันทึกไม่สำเร็จ: ' + ((data && data.error) || (error && error.message) || 'กรุณาลองอีกครั้ง'), 'error');
         return;
       }
-      
-      dataHelpers.toast('✅ Settings saved!', 'success');
+
+      dataHelpers.toast('✅ บันทึกแล้ว — ข้อมูลจะแสดงบนเว็บไซต์โรงเรียน ใบประกาศ และเอกสาร ปพ.', 'success');
       await loadSchool();
     }
     
-    init();
+    init().catch(e => {
+      const m = document.getElementById('loadingMsg');
+      if (m) m.textContent = '⚠️ เกิดข้อผิดพลาดในการโหลด: ' + (e && e.message ? e.message : e);
+    });
   </script>
 </body>
 </html>

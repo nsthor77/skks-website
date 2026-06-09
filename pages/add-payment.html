@@ -463,7 +463,7 @@
       if (statusCode !== 200) {
         submitBtn.disabled = false;
         submitText.textContent = 'บันทึกบัตร';
-        showAlert('error', `Tokenize ไม่สำเร็จ: ${response.message || response.code || 'unknown error'}`);
+        showAlert('error', `บันทึกข้อมูลบัตรไม่สำเร็จ: ${response.message || response.code || 'กรุณาตรวจสอบข้อมูลบัตรอีกครั้ง'}`);
         return;
       }
 

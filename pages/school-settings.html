@@ -30,6 +30,11 @@
     .switch .slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.2s}
     .switch input:checked + .slider{background:#10B981}
     .switch input:checked + .slider::before{transform:translateX(24px)}
+    .mode-card{display:flex;gap:12px;align-items:flex-start;border:1.5px solid #E5E7EB;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;}
+    .mode-card input{margin-top:3px;flex-shrink:0;}
+    .mode-card b{font-size:14px;}
+    .mode-card span{font-size:12.5px;color:#6B7280;line-height:1.5;}
+    .mode-card:has(input:checked){border-color:var(--brand,#1B5E3F);background:#F0FDF4;}
   </style>
 </head>
 <body>
@@ -73,6 +78,7 @@
           <a class="tab-link" onclick="showTab('principal')">👤 ผู้อำนวยการ</a>
           <a class="tab-link" onclick="showTab('line')">📱 LINE แจ้งเตือน</a>
           <a class="tab-link" onclick="showTab('payment')">💳 บัญชีรับเงิน</a>
+          <a class="tab-link" onclick="showTab('website')">🌐 เว็บไซต์โรงเรียน</a>
         </div>
         
         <div>
@@ -184,10 +190,45 @@
           </div>
 
           <div class="setting-section" id="tab-payment">
-            <h3>💳 Payment Account</h3>
+            <h3>💳 บัญชีรับเงิน</h3>
             <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">
-              ตั้งค่าบัญชีสำหรับรับชำระเงิน — <a href="payment-settings.html" style="color:var(--brand,#1B5E3F);font-weight:600;">ไปที่ Payment Settings →</a>
+              ตั้งค่าบัญชีสำหรับรับชำระเงิน (พร้อมเพย์/ธนาคาร) — <a href="payment-settings.html" style="color:var(--brand,#1B5E3F);font-weight:600;">ไปที่หน้าตั้งค่าการชำระเงิน →</a>
             </p>
+          </div>
+
+          <div class="setting-section" id="tab-website">
+            <h3>🌐 เว็บไซต์โรงเรียน</h3>
+            <p style="font-size:12.5px;color:#6B7280;background:#F0F9FF;padding:10px 14px;border-radius:8px;margin-bottom:16px;">
+              ℹ️ เลือกว่า "หน้าแรก" ของลิงก์โรงเรียนจะแสดงอะไร — เปลี่ยนเมื่อไหร่ก็ได้
+            </p>
+
+            <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;">
+              🔗 ลิงก์เว็บโรงเรียนของคุณ: <a id="siteUrl" href="#" target="_blank" style="color:var(--brand,#1B5E3F);font-weight:600;">—</a>
+            </div>
+
+            <label class="mode-card">
+              <input type="radio" name="siteMode" value="managed" />
+              <div><b>ใช้เว็บไซต์สำเร็จรูปของเรา</b><br><span>มีหน้าเว็บพร้อมข่าว/กิจกรรม/รับสมัครให้เลย — เหมาะถ้ายังไม่มีเว็บ ไม่ต้องออกแบบเอง</span></div>
+            </label>
+            <label class="mode-card">
+              <input type="radio" name="siteMode" value="external" />
+              <div><b>มีเว็บไซต์ของตัวเองอยู่แล้ว</b><br><span>หน้าแรกจะพาเข้าสู่ระบบทันที — นำลิงก์ "เข้าสู่ระบบ" ด้านล่างไปวางบนเว็บเดิมของท่าน</span></div>
+            </label>
+            <label class="mode-card">
+              <input type="radio" name="siteMode" value="app_only" />
+              <div><b>ใช้เฉพาะโปรแกรม (ไม่ต้องการหน้าเว็บ)</b><br><span>หน้าแรกจะพาเข้าสู่ระบบทันที — เหมาะกับการใช้ภายในโรงเรียน</span></div>
+            </label>
+
+            <div id="loginLinkBox" style="display:none;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:12px 14px;margin-top:8px;font-size:13px;">
+              ลิงก์เข้าสู่ระบบ (สำหรับวางบนเว็บของท่าน):<br>
+              <code id="loginUrl" style="font-size:12px;word-break:break-all;">—</code>
+              <button type="button" class="btn btn-secondary" style="margin-top:8px;padding:5px 12px;font-size:12px;" onclick="copyLoginUrl()">📋 คัดลอกลิงก์</button>
+            </div>
+
+            <div style="text-align:right;margin-top:18px;">
+              <a id="previewBtn" href="/?preview=1" target="_blank" class="btn btn-secondary" style="margin-right:8px;">👁️ ดูเว็บ (พรีวิว)</a>
+              <button class="btn btn-primary" type="button" onclick="saveSiteMode()">💾 บันทึกโหมดเว็บไซต์</button>
+            </div>
           </div>
         </div>
       </div>
@@ -245,6 +286,34 @@
       document.getElementById('principalNameTh').value = school.principal_name_th || '';
       document.getElementById('principalTitle').value = school.principal_title || '';
       document.getElementById('principalTitleTh').value = school.principal_title_th || '';
+
+      // --- website mode ---
+      const sm = school.site_mode || 'managed';
+      const radios = document.getElementsByName('siteMode');
+      for (let i = 0; i < radios.length; i++) { radios[i].checked = (radios[i].value === sm); radios[i].onchange = onModeChange; }
+      const base = school.custom_domain ? ('https://' + school.custom_domain)
+                 : ('https://' + (school.slug || 'your-school') + '.panyaschoolkit.com');
+      const su = document.getElementById('siteUrl'); su.textContent = base; su.href = base;
+      document.getElementById('loginUrl').textContent = base + '/login.html';
+      onModeChange();
+    }
+
+    function onModeChange() {
+      const v = (document.querySelector('input[name="siteMode"]:checked') || {}).value || 'managed';
+      document.getElementById('loginLinkBox').style.display = (v === 'managed') ? 'none' : 'block';
+    }
+    function copyLoginUrl() {
+      const t = document.getElementById('loginUrl').textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => dataHelpers.toast('คัดลอกลิงก์แล้ว', 'success')).catch(() => {});
+    }
+    async function saveSiteMode() {
+      const v = (document.querySelector('input[name="siteMode"]:checked') || {}).value || 'managed';
+      const { data, error } = await supabaseClient.rpc('save_school_info', { p: { site_mode: v } });
+      if (error || !data || !data.success) {
+        dataHelpers.toast('❌ บันทึกไม่สำเร็จ: ' + ((data && data.error) || (error && error.message) || 'กรุณาลองอีกครั้ง'), 'error');
+        return;
+      }
+      dataHelpers.toast('✅ บันทึกโหมดเว็บไซต์แล้ว', 'success');
     }
     
     async function loadLine() {

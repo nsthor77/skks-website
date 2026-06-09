@@ -64,6 +64,14 @@
       </div>
       <label class="chk"><input type="checkbox" id="comp" checked /> เปิดใช้ฟรี / Comp (ข้ามการจ่ายเงิน — สำหรับทดลอง)</label>
       <hr style="border:none;border-top:1px solid #EEF0F5;margin:6px 0 16px;" />
+      <div class="field"><label>โหมดหน้าเว็บ</label>
+        <select id="siteMode">
+          <option value="managed">ใช้เว็บไซต์สำเร็จรูปของเรา (มีหน้าเว็บ public)</option>
+          <option value="external">มีเว็บไซต์ของตัวเองอยู่แล้ว (หน้าแรก → เข้าระบบ)</option>
+          <option value="app_only">ใช้เฉพาะโปรแกรม (ไม่มีหน้าเว็บ → เข้าระบบ)</option>
+        </select>
+        <div class="hint">โรงเรียนเปลี่ยนเองได้ทีหลังในหน้า "ตั้งค่า → เว็บไซต์โรงเรียน"</div>
+      </div>
       <div class="field"><label>Custom Domain ของโรงเรียน (ถ้ามี)</label>
         <input id="customDomain" placeholder="app.suansonkk.ac.th" />
         <div class="hint">ถ้าโรงเรียนมีโดเมนเอง ใส่ที่นี่ — ระบบจะผูกกับ Vercel + ออก SSL ให้อัตโนมัติ แล้วจะบอก DNS ที่โรงเรียนต้องเพิ่ม · เว้นว่างได้ (จะใช้ <span id="slugPreview2">slug</span>.panyaschoolkit.com)</div>
@@ -102,7 +110,8 @@
         ownerEmail: val('ownerEmail').toLowerCase(), ownerPassword: val('ownerPassword'),
         ownerFirstName: val('ownerFirstName'), ownerLastName: val('ownerLastName'),
         discountPercent: Number(val('discountPercent'))||0, comp: document.getElementById('comp').checked, notes: val('notes'),
-        customDomain: val('customDomain').toLowerCase()
+        customDomain: val('customDomain').toLowerCase(),
+        siteMode: val('siteMode') || 'managed'
       };
       if(!payload.schoolName||!payload.slug||!payload.ownerEmail||!payload.ownerPassword){ showAlert('กรอกช่องที่มี * ให้ครบ',false); return; }
       if(payload.ownerPassword.length<8){ showAlert('รหัสผ่านอย่างน้อย 8 ตัว',false); return; }

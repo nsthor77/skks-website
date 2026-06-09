@@ -84,7 +84,8 @@
         value:parseFloat(document.getElementById('fValue').value)||null, acquired_date:document.getElementById('fDate').value||null };
       const id=document.getElementById('fId').value; const btn=document.getElementById('saveBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='⏳';
       let res; if(id){ res=await supabaseClient.from('assets').update(payload).eq('id',id); }
-      else { res=await supabaseClient.from('assets').insert({ ...payload, school_id:window.CURRENT_SCHOOL_ID, created_by:(await auth.getProfile()).id }); }
+      else { let _pid=null; try{ _pid=(await auth.getProfile())?.id||null; }catch(e){}
+        res=await supabaseClient.from('assets').insert({ ...payload, school_id:window.CURRENT_SCHOOL_ID, created_by:_pid }); }
       btn.disabled=false; btn.textContent=old;
       if(res.error){ toast('บันทึกไม่สำเร็จ: '+res.error.message,'error'); return; }
       toast('บันทึกแล้ว','success'); closeForm(); load(); }

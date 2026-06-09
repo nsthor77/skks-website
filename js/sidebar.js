@@ -87,6 +87,7 @@
       // custom-tables.html hidden: generic table builder needs custom_tables/custom_table_rows SQL (not deployed) — errors on load. Use student/teacher Custom Fields instead.
       { href: 'users.html',            tier: 'admin', en: 'Users',            th: 'ผู้ใช้' },
       { href: 'manage-invites.html',   tier: 'admin', en: 'Invites',          th: 'คำเชิญ' },
+      { href: 'website-manager.html',  tier: 'admin', en: 'Website',          th: 'จัดการเว็บไซต์' },
       { href: 'school-settings.html',  tier: 'admin', en: 'School',           th: 'โรงเรียน' },
       { href: 'brand-setup.html',      tier: 'admin', en: 'Branding',         th: 'แบรนด์/โลโก้' },
       { href: 'data-export.html',      tier: 'owner', en: 'Export Data',      th: 'ส่งออกข้อมูล' }

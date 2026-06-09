@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>จัดการเว็บไซต์โรงเรียน — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--brand:#1B5E3F;--pk-blue-800:#1E40AF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;}
+    *{box-sizing:border-box;margin:0;padding:0;} body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;gap:16px;}
+    .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:920px;margin:0 auto;padding:24px;}
+    .page-title h1{font-size:24px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:14px;margin:6px 0 18px;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:14px;padding:20px 22px;margin-bottom:18px;}
+    .card h3{font-size:16px;font-weight:700;color:var(--brand);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+    .card .desc{font-size:12.5px;color:var(--pk-ash);margin-bottom:16px;}
+    label.fl{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin:10px 0 4px;}
+    input,textarea{width:100%;padding:10px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .btn{padding:10px 18px;border-radius:9px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;text-decoration:none;display:inline-block;}
+    .btn-primary{background:var(--brand);color:#fff;} .btn-secondary{background:#fff;color:var(--pk-ink);border:1px solid var(--pk-border-em);}
+    .btn-lg{padding:13px 26px;font-size:15px;}
+    .hero-bar{background:linear-gradient(135deg,var(--brand),#0f3d28);color:#fff;border-radius:16px;padding:22px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+    .hero-bar .u{font-size:13px;opacity:.9;margin-top:4px;word-break:break-all;} .hero-bar a.u{color:#fff;}
+    .hero-bar h2{font-size:18px;font-weight:700;}
+    .chk{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px;}
+    .chip{font-size:12.5px;padding:6px 12px;border-radius:999px;background:#F1F5F9;color:var(--pk-ash);font-weight:600;}
+    .chip.ok{background:#D1FAE5;color:#065F46;}
+    .mode-card{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--pk-border);border-radius:12px;padding:13px;margin-bottom:10px;cursor:pointer;}
+    .mode-card input{margin-top:3px;flex-shrink:0;} .mode-card b{font-size:14px;} .mode-card span{font-size:12.5px;color:var(--pk-ash);line-height:1.5;}
+    .mode-card:has(input:checked){border-color:var(--brand);background:#F0FDF4;}
+    .brandrow{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+    .logo-box{width:72px;height:72px;border-radius:12px;border:1px solid var(--pk-border);background:#F8FAFC center/contain no-repeat;display:flex;align-items:center;justify-content:center;font-size:28px;color:#9AA3B5;}
+    .swatch{width:30px;height:30px;border-radius:8px;border:1px solid var(--pk-border-em);display:inline-block;vertical-align:middle;}
+    .mini{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .mini a{display:block;border:1px solid var(--pk-border);border-radius:12px;padding:16px;text-decoration:none;color:inherit;transition:.15s;}
+    .mini a:hover{border-color:var(--brand);background:#F8FAFC;}
+    .mini .n{font-size:26px;font-weight:800;color:var(--brand);} .mini .t{font-weight:700;font-size:14px;margin-top:2px;} .mini .s{font-size:12px;color:var(--pk-ash);}
+    .loginbox{display:none;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:13px;}
+    .loginbox code{font-size:12px;word-break:break-all;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;}.toast.show{opacity:1;}.toast.success{background:#065F46;}.toast.error{background:#991B1B;}
+    .loading{text-align:center;padding:80px;color:var(--pk-ash);}
+    @media(max-width:640px){.row,.mini{grid-template-columns:1fr;}input,textarea{font-size:16px;}.container{padding:14px;}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html" class="admin-logo"><img src="../images/panya-schoolkit-lockup.png" alt="PanyaSchoolKit" /></a>
+    <a href="dashboard.html" class="back-link">← แดชบอร์ด</a>
+  </div>
+
+  <div class="container">
+    <div class="loading" id="loading">⏳ กำลังโหลด...</div>
+
+    <div id="content" style="display:none;">
+      <div class="page-title">
+        <h1>🌐 จัดการเว็บไซต์โรงเรียน</h1>
+        <p>แก้ทุกอย่างที่แสดงบนเว็บโรงเรียนของคุณ — ในที่เดียว</p>
+      </div>
+
+      <!-- Hero: URL + preview -->
+      <div class="hero-bar">
+        <div>
+          <h2>เว็บไซต์ของคุณพร้อมแล้ว</h2>
+          <a class="u" id="siteUrl" href="#" target="_blank">—</a>
+        </div>
+        <a class="btn btn-secondary btn-lg" id="previewBtn" href="/?preview=1" target="_blank" style="background:#fff;color:var(--brand);">👁️ ดูเว็บจริง</a>
+      </div>
+
+      <!-- Checklist -->
+      <div class="card">
+        <h3>📋 ความครบถ้วน</h3>
+        <div class="desc">ยิ่งกรอกครบ เว็บยิ่งสมบูรณ์ — ส่วนที่ยังไม่กรอกจะถูกซ่อนบนเว็บอัตโนมัติ</div>
+        <div class="chk" id="checklist"></div>
+      </div>
+
+      <!-- Mode -->
+      <div class="card">
+        <h3>🧭 โหมดหน้าแรก</h3>
+        <div class="desc">เลือกว่า "หน้าแรก" ของลิงก์โรงเรียนจะแสดงอะไร</div>
+        <label class="mode-card"><input type="radio" name="siteMode" value="managed" /><div><b>ใช้เว็บไซต์สำเร็จรูปของเรา</b><br><span>มีหน้าเว็บพร้อมข่าว/กิจกรรม/รับสมัคร — ไม่ต้องออกแบบเอง</span></div></label>
+        <label class="mode-card"><input type="radio" name="siteMode" value="external" /><div><b>มีเว็บไซต์ของตัวเองอยู่แล้ว</b><br><span>หน้าแรกพาเข้าสู่ระบบ — นำลิงก์เข้าระบบไปวางบนเว็บเดิม</span></div></label>
+        <label class="mode-card"><input type="radio" name="siteMode" value="app_only" /><div><b>ใช้เฉพาะโปรแกรม (ไม่มีหน้าเว็บ)</b><br><span>หน้าแรกพาเข้าสู่ระบบ — เหมาะกับใช้ภายใน</span></div></label>
+        <div class="loginbox" id="loginbox">ลิงก์เข้าสู่ระบบ (วางบนเว็บของท่าน): <code id="loginUrl">—</code>
+          <button class="btn btn-secondary" style="margin-top:8px;padding:5px 12px;font-size:12px;" onclick="copyLogin()">📋 คัดลอก</button></div>
+        <div style="text-align:right;margin-top:12px;"><button class="btn btn-primary" onclick="saveMode()">💾 บันทึกโหมด</button></div>
+      </div>
+
+      <!-- Brand -->
+      <div class="card">
+        <h3>🎨 โลโก้ & สีแบรนด์</h3>
+        <div class="desc">โลโก้และสีนี้จะใช้ทั้งบนเว็บ ในระบบ และเอกสารต่าง ๆ</div>
+        <div class="brandrow">
+          <div class="logo-box" id="logoBox">🏫</div>
+          <div style="flex:1;min-width:160px;">
+            <div style="font-size:13px;color:var(--pk-ash);">สีแบรนด์: <span class="swatch" id="swatch"></span> <span id="swatchHex" style="font-size:12px;"></span></div>
+          </div>
+          <a class="btn btn-secondary" href="brand-setup.html">แก้โลโก้ / สี →</a>
+        </div>
+      </div>
+
+      <!-- Public info -->
+      <div class="card">
+        <h3>📝 ข้อมูลหน้าเว็บ</h3>
+        <div class="desc">ชื่อ คำขวัญ คำแนะนำ และช่องทางติดต่อ ที่แสดงบนเว็บ</div>
+        <div class="row">
+          <div><label class="fl">ชื่อโรงเรียน (ไทย)</label><input id="f_name_th" /></div>
+          <div><label class="fl">ชื่อ (อังกฤษ)</label><input id="f_name_en" /></div>
+        </div>
+        <label class="fl">คำขวัญ</label><input id="f_motto" placeholder="เช่น เรียนรู้ด้วยใจ เติบโตอย่างมีคุณค่า" />
+        <label class="fl">เกี่ยวกับโรงเรียน (ข้อความแนะนำบนเว็บ)</label><textarea id="f_about" rows="3"></textarea>
+        <div class="row">
+          <div><label class="fl">เบอร์โทร</label><input id="f_phone" /></div>
+          <div><label class="fl">อีเมล</label><input id="f_email" /></div>
+        </div>
+        <label class="fl">ที่อยู่</label><input id="f_address" />
+        <label class="fl">เว็บไซต์ (ถ้ามี)</label><input id="f_website" placeholder="https://..." />
+        <div style="text-align:right;margin-top:14px;"><button class="btn btn-primary" onclick="saveInfo()">💾 บันทึกข้อมูล</button></div>
+      </div>
+
+      <!-- News & Events -->
+      <div class="card">
+        <h3>📰 ข่าวสาร & กิจกรรม</h3>
+        <div class="desc">โพสต์ข่าวและกิจกรรม — จะแสดงบนหน้าเว็บทันที</div>
+        <div class="mini">
+          <a href="news-admin.html"><div class="n" id="newsCount">—</div><div class="t">ข่าวสาร</div><div class="s">กดเพื่อเพิ่ม/แก้ข่าว →</div></a>
+          <a href="events-admin.html"><div class="n" id="eventCount">—</div><div class="t">กิจกรรม</div><div class="s">กดเพื่อเพิ่ม/แก้กิจกรรม →</div></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let school = null;
+    document.addEventListener('DOMContentLoaded', () => {
+      init().catch(e => { document.getElementById('loading').textContent = '⚠️ เกิดข้อผิดพลาด: ' + (e && e.message ? e.message : e); });
+    });
+
+    async function init() {
+      const p = await roleGuard.requireStaff();   // owner + admin (ไม่รวมครู)
+      if (!p) return;
+      await load();
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    function v(id){ return (document.getElementById(id).value || '').trim(); }
+    function esc(s){ return String(s==null?'':s); }
+
+    async function load() {
+      const { data, error } = await supabaseClient.rpc('get_school_info');
+      if (error || !data || data.error) { toast('โหลดข้อมูลไม่สำเร็จ', 'error'); return; }
+      school = data;
+
+      // URL + preview
+      const base = school.custom_domain ? ('https://' + school.custom_domain)
+                 : ('https://' + (school.slug || 'your-school') + '.panyaschoolkit.com');
+      const su = document.getElementById('siteUrl'); su.textContent = base; su.href = base;
+      document.getElementById('loginUrl').textContent = base + '/login.html';
+
+      // brand
+      if (school.theme_color) {
+        document.documentElement.style.setProperty('--brand', school.theme_color);
+        document.getElementById('swatch').style.background = school.theme_color;
+        document.getElementById('swatchHex').textContent = school.theme_color;
+      }
+      if (school.logo_url) { document.getElementById('logoBox').style.backgroundImage = 'url(' + school.logo_url + ')'; document.getElementById('logoBox').textContent = ''; }
+
+      // info fields
+      document.getElementById('f_name_th').value = school.school_name_th || '';
+      document.getElementById('f_name_en').value = school.school_name || '';
+      document.getElementById('f_motto').value   = school.motto_th || school.motto || '';
+      document.getElementById('f_about').value    = school.description || '';
+      document.getElementById('f_phone').value    = school.school_phone || '';
+      document.getElementById('f_email').value    = school.school_email || '';
+      document.getElementById('f_address').value  = school.school_address || '';
+      document.getElementById('f_website').value  = school.school_website || '';
+
+      // mode
+      const sm = school.site_mode || 'managed';
+      const radios = document.getElementsByName('siteMode');
+      for (let i = 0; i < radios.length; i++) { radios[i].checked = (radios[i].value === sm); radios[i].onchange = onMode; }
+      onMode();
+
+      buildChecklist();
+      loadCounts();
+    }
+
+    function buildChecklist() {
+      const items = [
+        ['ชื่อโรงเรียน', !!school.school_name_th],
+        ['โลโก้', !!school.logo_url],
+        ['สีแบรนด์', !!school.theme_color],
+        ['คำขวัญ', !!(school.motto_th || school.motto)],
+        ['เกี่ยวกับ', !!school.description],
+        ['ติดต่อ', !!(school.school_phone || school.school_email)]
+      ];
+      document.getElementById('checklist').innerHTML = items.map(it =>
+        `<span class="chip ${it[1] ? 'ok' : ''}">${it[1] ? '✓' : '○'} ${it[0]}</span>`).join('');
+    }
+
+    async function loadCounts() {
+      try { const { count } = await supabaseClient.from('news').select('*', { count: 'exact', head: true }); document.getElementById('newsCount').textContent = count ?? 0; } catch (e) {}
+      try { const { count } = await supabaseClient.from('events').select('*', { count: 'exact', head: true }); document.getElementById('eventCount').textContent = count ?? 0; } catch (e) {}
+    }
+
+    function onMode() {
+      const sel = (document.querySelector('input[name="siteMode"]:checked') || {}).value || 'managed';
+      document.getElementById('loginbox').style.display = (sel === 'managed') ? 'none' : 'block';
+    }
+    function copyLogin() {
+      const t = document.getElementById('loginUrl').textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('คัดลอกแล้ว', 'success')).catch(() => {});
+    }
+
+    async function saveMode() {
+      const sel = (document.querySelector('input[name="siteMode"]:checked') || {}).value || 'managed';
+      const { data, error } = await supabaseClient.rpc('save_school_info', { p: { site_mode: sel } });
+      if (error || !data || !data.success) { toast('บันทึกไม่สำเร็จ', 'error'); return; }
+      toast('บันทึกโหมดแล้ว', 'success');
+    }
+
+    async function saveInfo() {
+      const payload = {
+        school_name_th: v('f_name_th'), school_name: v('f_name_en'),
+        motto_th: v('f_motto'), description: v('f_about'),
+        school_phone: v('f_phone'), school_email: v('f_email'),
+        school_address: v('f_address'), school_website: v('f_website')
+      };
+      const { data, error } = await supabaseClient.rpc('save_school_info', { p: payload });
+      if (error || !data || !data.success) { toast('บันทึกไม่สำเร็จ: ' + ((data && data.error) || (error && error.message) || ''), 'error'); return; }
+      toast('บันทึกข้อมูลแล้ว ✓ แสดงบนเว็บทันที', 'success');
+      await load();
+    }
+
+    let toastTimer = null;
+    function toast(msg, type) { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'toast show ' + (type || ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.className = 'toast', 2600); }
+  </script>
+</body>
+</html>

@@ -64,6 +64,14 @@
       </div>
       <label class="chk"><input type="checkbox" id="comp" checked /> เปิดใช้ฟรี / Comp (ข้ามการจ่ายเงิน — สำหรับทดลอง)</label>
       <hr style="border:none;border-top:1px solid #EEF0F5;margin:6px 0 16px;" />
+      <div class="field"><label>แพกเกจ</label>
+        <select id="plan">
+          <option value="starter">Starter — ฿1,990 (เว็บบน subdomain · ≤150 นร.)</option>
+          <option value="pro" selected>Pro — ฿3,990 (ครบทั้งโรงเรียน · ≤800 นร.)</option>
+          <option value="premium">Premium — ฿6,990 (ทุกระบบ · ไม่จำกัด)</option>
+        </select>
+        <div class="hint">กำหนดฟีเจอร์ที่โรงเรียนนี้ใช้ได้ — เปลี่ยนทีหลังได้</div>
+      </div>
       <div class="field"><label>โหมดหน้าเว็บ</label>
         <select id="siteMode">
           <option value="managed">ใช้เว็บไซต์สำเร็จรูปของเรา (มีหน้าเว็บ public)</option>
@@ -111,7 +119,8 @@
         ownerFirstName: val('ownerFirstName'), ownerLastName: val('ownerLastName'),
         discountPercent: Number(val('discountPercent'))||0, comp: document.getElementById('comp').checked, notes: val('notes'),
         customDomain: val('customDomain').toLowerCase(),
-        siteMode: val('siteMode') || 'managed'
+        siteMode: val('siteMode') || 'managed',
+        plan: val('plan') || 'pro'
       };
       if(!payload.schoolName||!payload.slug||!payload.ownerEmail||!payload.ownerPassword){ showAlert('กรอกช่องที่มี * ให้ครบ',false); return; }
       if(payload.ownerPassword.length<8){ showAlert('รหัสผ่านอย่างน้อย 8 ตัว',false); return; }

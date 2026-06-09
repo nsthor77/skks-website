@@ -155,6 +155,18 @@
     + 'body.pk-has-sb .admin-nav{display:none !important;}'
     + 'body.pk-has-sb .admin-logo{display:none !important;}'
     + 'body.pk-has-sb .topbar .topbar-left>a:first-child{display:none !important;}'
+    + '#pk-sb a.pk-sb-link.pk-locked{color:#9AA3B5;}'
+    + '#pk-sb a.pk-sb-link.pk-locked:hover{background:#FAFBFD;color:#9AA3B5;}'
+    + '#pk-sb .pk-lock{display:inline-block;margin-left:6px;font-size:9.5px;font-weight:700;color:#92400E;background:#FEF3C7;border-radius:6px;padding:1px 6px;vertical-align:middle;}'
+    + '#pk-upgrade{position:fixed;inset:0;z-index:2000;background:rgba(15,26,54,.55);display:flex;align-items:center;justify-content:center;padding:18px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}'
+    + "#pk-upgrade .pk-up-box{background:#fff;border-radius:18px;max-width:420px;width:100%;padding:30px 26px 24px;text-align:center;position:relative;font-family:'IBM Plex Sans Thai','Inter',sans-serif;box-shadow:0 24px 60px rgba(15,26,54,.3);}"
+    + '#pk-upgrade .pk-up-x{position:absolute;top:12px;right:14px;background:none;border:none;font-size:26px;color:#9AA3B5;cursor:pointer;line-height:1;}'
+    + '#pk-upgrade .pk-up-ic{font-size:40px;}'
+    + '#pk-upgrade h3{font-size:19px;font-weight:800;color:#0F1A36;margin:10px 0 8px;}'
+    + '#pk-upgrade p{font-size:14px;color:#5A6788;line-height:1.6;margin-bottom:20px;}'
+    + '#pk-upgrade .pk-up-foot{display:flex;gap:10px;flex-direction:column;}'
+    + '#pk-upgrade .pk-up-btn{background:#1E40AF;color:#fff;text-decoration:none;padding:12px;border-radius:10px;font-weight:700;font-size:14.5px;}'
+    + '#pk-upgrade .pk-up-cancel{background:#fff;border:1px solid #D8DEE9;color:#46506B;padding:11px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}'
     + '#pk-sb-toggle{display:none;}'
     + '#pk-sb-backdrop{display:none;position:fixed;inset:0;background:rgba(15,26,54,.45);z-index:899;}'
     + '@media(max-width:900px){'
@@ -174,6 +186,32 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
 
   var TIER_RANK = { teacher: 1, admin: 2, owner: 3 };
+
+  // ---- Plan-based feature gating -------------------------------------------
+  var PLAN_RANK = { starter: 1, pro: 2, premium: 3 };
+  var PLAN_LABEL = { starter: 'Starter', pro: 'Pro', premium: 'Premium' };
+  var PLAN_PRICE = { pro: '฿3,990', premium: '฿6,990' };
+  // minimum package per page (filename). Not listed = available to all (Starter).
+  var PLAN_MIN = {
+    // Pro (฿3,990)
+    'create-bills.html': 'pro', 'parent-bills.html': 'pro', 'payment-approvals.html': 'pro', 'tuition-admin.html': 'pro',
+    'payments.html': 'pro', 'finance.html': 'pro', 'receipt.html': 'pro', 'payment-settings.html': 'pro', 'my-bills.html': 'pro',
+    'homework.html': 'pro', 'quiz.html': 'pro', 'materials.html': 'pro', 'library.html': 'pro',
+    'schedule-admin.html': 'pro', 'my-schedule.html': 'pro', 'teacher-schedule.html': 'pro', 'exam-schedule.html': 'pro',
+    'behavior.html': 'pro', 'care-hub.html': 'pro', 'sdq.html': 'pro', 'home-visit.html': 'pro', 'popor-docs.html': 'pro',
+    'consent-admin.html': 'pro', 'my-consent.html': 'pro', 'surveys-admin.html': 'pro', 'my-surveys.html': 'pro', 'messages.html': 'pro',
+    'website-manager.html': 'pro', 'brand-setup.html': 'pro',
+    // Premium (฿6,990)
+    'scholarships.html': 'premium', 'my-scholarships.html': 'premium', 'budget.html': 'premium', 'poverty.html': 'premium',
+    'cafeteria.html': 'premium', 'my-wallet.html': 'premium', 'bus.html': 'premium', 'my-bus.html': 'premium',
+    'assets.html': 'premium', 'visitor-log.html': 'premium', 'gate-scan.html': 'premium',
+    'ai-grading.html': 'premium', 'ai-comments.html': 'premium', 'analytics.html': 'premium', 'predictions.html': 'premium',
+    'data-export.html': 'premium'
+  };
+  var userPlan = 'premium';       // fail-open until get_my_plan() returns (never wrongly locks)
+  var planHome = 'dashboard.html';
+  function planMinFor(href) { var f = (href || '').split('/').pop().split('?')[0].toLowerCase(); return PLAN_MIN[f] || 'starter'; }
+  function planAllows(href) { return (PLAN_RANK[userPlan] || 1) >= (PLAN_RANK[planMinFor(href)] || 1); }
 
   // subtle line icons (Feather) per category header — keyed by English label
   var GROUP_ICONS = {
@@ -205,7 +243,13 @@
       html += '<div class="pk-sb-sub' + open + '">';
       links.forEach(function (it) {
         var active = (it.href.toLowerCase() === here) ? ' active' : '';
-        html += '<a class="pk-sb-link' + active + '" href="' + esc(it.href) + '">' + esc(it[lang]) + '</a>';
+        if (!planAllows(it.href)) {
+          var need = planMinFor(it.href);
+          html += '<a class="pk-sb-link pk-locked" href="#" data-need="' + need + '" title="ฟีเจอร์แพกเกจ ' + PLAN_LABEL[need] + '">'
+            + esc(it[lang]) + '<span class="pk-lock">🔒 ' + PLAN_LABEL[need] + '</span></a>';
+        } else {
+          html += '<a class="pk-sb-link' + active + '" href="' + esc(it.href) + '">' + esc(it[lang]) + '</a>';
+        }
       });
       html += '</div>';
     });
@@ -219,9 +263,53 @@
     if (nav) nav.innerHTML = buildNav(menu, userRank);
   }
 
+  // ---- Plan gating: upgrade popup + page block + fetch ----------------------
+  function showUpgrade(need, block) {
+    need = need || 'pro';
+    var old = document.getElementById('pk-upgrade'); if (old) old.remove();
+    var planName = PLAN_LABEL[need] || 'Pro';
+    var price = PLAN_PRICE[need] || '';
+    var ov = document.createElement('div');
+    ov.id = 'pk-upgrade';
+    var foot = block
+      ? '<a href="' + planHome + '" class="pk-up-btn">← กลับหน้าหลัก</a>'
+        + '<a href="billing.html" class="pk-up-cancel" style="text-decoration:none;display:block;">ดูแพกเกจ / อัปเกรด</a>'
+      : '<a href="billing.html" class="pk-up-btn">ดูแพกเกจ / อัปเกรด</a>'
+        + '<button class="pk-up-cancel" type="button">ไว้ก่อน</button>';
+    ov.innerHTML = '<div class="pk-up-box">'
+      + (block ? '' : '<button class="pk-up-x" type="button">&times;</button>')
+      + '<div class="pk-up-ic">🔒</div>'
+      + '<h3>ฟีเจอร์นี้อยู่ในแพกเกจ ' + planName + '</h3>'
+      + '<p>อัปเกรดเป็น <b>' + planName + '</b>' + (price ? ' (' + price + '/เดือน)' : '') + ' เพื่อปลดล็อกฟีเจอร์นี้และอีกมากมาย</p>'
+      + '<div class="pk-up-foot">' + foot + '</div></div>';
+    document.body.appendChild(ov);
+    function close() { ov.remove(); }
+    var x = ov.querySelector('.pk-up-x'); if (x) x.addEventListener('click', close);
+    if (!block) {
+      var c = ov.querySelector('.pk-up-cancel'); if (c && c.tagName === 'BUTTON') c.addEventListener('click', close);
+      ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    }
+  }
+
+  function enforcePagePlan() {
+    if (!planAllows(curFile())) showUpgrade(planMinFor(curFile()), true);
+  }
+
+  function loadPlan() {
+    var cached = null; try { cached = sessionStorage.getItem('pk_plan'); } catch (e) {}
+    if (cached) { userPlan = cached; render(); enforcePagePlan(); return; }
+    if (typeof supabaseClient === 'undefined' || !supabaseClient.rpc) return;
+    supabaseClient.rpc('get_my_plan').then(function (r) {
+      userPlan = (r && r.data && r.data.plan) || 'premium';
+      try { sessionStorage.setItem('pk_plan', userPlan); } catch (e) {}
+      render(); enforcePagePlan();
+    }).catch(function () {});
+  }
+
   function mount(isStudent, rank) {
     menu = isStudent ? STUDENT_MENU : STAFF_MENU;
     userRank = rank;
+    planHome = isStudent ? 'student-dashboard.html' : 'dashboard.html';
 
     var style = document.createElement('style');
     style.id = 'pk-sb-style';
@@ -269,6 +357,13 @@
     render();
     applyBrand();
     document.addEventListener('langchange', render);
+
+    // plan gating: locked menu items open the upgrade popup
+    nav.addEventListener('click', function (e) {
+      var lk = e.target.closest('a.pk-locked');
+      if (lk) { e.preventDefault(); e.stopPropagation(); showUpgrade(lk.getAttribute('data-need'), false); }
+    });
+    loadPlan();
   }
 
   // ---- Tenant branding: show the SCHOOL's own name + logo (not hardcoded) ----

@@ -110,12 +110,14 @@ module.exports = async (req, res) => {
     billing.onboarded_at = new Date().toISOString();
     if (b.notes) billing.onboard_notes = String(b.notes);
 
-    // website mode: managed (our public site) | external (own site) | app_only
+    // website mode + package tier
     const allowedModes = ['managed', 'external', 'app_only'];
     const siteMode = allowedModes.includes(b.siteMode) ? b.siteMode : 'managed';
+    const allowedPlans = ['starter', 'pro', 'premium'];
+    const plan = allowedPlans.includes(b.plan) ? b.plan : 'pro';
 
     const { error: upErr } = await supabaseAdmin.from('schools')
-      .update({ status: 'active', billing_info: billing, site_mode: siteMode })
+      .update({ status: 'active', billing_info: billing, site_mode: siteMode, plan: plan })
       .eq('id', schoolId);
     if (upErr) console.error('[create-school] school update failed', upErr.message);
 

@@ -407,3 +407,19 @@ console.log('✅ Role guard loaded');
     }
   } catch (e) { /* notifications are non-critical */ }
 })();
+
+// ── Auto-load the mobile bottom tab bar on every app page ───────────────────
+(function () {
+  try {
+    if (window.__pkTabbarLoaded) return;
+    var ss = document.getElementsByTagName('script');
+    for (var i = 0; i < ss.length; i++) {
+      if (ss[i].src && ss[i].src.indexOf('role-guard.js') > -1) {
+        var s = document.createElement('script');
+        s.src = ss[i].src.replace('role-guard.js', 'tabbar.js');
+        document.head.appendChild(s);
+        break;
+      }
+    }
+  } catch (e) { /* tab bar is non-critical */ }
+})();

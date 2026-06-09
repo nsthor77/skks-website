@@ -1029,7 +1029,11 @@
     function render() {
       const tbody = document.getElementById('tbody');
       if (!allRows.length) {
-        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">🎓</div><h4>${t('students.empty')}</h4><p>${t('students.emptyDesc')}</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="icon">🎓</div><h4>${t('students.empty')}</h4><p>${t('students.emptyDesc')}</p>
+          <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openSmartImport()">📥 นำเข้าจาก Excel/CSV</button>
+            <button class="btn btn-secondary" onclick="openCreateModal()">➕ เพิ่มทีละคน</button>
+          </div></div></td></tr>`;
         document.getElementById('pagination').style.display = 'none';
         document.getElementById('countInfo').textContent = '';
         return;

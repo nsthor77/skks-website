@@ -51,7 +51,7 @@
   <div class="header">
     <div class="avatar">🤖</div>
     <div>
-      <h1>SKKS AI Assistant</h1>
+      <h1 id="botTitle">ผู้ช่วยตอบคำถาม</h1>
       <div class="status">Online • พร้อมตอบคำถาม 24/7</div>
     </div>
   </div>
@@ -61,7 +61,7 @@
       <div class="msg-avatar">🤖</div>
       <div>
         <div class="msg-content">
-          สวัสดีค่ะ! 👋 ฉัน <strong>SKKS AI Assistant</strong><br><br>
+          สวัสดีค่ะ! 👋 ฉัน <strong id="botGreetName">ผู้ช่วยตอบคำถาม</strong><br><br>
           ฉันสามารถช่วยตอบคำถามเกี่ยวกับ:<br>
           • ค่าเทอม + การชำระเงิน 💰<br>
           • รายละเอียดหลักสูตร 📚<br>
@@ -98,31 +98,27 @@
     const knowledge = {
       tuition: {
         keywords: ['ค่าเทอม','ค่าเรียน','tuition','ราคา','เงิน','จ่าย','ค่าสมัคร'],
-        answer: '💰 <strong>ค่าเทอม SKKS</strong><br><br>• Pre-Kindergarten: ฿28,000 / เทอม<br>• Kindergarten: ฿32,000 / เทอม<br>• EP (English Program): ฿45,000 / เทอม<br>• MEP (Mini EP): ฿35,000 / เทอม<br><br>📌 <strong>ค่าใช้จ่ายอื่นๆ:</strong><br>• ค่าสมัคร: ฿1,500 (ครั้งเดียว)<br>• ค่าอาหารกลางวัน: ฿3,500/เดือน<br>• ค่ารถรับ-ส่ง: ฿2,500/เดือน<br>• ค่าหนังสือ: ฿5,000/ปี<br><br>ดูรายละเอียดเพิ่มเติม: <a href="../index.html#admissions" style="color:var(--brand,#1B5E3F);">หน้ารับสมัคร →</a>'
+        answer: '💰 <strong>ค่าเทอมและค่าใช้จ่าย</strong><br><br>ค่าเทอมแตกต่างกันตามระดับชั้นและหลักสูตร — กรุณาสอบถามรายละเอียดล่าสุดจากทางโรงเรียนโดยตรง หรือกรอกแบบฟอร์มสมัคร/สอบถามเพื่อให้เจ้าหน้าที่ติดต่อกลับค่ะ 🙏'
       },
       admission: {
         keywords: ['สมัคร','รับสมัคร','admission','apply','enroll'],
-        answer: '📝 <strong>ขั้นตอนการสมัคร</strong><br><br>1. กรอกใบสมัครออนไลน์<br>2. นัดเยี่ยมชมโรงเรียน<br>3. สอบสัมภาษณ์ + วัดระดับ<br>4. ชำระค่าสมัคร ฿1,500<br>5. รอผลภายใน 7 วัน<br><br>📌 <strong>เอกสารที่ต้องใช้:</strong><br>• สำเนาทะเบียนบ้าน<br>• สำเนาสูติบัตร<br>• รูปถ่าย 1 นิ้ว 2 ใบ<br>• ใบเกรดเดิม (ถ้ามี)<br><br>สมัครออนไลน์: <a href="../admissions.html" style="color:var(--brand,#1B5E3F);">คลิกที่นี่ →</a>'
+        answer: '📝 <strong>การสมัครเรียน</strong><br><br>กรอกแบบฟอร์มสมัคร/สอบถามออนไลน์ได้ที่หน้าเว็บไซต์ของโรงเรียน แล้วเจ้าหน้าที่จะติดต่อกลับเพื่อแจ้งขั้นตอนและเอกสารที่ต้องใช้ค่ะ'
       },
-      ep: {
-        keywords: ['ep','english program','สองภาษา','bilingual'],
-        answer: '🌍 <strong>English Program (EP)</strong><br><br>หลักสูตรที่สอน 60-70% เป็นภาษาอังกฤษ โดยครูเจ้าของภาษา<br><br>📚 <strong>วิชาที่สอนเป็นอังกฤษ:</strong><br>• English Language<br>• Mathematics<br>• Science<br>• Social Studies<br>• Computer Science<br>• Art / Music / PE<br><br>📌 <strong>เหมาะกับ:</strong> นักเรียนที่ต้องการเรียนต่อต่างประเทศ หรือมหาวิทยาลัยอินเตอร์<br><br>ค่าเทอม: ฿45,000/เทอม'
-      },
-      mep: {
-        keywords: ['mep','mini english','mini'],
-        answer: '🌐 <strong>Mini English Program (MEP)</strong><br><br>หลักสูตรที่สอน 30-40% เป็นภาษาอังกฤษ ส่วนที่เหลือเป็นภาษาไทย<br><br>📚 <strong>วิชาเป็นอังกฤษ:</strong><br>• English Language<br>• Mathematics (บางส่วน)<br>• Science (บางส่วน)<br><br>📌 <strong>เหมาะกับ:</strong> นักเรียนที่ต้องการพื้นฐานสองภาษา แต่ยังคงเรียนภาษาไทยเป็นหลัก<br><br>ค่าเทอม: ฿35,000/เทอม'
+      program: {
+        keywords: ['หลักสูตร','program','ep','mep','สองภาษา','bilingual','เรียนอะไร','วิชา'],
+        answer: '📚 <strong>หลักสูตรการเรียน</strong><br><br>โรงเรียนเปิดสอนหลายระดับชั้น/หลักสูตร — สอบถามรายละเอียดหลักสูตรที่เปิดสอนและความเหมาะสมกับบุตรหลานได้จากทางโรงเรียนโดยตรงค่ะ'
       },
       schedule: {
         keywords: ['เวลา','ตาราง','schedule','time','เปิดกี่โมง'],
-        answer: '🕐 <strong>เวลาเรียน SKKS</strong><br><br>📅 <strong>วันเรียน:</strong> จันทร์ - ศุกร์<br>🕘 <strong>เวลาเปิด:</strong> 07:30 - 16:00<br>📚 <strong>คาบเรียน:</strong> 08:00 - 15:30<br>🍱 <strong>พักกลางวัน:</strong> 11:30 - 12:30<br><br>📌 <strong>กิจกรรมพิเศษ:</strong><br>• ค่ายภาษา: ปิดเทอม<br>• Open House: พฤษภาคม ของทุกปี'
+        answer: '🕐 <strong>เวลาเรียน</strong><br><br>สอบถามเวลาเรียนและตารางกิจกรรมล่าสุดได้จากทางโรงเรียน หรือดูที่หน้าปฏิทินการศึกษาค่ะ'
       },
       holiday: {
-        keywords: ['หยุด','วันหยุด','holiday','ปิดเทอม'],
-        answer: '📅 <strong>ปฏิทินวันหยุด 2026</strong><br><br>🌸 <strong>ปิดเทอม 1:</strong> ตุลาคม 2026<br>🌺 <strong>ปิดเทอม 2:</strong> มีนาคม-เมษายน 2026<br><br>📌 <strong>วันหยุดสำคัญ:</strong><br>• สงกรานต์: 13-15 เมษายน<br>• วันแม่: 12 สิงหาคม<br>• วันพ่อ: 5 ธันวาคม<br>• ปีใหม่: 31 ธ.ค. - 2 ม.ค.<br><br>ดูปฏิทินเต็ม: <a href="../index.html#events" style="color:var(--brand,#1B5E3F);">หน้าหลัก →</a>'
+        keywords: ['หยุด','วันหยุด','holiday','ปิดเทอม','ปฏิทิน'],
+        answer: '📅 <strong>วันหยุด / ปฏิทินการศึกษา</strong><br><br>ดูวันหยุดและกิจกรรมต่าง ๆ ได้ที่หน้าปฏิทินการศึกษาของโรงเรียนค่ะ'
       },
       contact: {
-        keywords: ['ติดต่อ','contact','โทร','phone','email'],
-        answer: '📞 <strong>ติดต่อ SKKS</strong><br><br>🏫 <strong>ที่อยู่:</strong> โรงเรียนสวนสนขอนแก่น<br>จังหวัดขอนแก่น<br><br>📞 <strong>โทร:</strong> +66 43 XXX XXXX<br>📧 <strong>Email:</strong> info@suansonkk.com<br>🌐 <strong>Website:</strong> suansonkk.com<br><br>⏰ <strong>เวลาทำการ:</strong><br>จันทร์-ศุกร์ 07:30 - 16:30<br>เสาร์ 08:00 - 12:00'
+        keywords: ['ติดต่อ','contact','โทร','phone','email','อีเมล'],
+        answer: '📞 กรุณาติดต่อโรงเรียนเพื่อสอบถามเพิ่มเติมค่ะ'
       }
     };
     
@@ -169,7 +165,7 @@
           }
         }
       }
-      return 'ขอบคุณสำหรับคำถามค่ะ 🙏<br><br>คำถามนี้อาจต้องให้ครูตอบโดยตรง<br><br>📞 <strong>ติดต่อเรา:</strong><br>• โทร: +66 43 XXX XXXX<br>• Email: info@suansonkk.com<br><br>หรือลองถามใหม่ด้วยคำเช่น:<br>"ค่าเทอม", "สมัครเรียน", "หลักสูตร EP"';
+      return fallbackMsg();
     }
     
     function addMsg(role, content) {
@@ -202,6 +198,43 @@
       const t = document.getElementById('typingMsg');
       if (t) t.remove();
     }
+
+    // ---- White-label: greet with THIS school's name + use its real contact ----
+    var SCHOOL = null;
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+    function contactHtml(){
+      if (!SCHOOL) return 'กรุณาติดต่อโรงเรียนเพื่อสอบถามเพิ่มเติมค่ะ';
+      var p = [];
+      if (SCHOOL.phone)   p.push('📞 โทร: ' + esc(SCHOOL.phone));
+      if (SCHOOL.email)   p.push('📧 อีเมล: ' + esc(SCHOOL.email));
+      if (SCHOOL.website) p.push('🌐 เว็บไซต์: ' + esc(SCHOOL.website));
+      return '<strong>ติดต่อ ' + esc(SCHOOL.name || 'โรงเรียน') + '</strong><br>' + (p.length ? p.join('<br>') : 'กรุณาติดต่อโรงเรียนโดยตรงค่ะ');
+    }
+    function fallbackMsg(){
+      return 'ขอบคุณสำหรับคำถามค่ะ 🙏<br><br>คำถามนี้อาจต้องให้เจ้าหน้าที่ตอบโดยตรง<br><br>' + contactHtml();
+    }
+    function resolveBotKey(){
+      var h = (location.hostname || '').toLowerCase();
+      if (h.endsWith('.panyaschoolkit.com')) { var s = h.split('.')[0]; if (s && ['www','app','panyaschoolkit'].indexOf(s) < 0) return { slug: s }; }
+      else if (h && h !== 'localhost' && h.indexOf('127.') !== 0 && h !== 'panyaschoolkit.com' && !h.endsWith('.vercel.app')) return { domain: h };
+      return { slug: null };
+    }
+    (async function initBot(){
+      try {
+        var k = resolveBotKey();
+        if (!k.slug && !k.domain) return;
+        var res = await sb.rpc('get_public_school', { p_slug: k.slug || null, p_domain: k.domain || null });
+        var data = res && res.data;
+        if (data && data.school) {
+          SCHOOL = data.school;
+          var nm = SCHOOL.name || 'โรงเรียน';
+          var t = document.getElementById('botTitle'); if (t) t.textContent = nm + ' • ผู้ช่วยตอบคำถาม';
+          var g = document.getElementById('botGreetName'); if (g) g.textContent = 'ผู้ช่วยตอบคำถาม ' + nm;
+          document.title = nm + ' — ผู้ช่วยตอบคำถาม';
+          knowledge.contact.answer = '📞 ' + contactHtml();
+        }
+      } catch (e) { /* keep neutral defaults */ }
+    })();
   </script>
 </body>
 </html>

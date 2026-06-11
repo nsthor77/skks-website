@@ -121,7 +121,7 @@
           </div>
           
           <button class="btn btn-primary" onclick="sendMessage()" style="width:100%;" id="sendBtn">
-            📤 Send Now
+            📤 ส่งตอนนี้
           </button>
         </div>
         
@@ -229,8 +229,8 @@
       const today = new Date().toISOString().split('T')[0];
       const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
       
-      const { data: todayData } = await supabaseClient.from('notification_log').select('id').gte('sent_at', today);
-      const { data: monthData } = await supabaseClient.from('notification_log').select('id').gte('sent_at', monthStart);
+      const { data: todayData } = await supabaseClient.from('notification_log').select('id').gte('created_at', today);
+      const { data: monthData } = await supabaseClient.from('notification_log').select('id').gte('created_at', monthStart);
       const { data: totalData } = await supabaseClient.from('notification_log').select('id');
       
       document.getElementById('cntToday').textContent = (todayData || []).length;
@@ -239,7 +239,7 @@
     }
     
     async function loadHistory() {
-      const { data } = await supabaseClient.from('notification_log').select('*').order('sent_at', { ascending: false }).limit(10);
+      const { data } = await supabaseClient.from('notification_log').select('*').order('created_at', { ascending: false }).limit(10);
       const list = document.getElementById('historyList');
       
       if (!data || data.length === 0) {
@@ -261,37 +261,46 @@
     async function sendMessage() {
       const msg = document.getElementById('message').value.trim();
       if (!msg) {
-        dataHelpers.toast('Enter message', 'error');
+        dataHelpers.toast('กรุณาพิมพ์ข้อความก่อนส่ง', 'error');
         return;
       }
-      
+
       const recipient = document.getElementById('recipient').value;
-      
+      if (recipient !== 'all') {
+        dataHelpers.toast('ตอนนี้รองรับการส่งถึง "ผู้ปกครองทั้งหมด" เท่านั้น — ตัวกรองตามห้อง/โปรแกรมจะตามมาเร็ว ๆ นี้', 'warning');
+        return;
+      }
+      if (!confirm('ส่งข้อความนี้ถึงผู้ปกครองทุกคนที่ผูก LINE ไว้?\n\n(ใช้โควต้าข้อความของ LINE OA โรงเรียน)')) return;
+
       const btn = document.getElementById('sendBtn');
       btn.disabled = true;
-      btn.textContent = '📡 Sending...';
-      
-      await new Promise(r => setTimeout(r, 1000));
-      
+      btn.textContent = '📡 กำลังส่ง...';
+
       try {
-        await supabaseClient.from('notification_log').insert({
-          channel: 'line',
-          feature: 'manual_broadcast',
-          recipient: recipient,
-          message: msg,
-          status: 'sent'
+        const s = await supabaseClient.auth.getSession();
+        const res = await fetch('/api/line/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.data.session.access_token },
+          body: JSON.stringify({ event: 'broadcast', data: { message: msg } })
         });
-        
-        dataHelpers.toast('✅ Sent via LINE Notify!', 'success');
-        document.getElementById('message').value = '';
-        updatePreview();
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(out.error || 'ส่งไม่สำเร็จ กรุณาลองใหม่');
+
+        if (out.skipped) {
+          dataHelpers.toast('ยังไม่ได้เปิดใช้ LINE — ตั้งค่า token ได้ที่ ตั้งค่า → LINE แจ้งเตือน', 'warning');
+        } else {
+          dataHelpers.toast('✅ ส่งแล้ว ' + (out.sent || 0) + ' คน'
+            + (out.no_line ? ' · ยังไม่ผูก LINE ' + out.no_line + ' คน' : ''), 'success');
+          document.getElementById('message').value = '';
+          updatePreview();
+        }
         await loadStats();
         await loadHistory();
       } catch(e) {
         dataHelpers.toast('❌ ' + e.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '📤 Send Now';
+        btn.textContent = '📤 ส่งตอนนี้';
       }
     }
     

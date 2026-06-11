@@ -31,8 +31,8 @@
   <div class="admin-topbar">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <img src="../images/logo.png" alt="" />
+        <h1>ระบบจัดการ</h1>
       </a>
       <nav class="admin-nav">
         <a href="dashboard.html">📊 Dashboard</a>
@@ -169,7 +169,7 @@
         
         <div style="text-align:center; margin-top:24px;">
           <button type="submit" class="btn btn-primary" id="saveBtn" style="padding:14px 40px; font-size:15px;">
-            💾 Save All Settings
+            💾 บันทึกการตั้งค่า
           </button>
         </div>
       </form>
@@ -198,19 +198,20 @@
     }
     
     async function loadSettings() {
-      const { data, error } = await supabaseClient
-        .from('payment_settings')
-        .select('*')
-        .limit(1)
-        .single();
-      
+      // tenant-scoped: only THIS school's payment account (never another school's)
+      let q = supabaseClient.from('payment_settings').select('*');
+      if (window.CURRENT_SCHOOL_ID) q = q.eq('school_id', window.CURRENT_SCHOOL_ID);
+      const { data, error } = await q.limit(1).maybeSingle();
+
       if (error) {
         console.error(error);
+        dataHelpers.toast('โหลดการตั้งค่าไม่สำเร็จ: ' + error.message, 'error');
         return;
       }
-      
-      currentSettings = data;
-      
+
+      currentSettings = data;          // null = โรงเรียนใหม่ยังไม่เคยตั้งค่า → ฟอร์มว่าง พร้อมกรอก
+      if (!data) return;
+
       document.getElementById('bankName').value = data.bank_name || '';
       document.getElementById('accountNumber').value = data.account_number || '';
       document.getElementById('accountName').value = data.account_name || '';
@@ -303,24 +304,32 @@
           updated_at: new Date().toISOString()
         };
         
-        btn.textContent = '💾 Saving...';
+        btn.textContent = '💾 กำลังบันทึก...';
         
-        const { error } = await supabaseClient
-          .from('payment_settings')
-          .update(data)
-          .eq('id', currentSettings.id);
-        
+        let error;
+        if (currentSettings && currentSettings.id) {
+          ({ error } = await supabaseClient
+            .from('payment_settings')
+            .update(data)
+            .eq('id', currentSettings.id));
+        } else {
+          // first save for this school → create its own row
+          ({ error } = await supabaseClient
+            .from('payment_settings')
+            .insert({ ...data, school_id: window.CURRENT_SCHOOL_ID }));
+        }
+
         if (error) throw error;
         
-        dataHelpers.toast('✅ Settings saved!', 'success');
+        dataHelpers.toast('✅ บันทึกการตั้งค่าแล้ว', 'success');
         await loadSettings();
         selectedQrFile = null;
       } catch (err) {
         console.error(err);
-        dataHelpers.toast('❌ Save failed: ' + err.message, 'error');
+        dataHelpers.toast('❌ บันทึกไม่สำเร็จ: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '💾 Save All Settings';
+        btn.textContent = '💾 บันทึกการตั้งค่า';
       }
     }
     

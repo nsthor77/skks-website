@@ -214,11 +214,10 @@
     }
     
     async function loadPaymentSettings() {
-      const { data } = await supabaseClient
-        .from('payment_settings')
-        .select('*')
-        .eq('active', true)
-        .single();
+      // tenant-scoped: parents must see THIS school's PromptPay/bank only
+      let q = supabaseClient.from('payment_settings').select('*').eq('active', true);
+      if (window.CURRENT_SCHOOL_ID) q = q.eq('school_id', window.CURRENT_SCHOOL_ID);
+      const { data } = await q.limit(1).maybeSingle();
       paymentSettings = data;
     }
     

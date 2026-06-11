@@ -177,8 +177,10 @@
         page: 'payment-settings.html',
         detect: async () => {
           try {
-            const { data } = await supabaseClient.from('payment_settings')
-              .select('promptpay_id, bank_name').eq('active', true).limit(1).maybeSingle();
+            let q = supabaseClient.from('payment_settings')
+              .select('promptpay_id, bank_name').eq('active', true);
+            if (window.CURRENT_SCHOOL_ID) q = q.eq('school_id', window.CURRENT_SCHOOL_ID);
+            const { data } = await q.limit(1).maybeSingle();
             return !!(data && (data.promptpay_id || data.bank_name));
           } catch { return false; }
         }

@@ -35,43 +35,43 @@
         <h1>ระบบจัดการ</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="applications.html">📝 Applications</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="payment-approvals.html">✅ Approvals</a>
-        <a href="create-bills.html">📄 Bills</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="events-admin.html">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="reports.html">📄 Reports</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="payment-settings.html" class="owner-only active" style="display:none">⚙️ Settings</a>
-        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
-        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="applications.html">📝 ใบสมัคร</a>
+        <a href="payments.html">💳 การชำระเงิน</a>
+        <a href="payment-approvals.html">✅ อนุมัติสลิป</a>
+        <a href="create-bills.html">📄 ใบแจ้งหนี้</a>
+        <a href="tuition-admin.html">💰 ค่าเล่าเรียน</a>
+        <a href="events-admin.html">📅 กิจกรรม</a>
+        <a href="news-admin.html">📰 ข่าวสาร</a>
+        <a href="reports.html">📄 รายงาน</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 การเงิน</a>
+        <a href="payment-settings.html" class="owner-only active" style="display:none">⚙️ ตั้งค่า</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ ตารางกำหนดเอง</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 ผู้ใช้งาน</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ คำเชิญ</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
 
   <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
     
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>⚙️ Payment Settings</h2>
-          <p>ตั้งค่าบัญชีธนาคารและ QR Code สำหรับรับชำระเงิน — Owner only</p>
+          <h2>⚙️ ตั้งค่าการรับชำระเงิน</h2>
+          <p>ตั้งค่าบัญชีธนาคารและ QR Code สำหรับรับชำระเงิน — เฉพาะเจ้าของ</p>
         </div>
       </div>
 
       <div class="info-box">
         <div class="ic">ℹ️</div>
         <h4>เกี่ยวกับการตั้งค่านี้</h4>
-        <p>ข้อมูลที่ตั้งไว้จะแสดงให้ผู้ปกครองเห็นเมื่อกดปุ่ม "Pay Now" — ผู้ปกครองจะใช้ QR Code นี้สแกนจ่ายเงิน หรือโอนเข้าเลขบัญชีที่ระบุ</p>
+        <p>ข้อมูลที่ตั้งไว้จะแสดงให้ผู้ปกครองเห็นเมื่อกดปุ่ม "ชำระเงิน" — ผู้ปกครองจะใช้ QR Code นี้สแกนจ่ายเงิน หรือโอนเข้าเลขบัญชีที่ระบุ</p>
       </div>
 
       <form id="settingsForm" onsubmit="saveSettings(event)">
@@ -79,26 +79,26 @@
           
           <div>
             <div class="setting-card">
-              <h3>🏦 Bank Account Information</h3>
-              
+              <h3>🏦 ข้อมูลบัญชีธนาคาร</h3>
+
               <div class="form-group">
-                <label>Bank Name <span style="color:#EF4444;">*</span></label>
-                <input type="text" id="bankName" required placeholder="e.g., Bangkok Bank (ธนาคารกรุงเทพ)" />
+                <label>ชื่อธนาคาร <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="bankName" required placeholder="เช่น ธนาคารกรุงเทพ" />
               </div>
-              
+
               <div class="form-group">
-                <label>Account Number <span style="color:#EF4444;">*</span></label>
-                <input type="text" id="accountNumber" required placeholder="e.g., 123-4-56789-0" style="font-family:monospace;letter-spacing:1px;font-size:16px;" />
+                <label>เลขที่บัญชี <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="accountNumber" required placeholder="เช่น 123-4-56789-0" style="font-family:monospace;letter-spacing:1px;font-size:16px;" />
               </div>
-              
+
               <div class="form-group">
-                <label>Account Name <span style="color:#EF4444;">*</span></label>
-                <input type="text" id="accountName" required placeholder="โรงเรียนสวนสนขอนแก่น" />
+                <label>ชื่อบัญชี <span style="color:#EF4444;">*</span></label>
+                <input type="text" id="accountName" required placeholder="ชื่อบัญชีของโรงเรียน" />
               </div>
-              
+
               <div class="form-group">
-                <label>Branch</label>
-                <input type="text" id="branch" placeholder="e.g., Khon Kaen Branch" />
+                <label>สาขา</label>
+                <input type="text" id="branch" placeholder="เช่น สาขาขอนแก่น" />
               </div>
               
               <div class="form-group">
@@ -111,11 +111,11 @@
             </div>
             
             <div class="setting-card">
-              <h3>📝 Payment Notice</h3>
+              <h3>📝 ข้อความแจ้งผู้ปกครอง</h3>
               <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">ข้อความที่แสดงให้ผู้ปกครองอ่านก่อนจ่าย</p>
-              
+
               <div class="form-group">
-                <label>Notice (English)</label>
+                <label>ข้อความ (ภาษาอังกฤษ)</label>
                 <textarea id="paymentNote" rows="3" placeholder="Please transfer the exact amount and upload your transfer slip."></textarea>
               </div>
               
@@ -144,7 +144,7 @@
               
               <div style="margin-top:12px;text-align:center;">
                 <button type="button" class="btn btn-sm btn-secondary" onclick="removeQr()" id="removeQrBtn" style="display:none;">
-                  🗑️ Remove QR
+                  🗑️ ลบ QR
                 </button>
               </div>
               

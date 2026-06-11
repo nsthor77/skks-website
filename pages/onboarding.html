@@ -136,6 +136,18 @@
     // tables / RLS never crash the wizard — they just show as "to do".
     const STEPS = [
       {
+        key: 'brand', icon: '🎨', group: 'essential',
+        title: 'ตั้งชื่อ โลโก้ และสีของโรงเรียน',
+        desc: 'ทำให้ระบบและเว็บไซต์เป็นแบรนด์ของโรงเรียนคุณ — ตั้งครั้งเดียว แสดงทุกที่ (เว็บ ใบเสร็จ เอกสาร)',
+        page: 'website-manager.html',
+        detect: async () => {
+          try {
+            const { data } = await supabaseClient.rpc('get_school_branding');
+            return !!(data && (data.logo_url || data.theme_color));
+          } catch (e) { return false; }
+        }
+      },
+      {
         key: 'subjects', icon: '📚', group: 'essential',
         titleKey: 'onboarding.s_subjects', descKey: 'onboarding.s_subjects_d',
         page: 'subjects-config.html',
@@ -265,8 +277,8 @@
         <div class="step-card ${done ? 'done' : ''}">
           <div class="step-num">${done ? '✅' : s.icon}</div>
           <div class="step-body">
-            <div class="step-title">${esc(t(s.titleKey))} <span class="step-status ${statusClass}">${statusText}</span></div>
-            <div class="step-desc">${esc(t(s.descKey))}</div>
+            <div class="step-title">${esc(s.title || t(s.titleKey))} <span class="step-status ${statusClass}">${statusText}</span></div>
+            <div class="step-desc">${esc(s.desc || t(s.descKey))}</div>
           </div>
           <a href="${s.page}" class="${ctaClass}">${ctaText} →</a>
         </div>`;

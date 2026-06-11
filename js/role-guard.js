@@ -408,6 +408,22 @@ console.log('✅ Role guard loaded');
   } catch (e) { /* notifications are non-critical */ }
 })();
 
+// ── Auto-load friendly errors (Thai error messages + loading watchdog) ──────
+(function () {
+  try {
+    if (window.__pkErrLoaded) return;
+    var ss = document.getElementsByTagName('script');
+    for (var i = 0; i < ss.length; i++) {
+      if (ss[i].src && ss[i].src.indexOf('role-guard.js') > -1) {
+        var s = document.createElement('script');
+        s.src = ss[i].src.replace('role-guard.js', 'friendly-errors.js');
+        document.head.appendChild(s);
+        break;
+      }
+    }
+  } catch (e) { /* friendly errors are non-critical */ }
+})();
+
 // ── Auto-load the mobile bottom tab bar on every app page ───────────────────
 (function () {
   try {

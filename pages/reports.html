@@ -477,6 +477,26 @@
       ).join('');
     }
     
+    // Thai display labels for raw DB enum values (display only — filters/queries unchanged)
+    const TH_VALUES = {
+      // statuses
+      active: 'กำลังศึกษา', inactive: 'พ้นสภาพ', graduated: 'จบการศึกษา', transferred: 'ย้ายโรงเรียน', suspended: 'พักการเรียน',
+      pending: 'รอดำเนินการ', approved: 'อนุมัติแล้ว', rejected: 'ปฏิเสธ', completed: 'สำเร็จ', cancelled: 'ยกเลิก',
+      refunded: 'คืนเงินแล้ว', enrolled: 'รับเข้าเรียนแล้ว', waitlisted: 'รอคิว', reviewing: 'กำลังพิจารณา', interview: 'นัดสัมภาษณ์',
+      // finance types + categories
+      income: 'รายรับ', expense: 'รายจ่าย',
+      tuition: 'ค่าเล่าเรียน', application_fee: 'ค่าสมัคร', registration_fee: 'ค่าลงทะเบียน', uniform: 'ชุดนักเรียน',
+      books: 'หนังสือ', activity: 'กิจกรรม', salary: 'เงินเดือน', utilities: 'ค่าน้ำ-ไฟ', supplies: 'วัสดุอุปกรณ์',
+      maintenance: 'ซ่อมบำรุง', marketing: 'การตลาด', food: 'อาหาร', transport: 'รถรับส่ง', donation: 'เงินบริจาค', other: 'อื่นๆ',
+      // payment methods
+      cash: 'เงินสด', bank_transfer: 'โอนธนาคาร', promptpay: 'พร้อมเพย์', credit_card: 'บัตรเครดิต', cheque: 'เช็ค', online: 'ออนไลน์'
+    };
+    function thVal(v) {
+      if (v == null || v === '') return '—';
+      const k = String(v).toLowerCase().trim();
+      return TH_VALUES[k] || String(v).replace(/_/g, ' ');
+    }
+
     function getReportConfig(type) {
       const configs = {
         students: {
@@ -486,7 +506,7 @@
             { label: 'โปรแกรม', render: r => (r.program || '').toUpperCase() },
             { label: 'ระดับชั้น', render: r => r.grade || '—' },
             { label: 'ห้องเรียน', render: r => r.classroom || '—' },
-            { label: 'สถานะ', render: r => r.status || '—' },
+            { label: 'สถานะ', render: r => thVal(r.status) },
             { label: 'วันที่เข้าเรียน', render: r => dataHelpers.formatDate(r.enrollment_date) }
           ]
         },
@@ -498,7 +518,7 @@
             { label: 'โปรแกรม', render: r => (r.program || '').toUpperCase() },
             { label: 'ผู้ปกครอง', render: r => r.parent_name },
             { label: 'เบอร์โทร', render: r => r.parent_phone },
-            { label: 'สถานะ', render: r => r.status },
+            { label: 'สถานะ', render: r => thVal(r.status) },
             { label: 'วันที่ยื่น', render: r => dataHelpers.formatDate(r.created_at) }
           ]
         },
@@ -506,8 +526,8 @@
           title: 'รายงานการเงิน',
           columns: [
             { label: 'วันที่', render: r => dataHelpers.formatDate(r.transaction_date) },
-            { label: 'ประเภท', render: r => r.type },
-            { label: 'หมวดหมู่', render: r => r.category },
+            { label: 'ประเภท', render: r => thVal(r.type) },
+            { label: 'หมวดหมู่', render: r => thVal(r.category) },
             { label: 'รายละเอียด', render: r => r.description },
             { label: 'จำนวนเงิน', render: r => (r.type === 'income' ? '+' : '-') + dataHelpers.formatMoney(r.amount) }
           ]
@@ -518,10 +538,10 @@
             { label: 'เลขที่ใบเสร็จ', render: r => r.receipt_number },
             { label: 'วันที่', render: r => dataHelpers.formatDate(r.paid_at) },
             { label: 'นักเรียน', render: r => r.students?.student_number || '—' },
-            { label: 'ประเภท', render: r => r.payment_type },
-            { label: 'วิธีชำระ', render: r => r.payment_method || '—' },
+            { label: 'ประเภท', render: r => thVal(r.payment_type) },
+            { label: 'วิธีชำระ', render: r => thVal(r.payment_method) },
             { label: 'จำนวนเงิน', render: r => dataHelpers.formatMoney(r.amount) },
-            { label: 'สถานะ', render: r => r.status }
+            { label: 'สถานะ', render: r => thVal(r.status) }
           ]
         }
       };

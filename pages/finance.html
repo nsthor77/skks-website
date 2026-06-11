@@ -16,25 +16,25 @@
   <div class="admin-topbar">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <img src="../images/logo.png" alt="" />
+        <h1>ระบบจัดการ</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="applications.html">📝 Applications</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="payment-approvals.html">✅ Approvals</a>
-        <a href="create-bills.html">📄 Bills</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="events-admin.html">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="reports.html">📄 Reports</a>
-        <a href="finance.html" class="active" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
-        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
-        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="applications.html">📝 ใบสมัคร</a>
+        <a href="payments.html">💳 การชำระเงิน</a>
+        <a href="payment-approvals.html">✅ อนุมัติการชำระ</a>
+        <a href="create-bills.html">📄 ใบแจ้งหนี้</a>
+        <a href="tuition-admin.html">💰 ค่าเทอม</a>
+        <a href="events-admin.html">📅 กิจกรรม</a>
+        <a href="news-admin.html">📰 ข่าวสาร</a>
+        <a href="reports.html">📄 รายงาน</a>
+        <a href="finance.html" class="active" class="owner-only" style="display:none">💎 การเงิน</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ ตั้งค่า</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ ตารางกำหนดเอง</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 ผู้ใช้</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ คำเชิญ</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
@@ -42,45 +42,45 @@
         <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
         <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
   
   <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
     
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>💰 Finance</h2>
-          <p>Track income and expenses — owner only</p>
+          <h2>💰 การเงิน</h2>
+          <p>ติดตามรายรับและรายจ่าย — เฉพาะเจ้าของเท่านั้น</p>
         </div>
         <button class="btn btn-primary" onclick="openCreateModal()">
-          ➕ Add Transaction
+          ➕ เพิ่มรายการ
         </button>
       </div>
       
       <!-- Stats -->
       <div class="stats-grid">
         <div class="stat-card green">
-          <div class="label">💵 Total Income</div>
+          <div class="label">💵 รายรับรวม</div>
           <div class="value" id="statIncome">—</div>
-          <div class="sub">All time</div>
+          <div class="sub">ทั้งหมด</div>
         </div>
         <div class="stat-card pink">
-          <div class="label">💸 Total Expense</div>
+          <div class="label">💸 รายจ่ายรวม</div>
           <div class="value" id="statExpense">—</div>
-          <div class="sub">All time</div>
+          <div class="sub">ทั้งหมด</div>
         </div>
         <div class="stat-card blue">
-          <div class="label">💹 Net Profit</div>
+          <div class="label">💹 กำไรสุทธิ</div>
           <div class="value" id="statProfit">—</div>
-          <div class="sub">Income - Expense</div>
+          <div class="sub">รายรับ - รายจ่าย</div>
         </div>
         <div class="stat-card amber">
-          <div class="label">📅 This Month</div>
+          <div class="label">📅 เดือนนี้</div>
           <div class="value" id="statThisMonth">—</div>
-          <div class="sub">Net</div>
+          <div class="sub">สุทธิ</div>
         </div>
       </div>
       
@@ -88,14 +88,14 @@
       <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; margin-bottom:20px;">
         <div class="card">
           <div class="card-header">
-            <h3>📊 Income vs Expense (Last 6 Months)</h3>
+            <h3>📊 รายรับเทียบรายจ่าย (6 เดือนล่าสุด)</h3>
           </div>
           <canvas id="financeChart" style="max-height:280px;"></canvas>
         </div>
         
         <div class="card">
           <div class="card-header">
-            <h3>📂 By Category</h3>
+            <h3>📂 แยกตามหมวดหมู่</h3>
           </div>
           <canvas id="categoryChart" style="max-height:280px;"></canvas>
         </div>
@@ -104,31 +104,31 @@
       <!-- Transactions -->
       <div class="card">
         <div class="card-header">
-          <h3>📋 Transactions</h3>
+          <h3>📋 รายการธุรกรรม</h3>
         </div>
         
         <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="🔍 Search description, reference..." oninput="filterTransactions()" />
+          <input type="text" id="searchInput" placeholder="🔍 ค้นหารายละเอียด, เลขอ้างอิง..." oninput="filterTransactions()" />
           <select id="filterType" onchange="filterTransactions()">
-            <option value="">All Types</option>
-            <option value="income">💵 Income</option>
-            <option value="expense">💸 Expense</option>
+            <option value="">ทุกประเภท</option>
+            <option value="income">💵 รายรับ</option>
+            <option value="expense">💸 รายจ่าย</option>
           </select>
           <select id="filterCategory" onchange="filterTransactions()">
-            <option value="">All Categories</option>
-            <option value="tuition">Tuition</option>
-            <option value="salary">Salary</option>
-            <option value="utilities">Utilities</option>
-            <option value="books">Books</option>
-            <option value="uniform">Uniform</option>
-            <option value="food">Food</option>
-            <option value="maintenance">Maintenance</option>
-            <option value="equipment">Equipment</option>
-            <option value="marketing">Marketing</option>
-            <option value="other">Other</option>
+            <option value="">ทุกหมวดหมู่</option>
+            <option value="tuition">ค่าเทอม</option>
+            <option value="salary">เงินเดือน</option>
+            <option value="utilities">ค่าสาธารณูปโภค</option>
+            <option value="books">หนังสือ</option>
+            <option value="uniform">ชุดนักเรียน</option>
+            <option value="food">อาหาร</option>
+            <option value="maintenance">ค่าซ่อมบำรุง</option>
+            <option value="equipment">อุปกรณ์</option>
+            <option value="marketing">การตลาด</option>
+            <option value="other">อื่น ๆ</option>
           </select>
           <select id="filterMonth" onchange="filterTransactions()">
-            <option value="">All Months</option>
+            <option value="">ทุกเดือน</option>
           </select>
         </div>
         
@@ -136,17 +136,17 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th style="text-align:right;">Amount</th>
-                <th>Reference</th>
-                <th style="text-align:right;">Actions</th>
+                <th>วันที่</th>
+                <th>ประเภท</th>
+                <th>หมวดหมู่</th>
+                <th>รายละเอียด</th>
+                <th style="text-align:right;">จำนวนเงิน</th>
+                <th>เลขอ้างอิง</th>
+                <th style="text-align:right;">จัดการ</th>
               </tr>
             </thead>
             <tbody id="transList">
-              <tr><td colspan="7"><div class="loading-state">Loading...</div></td></tr>
+              <tr><td colspan="7"><div class="loading-state">กำลังโหลด...</div></td></tr>
             </tbody>
           </table>
         </div>
@@ -160,7 +160,7 @@
   <div class="modal-overlay" id="transModal">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="modalTitle">➕ Add Transaction</h3>
+        <h3 id="modalTitle">➕ เพิ่มรายการ</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       
@@ -169,57 +169,57 @@
         
         <div class="form-grid">
           <div class="form-group">
-            <label>Type <span class="req">*</span></label>
+            <label>ประเภท <span class="req">*</span></label>
             <select id="transType" required>
-              <option value="income">💵 Income (รายรับ)</option>
-              <option value="expense">💸 Expense (รายจ่าย)</option>
+              <option value="income">💵 รายรับ</option>
+              <option value="expense">💸 รายจ่าย</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Category <span class="req">*</span></label>
+            <label>หมวดหมู่ <span class="req">*</span></label>
             <select id="transCategory" required>
-              <option value="">Select...</option>
-              <option value="tuition">📚 Tuition</option>
-              <option value="salary">💼 Salary</option>
-              <option value="utilities">⚡ Utilities</option>
-              <option value="books">📖 Books</option>
-              <option value="uniform">👕 Uniform</option>
-              <option value="food">🍱 Food</option>
-              <option value="maintenance">🔧 Maintenance</option>
-              <option value="equipment">🖥️ Equipment</option>
-              <option value="marketing">📢 Marketing</option>
-              <option value="other">📦 Other</option>
+              <option value="">เลือก...</option>
+              <option value="tuition">📚 ค่าเทอม</option>
+              <option value="salary">💼 เงินเดือน</option>
+              <option value="utilities">⚡ ค่าสาธารณูปโภค</option>
+              <option value="books">📖 หนังสือ</option>
+              <option value="uniform">👕 ชุดนักเรียน</option>
+              <option value="food">🍱 อาหาร</option>
+              <option value="maintenance">🔧 ค่าซ่อมบำรุง</option>
+              <option value="equipment">🖥️ อุปกรณ์</option>
+              <option value="marketing">📢 การตลาด</option>
+              <option value="other">📦 อื่น ๆ</option>
             </select>
           </div>
-          
+
           <div class="form-group">
-            <label>Amount (THB) <span class="req">*</span></label>
+            <label>จำนวนเงิน (บาท) <span class="req">*</span></label>
             <input type="number" id="transAmount" required min="0" step="0.01" placeholder="0.00" />
           </div>
           <div class="form-group">
-            <label>Date <span class="req">*</span></label>
+            <label>วันที่ <span class="req">*</span></label>
             <input type="date" id="transDate" required />
           </div>
-          
+
           <div class="form-group full">
-            <label>Description <span class="req">*</span></label>
-            <input type="text" id="transDescription" required placeholder="e.g., ค่าเทอม 1/2026 - นักเรียน 50 คน" />
+            <label>รายละเอียด <span class="req">*</span></label>
+            <input type="text" id="transDescription" required placeholder="เช่น ค่าเทอม 1/2026 - นักเรียน 50 คน" />
           </div>
-          
+
           <div class="form-group full">
-            <label>Reference Number</label>
-            <input type="text" id="transReference" placeholder="Optional - invoice/receipt number" />
+            <label>เลขที่อ้างอิง</label>
+            <input type="text" id="transReference" placeholder="ไม่บังคับ - เลขที่ใบแจ้งหนี้/ใบเสร็จ" />
           </div>
-          
+
           <div class="form-group full">
-            <label>Notes</label>
+            <label>หมายเหตุ</label>
             <textarea id="transNotes" rows="2"></textarea>
           </div>
         </div>
         
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Transaction</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">💾 บันทึกรายการ</button>
         </div>
       </form>
     </div>
@@ -263,7 +263,7 @@
         .order('transaction_date', { ascending: false });
       
       if (error) {
-        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        dataHelpers.toast('โหลดข้อมูลไม่สำเร็จ: ' + error.message, 'error');
         return;
       }
       
@@ -306,7 +306,7 @@
       
       const select = document.getElementById('filterMonth');
       const current = select.value;
-      select.innerHTML = '<option value="">All Months</option>' + 
+      select.innerHTML = '<option value="">ทุกเดือน</option>' +
         [...months].sort().reverse().map(m => `<option value="${m}">${m}</option>`).join('');
       select.value = current;
     }
@@ -315,7 +315,7 @@
       const tbody = document.getElementById('transList');
       
       if (!trans || trans.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">💰</div><h4>No transactions yet</h4><p>Click "Add Transaction" to start tracking</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">💰</div><h4>ยังไม่มีรายการ</h4><p>คลิก "เพิ่มรายการ" เพื่อเริ่มบันทึก</p></div></td></tr>`;
         document.getElementById('transCount').textContent = '';
         return;
       }
@@ -325,8 +325,8 @@
           <td style="font-size:12px;">${dataHelpers.formatDate(t.transaction_date)}</td>
           <td>
             ${t.type === 'income' 
-              ? '<span style="padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600; background:#DCFCE7; color:#166534;">💵 Income</span>'
-              : '<span style="padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600; background:#FEE2E2; color:#991B1B;">💸 Expense</span>'}
+              ? '<span style="padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600; background:#DCFCE7; color:#166534;">💵 รายรับ</span>'
+              : '<span style="padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600; background:#FEE2E2; color:#991B1B;">💸 รายจ่าย</span>'}
           </td>
           <td><span style="font-size:11px; color:#6B7280; text-transform:uppercase; font-weight:600;">${t.category}</span></td>
           <td>${t.description}</td>
@@ -341,7 +341,7 @@
         </tr>
       `).join('');
       
-      document.getElementById('transCount').textContent = `${trans.length} transaction(s)`;
+      document.getElementById('transCount').textContent = `${trans.length} รายการ`;
     }
     
     function filterTransactions() {
@@ -394,13 +394,13 @@
           labels: months.map(m => m.label),
           datasets: [
             {
-              label: 'Income',
+              label: 'รายรับ',
               data: months.map(m => m.income),
               backgroundColor: '#7CB342',
               borderRadius: 6
             },
             {
-              label: 'Expense',
+              label: 'รายจ่าย',
               data: months.map(m => m.expense),
               backgroundColor: '#EF4444',
               borderRadius: 6
@@ -434,7 +434,7 @@
       chart2 = new Chart(ctx2, {
         type: 'doughnut',
         data: {
-          labels: catLabels.length ? catLabels : ['No expenses yet'],
+          labels: catLabels.length ? catLabels : ['ยังไม่มีรายจ่าย'],
           datasets: [{
             data: catData.length ? catData : [1],
             backgroundColor: ['#5BB8E0', '#7CB342', '#F59E0B', '#EF4444', '#9333EA', '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6B7280']
@@ -449,7 +449,7 @@
     }
     
     function openCreateModal() {
-      document.getElementById('modalTitle').textContent = '➕ Add Transaction';
+      document.getElementById('modalTitle').textContent = '➕ เพิ่มรายการ';
       document.getElementById('transId').value = '';
       document.getElementById('transForm').reset();
       document.getElementById('transType').value = 'income';
@@ -461,7 +461,7 @@
       const t = allTrans.find(x => x.id === id);
       if (!t) return;
       
-      document.getElementById('modalTitle').textContent = '✏️ Edit Transaction';
+      document.getElementById('modalTitle').textContent = '✏️ แก้ไขรายการ';
       document.getElementById('transId').value = t.id;
       document.getElementById('transType').value = t.type;
       document.getElementById('transCategory').value = t.category;
@@ -483,7 +483,7 @@
       const id = document.getElementById('transId').value;
       const btn = document.getElementById('saveBtn');
       btn.disabled = true;
-      btn.textContent = '⏳ Saving...';
+      btn.textContent = '⏳ กำลังบันทึก...';
       
       const transData = {
         type: document.getElementById('transType').value,
@@ -504,22 +504,22 @@
       }
       
       btn.disabled = false;
-      btn.textContent = '💾 Save Transaction';
-      
+      btn.textContent = '💾 บันทึกรายการ';
+
       if (result.error) {
         dataHelpers.toast('❌ ' + result.error.message, 'error');
         return;
       }
       
-      dataHelpers.toast(id ? '✅ Transaction updated!' : '✅ Transaction recorded!', 'success');
+      dataHelpers.toast(id ? '✅ อัปเดตรายการแล้ว!' : '✅ บันทึกรายการแล้ว!', 'success');
       closeModal();
       loadTransactions();
     }
     
     async function deleteTransaction(id) {
       const confirmed = await dataHelpers.confirm(
-        'Delete this transaction? This cannot be undone.',
-        { title: '⚠️ Delete Transaction', confirmText: 'Delete', danger: true }
+        'ลบรายการนี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้',
+        { title: '⚠️ ลบรายการ', confirmText: 'ลบ', danger: true }
       );
       if (!confirmed) return;
       
@@ -528,7 +528,7 @@
         dataHelpers.toast('❌ ' + error.message, 'error');
         return;
       }
-      dataHelpers.toast('✅ Transaction deleted', 'success');
+      dataHelpers.toast('✅ ลบรายการแล้ว', 'success');
       loadTransactions();
     }
     

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payment Approvals — PanyaSchoolKit</title>
+  <title>อนุมัติสลิปการชำระเงิน — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -37,72 +37,72 @@
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
         <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <h1>ระบบจัดการ</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="applications.html">📝 Applications</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="payment-approvals.html" class="active">✅ Approvals</a>
-        <a href="create-bills.html">📄 Bills</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="events-admin.html">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="reports.html">📄 Reports</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
-        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="applications.html">📝 ใบสมัคร</a>
+        <a href="payments.html">💳 การชำระเงิน</a>
+        <a href="payment-approvals.html" class="active">✅ อนุมัติสลิป</a>
+        <a href="create-bills.html">📄 ใบแจ้งหนี้</a>
+        <a href="tuition-admin.html">💰 ค่าเล่าเรียน</a>
+        <a href="events-admin.html">📅 กิจกรรม</a>
+        <a href="news-admin.html">📰 ข่าวสาร</a>
+        <a href="reports.html">📄 รายงาน</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 การเงิน</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ ตั้งค่า</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ ตารางกำหนดเอง</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 ผู้ใช้งาน</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
 
   <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
+
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>✅ Payment Approvals</h2>
-          <p>ตรวจสลิปจากผู้ปกครอง — Review and approve payment slips</p>
+          <h2>✅ อนุมัติสลิปการชำระเงิน</h2>
+          <p>ตรวจสลิปจากผู้ปกครอง — ตรวจสอบและอนุมัติสลิปการชำระเงิน</p>
         </div>
-        <button class="btn btn-secondary" onclick="loadSlips()">🔄 Refresh</button>
+        <button class="btn btn-secondary" onclick="loadSlips()">🔄 รีเฟรช</button>
       </div>
 
       <div class="stat-cards" style="grid-template-columns:repeat(3,1fr);">
         <div class="stat-card amber">
-          <div class="label">⏳ Pending Review</div>
+          <div class="label">⏳ รอตรวจสอบ</div>
           <div class="value" id="cntPending">0</div>
         </div>
         <div class="stat-card teal">
-          <div class="label">✅ Approved Today</div>
+          <div class="label">✅ อนุมัติแล้ววันนี้</div>
           <div class="value" id="cntApproved">0</div>
         </div>
         <div class="stat-card purple">
-          <div class="label">Total This Month</div>
+          <div class="label">ทั้งหมดเดือนนี้</div>
           <div class="value" id="cntMonth">0</div>
         </div>
       </div>
 
       <div style="display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;">
         <select id="filterStatus" onchange="renderSlips()" style="padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;">
-          <option value="pending">⏳ Pending (Default)</option>
-          <option value="">All Status</option>
-          <option value="approved">✅ Approved</option>
-          <option value="rejected">❌ Rejected</option>
+          <option value="pending">⏳ รอตรวจสอบ (ค่าเริ่มต้น)</option>
+          <option value="">ทุกสถานะ</option>
+          <option value="approved">✅ อนุมัติแล้ว</option>
+          <option value="rejected">❌ ปฏิเสธ</option>
         </select>
-        <input type="search" id="search" placeholder="🔍 Search student..." oninput="renderSlips()" style="flex:1; min-width:200px; padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;" />
+        <input type="search" id="search" placeholder="🔍 ค้นหานักเรียน..." oninput="renderSlips()" style="flex:1; min-width:200px; padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;" />
       </div>
 
       <div id="slipsList"></div>
       
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
         <div style="font-size:64px;">📭</div>
-        <h3 style="color:var(--brand,#1B5E3F);">No slips to review</h3>
+        <h3 style="color:var(--brand,#1B5E3F);">ไม่มีสลิปที่ต้องตรวจสอบ</h3>
         <p>เมื่อผู้ปกครองอัปสลิป จะปรากฏที่นี่</p>
       </div>
     </div>
@@ -110,22 +110,22 @@
 
   <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
     <button class="lightbox-close" onclick="closeLightbox(event)">✕</button>
-    <img id="lightboxImg" src="" alt="Slip" onclick="event.stopPropagation()" />
+    <img id="lightboxImg" src="" alt="สลิป" onclick="event.stopPropagation()" />
   </div>
 
   <div class="modal" id="rejectModal" style="display:none;">
     <div class="modal-content" style="max-width:500px;">
       <div class="modal-header">
-        <h3 style="color:#EF4444; margin:0;">❌ Reject Slip</h3>
+        <h3 style="color:#EF4444; margin:0;">❌ ปฏิเสธสลิป</h3>
         <button class="modal-close" onclick="closeReject()">×</button>
       </div>
       <div class="modal-body">
         <form id="rejectForm" onsubmit="confirmReject(event)">
           <input type="hidden" id="rejectSlipId" />
           <div class="form-group">
-            <label>Reason for rejection <span style="color:#EF4444;">*</span></label>
+            <label>เหตุผลในการปฏิเสธ <span style="color:#EF4444;">*</span></label>
             <select id="rejectReasonPreset" onchange="document.getElementById('rejectReason').value = this.value">
-              <option value="">-- Quick reasons --</option>
+              <option value="">-- เหตุผลด่วน --</option>
               <option value="ไม่พบเงินเข้าในบัญชี">ไม่พบเงินเข้าในบัญชี</option>
               <option value="จำนวนเงินไม่ตรง">จำนวนเงินไม่ตรง</option>
               <option value="สลิปไม่ชัดเจน — กรุณาส่งใหม่">สลิปไม่ชัดเจน — กรุณาส่งใหม่</option>
@@ -134,12 +134,12 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Detailed reason</label>
+            <label>เหตุผลโดยละเอียด</label>
             <textarea id="rejectReason" rows="3" required></textarea>
           </div>
           <div class="modal-footer" style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-            <button type="button" class="btn btn-secondary" onclick="closeReject()">Cancel</button>
-            <button type="submit" class="btn" style="background:#EF4444; color:white;">❌ Reject</button>
+            <button type="button" class="btn btn-secondary" onclick="closeReject()">ยกเลิก</button>
+            <button type="submit" class="btn" style="background:#EF4444; color:white;">❌ ปฏิเสธ</button>
           </div>
         </form>
       </div>
@@ -175,7 +175,7 @@
         .order('created_at', { ascending: false });
       
       if (error) {
-        dataHelpers.toast('❌ Load failed', 'error');
+        dataHelpers.toast('❌ โหลดข้อมูลไม่สำเร็จ', 'error');
         return;
       }
       
@@ -219,37 +219,39 @@
       }
       empty.style.display = 'none';
       
+      const statusLabels = { pending: 'รอตรวจสอบ', approved: 'อนุมัติแล้ว', rejected: 'ปฏิเสธ' };
+
       list.innerHTML = filtered.map(slip => {
         const s = slip.students || {};
         const bill = slip.bills || {};
         const isPending = slip.status === 'pending';
-        
+
         return `<div class="slip-card">
           <div class="slip-thumb" onclick="viewSlip('${slip.slip_url}')">
-            ${slip.slip_url ? `<img src="${slip.slip_url}" alt="Slip" />` : '<div style="color:#9CA3AF;font-size:48px;">📄</div>'}
+            ${slip.slip_url ? `<img src="${slip.slip_url}" alt="สลิป" />` : '<div style="color:#9CA3AF;font-size:48px;">📄</div>'}
           </div>
           <div class="slip-info">
-            <div style="margin-bottom:6px;"><span class="status-${slip.status}">${slip.status.toUpperCase()}</span></div>
+            <div style="margin-bottom:6px;"><span class="status-${slip.status}">${statusLabels[slip.status] || slip.status}</span></div>
             <h3>${s.first_name || '?'} ${s.last_name || ''}${s.nickname ? ` (${s.nickname})` : ''}</h3>
             <div class="student">${(s.program||'').toUpperCase()} ${s.grade || ''}</div>
-            <div class="bill-ref">${bill.bill_number || '(no bill)'} • ${bill.description || ''}</div>
+            <div class="bill-ref">${bill.bill_number || '(ไม่มีใบแจ้งหนี้)'} • ${bill.description || ''}</div>
             <div class="amount">฿${Number(slip.amount).toLocaleString('en-US')}</div>
             <div class="meta">
-              ${slip.transfer_date ? `📅 Transferred: ${slip.transfer_date}` : ''}
+              ${slip.transfer_date ? `📅 วันที่โอน: ${slip.transfer_date}` : ''}
               ${slip.transfer_time ? ` ${slip.transfer_time}` : ''}<br>
               ${slip.bank_name ? `🏦 ${slip.bank_name}` : ''}
-              ${slip.reference_number ? ` • Ref: ${slip.reference_number}` : ''}<br>
+              ${slip.reference_number ? ` • อ้างอิง: ${slip.reference_number}` : ''}<br>
               ${slip.notes ? `📝 ${slip.notes}` : ''}
               ${!isPending && slip.rejection_reason ? `<br><span style="color:#EF4444;">❌ ${slip.rejection_reason}</span>` : ''}
-              <div style="margin-top:6px; color:#9CA3AF; font-size:11px;">Submitted: ${new Date(slip.created_at).toLocaleString('th-TH')}</div>
+              <div style="margin-top:6px; color:#9CA3AF; font-size:11px;">ส่งเมื่อ: ${new Date(slip.created_at).toLocaleString('th-TH')}</div>
             </div>
           </div>
           <div class="slip-actions">
             ${isPending ? `
-              <button class="btn btn-sm" style="background:#10B981;color:white;" onclick="approve('${slip.id}')">✅ Approve</button>
-              <button class="btn btn-sm" style="background:#EF4444;color:white;" onclick="openReject('${slip.id}')">❌ Reject</button>
+              <button class="btn btn-sm" style="background:#10B981;color:white;" onclick="approve('${slip.id}')">✅ อนุมัติ</button>
+              <button class="btn btn-sm" style="background:#EF4444;color:white;" onclick="openReject('${slip.id}')">❌ ปฏิเสธ</button>
             ` : ''}
-            <button class="btn btn-sm btn-secondary" onclick="viewSlip('${slip.slip_url}')">👁️ View</button>
+            <button class="btn btn-sm btn-secondary" onclick="viewSlip('${slip.slip_url}')">👁️ ดูสลิป</button>
           </div>
         </div>`;
       }).join('');
@@ -267,7 +269,7 @@
     }
     
     async function approve(id) {
-      if (!confirm('✅ ยืนยันการอนุมัติสลิปนี้?\n\nระบบจะ:\n1. บันทึก Payment record\n2. เปลี่ยนสถานะบิลเป็น "Paid"\n3. ส่งใบเสร็จให้ผู้ปกครอง')) return;
+      if (!confirm('✅ ยืนยันการอนุมัติสลิปนี้?\n\nระบบจะ:\n1. บันทึกรายการชำระเงิน\n2. เปลี่ยนสถานะบิลเป็น "ชำระแล้ว"\n3. ส่งใบเสร็จให้ผู้ปกครอง')) return;
       
       const slip = allSlips.find(x => x.id === id);
       if (!slip) return;
@@ -326,11 +328,11 @@
             transaction_date: slip.transfer_date || new Date().toISOString().split('T')[0]
           });
         
-        dataHelpers.toast('✅ Approved! Receipt: ' + receiptNum, 'success');
+        dataHelpers.toast('✅ อนุมัติแล้ว! เลขที่ใบเสร็จ: ' + receiptNum, 'success');
         await loadSlips();
       } catch (err) {
         console.error(err);
-        dataHelpers.toast('❌ Failed: ' + err.message, 'error');
+        dataHelpers.toast('❌ ไม่สำเร็จ: ' + err.message, 'error');
       }
     }
     
@@ -364,11 +366,11 @@
           .eq('id', id);
         if (error) throw error;
         
-        dataHelpers.toast('❌ Slip rejected', 'success');
+        dataHelpers.toast('❌ ปฏิเสธสลิปแล้ว', 'success');
         closeReject();
         await loadSlips();
       } catch (err) {
-        dataHelpers.toast('❌ Failed: ' + err.message, 'error');
+        dataHelpers.toast('❌ ไม่สำเร็จ: ' + err.message, 'error');
       }
     }
     

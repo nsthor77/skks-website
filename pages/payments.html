@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payments — PanyaSchoolKit</title>
+  <title>การชำระเงิน — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -41,24 +41,24 @@
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
         <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <h1>ระบบจัดการ</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="applications.html">📝 Applications</a>
-        <a href="payments.html" class="active">💳 Payments</a>
-        <a href="payment-approvals.html">✅ Approvals</a>
-        <a href="create-bills.html">📄 Bills</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="events-admin.html">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="reports.html">📄 Reports</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
-        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
-        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="applications.html">📝 ใบสมัคร</a>
+        <a href="payments.html" class="active">💳 การชำระเงิน</a>
+        <a href="payment-approvals.html">✅ อนุมัติสลิป</a>
+        <a href="create-bills.html">📄 ใบแจ้งหนี้</a>
+        <a href="tuition-admin.html">💰 ค่าเล่าเรียน</a>
+        <a href="events-admin.html">📅 กิจกรรม</a>
+        <a href="news-admin.html">📰 ข่าวสาร</a>
+        <a href="reports.html">📄 รายงาน</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 การเงิน</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ ตั้งค่า</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ ตารางกำหนดเอง</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 ผู้ใช้งาน</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ คำเชิญ</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
@@ -66,67 +66,67 @@
         <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
         <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
   
   <div class="admin-container no-print">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
+
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>💳 Payments</h2>
-          <p>Record payments and print receipts</p>
+          <h2>💳 การชำระเงิน</h2>
+          <p>บันทึกการชำระเงินและพิมพ์ใบเสร็จ</p>
         </div>
         <button class="btn btn-primary" onclick="openCreateModal()">
-          ➕ Record Payment
+          ➕ บันทึกการชำระเงิน
         </button>
       </div>
       
       <!-- Stats -->
       <div class="stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));">
         <div class="stat-card green">
-          <div class="label">Today's Revenue</div>
+          <div class="label">รายรับวันนี้</div>
           <div class="value" id="statToday">—</div>
-          <div class="sub">From completed payments</div>
+          <div class="sub">จากการชำระเงินที่สำเร็จแล้ว</div>
         </div>
         <div class="stat-card blue">
-          <div class="label">This Month</div>
+          <div class="label">เดือนนี้</div>
           <div class="value" id="statMonth">—</div>
-          <div class="sub">Total received</div>
+          <div class="sub">ยอดรับทั้งหมด</div>
         </div>
         <div class="stat-card purple">
-          <div class="label">Total Payments</div>
+          <div class="label">รายการชำระเงินทั้งหมด</div>
           <div class="value" id="statCount">—</div>
-          <div class="sub">All time</div>
+          <div class="sub">ตลอดเวลา</div>
         </div>
         <div class="stat-card amber">
-          <div class="label">Pending</div>
+          <div class="label">รอดำเนินการ</div>
           <div class="value" id="statPending">—</div>
-          <div class="sub">Awaiting confirmation</div>
+          <div class="sub">รอการยืนยัน</div>
         </div>
       </div>
       
       <div class="card">
         <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="🔍 Search by receipt #, student #..." oninput="filterPayments()" />
+          <input type="text" id="searchInput" placeholder="🔍 ค้นหาด้วยเลขที่ใบเสร็จ, รหัสนักเรียน..." oninput="filterPayments()" />
           <select id="filterType" onchange="filterPayments()">
-            <option value="">All Types</option>
-            <option value="tuition">Tuition</option>
-            <option value="application_fee">Application Fee</option>
-            <option value="registration_fee">Registration Fee</option>
-            <option value="uniform">Uniform</option>
-            <option value="books">Books</option>
-            <option value="activity">Activity</option>
-            <option value="other">Other</option>
+            <option value="">ทุกประเภท</option>
+            <option value="tuition">ค่าเล่าเรียน</option>
+            <option value="application_fee">ค่าสมัคร</option>
+            <option value="registration_fee">ค่าลงทะเบียน</option>
+            <option value="uniform">ชุดนักเรียน</option>
+            <option value="books">หนังสือ</option>
+            <option value="activity">กิจกรรม</option>
+            <option value="other">อื่นๆ</option>
           </select>
           <select id="filterStatus" onchange="filterPayments()">
-            <option value="">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="refunded">Refunded</option>
+            <option value="">ทุกสถานะ</option>
+            <option value="pending">รอดำเนินการ</option>
+            <option value="completed">สำเร็จ</option>
+            <option value="cancelled">ยกเลิก</option>
+            <option value="refunded">คืนเงินแล้ว</option>
           </select>
         </div>
         
@@ -134,18 +134,18 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Receipt #</th>
-                <th>Student</th>
-                <th>Type</th>
-                <th style="text-align:right;">Amount</th>
-                <th>Method</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th style="text-align:right;">Actions</th>
+                <th>เลขที่ใบเสร็จ</th>
+                <th>นักเรียน</th>
+                <th>ประเภท</th>
+                <th style="text-align:right;">จำนวนเงิน</th>
+                <th>ช่องทาง</th>
+                <th>สถานะ</th>
+                <th>วันที่</th>
+                <th style="text-align:right;">จัดการ</th>
               </tr>
             </thead>
             <tbody id="paymentsList">
-              <tr><td colspan="8"><div class="loading-state">Loading...</div></td></tr>
+              <tr><td colspan="8"><div class="loading-state">กำลังโหลด...</div></td></tr>
             </tbody>
           </table>
         </div>
@@ -159,86 +159,86 @@
   <div class="modal-overlay no-print" id="paymentModal">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="modalTitle">➕ Record Payment</h3>
+        <h3 id="modalTitle">➕ บันทึกการชำระเงิน</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
-      
+
       <form id="paymentForm" onsubmit="savePayment(event)">
         <input type="hidden" id="paymentId" />
-        
+
         <div class="form-grid">
           <div class="form-group">
-            <label>Receipt # <span class="req">*</span></label>
+            <label>เลขที่ใบเสร็จ <span class="req">*</span></label>
             <input type="text" id="receiptNumber" required />
           </div>
           <div class="form-group">
-            <label>Status</label>
+            <label>สถานะ</label>
             <select id="paymentStatus">
-              <option value="completed">✅ Completed</option>
-              <option value="pending">⏳ Pending</option>
-              <option value="cancelled">❌ Cancelled</option>
-              <option value="refunded">↩️ Refunded</option>
+              <option value="completed">✅ สำเร็จ</option>
+              <option value="pending">⏳ รอดำเนินการ</option>
+              <option value="cancelled">❌ ยกเลิก</option>
+              <option value="refunded">↩️ คืนเงินแล้ว</option>
             </select>
           </div>
-          
+
           <div class="form-group full">
-            <label>Student <span class="req">*</span></label>
+            <label>นักเรียน <span class="req">*</span></label>
             <select id="studentId" required>
-              <option value="">Select student...</option>
+              <option value="">เลือกนักเรียน...</option>
             </select>
           </div>
-          
+
           <div class="form-group">
-            <label>Payment Type <span class="req">*</span></label>
+            <label>ประเภทการชำระเงิน <span class="req">*</span></label>
             <select id="paymentType" required>
-              <option value="">Select...</option>
-              <option value="tuition">📚 Tuition</option>
-              <option value="application_fee">📝 Application Fee</option>
-              <option value="registration_fee">📋 Registration Fee</option>
-              <option value="uniform">👕 Uniform</option>
-              <option value="books">📖 Books</option>
-              <option value="activity">🎨 Activity</option>
-              <option value="other">📦 Other</option>
+              <option value="">เลือก...</option>
+              <option value="tuition">📚 ค่าเล่าเรียน</option>
+              <option value="application_fee">📝 ค่าสมัคร</option>
+              <option value="registration_fee">📋 ค่าลงทะเบียน</option>
+              <option value="uniform">👕 ชุดนักเรียน</option>
+              <option value="books">📖 หนังสือ</option>
+              <option value="activity">🎨 กิจกรรม</option>
+              <option value="other">📦 อื่นๆ</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Amount (THB) <span class="req">*</span></label>
+            <label>จำนวนเงิน (บาท) <span class="req">*</span></label>
             <input type="number" id="amount" required min="0" step="0.01" placeholder="0.00" />
           </div>
-          
+
           <div class="form-group">
-            <label>Semester</label>
-            <input type="text" id="semester" placeholder="e.g., 1/2026" />
+            <label>ภาคเรียน</label>
+            <input type="text" id="semester" placeholder="เช่น 1/2569" />
           </div>
           <div class="form-group">
-            <label>Payment Method</label>
+            <label>ช่องทางการชำระเงิน</label>
             <select id="paymentMethod">
-              <option value="cash">💵 Cash</option>
-              <option value="bank_transfer">🏦 Bank Transfer</option>
-              <option value="qr_payment">📱 QR Payment</option>
-              <option value="credit_card">💳 Credit Card</option>
-              <option value="cheque">📋 Cheque</option>
+              <option value="cash">💵 เงินสด</option>
+              <option value="bank_transfer">🏦 โอนผ่านธนาคาร</option>
+              <option value="qr_payment">📱 QR พร้อมเพย์</option>
+              <option value="credit_card">💳 บัตรเครดิต</option>
+              <option value="cheque">📋 เช็ค</option>
             </select>
           </div>
-          
+
           <div class="form-group">
-            <label>Payment Date</label>
+            <label>วันที่ชำระเงิน</label>
             <input type="date" id="paidAt" />
           </div>
           <div class="form-group">
-            <label>Reference / Transaction ID</label>
-            <input type="text" id="referenceNumber" placeholder="Optional" />
+            <label>เลขอ้างอิง / รหัสธุรกรรม</label>
+            <input type="text" id="referenceNumber" placeholder="ไม่บังคับ" />
           </div>
-          
+
           <div class="form-group full">
-            <label>Notes</label>
-            <textarea id="notes" rows="2" placeholder="Optional notes..."></textarea>
+            <label>หมายเหตุ</label>
+            <textarea id="notes" rows="2" placeholder="หมายเหตุเพิ่มเติม (ไม่บังคับ)..."></textarea>
           </div>
         </div>
-        
+
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Payment</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">💾 บันทึกการชำระเงิน</button>
         </div>
       </form>
     </div>
@@ -322,7 +322,7 @@
       
       allStudents = data || [];
       const select = document.getElementById('studentId');
-      select.innerHTML = '<option value="">Select student...</option>' + 
+      select.innerHTML = '<option value="">เลือกนักเรียน...</option>' +
         allStudents.map(s => `<option value="${s.id}">${s.student_number} • ${s.grade || ''} ${s.classroom || ''}</option>`).join('');
     }
     
@@ -333,7 +333,7 @@
         .order('paid_at', { ascending: false });
       
       if (error) {
-        dataHelpers.toast('Failed to load: ' + error.message, 'error');
+        dataHelpers.toast('โหลดข้อมูลไม่สำเร็จ: ' + error.message, 'error');
         return;
       }
       
@@ -369,7 +369,7 @@
       const tbody = document.getElementById('paymentsList');
       
       if (!payments || payments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">💳</div><h4>No payments yet</h4><p>Click "Record Payment" to add one</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">💳</div><h4>ยังไม่มีรายการชำระเงิน</h4><p>คลิก "บันทึกการชำระเงิน" เพื่อเพิ่มรายการ</p></div></td></tr>`;
         document.getElementById('paymentCount').textContent = '';
         return;
       }
@@ -384,14 +384,14 @@
           <td>${dataHelpers.statusBadge(p.status)}</td>
           <td style="font-size:12px; color:#6B7280;">${dataHelpers.formatDate(p.paid_at)}</td>
           <td class="actions-cell">
-            <button class="btn btn-sm btn-secondary" onclick="printReceipt('${p.id}')" title="Print">🖨️</button>
-            <button class="btn btn-sm btn-secondary" onclick="editPayment('${p.id}')" title="Edit">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deletePayment('${p.id}', '${p.receipt_number}')" title="Delete">🗑️</button>
+            <button class="btn btn-sm btn-secondary" onclick="printReceipt('${p.id}')" title="พิมพ์ใบเสร็จ">🖨️</button>
+            <button class="btn btn-sm btn-secondary" onclick="editPayment('${p.id}')" title="แก้ไข">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deletePayment('${p.id}', '${p.receipt_number}')" title="ลบ">🗑️</button>
           </td>
         </tr>
       `).join('');
       
-      document.getElementById('paymentCount').textContent = `${payments.length} payment(s)`;
+      document.getElementById('paymentCount').textContent = `${payments.length} รายการ`;
     }
     
     function filterPayments() {
@@ -414,7 +414,7 @@
     }
     
     function openCreateModal() {
-      document.getElementById('modalTitle').textContent = '➕ Record Payment';
+      document.getElementById('modalTitle').textContent = '➕ บันทึกการชำระเงิน';
       document.getElementById('paymentId').value = '';
       document.getElementById('paymentForm').reset();
       document.getElementById('paymentStatus').value = 'completed';
@@ -437,7 +437,7 @@
       const p = allPayments.find(x => x.id === id);
       if (!p) return;
       
-      document.getElementById('modalTitle').textContent = '✏️ Edit Payment';
+      document.getElementById('modalTitle').textContent = '✏️ แก้ไขการชำระเงิน';
       document.getElementById('paymentId').value = p.id;
       document.getElementById('receiptNumber').value = p.receipt_number;
       document.getElementById('paymentStatus').value = p.status;
@@ -462,7 +462,7 @@
       const id = document.getElementById('paymentId').value;
       const btn = document.getElementById('saveBtn');
       btn.disabled = true;
-      btn.textContent = '⏳ Saving...';
+      btn.textContent = '⏳ กำลังบันทึก...';
       
       const paymentData = {
         receipt_number: document.getElementById('receiptNumber').value.trim(),
@@ -486,22 +486,22 @@
       }
       
       btn.disabled = false;
-      btn.textContent = '💾 Save Payment';
-      
+      btn.textContent = '💾 บันทึกการชำระเงิน';
+
       if (result.error) {
         dataHelpers.toast('❌ ' + result.error.message, 'error');
         return;
       }
-      
-      dataHelpers.toast(id ? '✅ Payment updated!' : '✅ Payment recorded!', 'success');
+
+      dataHelpers.toast(id ? '✅ อัปเดตการชำระเงินแล้ว!' : '✅ บันทึกการชำระเงินแล้ว!', 'success');
       closeModal();
       loadPayments();
     }
     
     async function deletePayment(id, rcpt) {
       const confirmed = await dataHelpers.confirm(
-        `Delete payment "${rcpt}"? This cannot be undone.`,
-        { title: '⚠️ Delete Payment', confirmText: 'Delete', danger: true }
+        `ลบการชำระเงิน "${rcpt}"? การกระทำนี้ไม่สามารถย้อนกลับได้`,
+        { title: '⚠️ ลบการชำระเงิน', confirmText: 'ลบ', danger: true }
       );
       if (!confirmed) return;
       
@@ -510,7 +510,7 @@
         dataHelpers.toast('❌ ' + error.message, 'error');
         return;
       }
-      dataHelpers.toast('✅ Payment deleted', 'success');
+      dataHelpers.toast('✅ ลบการชำระเงินแล้ว', 'success');
       loadPayments();
     }
     

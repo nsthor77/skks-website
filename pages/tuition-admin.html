@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tuition Fees — PanyaSchoolKit</title>
+  <title>ค่าธรรมเนียมการศึกษา — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -35,53 +35,53 @@
   <div class="admin-topbar">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <img src="../images/logo.png" alt="โลโก้โรงเรียน" />
+        <h1>ผู้ดูแลระบบ</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="applications.html">📝 Applications</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="payment-approvals.html">✅ Approvals</a>
-        <a href="create-bills.html">📄 Bills</a>
-        <a href="tuition-admin.html" class="active">💰 Tuition</a>
-        <a href="events-admin.html">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="reports.html">📄 Reports</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
-        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
-        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="applications.html">📝 ใบสมัคร</a>
+        <a href="payments.html">💳 การชำระเงิน</a>
+        <a href="payment-approvals.html">✅ อนุมัติการชำระ</a>
+        <a href="create-bills.html">📄 บิล</a>
+        <a href="tuition-admin.html" class="active">💰 ค่าเทอม</a>
+        <a href="events-admin.html">📅 กิจกรรม</a>
+        <a href="news-admin.html">📰 ข่าวสาร</a>
+        <a href="reports.html">📄 รายงาน</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 การเงิน</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ ตั้งค่า</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ ตารางกำหนดเอง</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 ผู้ใช้งาน</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ คำเชิญ</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
 
   <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
+
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>💰 Tuition Fees Management</h2>
-          <p>ปรับค่าเทอม ค่าอาหาร และค่าใช้จ่ายอื่นๆ — Manage tuition and fee structure</p>
+          <h2>💰 จัดการค่าธรรมเนียมการศึกษา</h2>
+          <p>ปรับค่าเทอม ค่าอาหาร และค่าใช้จ่ายอื่นๆ — จัดการโครงสร้างค่าธรรมเนียม</p>
         </div>
         <button class="btn btn-primary" onclick="openCreateModal()">
-          + Add New Fee
+          + เพิ่มค่าธรรมเนียมใหม่
         </button>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:12px;" id="feesList">
       </div>
-      
+
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
         <div style="font-size:64px;">💰</div>
-        <h3 style="color:var(--brand,#1B5E3F);">No fees set up yet</h3>
-        <p>Click "+ Add New Fee" to start</p>
+        <h3 style="color:var(--brand,#1B5E3F);">ยังไม่ได้ตั้งค่าธรรมเนียม</h3>
+        <p>คลิก "+ เพิ่มค่าธรรมเนียมใหม่" เพื่อเริ่มต้น</p>
       </div>
     </div>
   </div>
@@ -89,79 +89,79 @@
   <div class="modal" id="feeModal" style="display:none;">
     <div class="modal-content" style="max-width:600px;">
       <div class="modal-header">
-        <h3 id="modalTitle" style="color:var(--brand,#1B5E3F); margin:0;">💰 New Fee</h3>
+        <h3 id="modalTitle" style="color:var(--brand,#1B5E3F); margin:0;">💰 ค่าธรรมเนียมใหม่</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       <div class="modal-body">
         <form id="feeForm" onsubmit="saveFee(event)">
           <input type="hidden" id="feeId" />
-          
+
           <div class="form-row">
             <div class="form-group">
-              <label>Program <span style="color:#EF4444;">*</span></label>
+              <label>หลักสูตร <span style="color:#EF4444;">*</span></label>
               <select id="feeProgram" required>
-                <option value="all">All Programs (ทุกหลักสูตร)</option>
-                <option value="prek">Pre-K (เตรียมอนุบาล)</option>
-                <option value="k">Kindergarten (อนุบาล)</option>
+                <option value="all">ทุกหลักสูตร</option>
+                <option value="prek">เตรียมอนุบาล</option>
+                <option value="k">อนุบาล</option>
                 <option value="ep">EP (English Program)</option>
                 <option value="mep">MEP (Mini English Program)</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Category <span style="color:#EF4444;">*</span></label>
+              <label>ประเภท <span style="color:#EF4444;">*</span></label>
               <select id="feeCategory" required>
-                <option value="tuition">Tuition (ค่าเทอม)</option>
-                <option value="registration">Registration (ค่าสมัคร)</option>
-                <option value="lunch">Lunch (ค่าอาหาร)</option>
-                <option value="school_bus">School Bus (ค่ารถ)</option>
-                <option value="books">Books & Materials (หนังสือ)</option>
-                <option value="activities">Activities (กิจกรรม)</option>
-                <option value="other">Other (อื่นๆ)</option>
+                <option value="tuition">ค่าเทอม</option>
+                <option value="registration">ค่าสมัคร</option>
+                <option value="lunch">ค่าอาหาร</option>
+                <option value="school_bus">ค่ารถรับส่ง</option>
+                <option value="books">หนังสือและอุปกรณ์การเรียน</option>
+                <option value="activities">กิจกรรม</option>
+                <option value="other">อื่นๆ</option>
               </select>
             </div>
           </div>
-          
+
           <div class="form-group">
-            <label>Name (English) <span style="color:#EF4444;">*</span></label>
-            <input type="text" id="feeName" required placeholder="e.g., Pre-Kindergarten Tuition" />
+            <label>ชื่อ (ภาษาอังกฤษ) <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="feeName" required placeholder="เช่น Pre-Kindergarten Tuition" />
           </div>
-          
+
           <div class="form-group">
-            <label>Name (Thai)</label>
+            <label>ชื่อ (ภาษาไทย)</label>
             <input type="text" id="feeNameTh" placeholder="เช่น ค่าเทอมเตรียมอนุบาล" />
           </div>
-          
+
           <div class="form-group">
-            <label>Amount (THB) <span style="color:#EF4444;">*</span></label>
+            <label>จำนวนเงิน (บาท) <span style="color:#EF4444;">*</span></label>
             <input type="number" id="feeAmount" required min="0" step="100" placeholder="28000" />
           </div>
-          
+
           <div class="form-group">
-            <label>Description (English)</label>
-            <input type="text" id="feeDesc" placeholder="e.g., Tuition per term" />
+            <label>รายละเอียด (ภาษาอังกฤษ)</label>
+            <input type="text" id="feeDesc" placeholder="เช่น Tuition per term" />
           </div>
-          
+
           <div class="form-group">
-            <label>Description (Thai)</label>
+            <label>รายละเอียด (ภาษาไทย)</label>
             <input type="text" id="feeDescTh" placeholder="เช่น ค่าเทอมต่อเทอม" />
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
-              <label>Display Order</label>
+              <label>ลำดับการแสดงผล</label>
               <input type="number" id="feeOrder" value="0" min="0" />
             </div>
             <div class="form-group">
               <label style="display:flex; align-items:center; gap:8px; margin-top:24px;">
                 <input type="checkbox" id="feeActive" checked />
-                ✅ Active (show in list)
+                ✅ เปิดใช้งาน (แสดงในรายการ)
               </label>
             </div>
           </div>
-          
+
           <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Fee</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">💾 บันทึกค่าธรรมเนียม</button>
           </div>
         </form>
       </div>
@@ -198,7 +198,7 @@
         .order('amount', { ascending: false });
       
       if (error) {
-        dataHelpers.toast('❌ Failed to load fees', 'error');
+        dataHelpers.toast('❌ โหลดค่าธรรมเนียมไม่สำเร็จ', 'error');
         return;
       }
       
@@ -217,15 +217,16 @@
       }
       empty.style.display = 'none';
       
-      const programNames = { prek:'Pre-K', k:'K', ep:'EP', mep:'MEP', all:'ALL' };
-      
+      const programNames = { prek:'เตรียมอนุบาล', k:'อนุบาล', ep:'EP', mep:'MEP', all:'ทุกหลักสูตร' };
+      const catNames = { tuition:'ค่าเทอม', registration:'ค่าสมัคร', lunch:'ค่าอาหาร', school_bus:'ค่ารถรับส่ง', books:'หนังสือ', activities:'กิจกรรม', other:'อื่นๆ' };
+
       list.innerHTML = allFees.map(f => `
         <div class="fee-card" style="${!f.active ? 'opacity:0.5;' : ''}">
           <div class="fee-info">
             <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px; flex-wrap:wrap;">
-              <span class="badge-cat cat-${f.category}">${(f.category || 'other').replace('_',' ')}</span>
+              <span class="badge-cat cat-${f.category}">${catNames[f.category] || (f.category || 'other').replace('_',' ')}</span>
               <span style="font-size:11px; color:#5BB8E0; font-weight:600; padding:2px 8px; background:#EFF6FF; border-radius:4px;">${programNames[f.program] || f.program}</span>
-              ${!f.active ? '<span class="badge-cat cat-other">INACTIVE</span>' : ''}
+              ${!f.active ? '<span class="badge-cat cat-other">ปิดใช้งาน</span>' : ''}
             </div>
             <h3>${f.program_name}</h3>
             ${f.program_name_th ? `<div style="font-size:13px;color:#6B7280;margin-bottom:4px;">${f.program_name_th}</div>` : ''}
@@ -233,10 +234,10 @@
           </div>
           <div class="fee-amount">
             <div class="number">฿${Number(f.amount).toLocaleString('en-US')}</div>
-            <div class="unit">THB</div>
+            <div class="unit">บาท</div>
           </div>
           <div class="fee-actions">
-            <button class="btn btn-sm btn-secondary" onclick="editFee('${f.id}')">✏️ Edit</button>
+            <button class="btn btn-sm btn-secondary" onclick="editFee('${f.id}')">✏️ แก้ไข</button>
             <button class="btn btn-sm btn-danger" onclick="deleteFee('${f.id}','${f.program_name.replace(/'/g,"\\'")}')">🗑️</button>
           </div>
         </div>
@@ -244,7 +245,7 @@
     }
     
     function openCreateModal() {
-      document.getElementById('modalTitle').textContent = '💰 New Fee';
+      document.getElementById('modalTitle').textContent = '💰 ค่าธรรมเนียมใหม่';
       document.getElementById('feeForm').reset();
       document.getElementById('feeId').value = '';
       document.getElementById('feeActive').checked = true;
@@ -257,7 +258,7 @@
       const f = allFees.find(x => x.id === id);
       if (!f) return;
       
-      document.getElementById('modalTitle').textContent = '✏️ Edit Fee';
+      document.getElementById('modalTitle').textContent = '✏️ แก้ไขค่าธรรมเนียม';
       document.getElementById('feeId').value = id;
       document.getElementById('feeProgram').value = f.program;
       document.getElementById('feeCategory').value = f.category;
@@ -279,8 +280,8 @@
       event.preventDefault();
       const btn = document.getElementById('saveBtn');
       btn.disabled = true;
-      btn.textContent = '⏳ Saving...';
-      
+      btn.textContent = '⏳ กำลังบันทึก...';
+
       const id = document.getElementById('feeId').value;
       const data = {
         program: document.getElementById('feeProgram').value,
@@ -299,11 +300,11 @@
         if (id) {
           const { error } = await supabaseClient.from('tuition_fees').update(data).eq('id', id);
           if (error) throw error;
-          dataHelpers.toast('✅ Fee updated!', 'success');
+          dataHelpers.toast('✅ อัปเดตค่าธรรมเนียมแล้ว!', 'success');
         } else {
           const { error } = await supabaseClient.from('tuition_fees').insert(data);
           if (error) throw error;
-          dataHelpers.toast('🎉 Fee added!', 'success');
+          dataHelpers.toast('🎉 เพิ่มค่าธรรมเนียมแล้ว!', 'success');
         }
         closeModal();
         await loadFees();
@@ -311,19 +312,19 @@
         dataHelpers.toast('❌ ' + err.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '💾 Save Fee';
+        btn.textContent = '💾 บันทึกค่าธรรมเนียม';
       }
     }
     
     async function deleteFee(id, name) {
-      if (!confirm(`Delete "${name}"?\n\nThis cannot be undone.`)) return;
-      
+      if (!confirm(`ลบ "${name}" หรือไม่?\n\nการดำเนินการนี้ไม่สามารถยกเลิกได้`)) return;
+
       const { error } = await supabaseClient.from('tuition_fees').delete().eq('id', id);
       if (error) {
         dataHelpers.toast('❌ ' + error.message, 'error');
         return;
       }
-      dataHelpers.toast('🗑️ Fee deleted', 'success');
+      dataHelpers.toast('🗑️ ลบค่าธรรมเนียมแล้ว', 'success');
       await loadFees();
     }
     

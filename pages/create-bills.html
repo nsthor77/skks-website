@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bills Management — PanyaSchoolKit</title>
+  <title>จัดการบิล — PanyaSchoolKit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -29,81 +29,81 @@
   <div class="admin-topbar">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <img src="../images/logo.png" alt="โลโก้โรงเรียน" />
+        <h1>ผู้ดูแลระบบ</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="applications.html">📝 Applications</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="payment-approvals.html">✅ Approvals</a>
-        <a href="create-bills.html" class="active">📄 Bills</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="events-admin.html">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="reports.html">📄 Reports</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
-        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="applications.html">📝 ใบสมัคร</a>
+        <a href="payments.html">💳 การชำระเงิน</a>
+        <a href="payment-approvals.html">✅ อนุมัติการชำระ</a>
+        <a href="create-bills.html" class="active">📄 บิล</a>
+        <a href="tuition-admin.html">💰 ค่าเทอม</a>
+        <a href="events-admin.html">📅 กิจกรรม</a>
+        <a href="news-admin.html">📰 ข่าวสาร</a>
+        <a href="reports.html">📄 รายงาน</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 การเงิน</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ ตั้งค่า</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ ตารางกำหนดเอง</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 ผู้ใช้งาน</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
 
   <div class="admin-container">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
-    
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
+
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>📄 Bills Management</h2>
-          <p>ออกบิลค้างชำระให้นักเรียน — Create and manage bills</p>
+          <h2>📄 จัดการบิล</h2>
+          <p>ออกบิลค้างชำระให้นักเรียน — สร้างและจัดการบิล</p>
         </div>
         <div style="display:flex; gap:10px;">
-          <button class="btn btn-secondary" onclick="openBulkModal()">📋 Bulk Create</button>
-          <button class="btn btn-primary" onclick="openCreateModal()">+ New Bill</button>
+          <button class="btn btn-secondary" onclick="openBulkModal()">📋 สร้างหลายรายการ</button>
+          <button class="btn btn-primary" onclick="openCreateModal()">+ บิลใหม่</button>
         </div>
       </div>
 
       <div class="stat-cards" style="grid-template-columns:repeat(4,1fr);">
         <div class="stat-card teal">
-          <div class="label">Total Bills</div>
+          <div class="label">บิลทั้งหมด</div>
           <div class="value" id="cntTotal">0</div>
         </div>
         <div class="stat-card amber">
-          <div class="label">Unpaid</div>
+          <div class="label">ยังไม่ชำระ</div>
           <div class="value" id="cntUnpaid">0</div>
         </div>
         <div class="stat-card purple">
-          <div class="label">Pending Review</div>
+          <div class="label">รอตรวจสอบ</div>
           <div class="value" id="cntPending">0</div>
         </div>
         <div class="stat-card teal">
-          <div class="label">Paid</div>
+          <div class="label">ชำระแล้ว</div>
           <div class="value" id="cntPaid">0</div>
         </div>
       </div>
 
       <div style="display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;">
         <select id="filterStatus" onchange="renderBills()" style="padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;">
-          <option value="">All Status</option>
-          <option value="unpaid">Unpaid</option>
-          <option value="pending">Pending Review</option>
-          <option value="paid">Paid</option>
+          <option value="">ทุกสถานะ</option>
+          <option value="unpaid">ยังไม่ชำระ</option>
+          <option value="pending">รอตรวจสอบ</option>
+          <option value="paid">ชำระแล้ว</option>
         </select>
-        <input type="search" id="searchBill" placeholder="🔍 Search bill# or student..." oninput="renderBills()" style="flex:1; min-width:200px; padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;" />
+        <input type="search" id="searchBill" placeholder="🔍 ค้นหาเลขที่บิลหรือนักเรียน..." oninput="renderBills()" style="flex:1; min-width:200px; padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;" />
       </div>
 
       <div id="billsList"></div>
-      
+
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
         <div style="font-size:64px;">📄</div>
-        <h3 style="color:var(--brand,#1B5E3F);">No bills yet</h3>
-        <p>Click "+ New Bill" to create your first bill</p>
+        <h3 style="color:var(--brand,#1B5E3F);">ยังไม่มีบิล</h3>
+        <p>คลิก "+ บิลใหม่" เพื่อสร้างบิลแรกของคุณ</p>
       </div>
     </div>
   </div>
@@ -111,80 +111,80 @@
   <div class="modal" id="billModal" style="display:none;">
     <div class="modal-content" style="max-width:600px;">
       <div class="modal-header">
-        <h3 id="modalTitle" style="color:var(--brand,#1B5E3F); margin:0;">📄 New Bill</h3>
+        <h3 id="modalTitle" style="color:var(--brand,#1B5E3F); margin:0;">📄 บิลใหม่</h3>
         <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       <div class="modal-body">
         <form id="billForm" onsubmit="saveBill(event)">
           <input type="hidden" id="billId" />
-          
+
           <div class="form-group">
-            <label>Student <span style="color:#EF4444;">*</span></label>
+            <label>นักเรียน <span style="color:#EF4444;">*</span></label>
             <select id="billStudent" required>
-              <option value="">-- Select Student --</option>
+              <option value="">-- เลือกนักเรียน --</option>
             </select>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
-              <label>Category <span style="color:#EF4444;">*</span></label>
+              <label>ประเภท <span style="color:#EF4444;">*</span></label>
               <select id="billCategory" required onchange="autoFillFromCategory()">
-                <option value="">-- Select --</option>
-                <option value="tuition">Tuition (ค่าเทอม)</option>
-                <option value="registration">Registration (ค่าสมัคร)</option>
-                <option value="lunch">Lunch (ค่าอาหาร)</option>
-                <option value="school_bus">School Bus (ค่ารถ)</option>
-                <option value="books">Books (หนังสือ)</option>
-                <option value="activities">Activities (กิจกรรม)</option>
-                <option value="other">Other (อื่นๆ)</option>
+                <option value="">-- เลือก --</option>
+                <option value="tuition">ค่าเทอม</option>
+                <option value="registration">ค่าสมัคร</option>
+                <option value="lunch">ค่าอาหาร</option>
+                <option value="school_bus">ค่ารถรับส่ง</option>
+                <option value="books">หนังสือ</option>
+                <option value="activities">กิจกรรม</option>
+                <option value="other">อื่นๆ</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Amount (THB) <span style="color:#EF4444;">*</span></label>
+              <label>จำนวนเงิน (บาท) <span style="color:#EF4444;">*</span></label>
               <input type="number" id="billAmount" required min="0" step="100" placeholder="0" />
             </div>
           </div>
-          
+
           <div class="form-group">
-            <label>Description <span style="color:#EF4444;">*</span></label>
-            <input type="text" id="billDesc" required placeholder="e.g., Term 1/2026 Tuition Fee" />
+            <label>รายละเอียด <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="billDesc" required placeholder="เช่น ค่าเทอม 1/2569" />
           </div>
-          
+
           <div class="form-group">
-            <label>Description (Thai)</label>
+            <label>รายละเอียด (ภาษาไทย)</label>
             <input type="text" id="billDescTh" placeholder="เช่น ค่าเทอม 1/2569" />
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
-              <label>Term</label>
-              <input type="text" id="billTerm" placeholder="e.g., 1/2026" />
+              <label>ภาคเรียน</label>
+              <input type="text" id="billTerm" placeholder="เช่น 1/2569" />
             </div>
             <div class="form-group">
-              <label>Academic Year</label>
-              <input type="text" id="billYear" placeholder="2026" />
+              <label>ปีการศึกษา</label>
+              <input type="text" id="billYear" placeholder="2569" />
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
-              <label>Issue Date</label>
+              <label>วันที่ออกบิล</label>
               <input type="date" id="billIssueDate" />
             </div>
             <div class="form-group">
-              <label>Due Date <span style="color:#EF4444;">*</span></label>
+              <label>วันครบกำหนด <span style="color:#EF4444;">*</span></label>
               <input type="date" id="billDueDate" required />
             </div>
           </div>
-          
+
           <div class="form-group">
-            <label>Notes (optional)</label>
+            <label>หมายเหตุ (ไม่บังคับ)</label>
             <textarea id="billNotes" rows="2"></textarea>
           </div>
-          
+
           <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Bill</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">💾 บันทึกบิล</button>
           </div>
         </form>
       </div>
@@ -194,7 +194,7 @@
   <div class="modal" id="bulkModal" style="display:none;">
     <div class="modal-content" style="max-width:600px;">
       <div class="modal-header">
-        <h3 style="color:var(--brand,#1B5E3F); margin:0;">📋 Bulk Create Bills</h3>
+        <h3 style="color:var(--brand,#1B5E3F); margin:0;">📋 สร้างบิลหลายรายการ</h3>
         <button class="modal-close" onclick="closeBulk()">×</button>
       </div>
       <div class="modal-body">
@@ -204,49 +204,49 @@
         <form id="bulkForm" onsubmit="bulkCreate(event)">
           <div class="form-row">
             <div class="form-group">
-              <label>Filter Program</label>
+              <label>กรองตามหลักสูตร</label>
               <select id="bulkProgram">
-                <option value="all">All Programs</option>
-                <option value="prek">Pre-K only</option>
-                <option value="k">K only</option>
-                <option value="ep">EP only</option>
-                <option value="mep">MEP only</option>
+                <option value="all">ทุกหลักสูตร</option>
+                <option value="prek">เตรียมอนุบาลเท่านั้น</option>
+                <option value="k">อนุบาลเท่านั้น</option>
+                <option value="ep">EP เท่านั้น</option>
+                <option value="mep">MEP เท่านั้น</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Category <span style="color:#EF4444;">*</span></label>
+              <label>ประเภท <span style="color:#EF4444;">*</span></label>
               <select id="bulkCategory" required>
-                <option value="tuition">Tuition</option>
-                <option value="lunch">Lunch (Monthly)</option>
-                <option value="school_bus">School Bus (Monthly)</option>
-                <option value="books">Books</option>
+                <option value="tuition">ค่าเทอม</option>
+                <option value="lunch">ค่าอาหาร (รายเดือน)</option>
+                <option value="school_bus">ค่ารถรับส่ง (รายเดือน)</option>
+                <option value="books">หนังสือ</option>
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label>Amount per student (THB) <span style="color:#EF4444;">*</span></label>
+            <label>จำนวนเงินต่อคน (บาท) <span style="color:#EF4444;">*</span></label>
             <input type="number" id="bulkAmount" required min="0" step="100" />
           </div>
           <div class="form-group">
-            <label>Description <span style="color:#EF4444;">*</span></label>
-            <input type="text" id="bulkDesc" required placeholder="e.g., Term 1/2026 Tuition" />
+            <label>รายละเอียด <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="bulkDesc" required placeholder="เช่น ค่าเทอม 1/2569" />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Due Date <span style="color:#EF4444;">*</span></label>
+              <label>วันครบกำหนด <span style="color:#EF4444;">*</span></label>
               <input type="date" id="bulkDueDate" required />
             </div>
             <div class="form-group">
-              <label>Term</label>
-              <input type="text" id="bulkTerm" placeholder="1/2026" />
+              <label>ภาคเรียน</label>
+              <input type="text" id="bulkTerm" placeholder="1/2569" />
             </div>
           </div>
           <div id="bulkPreview" style="background:#F0FDF4; padding:14px; border-radius:8px; margin-top:14px; font-size:13px; color:var(--brand,#1B5E3F);">
-            <strong>Will create:</strong> <span id="bulkCount">0</span> bills
+            <strong>จะสร้าง:</strong> <span id="bulkCount">0</span> บิล
           </div>
           <div class="modal-footer" style="border-top:1px solid #E5E7EB; padding-top:16px; display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-            <button type="button" class="btn btn-secondary" onclick="closeBulk()">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="bulkBtn">🚀 Create All Bills</button>
+            <button type="button" class="btn btn-secondary" onclick="closeBulk()">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" id="bulkBtn">🚀 สร้างบิลทั้งหมด</button>
           </div>
         </form>
       </div>
@@ -287,7 +287,7 @@
         .order('created_at', { ascending: false });
       
       if (error) {
-        dataHelpers.toast('❌ Load failed', 'error');
+        dataHelpers.toast('❌ โหลดข้อมูลไม่สำเร็จ', 'error');
         return;
       }
       
@@ -306,7 +306,7 @@
       allStudents = data || [];
       
       const select = document.getElementById('billStudent');
-      select.innerHTML = '<option value="">-- Select Student --</option>' +
+      select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>' +
         allStudents.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}${s.nickname ? ` (${s.nickname})` : ''} - ${(s.program||'').toUpperCase()} ${s.grade||''}</option>`).join('');
     }
     
@@ -366,10 +366,10 @@
         const overdue = b.status === 'unpaid' && b.due_date < today;
         const status = overdue ? 'overdue' : b.status;
         const statusText = {
-          unpaid: 'UNPAID',
-          pending: 'PENDING',
-          paid: '✅ PAID',
-          overdue: 'OVERDUE'
+          unpaid: 'ยังไม่ชำระ',
+          pending: 'รอตรวจสอบ',
+          paid: '✅ ชำระแล้ว',
+          overdue: 'เกินกำหนด'
         }[status];
         
         return `<div class="bill-row">
@@ -384,7 +384,7 @@
           <div class="bill-amount">฿${Number(b.amount).toLocaleString('en-US')}</div>
           <div style="text-align:center;">
             <div class="bill-status status-${status}">${statusText}</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Due: ${dataHelpers.formatDate(b.due_date)}</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">ครบกำหนด: ${dataHelpers.formatDate(b.due_date)}</div>
           </div>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-sm btn-secondary" onclick="editBill('${b.id}')">✏️</button>
@@ -395,7 +395,7 @@
     }
     
     function openCreateModal() {
-      document.getElementById('modalTitle').textContent = '📄 New Bill';
+      document.getElementById('modalTitle').textContent = '📄 บิลใหม่';
       document.getElementById('billForm').reset();
       document.getElementById('billId').value = '';
       document.getElementById('billIssueDate').value = new Date().toISOString().split('T')[0];
@@ -410,7 +410,7 @@
       const b = allBills.find(x => x.id === id);
       if (!b) return;
       
-      document.getElementById('modalTitle').textContent = '✏️ Edit Bill';
+      document.getElementById('modalTitle').textContent = '✏️ แก้ไขบิล';
       document.getElementById('billId').value = id;
       document.getElementById('billStudent').value = b.student_id;
       document.getElementById('billCategory').value = b.category;
@@ -441,8 +441,8 @@
       event.preventDefault();
       const btn = document.getElementById('saveBtn');
       btn.disabled = true;
-      btn.textContent = '⏳ Saving...';
-      
+      btn.textContent = '⏳ กำลังบันทึก...';
+
       try {
         const id = document.getElementById('billId').value;
         const data = {
@@ -462,13 +462,13 @@
         if (id) {
           const { error } = await supabaseClient.from('bills').update(data).eq('id', id);
           if (error) throw error;
-          dataHelpers.toast('✅ Bill updated!', 'success');
+          dataHelpers.toast('✅ อัปเดตบิลแล้ว!', 'success');
         } else {
           data.bill_number = await generateBillNumber();
           data.status = 'unpaid';
           const { error } = await supabaseClient.from('bills').insert(data);
           if (error) throw error;
-          dataHelpers.toast('🎉 Bill created!', 'success');
+          dataHelpers.toast('🎉 สร้างบิลแล้ว!', 'success');
         }
         
         closeModal();
@@ -477,18 +477,18 @@
         dataHelpers.toast('❌ ' + err.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '💾 Save Bill';
+        btn.textContent = '💾 บันทึกบิล';
       }
     }
-    
+
     async function deleteBill(id, num) {
-      if (!confirm(`Delete bill ${num}?`)) return;
+      if (!confirm(`ลบบิล ${num} หรือไม่?`)) return;
       const { error } = await supabaseClient.from('bills').delete().eq('id', id);
       if (error) {
         dataHelpers.toast('❌ ' + error.message, 'error');
         return;
       }
-      dataHelpers.toast('🗑️ Bill deleted', 'success');
+      dataHelpers.toast('🗑️ ลบบิลแล้ว', 'success');
       await loadBills();
     }
     
@@ -519,14 +519,14 @@
       const students = program === 'all' ? allStudents : allStudents.filter(s => s.program === program);
       
       if (students.length === 0) {
-        dataHelpers.toast('❌ No students found', 'error');
+        dataHelpers.toast('❌ ไม่พบนักเรียน', 'error');
         return;
       }
-      
-      if (!confirm(`Create ${students.length} bills?`)) return;
-      
+
+      if (!confirm(`สร้างบิล ${students.length} รายการหรือไม่?`)) return;
+
       btn.disabled = true;
-      btn.textContent = '⏳ Creating...';
+      btn.textContent = '⏳ กำลังสร้าง...';
       
       try {
         const yr = new Date().getFullYear();
@@ -549,14 +549,14 @@
         const { error } = await supabaseClient.from('bills').insert(bills);
         if (error) throw error;
         
-        dataHelpers.toast(`🎉 ${students.length} bills created!`, 'success');
+        dataHelpers.toast(`🎉 สร้างบิล ${students.length} รายการแล้ว!`, 'success');
         closeBulk();
         await loadBills();
       } catch (err) {
         dataHelpers.toast('❌ ' + err.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = '🚀 Create All Bills';
+        btn.textContent = '🚀 สร้างบิลทั้งหมด';
       }
     }
     

@@ -81,25 +81,25 @@
   <div class="admin-topbar no-print">
     <div class="admin-topbar-left">
       <a href="../index.html" class="admin-logo">
-        <img src="../images/logo.png" alt="SKKS" />
-        <h1>SKKS Admin</h1>
+        <img src="../images/logo.png" alt="" />
+        <h1>ระบบจัดการ</h1>
       </a>
       <nav class="admin-nav">
-        <a href="dashboard.html">📊 Dashboard</a>
-        <a href="students.html">🎓 Students</a>
-        <a href="applications.html">📝 Applications</a>
-        <a href="payments.html">💳 Payments</a>
-        <a href="payment-approvals.html">✅ Approvals</a>
-        <a href="create-bills.html">📄 Bills</a>
-        <a href="tuition-admin.html">💰 Tuition</a>
-        <a href="events-admin.html">📅 Events</a>
-        <a href="news-admin.html">📰 News</a>
-        <a href="reports.html" class="active">📄 Reports</a>
-        <a href="finance.html" class="owner-only" style="display:none">💎 Finance</a>
-        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ Settings</a>
-        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ Custom</a>
-        <a href="users.html" class="owner-only" style="display:none">👥 Users</a>
-        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ Invites</a>
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="applications.html">📝 ใบสมัคร</a>
+        <a href="payments.html">💳 การชำระเงิน</a>
+        <a href="payment-approvals.html">✅ อนุมัติการชำระ</a>
+        <a href="create-bills.html">📄 ใบแจ้งหนี้</a>
+        <a href="tuition-admin.html">💰 ค่าเทอม</a>
+        <a href="events-admin.html">📅 กิจกรรม</a>
+        <a href="news-admin.html">📰 ข่าวสาร</a>
+        <a href="reports.html" class="active">📄 รายงาน</a>
+        <a href="finance.html" class="owner-only" style="display:none">💎 การเงิน</a>
+        <a href="payment-settings.html" class="owner-only" style="display:none">⚙️ ตั้งค่า</a>
+        <a href="custom-tables.html" class="owner-only" style="display:none">🗂️ ตารางกำหนดเอง</a>
+        <a href="users.html" class="owner-only" style="display:none">👥 ผู้ใช้</a>
+        <a href="manage-invites.html" class="owner-only" style="display:none">🎟️ คำเชิญ</a>
       </nav>
     </div>
     <div class="admin-topbar-right">
@@ -107,50 +107,50 @@
         <a href="#" data-lang="en" class="active" onclick="event.preventDefault();setLang('en')">EN</a> |
         <a href="#" data-lang="th" onclick="event.preventDefault();setLang('th')">TH</a>
       </div>
-      <button class="btn-logout" onclick="auth.logout()">Sign Out</button>
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
     </div>
   </div>
   
   <div class="admin-container no-print">
-    <div class="loading-state" id="loadingMsg">⏳ Loading...</div>
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
     
     <div id="content" style="display:none;">
       <div class="page-header">
         <div>
-          <h2>📄 Reports</h2>
-          <p>Generate and print professional A4 reports</p>
+          <h2>📄 รายงาน</h2>
+          <p>สร้างและพิมพ์รายงานขนาด A4 อย่างมืออาชีพ</p>
         </div>
       </div>
       
       <!-- REPORT TYPE PICKER -->
       <div class="card">
         <div class="card-header">
-          <h3>📚 Select Report Type</h3>
+          <h3>📚 เลือกประเภทรายงาน</h3>
         </div>
         
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
           <div class="report-type-card" data-report="students" onclick="selectReport('students')">
             <div class="icon">🎓</div>
-            <div class="title">Student Roster</div>
-            <div class="desc">List of students by class</div>
+            <div class="title">รายชื่อนักเรียน</div>
+            <div class="desc">รายชื่อนักเรียนแยกตามชั้นเรียน</div>
           </div>
-          
+
           <div class="report-type-card" data-report="applications" onclick="selectReport('applications')">
             <div class="icon">📝</div>
-            <div class="title">Applications</div>
-            <div class="desc">Summary of admission</div>
+            <div class="title">ใบสมัคร</div>
+            <div class="desc">สรุปการรับสมัครเข้าเรียน</div>
           </div>
-          
+
           <div class="report-type-card owner-only" data-report="finance" onclick="selectReport('finance')" style="display:none">
             <div class="icon">💰</div>
-            <div class="title">Financial Report</div>
-            <div class="desc">Income & expense summary</div>
+            <div class="title">รายงานการเงิน</div>
+            <div class="desc">สรุปรายรับและรายจ่าย</div>
           </div>
-          
+
           <div class="report-type-card" data-report="payments" onclick="selectReport('payments')">
             <div class="icon">💳</div>
-            <div class="title">Payments Report</div>
-            <div class="desc">Payment transactions</div>
+            <div class="title">รายงานการชำระเงิน</div>
+            <div class="desc">รายการชำระเงิน</div>
           </div>
         </div>
       </div>
@@ -158,10 +158,10 @@
       <!-- REPORT FILTERS -->
       <div class="card" id="filtersCard" style="display:none;">
         <div class="card-header">
-          <h3>⚙️ Report Options</h3>
+          <h3>⚙️ ตัวเลือกรายงาน</h3>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
-            <button class="btn btn-primary" onclick="printReport()">🖨️ Print A4</button>
+            <button class="btn btn-secondary" onclick="exportCSV()">📥 ส่งออก CSV</button>
+            <button class="btn btn-primary" onclick="printReport()">🖨️ พิมพ์ A4</button>
           </div>
         </div>
         
@@ -171,7 +171,7 @@
       <!-- REPORT PREVIEW -->
       <div class="card" id="previewCard" style="display:none;">
         <div class="card-header">
-          <h3>👁️ Preview</h3>
+          <h3>👁️ ตัวอย่าง</h3>
           <span id="recordCount" style="color:#6B7280; font-size:12px;"></span>
         </div>
         
@@ -188,18 +188,18 @@
   <!-- A4 PRINT TEMPLATE -->
   <div class="report-print" id="reportPrint">
     <div class="report-header">
-      <img src="../images/logo.png" alt="SKKS" />
-      <h1>SUANSON KHON KAEN SCHOOL</h1>
-      <div class="subtitle">โรงเรียนสวนสนขอนแก่น</div>
-      <div class="report-title" id="printTitle">Report</div>
+      <img src="../images/logo.png" alt="" />
+      <h1>รายงานการเงิน</h1>
+      <div class="subtitle"></div>
+      <div class="report-title" id="printTitle">รายงาน</div>
       <div class="report-meta" id="printMeta">—</div>
     </div>
     
     <div id="printContent"></div>
     
     <div class="report-footer">
-      <div>Generated: <span id="printDate"></span></div>
-      <div>By: <span id="printBy"></span></div>
+      <div>สร้างเมื่อ: <span id="printDate"></span></div>
+      <div>โดย: <span id="printBy"></span></div>
     </div>
   </div>
   
@@ -261,131 +261,131 @@
       if (type === 'students') {
         html = `
           <div class="form-group">
-            <label>Program</label>
+            <label>โปรแกรม</label>
             <select id="fProgram" onchange="loadReportData()">
-              <option value="">All</option>
-              <option value="prek">Pre-K</option>
-              <option value="k">Kindergarten</option>
+              <option value="">ทั้งหมด</option>
+              <option value="prek">เตรียมอนุบาล</option>
+              <option value="k">อนุบาล</option>
               <option value="ep">EP</option>
               <option value="mep">MEP</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Grade</label>
-            <input type="text" id="fGrade" placeholder="e.g., Grade 1" oninput="loadReportData()" />
+            <label>ระดับชั้น</label>
+            <input type="text" id="fGrade" placeholder="เช่น ป.1" oninput="loadReportData()" />
           </div>
           <div class="form-group">
-            <label>Classroom</label>
-            <input type="text" id="fClassroom" placeholder="e.g., EP/1A" oninput="loadReportData()" />
+            <label>ห้องเรียน</label>
+            <input type="text" id="fClassroom" placeholder="เช่น EP/1A" oninput="loadReportData()" />
           </div>
           <div class="form-group">
-            <label>Status</label>
+            <label>สถานะ</label>
             <select id="fStatus" onchange="loadReportData()">
-              <option value="active" selected>Active Only</option>
-              <option value="">All</option>
-              <option value="graduated">Graduated</option>
-              <option value="transferred">Transferred</option>
+              <option value="active" selected>กำลังศึกษาเท่านั้น</option>
+              <option value="">ทั้งหมด</option>
+              <option value="graduated">จบการศึกษา</option>
+              <option value="transferred">ย้ายออก</option>
             </select>
           </div>
         `;
       } else if (type === 'applications') {
         html = `
           <div class="form-group">
-            <label>Status</label>
+            <label>สถานะ</label>
             <select id="fStatus" onchange="loadReportData()">
-              <option value="">All</option>
-              <option value="pending">Pending</option>
-              <option value="reviewing">Reviewing</option>
-              <option value="accepted">Accepted</option>
-              <option value="rejected">Rejected</option>
-              <option value="enrolled">Enrolled</option>
+              <option value="">ทั้งหมด</option>
+              <option value="pending">รอดำเนินการ</option>
+              <option value="reviewing">กำลังพิจารณา</option>
+              <option value="accepted">ผ่านการคัดเลือก</option>
+              <option value="rejected">ไม่ผ่าน</option>
+              <option value="enrolled">มอบตัวแล้ว</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Program</label>
+            <label>โปรแกรม</label>
             <select id="fProgram" onchange="loadReportData()">
-              <option value="">All</option>
-              <option value="prek">Pre-K</option>
-              <option value="k">Kindergarten</option>
+              <option value="">ทั้งหมด</option>
+              <option value="prek">เตรียมอนุบาล</option>
+              <option value="k">อนุบาล</option>
               <option value="ep">EP</option>
               <option value="mep">MEP</option>
             </select>
           </div>
           <div class="form-group">
-            <label>From Date</label>
+            <label>จากวันที่</label>
             <input type="date" id="fDateFrom" value="${monthAgoStr}" onchange="loadReportData()" />
           </div>
           <div class="form-group">
-            <label>To Date</label>
+            <label>ถึงวันที่</label>
             <input type="date" id="fDateTo" value="${today}" onchange="loadReportData()" />
           </div>
         `;
       } else if (type === 'finance') {
         html = `
           <div class="form-group">
-            <label>Type</label>
+            <label>ประเภท</label>
             <select id="fType" onchange="loadReportData()">
-              <option value="">All</option>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
+              <option value="">ทั้งหมด</option>
+              <option value="income">รายรับ</option>
+              <option value="expense">รายจ่าย</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Category</label>
+            <label>หมวดหมู่</label>
             <select id="fCategory" onchange="loadReportData()">
-              <option value="">All</option>
-              <option value="tuition">Tuition</option>
-              <option value="salary">Salary</option>
-              <option value="utilities">Utilities</option>
-              <option value="books">Books</option>
-              <option value="uniform">Uniform</option>
-              <option value="food">Food</option>
-              <option value="maintenance">Maintenance</option>
-              <option value="equipment">Equipment</option>
-              <option value="marketing">Marketing</option>
-              <option value="other">Other</option>
+              <option value="">ทั้งหมด</option>
+              <option value="tuition">ค่าเทอม</option>
+              <option value="salary">เงินเดือน</option>
+              <option value="utilities">ค่าสาธารณูปโภค</option>
+              <option value="books">หนังสือ</option>
+              <option value="uniform">ชุดนักเรียน</option>
+              <option value="food">อาหาร</option>
+              <option value="maintenance">ค่าซ่อมบำรุง</option>
+              <option value="equipment">อุปกรณ์</option>
+              <option value="marketing">การตลาด</option>
+              <option value="other">อื่น ๆ</option>
             </select>
           </div>
           <div class="form-group">
-            <label>From Date</label>
+            <label>จากวันที่</label>
             <input type="date" id="fDateFrom" value="${monthAgoStr}" onchange="loadReportData()" />
           </div>
           <div class="form-group">
-            <label>To Date</label>
+            <label>ถึงวันที่</label>
             <input type="date" id="fDateTo" value="${today}" onchange="loadReportData()" />
           </div>
         `;
       } else if (type === 'payments') {
         html = `
           <div class="form-group">
-            <label>Status</label>
+            <label>สถานะ</label>
             <select id="fStatus" onchange="loadReportData()">
-              <option value="completed" selected>Completed Only</option>
-              <option value="">All</option>
-              <option value="pending">Pending</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="refunded">Refunded</option>
+              <option value="completed" selected>สำเร็จเท่านั้น</option>
+              <option value="">ทั้งหมด</option>
+              <option value="pending">รอดำเนินการ</option>
+              <option value="cancelled">ยกเลิก</option>
+              <option value="refunded">คืนเงินแล้ว</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Payment Type</label>
+            <label>ประเภทการชำระ</label>
             <select id="fType" onchange="loadReportData()">
-              <option value="">All</option>
-              <option value="tuition">Tuition</option>
-              <option value="application_fee">Application Fee</option>
-              <option value="registration_fee">Registration Fee</option>
-              <option value="uniform">Uniform</option>
-              <option value="books">Books</option>
-              <option value="activity">Activity</option>
-              <option value="other">Other</option>
+              <option value="">ทั้งหมด</option>
+              <option value="tuition">ค่าเทอม</option>
+              <option value="application_fee">ค่าสมัคร</option>
+              <option value="registration_fee">ค่าลงทะเบียน</option>
+              <option value="uniform">ชุดนักเรียน</option>
+              <option value="books">หนังสือ</option>
+              <option value="activity">กิจกรรม</option>
+              <option value="other">อื่น ๆ</option>
             </select>
           </div>
           <div class="form-group">
-            <label>From Date</label>
+            <label>จากวันที่</label>
             <input type="date" id="fDateFrom" value="${monthAgoStr}" onchange="loadReportData()" />
           </div>
           <div class="form-group">
-            <label>To Date</label>
+            <label>ถึงวันที่</label>
             <input type="date" id="fDateTo" value="${today}" onchange="loadReportData()" />
           </div>
         `;
@@ -461,11 +461,11 @@
       const body = document.getElementById('previewBody');
       const count = document.getElementById('recordCount');
       
-      count.textContent = `${data.length} record(s)`;
-      
+      count.textContent = `${data.length} รายการ`;
+
       if (data.length === 0) {
         head.innerHTML = '';
-        body.innerHTML = `<tr><td><div class="empty-state"><div class="icon">📭</div><p>No data found for selected filters</p></div></td></tr>`;
+        body.innerHTML = `<tr><td><div class="empty-state"><div class="icon">📭</div><p>ไม่พบข้อมูลตามตัวกรองที่เลือก</p></div></td></tr>`;
         return;
       }
       
@@ -480,48 +480,48 @@
     function getReportConfig(type) {
       const configs = {
         students: {
-          title: 'Student Roster',
+          title: 'รายชื่อนักเรียน',
           columns: [
-            { label: 'Student #', render: r => r.student_number || '—' },
-            { label: 'Program', render: r => (r.program || '').toUpperCase() },
-            { label: 'Grade', render: r => r.grade || '—' },
-            { label: 'Classroom', render: r => r.classroom || '—' },
-            { label: 'Status', render: r => r.status || '—' },
-            { label: 'Enrolled', render: r => dataHelpers.formatDate(r.enrollment_date) }
+            { label: 'เลขประจำตัว', render: r => r.student_number || '—' },
+            { label: 'โปรแกรม', render: r => (r.program || '').toUpperCase() },
+            { label: 'ระดับชั้น', render: r => r.grade || '—' },
+            { label: 'ห้องเรียน', render: r => r.classroom || '—' },
+            { label: 'สถานะ', render: r => r.status || '—' },
+            { label: 'วันที่เข้าเรียน', render: r => dataHelpers.formatDate(r.enrollment_date) }
           ]
         },
         applications: {
-          title: 'Applications Report',
+          title: 'รายงานใบสมัคร',
           columns: [
-            { label: 'App #', render: r => r.application_number },
-            { label: 'Student', render: r => `${r.student_first_name} ${r.student_last_name}` },
-            { label: 'Program', render: r => (r.program || '').toUpperCase() },
-            { label: 'Parent', render: r => r.parent_name },
-            { label: 'Phone', render: r => r.parent_phone },
-            { label: 'Status', render: r => r.status },
-            { label: 'Submitted', render: r => dataHelpers.formatDate(r.created_at) }
+            { label: 'เลขที่ใบสมัคร', render: r => r.application_number },
+            { label: 'นักเรียน', render: r => `${r.student_first_name} ${r.student_last_name}` },
+            { label: 'โปรแกรม', render: r => (r.program || '').toUpperCase() },
+            { label: 'ผู้ปกครอง', render: r => r.parent_name },
+            { label: 'เบอร์โทร', render: r => r.parent_phone },
+            { label: 'สถานะ', render: r => r.status },
+            { label: 'วันที่ยื่น', render: r => dataHelpers.formatDate(r.created_at) }
           ]
         },
         finance: {
-          title: 'Financial Report',
+          title: 'รายงานการเงิน',
           columns: [
-            { label: 'Date', render: r => dataHelpers.formatDate(r.transaction_date) },
-            { label: 'Type', render: r => r.type },
-            { label: 'Category', render: r => r.category },
-            { label: 'Description', render: r => r.description },
-            { label: 'Amount', render: r => (r.type === 'income' ? '+' : '-') + dataHelpers.formatMoney(r.amount) }
+            { label: 'วันที่', render: r => dataHelpers.formatDate(r.transaction_date) },
+            { label: 'ประเภท', render: r => r.type },
+            { label: 'หมวดหมู่', render: r => r.category },
+            { label: 'รายละเอียด', render: r => r.description },
+            { label: 'จำนวนเงิน', render: r => (r.type === 'income' ? '+' : '-') + dataHelpers.formatMoney(r.amount) }
           ]
         },
         payments: {
-          title: 'Payments Report',
+          title: 'รายงานการชำระเงิน',
           columns: [
-            { label: 'Receipt #', render: r => r.receipt_number },
-            { label: 'Date', render: r => dataHelpers.formatDate(r.paid_at) },
-            { label: 'Student', render: r => r.students?.student_number || '—' },
-            { label: 'Type', render: r => r.payment_type },
-            { label: 'Method', render: r => r.payment_method || '—' },
-            { label: 'Amount', render: r => dataHelpers.formatMoney(r.amount) },
-            { label: 'Status', render: r => r.status }
+            { label: 'เลขที่ใบเสร็จ', render: r => r.receipt_number },
+            { label: 'วันที่', render: r => dataHelpers.formatDate(r.paid_at) },
+            { label: 'นักเรียน', render: r => r.students?.student_number || '—' },
+            { label: 'ประเภท', render: r => r.payment_type },
+            { label: 'วิธีชำระ', render: r => r.payment_method || '—' },
+            { label: 'จำนวนเงิน', render: r => dataHelpers.formatMoney(r.amount) },
+            { label: 'สถานะ', render: r => r.status }
           ]
         }
       };
@@ -530,7 +530,7 @@
     
     function printReport() {
       if (!currentData.length) {
-        dataHelpers.toast('No data to print', 'warning');
+        dataHelpers.toast('ไม่มีข้อมูลให้พิมพ์', 'warning');
         return;
       }
       
@@ -540,14 +540,14 @@
       document.getElementById('printBy').textContent = `${currentProfile.first_name} ${currentProfile.last_name}`;
       
       // Build meta info from filters
-      let meta = `Records: ${currentData.length}`;
+      let meta = `จำนวน: ${currentData.length} รายการ`;
       const program = document.getElementById('fProgram')?.value;
       const status = document.getElementById('fStatus')?.value;
       const from = document.getElementById('fDateFrom')?.value;
       const to = document.getElementById('fDateTo')?.value;
-      if (program) meta += ` • Program: ${program.toUpperCase()}`;
-      if (status) meta += ` • Status: ${status}`;
-      if (from && to) meta += ` • ${from} to ${to}`;
+      if (program) meta += ` • โปรแกรม: ${program.toUpperCase()}`;
+      if (status) meta += ` • สถานะ: ${status}`;
+      if (from && to) meta += ` • ${from} ถึง ${to}`;
       document.getElementById('printMeta').textContent = meta;
       
       // Build content
@@ -565,15 +565,15 @@
           if (t.type === 'income') income += amt; else expense += amt;
         });
         contentHTML += `<div class="report-summary">
-          <div class="summary-item"><div class="label">Total Income</div><div class="value">${dataHelpers.formatMoney(income)}</div></div>
-          <div class="summary-item"><div class="label">Total Expense</div><div class="value">${dataHelpers.formatMoney(expense)}</div></div>
-          <div class="summary-item"><div class="label">Net</div><div class="value">${dataHelpers.formatMoney(income - expense)}</div></div>
+          <div class="summary-item"><div class="label">รายรับรวม</div><div class="value">${dataHelpers.formatMoney(income)}</div></div>
+          <div class="summary-item"><div class="label">รายจ่ายรวม</div><div class="value">${dataHelpers.formatMoney(expense)}</div></div>
+          <div class="summary-item"><div class="label">สุทธิ</div><div class="value">${dataHelpers.formatMoney(income - expense)}</div></div>
         </div>`;
       } else if (currentReport === 'payments') {
         const total = currentData.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
         contentHTML += `<div class="report-summary">
-          <div class="summary-item"><div class="label">Total Records</div><div class="value">${currentData.length}</div></div>
-          <div class="summary-item"><div class="label">Total Amount</div><div class="value">${dataHelpers.formatMoney(total)}</div></div>
+          <div class="summary-item"><div class="label">จำนวนรายการ</div><div class="value">${currentData.length}</div></div>
+          <div class="summary-item"><div class="label">ยอดรวม</div><div class="value">${dataHelpers.formatMoney(total)}</div></div>
         </div>`;
       }
       
@@ -589,7 +589,7 @@
     
     function exportCSV() {
       if (!currentData.length) {
-        dataHelpers.toast('No data to export', 'warning');
+        dataHelpers.toast('ไม่มีข้อมูลให้ส่งออก', 'warning');
         return;
       }
       
@@ -609,7 +609,7 @@
       a.click();
       URL.revokeObjectURL(url);
       
-      dataHelpers.toast('✅ CSV exported', 'success');
+      dataHelpers.toast('✅ ส่งออก CSV แล้ว', 'success');
     }
     
     setLang(getLang());

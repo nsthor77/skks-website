@@ -98,7 +98,13 @@
           <select id="fClass"><option value="" data-i18n="materials.allSchool">Whole school</option></select>
         </div>
       </div>
-      <div class="field"><label data-i18n="materials.fUrl">Link (URL)</label><input type="url" id="fUrl" placeholder="https://drive.google.com/... , https://youtube.com/..." /></div>
+      <div class="field"><label data-i18n="materials.fUrl">Link (URL)</label><input type="url" id="fUrl" placeholder="https://drive.google.com/... , https://youtube.com/..." />
+        <div style="margin-top:8px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="mUploadBtn">📎 หรืออัปโหลดไฟล์ (รูป/PDF ≤10MB)</button>
+          <input type="file" id="mUploadFile" accept="image/*,application/pdf" style="display:none;" />
+          <span id="mUploadName" style="font-size:12px;color:#16A34A;margin-left:8px;"></span>
+        </div>
+      </div>
       <div class="field"><label data-i18n="materials.fSubject">Subject</label><input type="text" id="fSubject" /></div>
       <div class="field"><label data-i18n="materials.fDesc">Description</label><textarea id="fDesc" rows="3"></textarea></div>
       <div class="modal-actions">
@@ -114,6 +120,7 @@
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
+  <script src="../js/upload.js"></script>
   <script>
     let isStaff = false, rows = [];
 
@@ -127,6 +134,21 @@
       document.getElementById('backLink').setAttribute('href', isStaff ? 'dashboard.html' : 'student-dashboard.html');
       if (isStaff) { document.getElementById('newBtn').style.display=''; document.getElementById('mineWrap').style.display=''; }
       await loadClassrooms();
+      if (window.skUpload) {
+        skUpload.attachPicker({
+          button: document.getElementById('mUploadBtn'),
+          fileInput: document.getElementById('mUploadFile'),
+          subfolder: 'materials',
+          schoolId: function(){ return window.CURRENT_SCHOOL_ID; },
+          onStart: () => { document.getElementById('mUploadName').textContent = 'กำลังอัปโหลด...'; },
+          onDone: (url) => {
+            document.getElementById('fUrl').value = url;
+            document.getElementById('fType').value = 'file';
+            document.getElementById('mUploadName').textContent = '✓ อัปโหลดแล้ว — ลิงก์ถูกใส่ให้อัตโนมัติ';
+          },
+          onError: (m) => { document.getElementById('mUploadName').textContent = ''; toast(m, 'error'); }
+        });
+      }
       load();
     });
     document.addEventListener('langchange', render);
@@ -183,6 +205,7 @@
       document.getElementById('mId').value=''; document.getElementById('formTitle').textContent=t('materials.newTitle');
       document.getElementById('fTitle').value=''; document.getElementById('fUrl').value=''; document.getElementById('fType').value='link';
       document.getElementById('fClass').value=''; document.getElementById('fSubject').value=''; document.getElementById('fDesc').value='';
+      document.getElementById('mUploadName').textContent='';
       document.getElementById('formModal').classList.add('show');
     }
     function openEdit(id) {
@@ -190,6 +213,7 @@
       document.getElementById('mId').value=r.id; document.getElementById('formTitle').textContent=t('materials.editTitle');
       document.getElementById('fTitle').value=r.title||''; document.getElementById('fUrl').value=r.url||''; document.getElementById('fType').value=r.material_type||'link';
       document.getElementById('fClass').value=r.classroom||''; document.getElementById('fSubject').value=r.subject||''; document.getElementById('fDesc').value=r.description||'';
+      document.getElementById('mUploadName').textContent='';
       document.getElementById('formModal').classList.add('show');
     }
     function closeForm() { document.getElementById('formModal').classList.remove('show'); }

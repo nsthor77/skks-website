@@ -258,6 +258,12 @@
       const { data, error } = await supabaseClient.rpc('review_leave_request', { p_id: id, p_approve: approve, p_note: note });
       if (error) { toast(error.message, 'error'); return; }
       if (!data.success) { toast(data.error, 'error'); return; }
+      // LINE notify — fire-and-forget (never blocks the review)
+      try { const lr = rows.find(x => x.id === id) || {};
+        const s = await supabaseClient.auth.getSession();
+        fetch('/api/line/notify', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.data.session.access_token},
+          body: JSON.stringify({ event:'leave_status', data:{ student_id: lr.student_id, approved: !!approve, leave_type: lr.leave_type || null, start_date: lr.start_date || null, end_date: lr.end_date || null } }) }).catch(()=>{});
+      } catch(e){}
       toast(approve ? (t('leave.approvedMsg').replace('{n}', data.attendance_marked||0)) : t('leave.rejectedMsg'), 'success');
       load();
     }

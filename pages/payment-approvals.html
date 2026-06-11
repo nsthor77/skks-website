@@ -98,6 +98,11 @@
         <input type="search" id="search" placeholder="🔍 ค้นหานักเรียน..." oninput="renderSlips()" style="flex:1; min-width:200px; padding:8px 14px; border-radius:8px; border:1px solid #D1D5DB;" />
       </div>
 
+      <div id="bulkBar" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:white; border:1px solid #E5E7EB; border-radius:10px; padding:10px 14px; margin-bottom:14px;">
+        <span style="font-size:13px; color:#374151;">เลือกแล้ว <span id="selCount" style="font-weight:700; color:var(--brand,#1B5E3F);">0</span> รายการ</span>
+        <button class="btn btn-sm" id="bulkApproveBtn" style="background:#10B981; color:white;" onclick="bulkApprove()">✅ อนุมัติที่เลือก</button>
+      </div>
+
       <div id="slipsList"></div>
       
       <div id="emptyState" style="display:none; text-align:center; padding:60px 20px;">
@@ -154,7 +159,8 @@
   <script src="../js/data-helpers.js"></script>
   <script>
     let allSlips = [];
-    
+    let qrCounts = {}; // qr_ref -> จำนวนครั้งที่ถูกใช้ (ไม่นับสลิปที่ถูกปฏิเสธ)
+
     async function init() {
       const profile = await roleGuard.requireOwner();
       if (!profile) return;
@@ -164,6 +170,12 @@
       }
       
       await loadSlips();
+
+      // นับจำนวนที่เลือกเมื่อ tick checkbox (delegated — รอดผ่านการ re-render)
+      document.getElementById('slipsList').addEventListener('change', (e) => {
+        if (e.target && e.target.classList.contains('slip-check')) updateSelCount();
+      });
+
       document.getElementById('loadingMsg').style.display = 'none';
       document.getElementById('content').style.display = 'block';
     }
@@ -180,8 +192,18 @@
       }
       
       allSlips = data || [];
+
+      // สร้างแผนที่ qr_ref → จำนวนครั้ง สำหรับตรวจสลิปซ้ำทั้งโรงเรียน (staff เห็นทุกสลิป)
+      qrCounts = {};
+      allSlips.forEach(s => {
+        if (s.qr_ref && s.status !== 'rejected') {
+          qrCounts[s.qr_ref] = (qrCounts[s.qr_ref] || 0) + 1;
+        }
+      });
+
       renderSlips();
       updateStats();
+      updateSelCount();
     }
     
     function updateStats() {
@@ -226,12 +248,29 @@
         const bill = slip.bills || {};
         const isPending = slip.status === 'pending';
 
+        // ป้ายตรวจ QR: ซ้ำ (แดง) / ตรวจแล้ว (เขียว) / ไม่พบ QR (เทา — เฉพาะรอตรวจสอบ)
+        let qrBadge = '';
+        if (slip.qr_ref) {
+          const useCount = qrCounts[slip.qr_ref] || 0;
+          if (useCount > 1) {
+            qrBadge = `<span style="display:inline-block;background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;">⚠️ สลิปซ้ำ — QR เดียวกันถูกใช้ ${useCount} ครั้ง</span>`;
+          } else {
+            qrBadge = `<span style="display:inline-block;background:#DCFCE7;color:#15803D;border:1px solid #BBF7D0;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;">🔒 ตรวจ QR แล้ว</span>`;
+          }
+        } else if (isPending) {
+          qrBadge = `<span style="display:inline-block;background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;">ไม่พบ QR ในสลิป (ตรวจด้วยตาอีกครั้ง)</span>`;
+        }
+
         return `<div class="slip-card">
           <div class="slip-thumb" onclick="viewSlip('${slip.slip_url}')">
             ${slip.slip_url ? `<img src="${slip.slip_url}" alt="สลิป" />` : '<div style="color:#9CA3AF;font-size:48px;">📄</div>'}
           </div>
           <div class="slip-info">
-            <div style="margin-bottom:6px;"><span class="status-${slip.status}">${statusLabels[slip.status] || slip.status}</span></div>
+            <div style="margin-bottom:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              ${isPending ? `<label style="display:inline-flex; align-items:center; gap:5px; font-size:12px; color:#374151; cursor:pointer;"><input type="checkbox" class="slip-check" data-id="${slip.id}" style="width:16px;height:16px;cursor:pointer;" /> เลือก</label>` : ''}
+              <span class="status-${slip.status}">${statusLabels[slip.status] || slip.status}</span>
+              ${qrBadge}
+            </div>
             <h3>${s.first_name || '?'} ${s.last_name || ''}${s.nickname ? ` (${s.nickname})` : ''}</h3>
             <div class="student">${(s.program||'').toUpperCase()} ${s.grade || ''}</div>
             <div class="bill-ref">${bill.bill_number || '(ไม่มีใบแจ้งหนี้)'} • ${bill.description || ''}</div>
@@ -268,71 +307,120 @@
       document.getElementById('lightbox').classList.remove('show');
     }
     
+    // ขั้นตอนอนุมัติ 5 ขั้น (ไม่มี confirm/toast/reload) — ใช้ทั้งอนุมัติเดี่ยวและอนุมัติหลายรายการ
+    async function approveCore(slip) {
+      const user = await supabaseClient.auth.getUser();
+
+      const { error: updateSlipError } = await supabaseClient
+        .from('payment_slips')
+        .update({
+          status: 'approved',
+          reviewed_by: user.data.user.id,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', slip.id);
+      if (updateSlipError) throw updateSlipError;
+
+      const yr = new Date().getFullYear();
+      const { count } = await supabaseClient.from('payments').select('*', { count: 'exact', head: true });
+      const receiptNum = `RCP-${yr}-${String((count || 0) + 1).padStart(5, '0')}`;
+
+      const { data: paymentData, error: paymentError } = await supabaseClient
+        .from('payments')
+        .insert({
+          receipt_number: receiptNum,
+          student_id: slip.student_id,
+          amount: slip.amount,
+          category: slip.bills?.description ? 'tuition' : 'other',
+          payment_method: 'bank_transfer',
+          payment_date: slip.transfer_date || new Date().toISOString().split('T')[0],
+          status: 'completed',
+          notes: `Auto-approved from slip ${slip.bills?.bill_number || ''} • Bank: ${slip.bank_name || ''} • Ref: ${slip.reference_number || ''}`
+        })
+        .select()
+        .single();
+      if (paymentError) throw paymentError;
+
+      if (slip.bill_id) {
+        await supabaseClient
+          .from('bills')
+          .update({
+            status: 'paid',
+            paid_at: new Date().toISOString(),
+            payment_id: paymentData.id
+          })
+          .eq('id', slip.bill_id);
+      }
+
+      await supabaseClient
+        .from('finance_transactions')
+        .insert({
+          transaction_type: 'income',
+          category: 'tuition',
+          amount: slip.amount,
+          description: `Payment from ${slip.students?.first_name || ''} ${slip.students?.last_name || ''} - ${slip.bills?.description || ''}`,
+          transaction_date: slip.transfer_date || new Date().toISOString().split('T')[0]
+        });
+
+      // แจ้งเตือน LINE ผู้ปกครอง (fire-and-forget — ไม่บล็อก UI ถ้าส่งไม่สำเร็จ)
+      try { const s = await supabaseClient.auth.getSession();
+        fetch('/api/line/notify', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.data.session.access_token},
+          body: JSON.stringify({ event:'payment_approved', data:{ student_id: slip.student_id, amount: slip.amount, receipt_number: receiptNum } }) }).catch(()=>{});
+      } catch(e){}
+
+      return receiptNum;
+    }
+
     async function approve(id) {
       if (!confirm('✅ ยืนยันการอนุมัติสลิปนี้?\n\nระบบจะ:\n1. บันทึกรายการชำระเงิน\n2. เปลี่ยนสถานะบิลเป็น "ชำระแล้ว"\n3. ส่งใบเสร็จให้ผู้ปกครอง')) return;
-      
+
       const slip = allSlips.find(x => x.id === id);
       if (!slip) return;
-      
+
       try {
-        const user = await supabaseClient.auth.getUser();
-        
-        const { error: updateSlipError } = await supabaseClient
-          .from('payment_slips')
-          .update({
-            status: 'approved',
-            reviewed_by: user.data.user.id,
-            reviewed_at: new Date().toISOString()
-          })
-          .eq('id', id);
-        if (updateSlipError) throw updateSlipError;
-        
-        const yr = new Date().getFullYear();
-        const { count } = await supabaseClient.from('payments').select('*', { count: 'exact', head: true });
-        const receiptNum = `RCP-${yr}-${String((count || 0) + 1).padStart(5, '0')}`;
-        
-        const { data: paymentData, error: paymentError } = await supabaseClient
-          .from('payments')
-          .insert({
-            receipt_number: receiptNum,
-            student_id: slip.student_id,
-            amount: slip.amount,
-            category: slip.bills?.description ? 'tuition' : 'other',
-            payment_method: 'bank_transfer',
-            payment_date: slip.transfer_date || new Date().toISOString().split('T')[0],
-            status: 'completed',
-            notes: `Auto-approved from slip ${slip.bills?.bill_number || ''} • Bank: ${slip.bank_name || ''} • Ref: ${slip.reference_number || ''}`
-          })
-          .select()
-          .single();
-        if (paymentError) throw paymentError;
-        
-        if (slip.bill_id) {
-          await supabaseClient
-            .from('bills')
-            .update({
-              status: 'paid',
-              paid_at: new Date().toISOString(),
-              payment_id: paymentData.id
-            })
-            .eq('id', slip.bill_id);
-        }
-        
-        await supabaseClient
-          .from('finance_transactions')
-          .insert({
-            transaction_type: 'income',
-            category: 'tuition',
-            amount: slip.amount,
-            description: `Payment from ${slip.students?.first_name || ''} ${slip.students?.last_name || ''} - ${slip.bills?.description || ''}`,
-            transaction_date: slip.transfer_date || new Date().toISOString().split('T')[0]
-          });
-        
+        const receiptNum = await approveCore(slip);
         dataHelpers.toast('✅ อนุมัติแล้ว! เลขที่ใบเสร็จ: ' + receiptNum, 'success');
         await loadSlips();
       } catch (err) {
         console.error(err);
         dataHelpers.toast('❌ ไม่สำเร็จ: ' + err.message, 'error');
+      }
+    }
+
+    function updateSelCount() {
+      const el = document.getElementById('selCount');
+      if (el) el.textContent = document.querySelectorAll('.slip-check:checked').length;
+    }
+
+    async function bulkApprove() {
+      const ids = Array.from(document.querySelectorAll('.slip-check:checked')).map(c => c.dataset.id);
+      if (ids.length === 0) {
+        dataHelpers.toast('กรุณาเลือกสลิปที่ต้องการอนุมัติก่อน', 'error');
+        return;
+      }
+      if (!confirm(`อนุมัติ ${ids.length} สลิปที่เลือก?`)) return;
+
+      const btn = document.getElementById('bulkApproveBtn');
+      btn.disabled = true;
+      let okCount = 0;
+
+      try {
+        for (let i = 0; i < ids.length; i++) {
+          btn.textContent = `กำลังอนุมัติ ${i + 1}/${ids.length}`;
+          const slip = allSlips.find(x => x.id === ids[i]);
+          if (!slip || slip.status !== 'pending') continue;
+          try {
+            await approveCore(slip);
+            okCount++;
+          } catch (err) {
+            console.error('อนุมัติไม่สำเร็จ:', ids[i], err);
+          }
+        }
+        dataHelpers.toast(`✅ อนุมัติแล้ว ${okCount} รายการ`, 'success');
+        await loadSlips();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✅ อนุมัติที่เลือก';
       }
     }
     

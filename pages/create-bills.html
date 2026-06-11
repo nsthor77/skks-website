@@ -469,6 +469,12 @@
           const { error } = await supabaseClient.from('bills').insert(data);
           if (error) throw error;
           dataHelpers.toast('🎉 สร้างบิลแล้ว!', 'success');
+
+          // แจ้งเตือน LINE ผู้ปกครองว่ามีบิลใหม่ (fire-and-forget — ไม่บล็อก UI)
+          try { const s = await supabaseClient.auth.getSession();
+            fetch('/api/line/notify', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.data.session.access_token},
+              body: JSON.stringify({ event:'bill_issued', data:{ student_ids:[data.student_id], amount: data.amount, due_date: data.due_date || null, description: data.description || null } }) }).catch(()=>{});
+          } catch(e){}
         }
         
         closeModal();
@@ -548,8 +554,14 @@
         
         const { error } = await supabaseClient.from('bills').insert(bills);
         if (error) throw error;
-        
+
         dataHelpers.toast(`🎉 สร้างบิล ${students.length} รายการแล้ว!`, 'success');
+
+        // แจ้งเตือน LINE ผู้ปกครองทุกคนที่ได้รับบิล (fire-and-forget — ไม่บล็อก UI)
+        try { const s = await supabaseClient.auth.getSession();
+          fetch('/api/line/notify', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.data.session.access_token},
+            body: JSON.stringify({ event:'bill_issued', data:{ student_ids: students.map(st => st.id), amount: parseFloat(document.getElementById('bulkAmount').value), due_date: document.getElementById('bulkDueDate').value || null, description: document.getElementById('bulkDesc').value.trim() || null } }) }).catch(()=>{});
+        } catch(e){}
         closeBulk();
         await loadBills();
       } catch (err) {

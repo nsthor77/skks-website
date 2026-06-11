@@ -175,18 +175,62 @@
           </div>
 
           <div class="setting-section" id="tab-line">
-            <h3>📱 LINE Notify Settings</h3>
-            <p style="font-size:13px;color:#6B7280;background:#FEF3C7;padding:14px;border-radius:8px;margin-bottom:18px;">
-              💡 LINE Notify ส่ง notification ฟรีให้ผู้ปกครอง — ตั้งค่า token ที่ <a href="https://notify-bot.line.me" target="_blank" style="color:var(--brand,#1B5E3F);font-weight:600;">notify-bot.line.me</a>
+            <h3>📱 LINE แจ้งเตือนผู้ปกครอง</h3>
+            <p style="font-size:12.5px;color:#6B7280;background:#F0F9FF;padding:10px 14px;border-radius:8px;margin-bottom:16px;">
+              ℹ️ ใช้ <b>LINE Official Account (LINE OA) ของโรงเรียนเอง</b> — แพ็กฟรีของ LINE ส่งได้ประมาณ 300 ข้อความ/เดือน
+              (ข้อความตอบกลับอัตโนมัติ เช่น ตอนผู้ปกครองผูกบัญชี <b>ไม่นับ</b>) โควต้าเป็นของบัญชี LINE โรงเรียน
             </p>
-            
-            <div class="form-group" style="background:#F0FDF4;padding:14px;border-radius:10px;border:1px solid var(--brand,#1B5E3F);margin-bottom:18px;">
-              <label style="font-weight:700;color:var(--brand,#1B5E3F);">🔑 LINE Notify Token (Global)</label>
-              <input type="text" id="lineGlobalToken" placeholder="kxXXXXXXXXXXXXXXXXXXXX" style="font-family:monospace;" />
-              <p style="font-size:11px;color:#6B7280;margin-top:6px;">หาได้ที่ notify-bot.line.me → My Page → Generate Token</p>
+
+            <div class="line-card">
+              <div class="line-card-header">
+                <h4>เปิดใช้งาน LINE แจ้งเตือน</h4>
+                <label class="switch">
+                  <input type="checkbox" id="lineEnabled" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="line-card-desc">เมื่อเปิดใช้งานและใส่ Token แล้ว ระบบจะส่งแจ้งเตือนให้ผู้ปกครองที่ผูก LINE ไว้โดยอัตโนมัติ</div>
             </div>
-            
+
+            <div class="form-group">
+              <label>Channel access token</label>
+              <textarea id="lineToken" rows="3" style="font-family:monospace;font-size:12px;" placeholder="วาง Channel access token จาก LINE Developers"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Channel secret</label>
+              <input type="text" id="lineSecret" style="font-family:monospace;" placeholder="วาง Channel secret จาก LINE Developers" />
+            </div>
+
+            <div class="form-group">
+              <label>Webhook URL — นำไปวางใน LINE Developers (Messaging API → Webhook URL)</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="text" id="lineWebhookUrl" readonly style="font-family:monospace;font-size:12px;flex:1;background:#F9FAFB;" />
+                <button type="button" class="btn btn-secondary" style="white-space:nowrap;" onclick="copyWebhookUrl()">📋 คัดลอก</button>
+              </div>
+            </div>
+
+            <div id="lineLinkedStatus" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;">
+              👨‍👩‍👧 ผูก LINE แล้ว — จาก — คน
+            </div>
+
+            <h4 style="margin:18px 0 10px;color:var(--brand,#1B5E3F);font-size:14px;">แจ้งเตือนอัตโนมัติ — เลือกได้ว่าจะส่งอะไรบ้าง</h4>
             <div id="lineFeatures"></div>
+
+            <div style="text-align:right;margin-top:14px;">
+              <button class="btn btn-primary" type="button" onclick="saveLine()">💾 บันทึกการตั้งค่า LINE</button>
+            </div>
+
+            <div class="line-card" style="margin-top:18px;">
+              <h4 style="margin:0 0 10px;color:var(--brand,#1B5E3F);font-size:14px;">📖 วิธีตั้งค่า (6 ขั้นตอน)</h4>
+              <ol style="margin:0;padding-left:20px;font-size:13px;color:#374151;line-height:2;">
+                <li>สร้าง LINE Official Account ของโรงเรียน (ฟรี) ที่ <a href="https://manager.line.biz" target="_blank" style="color:var(--brand,#1B5E3F);font-weight:600;">manager.line.biz</a></li>
+                <li>เปิดใช้ <b>Messaging API</b> ในหน้า Settings ของ OA (ระบบจะพาไปเชื่อมกับ LINE Developers)</li>
+                <li>คัดลอก <b>Channel access token</b> และ <b>Channel secret</b> มาวางในช่องด้านบน แล้วกดบันทึก</li>
+                <li>นำ <b>Webhook URL</b> (ปุ่มคัดลอกด้านบน) ไปวางใน LINE Developers แล้วเปิด <b>Use webhook</b></li>
+                <li>ปิด <b>Auto-reply</b> (ตอบกลับอัตโนมัติ) ใน LINE Official Account Manager</li>
+                <li>ให้ผู้ปกครองแอด LINE โรงเรียน แล้วพิมพ์ <b>เลขประจำตัวนักเรียน เว้นวรรค วันเกิด</b> เช่น <code>12345 25/10/2015</code> — ระบบจะผูกบัญชีให้อัตโนมัติ</li>
+              </ol>
+            </div>
           </div>
 
           <div class="setting-section" id="tab-payment">
@@ -243,7 +287,7 @@
   <script src="../js/data-helpers.js"></script>
   <script>
     let school = null;
-    let lineSettings = [];
+    let lineSettings = {};
     
     async function init() {
       const profile = await requireOwner();
@@ -316,44 +360,92 @@
       dataHelpers.toast('✅ บันทึกโหมดเว็บไซต์แล้ว', 'success');
     }
     
+    // ---- LINE แจ้งเตือนผู้ปกครอง (per-school LINE OA, Messaging API) ----
+    const LINE_FEATURES = [
+      { key: 'attendance_alert', icon: '⏰', name: 'เช็คชื่อเข้า-ออก',  desc: 'แจ้งผู้ปกครองเมื่อครูเช็คชื่อนักเรียน (มา/ขาด/สาย)' },
+      { key: 'bill_issued',      icon: '💰', name: 'แจ้งบิลค่าเทอม',    desc: 'แจ้งเมื่อออกบิลค่าเทอมใหม่ พร้อมยอดและกำหนดชำระ' },
+      { key: 'payment_approved', icon: '✅', name: 'ยืนยันรับชำระ',     desc: 'แจ้งเมื่อโรงเรียนยืนยันรับชำระเงิน พร้อมเลขที่ใบเสร็จ' },
+      { key: 'homework_posted',  icon: '📚', name: 'การบ้านใหม่',       desc: 'แจ้งเมื่อครูสั่งการบ้านใหม่ในห้อง/ระดับชั้นของนักเรียน' },
+      { key: 'leave_status',     icon: '📝', name: 'ผลใบลา',            desc: 'แจ้งเมื่อใบลาได้รับการอนุมัติหรือไม่อนุมัติ' },
+      { key: 'announcement',     icon: '📢', name: 'ประกาศ',            desc: 'ประกาศข่าวสารจากโรงเรียนถึงผู้ปกครองทุกคน' }
+    ];
+
     async function loadLine() {
-      const { data } = await supabaseClient.from('line_settings').select('*');
-      lineSettings = data || [];
-      
-      const container = document.getElementById('lineFeatures');
-      container.innerHTML = lineSettings.map(s => `
+      // 1) settings from RPC (schools.line_settings jsonb)
+      try {
+        const { data, error } = await supabaseClient.rpc('get_line_settings');
+        if (!error && data && !data.error) lineSettings = data || {};
+      } catch (e) { console.warn('get_line_settings:', e); }
+      const s = lineSettings || {};
+
+      document.getElementById('lineEnabled').checked = !!s.enabled;
+      document.getElementById('lineToken').value = s.channel_access_token || '';
+      document.getElementById('lineSecret').value = s.channel_secret || '';
+
+      // 2) feature switches — default ON unless features[k] === false
+      const feats = s.features || {};
+      document.getElementById('lineFeatures').innerHTML = LINE_FEATURES.map(f => `
         <div class="line-card">
           <div class="line-card-header">
-            <h4>${getFeatureIcon(s.feature)} ${getFeatureName(s.feature)}</h4>
+            <h4>${f.icon} ${f.name}</h4>
             <label class="switch">
-              <input type="checkbox" ${s.enabled ? 'checked' : ''} onchange="toggleLine('${s.feature}', this.checked)" />
+              <input type="checkbox" id="lineFeat_${f.key}" ${feats[f.key] === false ? '' : 'checked'} />
               <span class="slider"></span>
             </label>
           </div>
-          <div class="line-card-desc">${s.description || ''}</div>
-          <div class="line-template">${s.template || ''}</div>
+          <div class="line-card-desc">${f.desc}</div>
         </div>
       `).join('');
+
+      // 3) webhook URL — school id from profile (reliable, no race with loadSchool)
+      try {
+        const p = await auth.getProfile();
+        const sid = (p && p.school_id) || (school && school.id) || window.CURRENT_SCHOOL_ID || '';
+        document.getElementById('lineWebhookUrl').value =
+          sid ? ('https://app.panyaschoolkit.com/api/line/webhook?school=' + sid) : '';
+      } catch (e) { console.warn('webhook url:', e); }
+
+      // 4) linked count: 'ผูก LINE แล้ว X จาก Y คน'
+      try {
+        const { data: cnt } = await supabaseClient.rpc('count_line_linked');
+        const row = Array.isArray(cnt) ? cnt[0] : cnt;
+        if (row !== null && row !== undefined) {
+          const linked = (typeof row === 'number') ? row : (row.linked ?? row.linked_count ?? 0);
+          const total = (typeof row === 'number') ? '—' : (row.total ?? row.total_count ?? '—');
+          document.getElementById('lineLinkedStatus').textContent =
+            `👨‍👩‍👧 ผูก LINE แล้ว ${linked} จาก ${total} คน`;
+        }
+      } catch (e) { console.warn('count_line_linked:', e); }
     }
-    
-    function getFeatureIcon(f) {
-      return { bill_due:'💰', payment_received:'✅', grade_published:'📊', attendance_alert:'⏰', event_reminder:'🎉' }[f] || '📌';
+
+    function copyWebhookUrl() {
+      const t = document.getElementById('lineWebhookUrl').value;
+      if (t && navigator.clipboard) {
+        navigator.clipboard.writeText(t)
+          .then(() => dataHelpers.toast('คัดลอก Webhook URL แล้ว', 'success'))
+          .catch(() => {});
+      }
     }
-    function getFeatureName(f) {
-      return { bill_due:'แจ้งเตือนบิลค้างชำระ', payment_received:'แจ้งเตือนรับชำระเงิน', grade_published:'แจ้งเตือนใบเกรดออก', attendance_alert:'แจ้งเตือนนักเรียนขาดเรียน', event_reminder:'แจ้งเตือนกิจกรรม' }[f] || f;
-    }
-    
-    async function toggleLine(feature, enabled) {
-      const { error } = await supabaseClient
-        .from('line_settings')
-        .update({ enabled, updated_at: new Date().toISOString() })
-        .eq('feature', feature);
-      if (error) {
-        dataHelpers.toast('❌ ' + error.message, 'error');
-        await loadLine();
+
+    async function saveLine() {
+      const features = {};
+      LINE_FEATURES.forEach(f => {
+        const el = document.getElementById('lineFeat_' + f.key);
+        features[f.key] = el ? el.checked : true;
+      });
+      const p = {
+        enabled: document.getElementById('lineEnabled').checked,
+        channel_access_token: document.getElementById('lineToken').value.trim(),
+        channel_secret: document.getElementById('lineSecret').value.trim(),
+        features
+      };
+      const { data, error } = await supabaseClient.rpc('save_line_settings', { p });
+      if (error || (data && data.error)) {
+        dataHelpers.toast('❌ บันทึกไม่สำเร็จ: ' + ((data && data.error) || (error && error.message) || 'กรุณาลองอีกครั้ง'), 'error');
         return;
       }
-      dataHelpers.toast(`✅ ${enabled ? 'Enabled' : 'Disabled'}: ${getFeatureName(feature)}`, 'success');
+      lineSettings = { ...lineSettings, ...p };
+      dataHelpers.toast('✅ บันทึกการตั้งค่า LINE แล้ว', 'success');
     }
     
     async function saveSchool(event) {

@@ -167,6 +167,7 @@
 
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
   <script src="../js/promptpay.js"></script>
+  <script src="../js/slip-qr.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
@@ -385,8 +386,29 @@
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
+      btn.textContent = 'กำลังตรวจสลิป...';
+
+      // อ่าน QR บนสลิป (ถ้ามี) เพื่อกันส่งสลิปเดิมซ้ำ — อ่านไม่ได้ก็ส่งต่อได้ตามปกติ
+      let qrRef = null;
+      try { qrRef = await window.slipQR.decode(selectedSlipFile); } catch (e) {}
+
+      if (qrRef) {
+        const { data: dupRows } = await supabaseClient
+          .from('payment_slips')
+          .select('id,status')
+          .eq('qr_ref', qrRef)
+          .neq('status', 'rejected')
+          .limit(1);
+        if (dupRows && dupRows.length > 0) {
+          dataHelpers.toast('สลิปนี้ถูกส่งไปแล้ว — กรุณาใช้สลิปการโอนครั้งใหม่', 'error');
+          btn.disabled = false;
+          btn.textContent = t('parentBills.submitSlip');
+          return;
+        }
+      }
+
       btn.textContent = t('parentBills.uploading');
-      
+
       try {
         const user = await supabaseClient.auth.getUser();
         const userId = user.data.user.id;
@@ -416,6 +438,7 @@
           reference_number: document.getElementById('referenceNumber').value.trim() || null,
           bank_name: document.getElementById('fromBank').value.trim() || null,
           notes: document.getElementById('slipNotes').value.trim() || null,
+          qr_ref: qrRef || null,
           status: 'pending'
         };
         

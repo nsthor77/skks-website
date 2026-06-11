@@ -162,6 +162,11 @@
           <input type="number" id="fPoints" min="0" step="1" />
         </div>
       </div>
+      <div class="field"><label>ไฟล์แนบ (ถ้ามี — รูปหรือ PDF ≤10MB)</label>
+        <input type="hidden" id="fAttachmentUrl" />
+        <button type="button" class="btn btn-secondary" id="fAttachBtn">📎 อัปโหลดไฟล์</button>
+        <input type="file" id="fAttachFile" accept="image/*,application/pdf" style="display:none;" />
+        <span id="fAttachName" style="font-size:12px;color:#16A34A;margin-left:8px;"></span></div>
       <div class="field" id="fStatusWrap" style="display:none">
         <label data-i18n="homework.fStatus">Status</label>
         <select id="fStatus">
@@ -189,6 +194,12 @@
         <label data-i18n="homework.sNote">Note / answer link (optional)</label>
         <textarea id="sNote" rows="3" placeholder=""></textarea>
       </div>
+      <div class="field"><label>ไฟล์แนบ (ถ้ามี — รูปหรือ PDF ≤10MB)</label>
+        <input type="hidden" id="sAttachmentUrl" />
+        <button type="button" class="btn btn-secondary" id="sAttachBtn">📎 อัปโหลดไฟล์</button>
+        <input type="file" id="sAttachFile" accept="image/*,application/pdf" style="display:none;" />
+        <span id="sAttachName" style="font-size:12px;color:#16A34A;margin-left:8px;"></span>
+        <div id="sExistingAttach" style="font-size:12px;margin-top:4px;"></div></div>
       <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeSubmit()" data-i18n="common.cancel">Cancel</button>
         <button class="btn btn-primary" onclick="doSubmit()" data-i18n="homework.markDone">✓ Submit</button>
@@ -214,6 +225,7 @@
   <script src="../js/supabase-client.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/role-guard.js"></script>
+  <script src="../js/upload.js"></script>
   <script>
     let isStaff = false;
     let myStudents = [];
@@ -234,8 +246,39 @@
       }
       await loadClassrooms();
       await loadStudents();
+      wireUploaders();
       load();
     });
+
+    function wireUploaders() {
+      if (!window.skUpload) return;
+      // teacher: homework attachment
+      skUpload.attachPicker({
+        button: document.getElementById('fAttachBtn'),
+        fileInput: document.getElementById('fAttachFile'),
+        subfolder: 'homework',
+        schoolId: function(){ return window.CURRENT_SCHOOL_ID; },
+        onStart: () => { document.getElementById('fAttachName').textContent = 'กำลังอัปโหลด...'; },
+        onDone: (url) => {
+          document.getElementById('fAttachmentUrl').value = url;
+          document.getElementById('fAttachName').textContent = '✓ แนบไฟล์แล้ว';
+        },
+        onError: (m) => { document.getElementById('fAttachName').textContent = ''; toast(m, 'error'); }
+      });
+      // student: submission attachment
+      skUpload.attachPicker({
+        button: document.getElementById('sAttachBtn'),
+        fileInput: document.getElementById('sAttachFile'),
+        subfolder: 'homework-submissions',
+        schoolId: function(){ return window.CURRENT_SCHOOL_ID; },
+        onStart: () => { document.getElementById('sAttachName').textContent = 'กำลังอัปโหลด...'; },
+        onDone: (url) => {
+          document.getElementById('sAttachmentUrl').value = url;
+          document.getElementById('sAttachName').textContent = '✓ แนบไฟล์แล้ว';
+        },
+        onError: (m) => { document.getElementById('sAttachName').textContent = ''; toast(m, 'error'); }
+      });
+    }
     document.addEventListener('langchange', render);
 
     async function loadClassrooms() {
@@ -300,6 +343,7 @@
               🎯 ${target} · 📅 <span class="${dueCls}">${due}</span>${r.points?(' · ⭐ '+esc(r.points)):''}
             </div>
             ${r.description?`<div class="desc">${esc(r.description)}</div>`:''}
+            ${r.attachment_url?`<div class="meta"><a href="${esc(r.attachment_url)}" target="_blank" rel="noopener" style="color:var(--pk-blue-700);">📎 เปิดไฟล์แนบ</a></div>`:''}
             <div class="meta">👤 ${esc(r.creator_name||'')}</div>
           </div>
           <div style="text-align:right;min-width:140px;">
@@ -328,6 +372,8 @@
       document.getElementById('fClass').value = '';
       document.getElementById('fDue').value = '';
       document.getElementById('fPoints').value = '';
+      document.getElementById('fAttachmentUrl').value = '';
+      document.getElementById('fAttachName').textContent = '';
       document.getElementById('fStatusWrap').style.display = 'none';
       document.getElementById('formModal').classList.add('show');
     }
@@ -343,6 +389,8 @@
       document.getElementById('fClass').value = r.classroom || '';
       document.getElementById('fDue').value = r.due_date || '';
       document.getElementById('fPoints').value = (r.points ?? '');
+      document.getElementById('fAttachmentUrl').value = r.attachment_url || '';
+      document.getElementById('fAttachName').textContent = r.attachment_url ? '✓ มีไฟล์แนบเดิม' : '';
       document.getElementById('fStatus').value = r.status || 'open';
       document.getElementById('fStatusWrap').style.display = 'block';
       document.getElementById('formModal').classList.add('show');
@@ -359,7 +407,8 @@
         p_subject: document.getElementById('fSubject').value.trim() || null,
         p_classroom: document.getElementById('fClass').value || null,
         p_due_date: document.getElementById('fDue').value || null,
-        p_points: document.getElementById('fPoints').value !== '' ? Number(document.getElementById('fPoints').value) : null
+        p_points: document.getElementById('fPoints').value !== '' ? Number(document.getElementById('fPoints').value) : null,
+        p_attachment_url: document.getElementById('fAttachmentUrl').value || null
       };
       let res;
       if (id) {
@@ -370,6 +419,13 @@
       const { data, error } = res;
       if (error) { toast(error.message, 'error'); return; }
       if (!data.success) { toast(t('homework.'+data.error) || data.error, 'error'); return; }
+      // LINE notify — fire-and-forget, on CREATE only (never blocks the save)
+      if (!id) {
+        try { const s = await supabaseClient.auth.getSession();
+          fetch('/api/line/notify', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.data.session.access_token},
+            body: JSON.stringify({ event:'homework_posted', data:{ title: title, due_date: common.p_due_date, classroom: common.p_classroom, grade: null, subject: common.p_subject } }) }).catch(()=>{});
+        } catch(e){}
+      }
       toast(t(id ? 'homework.saved' : 'homework.created'), 'success');
       closeForm();
       load();
@@ -389,7 +445,20 @@
       curHwId = hwId;
       document.getElementById('submitHwTitle').textContent = getRow(hwId).title || '';
       document.getElementById('sNote').value = '';
+      document.getElementById('sAttachmentUrl').value = '';
+      document.getElementById('sAttachName').textContent = '';
+      document.getElementById('sExistingAttach').innerHTML = '';
       document.getElementById('submitModal').classList.add('show');
+      // if there is an existing submission with a file, show it (never blocks the modal)
+      try {
+        supabaseClient.rpc('get_homework_submissions', { p_homework_id: hwId }).then(({ data }) => {
+          const mine = Array.isArray(data) ? data.find(x => x.attachment_url) : null;
+          if (mine && curHwId === hwId) {
+            document.getElementById('sExistingAttach').innerHTML =
+              `<a href="${esc(mine.attachment_url)}" target="_blank" rel="noopener" style="color:var(--pk-blue-700);">📎 ไฟล์แนบเดิม — เปิดดู</a>`;
+          }
+        }).catch(()=>{});
+      } catch(e){}
     }
     function closeSubmit() { document.getElementById('submitModal').classList.remove('show'); }
 
@@ -400,7 +469,7 @@
         p_homework_id: curHwId,
         p_student_id: studentId,
         p_note: document.getElementById('sNote').value.trim() || null,
-        p_attachment_url: null
+        p_attachment_url: document.getElementById('sAttachmentUrl').value || null
       });
       if (error) { toast(error.message, 'error'); return; }
       if (!data.success) { toast(t('homework.'+data.error) || data.error, 'error'); return; }
@@ -429,6 +498,7 @@
         return `<div class="sub-item">
           <h4>${esc(name)} ${s.classroom?`<span style="font-size:12px;color:var(--pk-mist);font-weight:400;">· ${esc(s.classroom)}</span>`:''} <span class="status s-${s.status}">${esc(t('homework.'+s.status)||s.status)}</span></h4>
           ${s.note?`<div class="meta">📝 ${esc(s.note)}</div>`:''}
+          ${s.attachment_url?`<div class="meta"><a href="${esc(s.attachment_url)}" target="_blank" rel="noopener" style="color:var(--pk-blue-700);">📎 เปิดไฟล์แนบ</a></div>`:''}
           <div class="meta">📅 ${fmt(s.submitted_at)}</div>
           <div class="sub-grade">
             <input type="number" id="score_${s.id}" placeholder="${t('homework.score')}" value="${s.score ?? ''}" min="0" step="0.5" />

@@ -213,6 +213,14 @@
       });
       btn.disabled=false; btn.textContent='💾 บันทึก';
       if (error || !data || !data.success) { toast((data&&data.error)||(error&&error.message)||'บันทึกไม่สำเร็จ','error'); return; }
+      // LINE notify — fire-and-forget, on new active announcement only (never blocks the save)
+      const isEdit = !!document.getElementById('aId').value;
+      if (!isEdit && document.getElementById('aActive').checked) {
+        try { const s = await supabaseClient.auth.getSession();
+          fetch('/api/line/notify', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.data.session.access_token},
+            body: JSON.stringify({ event:'announcement', data:{ title: title, body: (document.getElementById('aBody').value.trim().slice(0,120)) || null } }) }).catch(()=>{});
+        } catch(e){}
+      }
       toast('บันทึกแล้ว','success');
       closeForm();
       load();

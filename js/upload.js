@@ -10,8 +10,8 @@
   'use strict';
 
   var BUCKET = 'school-assets';
-  var MAX_BYTES = 3 * 1024 * 1024; // 3 MB (matches bucket cap)
-  var OK_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml'];
+  var MAX_BYTES = 10 * 1024 * 1024; // 10 MB (matches bucket cap)
+  var OK_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml', 'application/pdf'];
 
   function cleanName(n) {
     var base = (n || 'image').toLowerCase();
@@ -25,8 +25,8 @@
   // Upload one image file. Returns the public URL string.
   async function image(file, subfolder, schoolId) {
     if (!file) throw new Error('ไม่พบไฟล์');
-    if (OK_TYPES.indexOf(file.type) < 0) throw new Error('รองรับเฉพาะรูปภาพ (PNG, JPG, WEBP, GIF, SVG)');
-    if (file.size > MAX_BYTES) throw new Error('ไฟล์ใหญ่เกิน 3MB — กรุณาย่อรูปก่อนอัปโหลด');
+    if (OK_TYPES.indexOf(file.type) < 0) throw new Error('ไฟล์ต้องเป็นรูปภาพหรือ PDF ขนาดไม่เกิน 10MB');
+    if (file.size > MAX_BYTES) throw new Error('ไฟล์ต้องเป็นรูปภาพหรือ PDF ขนาดไม่เกิน 10MB');
 
     var sid = schoolId || window.CURRENT_SCHOOL_ID;
     if (!sid) throw new Error('ไม่พบโรงเรียน (school id)');

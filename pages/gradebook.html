@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>สมุดคะแนนเก็บ — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .filters-bar{background:white;border:1px solid #E5E7EB;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+    .filters-bar .f{display:flex;flex-direction:column;gap:4px}
+    .filters-bar label{font-size:12px;font-weight:600;color:#374151}
+    .filters-bar input,.filters-bar select{padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;outline:none;background:white}
+    .filters-bar input:focus,.filters-bar select:focus{border-color:#5BB8E0}
+
+    .gb-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .gb-toolbar .right{display:flex;gap:8px;flex-wrap:wrap}
+    .gb-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:600;cursor:default}
+    .gb-chip.ok{background:#D1FAE5;color:#065F46}
+    .gb-chip.warn{background:#FEF3C7;color:#92400E}
+
+    .gb-card{background:white;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden}
+    .gb-wrap{overflow-x:auto}
+    table.gb-table{border-collapse:collapse;font-size:13px;width:100%}
+    .gb-table th{background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:10px 12px;text-align:center;font-size:12px;color:#374151;white-space:nowrap;vertical-align:top}
+    .gb-table td{border-bottom:1px solid #F3F4F6;padding:8px 10px;text-align:center;background:white}
+    .gb-table tr:last-child td{border-bottom:none}
+
+    /* sticky first 2 columns */
+    .gb-table th:nth-child(1),.gb-table td:nth-child(1){position:sticky;left:0;z-index:2;min-width:56px;text-align:center}
+    .gb-table th:nth-child(2),.gb-table td:nth-child(2){position:sticky;left:56px;z-index:2;min-width:170px;max-width:220px;text-align:left;box-shadow:2px 0 0 #E5E7EB}
+    .gb-table th:nth-child(1),.gb-table th:nth-child(2){z-index:3;background:#F9FAFB}
+
+    .gb-item-name{font-weight:700;color:#1E3A5F;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 auto}
+    .gb-item-meta{font-size:11px;color:#6B7280;font-weight:400;margin-top:2px}
+    .gb-item-actions{margin-top:5px;display:flex;gap:4px;justify-content:center}
+    .gb-mini{border:1px solid #E5E7EB;background:white;border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;line-height:1.4}
+    .gb-mini:hover{background:#F3F4F6}
+
+    .gb-score{width:74px;padding:6px 8px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;text-align:center;font-family:inherit;outline:none}
+    .gb-score:focus{border-color:#5BB8E0;box-shadow:0 0 0 3px rgba(91,184,224,0.12)}
+    .gb-score.over{border-color:#EF4444;background:#FEF2F2}
+
+    .gb-total{font-weight:700;color:#1E3A5F;white-space:nowrap}
+    .gb-grade{font-weight:700;color:#065F46;white-space:nowrap}
+    .stu-num{font-weight:600;color:#1D4ED8}
+    .stu-name{font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+    .hint-card{background:#F0F9FF;border:1px dashed #93C5FD;border-radius:12px;padding:36px 20px;text-align:center;color:#1E40AF;font-size:14px}
+
+    @media(max-width:640px){
+      .filters-bar{align-items:stretch;flex-direction:column}
+      .filters-bar .f{width:100%}
+      .filters-bar input,.filters-bar select{width:100%}
+      .gb-score{font-size:16px !important;width:80px}
+      .gb-toolbar .right{width:100%}
+      .gb-toolbar .right .btn{flex:1;justify-content:center}
+      .gb-table th:nth-child(2),.gb-table td:nth-child(2){left:48px;min-width:130px}
+      .gb-table th:nth-child(1),.gb-table td:nth-child(1){min-width:48px}
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <a href="../index.html" class="admin-logo">
+        <img src="../images/logo.png" alt="โลโก้" />
+        <h1>ระบบจัดการ</h1>
+      </a>
+      <nav class="admin-nav">
+        <a href="dashboard.html">📊 แดชบอร์ด</a>
+        <a href="students.html">🎓 นักเรียน</a>
+        <a href="attendance.html">📅 เช็คชื่อ</a>
+        <a href="gradebook.html" class="active">📒 สมุดคะแนน</a>
+        <a href="grades-admin.html">📝 บันทึกเกรด</a>
+      </nav>
+    </div>
+    <div class="admin-topbar-right">
+      <button class="btn-logout" onclick="auth.logout()">ออกจากระบบ</button>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="loading-state" id="loadingMsg">⏳ กำลังโหลด...</div>
+
+    <div id="content" style="display:none;">
+      <div class="page-header">
+        <div>
+          <h2>📒 สมุดคะแนนเก็บ</h2>
+          <p>สร้างช่องคะแนน กรอกคะแนน ระบบรวมเป็นเกรดให้อัตโนมัติ</p>
+        </div>
+      </div>
+
+      <div class="filters-bar">
+        <div class="f">
+          <label>ปีการศึกษา</label>
+          <input type="text" id="yearInput" placeholder="2569" style="width:100px;" />
+        </div>
+        <div class="f">
+          <label>ภาคเรียน</label>
+          <select id="termSelect">
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>ห้องเรียน</label>
+          <select id="classroomSelect">
+            <option value="">เลือกห้องเรียน...</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>วิชา</label>
+          <select id="subjectSelect">
+            <option value="">เลือกวิชา...</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="loadGradebook()">📖 โหลดสมุดคะแนน</button>
+      </div>
+
+      <div id="bookArea" style="display:none;">
+        <div class="gb-toolbar">
+          <span class="gb-chip ok" id="weightChip">น้ำหนักรวม 0%</span>
+          <div class="right">
+            <button class="btn btn-secondary" onclick="openItemModal(null)">➕ เพิ่มช่องคะแนน</button>
+            <button class="btn btn-primary" id="saveScoresBtn" onclick="saveAllScores()">💾 บันทึกคะแนนทั้งหมด</button>
+            <button class="btn btn-secondary" id="publishBtn" onclick="sendGrades()">📤 ส่งเกรดเข้าระบบ (ปพ.)</button>
+          </div>
+        </div>
+        <div id="tableArea"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: add/edit grade item -->
+  <div class="modal-overlay" id="itemModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 id="itemModalTitle">➕ เพิ่มช่องคะแนน</h3>
+        <button class="modal-close" onclick="closeItemModal()">×</button>
+      </div>
+      <input type="hidden" id="itemId" />
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>ชื่อช่องคะแนน <span class="req">*</span></label>
+        <input type="text" id="itemName" placeholder='เช่น เก็บครั้งที่ 1' />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="form-group">
+          <label>คะแนนเต็ม <span class="req">*</span></label>
+          <input type="number" id="itemMax" min="1" step="0.5" value="10" />
+        </div>
+        <div class="form-group">
+          <label>น้ำหนัก (%)</label>
+          <input type="number" id="itemWeight" min="0" max="100" step="0.5" value="10" />
+        </div>
+        <div class="form-group">
+          <label>ลำดับ</label>
+          <input type="number" id="itemOrder" min="1" step="1" value="1" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeItemModal()">ยกเลิก</button>
+        <button class="btn btn-primary" id="itemSaveBtn" onclick="saveItem()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script src="../js/data-helpers.js"></script>
+  <script>
+    let items = [];          // grade_items ของห้อง+วิชา+เทอมที่โหลด
+    let students = [];       // [{id, student_number, name}]
+    let serverScores = {};   // 'itemId|studentId' -> score (จาก DB)
+    let dirty = {};          // 'itemId|studentId' -> ค่าที่พิมพ์ค้างไว้ (ยังไม่บันทึก)
+    let scales = [];
+    let activeScale = null;
+    let ctx = null;          // {year, term, classroom, subjectCode, subjectName, credits}
+
+    // เกณฑ์เกรดสำรอง (มาตรฐานไทย) ถ้าโรงเรียนยังไม่ตั้งค่า Grade Scale
+    const FALLBACK_SCALE = [
+      { label: '4',   value: 4,   min: 80 },
+      { label: '3.5', value: 3.5, min: 75 },
+      { label: '3',   value: 3,   min: 70 },
+      { label: '2.5', value: 2.5, min: 65 },
+      { label: '2',   value: 2,   min: 60 },
+      { label: '1.5', value: 1.5, min: 55 },
+      { label: '1',   value: 1,   min: 50 },
+      { label: '0',   value: 0,   min: 0 }
+    ];
+
+    async function init() {
+      const profile = await roleGuard.requireTeacher();
+      if (!profile) return;
+
+      // ปีการศึกษาเริ่มต้น = ปี พ.ศ. ปัจจุบัน (แบบเดียวกับหน้าบันทึกเกรด)
+      document.getElementById('yearInput').value = (new Date().getFullYear() + 543).toString();
+
+      await Promise.all([loadClassrooms(), loadSubjects(), loadScales()]);
+
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    async function loadClassrooms() {
+      const { data } = await supabaseClient.from('students').select('classroom').not('classroom','is',null).order('classroom');
+      const sel = document.getElementById('classroomSelect');
+      const seen = new Set();
+      (data || []).forEach(r => {
+        if (r.classroom && !seen.has(r.classroom)) {
+          seen.add(r.classroom);
+          const opt = document.createElement('option');
+          opt.value = r.classroom; opt.textContent = r.classroom;
+          sel.appendChild(opt);
+        }
+      });
+    }
+
+    async function loadSubjects() {
+      const { data } = await supabaseClient.from('subjects').select('*').eq('is_active', true).order('sort_order').order('name_th');
+      const sel = document.getElementById('subjectSelect');
+      (data || []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.code;
+        opt.textContent = `${s.code} — ${s.name_th || s.name_en || s.code}`;
+        opt.dataset.name = s.name_th || s.name_en || s.code;
+        opt.dataset.credits = s.credit_hours || '';
+        sel.appendChild(opt);
+      });
+    }
+
+    async function loadScales() {
+      const { data } = await supabaseClient.rpc('get_grading_scales');
+      scales = Array.isArray(data) ? data : [];
+      activeScale = scales.find(s => s.is_default) || scales[0] || null;
+    }
+
+    // แปลงคะแนนรวม (0-100) → เกรด ตามเกณฑ์ของโรงเรียน (หรือเกณฑ์มาตรฐานไทยถ้าไม่มี)
+    function gradeFor(total) {
+      let defs = (activeScale && Array.isArray(activeScale.grades) && activeScale.grades.length) ? activeScale.grades : FALLBACK_SCALE;
+      defs = defs.slice().sort((a, b) => (Number(b.min) || 0) - (Number(a.min) || 0));
+      const m = defs.find(g => total >= (Number(g.min) || 0)) || defs[defs.length - 1];
+      return { label: String(m.label), value: (m.value === null || m.value === undefined || isNaN(Number(m.value))) ? null : Number(m.value) };
+    }
+
+    // ---------- โหลดสมุดคะแนน ----------
+    async function loadGradebook(keepDirty = false) {
+      const year = document.getElementById('yearInput').value.trim();
+      const term = document.getElementById('termSelect').value;
+      const classroom = document.getElementById('classroomSelect').value;
+      const subjOption = document.getElementById('subjectSelect').selectedOptions[0];
+      const subjectCode = document.getElementById('subjectSelect').value;
+
+      if (!year || !classroom || !subjectCode) {
+        dataHelpers.toast('กรุณาเลือก ปีการศึกษา + ห้องเรียน + วิชา ก่อน', 'warning');
+        return;
+      }
+
+      document.getElementById('bookArea').style.display = 'block';
+      document.getElementById('tableArea').innerHTML = '<div class="loading-state">⏳ กำลังโหลดสมุดคะแนน...</div>';
+
+      const { data, error } = await supabaseClient.rpc('get_gradebook', {
+        p_classroom: classroom,
+        p_subject_code: subjectCode,
+        p_academic_year: year,
+        p_term: term
+      });
+      if (error) { dataHelpers.toast('❌ โหลดไม่สำเร็จ: ' + error.message, 'error'); document.getElementById('tableArea').innerHTML = ''; return; }
+      if (data && data.error) { dataHelpers.toast('❌ ' + data.error, 'error'); document.getElementById('tableArea').innerHTML = ''; return; }
+
+      ctx = {
+        year, term, classroom, subjectCode,
+        subjectName: (subjOption && subjOption.dataset.name) || subjectCode,
+        credits: subjOption && subjOption.dataset.credits ? parseFloat(subjOption.dataset.credits) : null
+      };
+
+      items = (data && Array.isArray(data.items)) ? data.items.slice() : [];
+      items.sort((a, b) => (Number(a.item_order) || 0) - (Number(b.item_order) || 0));
+      students = (data && Array.isArray(data.students)) ? data.students : [];
+
+      serverScores = {};
+      ((data && data.scores) || []).forEach(sc => { serverScores[sc.item_id + '|' + sc.student_id] = sc.score; });
+
+      if (!keepDirty) {
+        dirty = {};
+      } else {
+        // ตัดค่าค้างของช่องที่ถูกลบไปแล้ว
+        const ids = new Set(items.map(it => it.id));
+        Object.keys(dirty).forEach(k => { if (!ids.has(k.split('|')[0])) delete dirty[k]; });
+      }
+
+      render();
+    }
+
+    function getVal(itemId, studentId) {
+      const k = itemId + '|' + studentId;
+      if (k in dirty) return dirty[k];
+      const sv = serverScores[k];
+      return (sv === null || sv === undefined) ? '' : sv;
+    }
+
+    // ---------- วาดตาราง ----------
+    function render() {
+      updateWeightChip();
+      const area = document.getElementById('tableArea');
+
+      if (!students.length) {
+        area.innerHTML = `<div class="gb-card"><div class="empty-state"><div class="icon">🧑‍🎓</div><h4>ไม่พบนักเรียนในห้องนี้</h4><p>ห้อง ${esc(ctx.classroom)} ยังไม่มีนักเรียนสถานะกำลังศึกษา — เพิ่มนักเรียนได้ที่เมนู "นักเรียน"</p></div></div>`;
+        return;
+      }
+
+      if (!items.length) {
+        area.innerHTML = `<div class="hint-card">📒 ยังไม่มีช่องคะแนน — กด <b>➕ เพิ่มช่องคะแนน</b> เช่น "เก็บครั้งที่ 1 (10%)"</div>`;
+        return;
+      }
+
+      const itemThs = items.map((it, i) => `
+        <th>
+          <div class="gb-item-name" title="${esc(it.name)}">${esc(it.name)}</div>
+          <div class="gb-item-meta">เต็ม ${esc(fmtNum(it.max_score))} · ${esc(fmtNum(it.weight))}%</div>
+          <div class="gb-item-actions">
+            <button class="gb-mini" title="แก้ไขช่องคะแนน" onclick="openItemModal(${i})">✏️</button>
+            <button class="gb-mini" title="ลบช่องคะแนน" onclick="delItem(${i})">🗑</button>
+          </div>
+        </th>`).join('');
+
+      const rows = students.map(stu => {
+        const cells = items.map(it => {
+          const v = getVal(it.id, stu.id);
+          const over = v !== '' && !isNaN(parseFloat(v)) && parseFloat(v) > (Number(it.max_score) || 0);
+          return `<td><input type="number" class="gb-score${over ? ' over' : ''}" min="0" max="${Number(it.max_score) || 0}" step="0.5"
+            data-item="${it.id}" data-student="${stu.id}" value="${esc(v)}"
+            oninput="onScoreInput(this)" onblur="onScoreBlur(this)" /></td>`;
+        }).join('');
+        return `<tr data-student="${stu.id}">
+          <td><span class="stu-num">${esc(stu.student_number || '—')}</span></td>
+          <td><div class="stu-name" title="${esc(stu.name || '')}">${esc(stu.name || '—')}</div></td>
+          ${cells}
+          <td class="gb-total" data-cell="total">—</td>
+          <td class="gb-grade" data-cell="grade">—</td>
+        </tr>`;
+      }).join('');
+
+      area.innerHTML = `<div class="gb-card"><div class="gb-wrap">
+        <table class="gb-table">
+          <thead><tr>
+            <th>เลขที่</th>
+            <th style="text-align:left;">ชื่อ</th>
+            ${itemThs}
+            <th>รวม (100)</th>
+            <th>เกรด</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div></div>`;
+
+      students.forEach(stu => updateRow(stu.id));
+    }
+
+    function updateWeightChip() {
+      const total = items.reduce((s, it) => s + (Number(it.weight) || 0), 0);
+      const chip = document.getElementById('weightChip');
+      const rounded = Math.round(total * 100) / 100;
+      chip.textContent = 'น้ำหนักรวม ' + fmtNum(rounded) + '%';
+      const ok = rounded === 100;
+      chip.className = 'gb-chip ' + (ok ? 'ok' : 'warn');
+      chip.title = ok ? '' : 'ควรรวมเป็น 100%';
+    }
+
+    // ---------- กรอกคะแนน ----------
+    function onScoreInput(el) {
+      const k = el.dataset.item + '|' + el.dataset.student;
+      dirty[k] = el.value;
+      const v = parseFloat(el.value);
+      const max = parseFloat(el.max);
+      el.classList.toggle('over', !isNaN(v) && (v > max || v < 0));
+      updateRow(el.dataset.student);
+    }
+
+    function onScoreBlur(el) {
+      const v = parseFloat(el.value);
+      const max = parseFloat(el.max);
+      if (!isNaN(v)) {
+        let clamped = v;
+        if (v > max) clamped = max;
+        if (v < 0) clamped = 0;
+        if (clamped !== v) {
+          el.value = clamped;
+          dirty[el.dataset.item + '|' + el.dataset.student] = String(clamped);
+        }
+      }
+      el.classList.remove('over');
+      updateRow(el.dataset.student);
+    }
+
+    // รวมคะแนน = Σ (คะแนน/เต็ม)×น้ำหนัก — ช่องว่างนับเป็น 0 แต่ถ้าว่างทุกช่องแสดง —
+    function computeTotal(studentId) {
+      let total = 0, any = false;
+      items.forEach(it => {
+        const el = document.querySelector(`input[data-item="${it.id}"][data-student="${studentId}"]`);
+        const raw = el ? el.value : getVal(it.id, studentId);
+        const v = parseFloat(raw);
+        if (raw !== '' && !isNaN(v)) {
+          any = true;
+          const max = Number(it.max_score) || 0;
+          if (max > 0) total += (v / max) * (Number(it.weight) || 0);
+        }
+      });
+      if (!any) return null;
+      return Math.round(total * 100) / 100;
+    }
+
+    function updateRow(studentId) {
+      const tr = document.querySelector(`tr[data-student="${studentId}"]`);
+      if (!tr) return;
+      const totCell = tr.querySelector('[data-cell="total"]');
+      const grdCell = tr.querySelector('[data-cell="grade"]');
+      const total = computeTotal(studentId);
+      if (total === null) {
+        totCell.textContent = '—';
+        grdCell.textContent = '—';
+      } else {
+        totCell.textContent = total.toFixed(2);
+        grdCell.textContent = gradeFor(total).label;
+      }
+    }
+
+    // ---------- บันทึกคะแนนทั้งหมด ----------
+    async function saveAllScores() {
+      if (!items.length) { dataHelpers.toast('ยังไม่มีช่องคะแนน — เพิ่มช่องคะแนนก่อน', 'warning'); return; }
+      const btn = document.getElementById('saveScoresBtn');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      try {
+        for (let i = 0; i < items.length; i++) {
+          btn.textContent = `⏳ กำลังบันทึก... (${i + 1}/${items.length})`;
+          const it = items[i];
+          const p_rows = students.map(stu => {
+            const el = document.querySelector(`input[data-item="${it.id}"][data-student="${stu.id}"]`);
+            const raw = el ? el.value : getVal(it.id, stu.id);
+            const v = parseFloat(raw);
+            return { student_id: stu.id, score: (raw === '' || isNaN(v)) ? null : v };
+          });
+          const { data, error } = await supabaseClient.rpc('save_grade_scores', { p_item_id: it.id, p_rows });
+          if (error) throw new Error(error.message);
+          if (data && data.error) throw new Error(data.error);
+          if (data && data.success === false) throw new Error('บันทึกไม่สำเร็จ');
+        }
+        dataHelpers.toast('บันทึกคะแนนแล้ว ✓', 'success');
+        dirty = {};
+        await loadGradebook(false);
+      } catch (e) {
+        // คะแนนที่พิมพ์ไว้ยังอยู่ในช่องครบ — ไม่ reload เมื่อพลาด
+        dataHelpers.toast('❌ บันทึกไม่สำเร็จ: ' + (e && e.message ? e.message : e), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    }
+
+    // ---------- ช่องคะแนน (เพิ่ม/แก้ไข/ลบ) ----------
+    function openItemModal(idx) {
+      const isEdit = idx !== null && idx !== undefined;
+      const it = isEdit ? items[idx] : null;
+      document.getElementById('itemModalTitle').textContent = isEdit ? '✏️ แก้ไขช่องคะแนน' : '➕ เพิ่มช่องคะแนน';
+      document.getElementById('itemId').value = it ? it.id : '';
+      document.getElementById('itemName').value = it ? (it.name || '') : '';
+      document.getElementById('itemMax').value = it ? (it.max_score ?? 10) : 10;
+      document.getElementById('itemWeight').value = it ? (it.weight ?? 10) : 10;
+      document.getElementById('itemOrder').value = it ? (it.item_order ?? 1) : (items.length + 1);
+      document.getElementById('itemModal').classList.add('show');
+    }
+    function closeItemModal() { document.getElementById('itemModal').classList.remove('show'); }
+
+    async function saveItem() {
+      if (!ctx) return;
+      const id = document.getElementById('itemId').value || null;
+      const name = document.getElementById('itemName').value.trim();
+      const maxScore = parseFloat(document.getElementById('itemMax').value);
+      const weight = parseFloat(document.getElementById('itemWeight').value);
+      const order = parseInt(document.getElementById('itemOrder').value, 10);
+
+      if (!name) { dataHelpers.toast('กรุณาใส่ชื่อช่องคะแนน', 'warning'); return; }
+      if (isNaN(maxScore) || maxScore <= 0) { dataHelpers.toast('คะแนนเต็มต้องมากกว่า 0', 'warning'); return; }
+      if (isNaN(weight) || weight < 0) { dataHelpers.toast('น้ำหนัก (%) ไม่ถูกต้อง', 'warning'); return; }
+
+      const p = {
+        classroom: ctx.classroom,
+        subject_code: ctx.subjectCode,
+        subject_name: ctx.subjectName,
+        academic_year: ctx.year,
+        term: ctx.term,
+        name: name,
+        max_score: maxScore,
+        weight: weight,
+        item_order: isNaN(order) ? (items.length + 1) : order
+      };
+      if (id) p.id = id;
+
+      const btn = document.getElementById('itemSaveBtn');
+      btn.disabled = true;
+      const { data, error } = await supabaseClient.rpc('save_grade_item', { p });
+      btn.disabled = false;
+      if (error) { dataHelpers.toast('❌ บันทึกไม่สำเร็จ: ' + error.message, 'error'); return; }
+      if (!data || data.success === false || data.error) { dataHelpers.toast('❌ ' + ((data && data.error) || 'บันทึกไม่สำเร็จ'), 'error'); return; }
+
+      closeItemModal();
+      dataHelpers.toast(id ? 'แก้ไขช่องคะแนนแล้ว ✓' : 'เพิ่มช่องคะแนนแล้ว ✓', 'success');
+      await loadGradebook(true);  // คะแนนที่พิมพ์ค้างไว้ไม่หาย
+    }
+
+    async function delItem(idx) {
+      const it = items[idx];
+      if (!it) return;
+      if (!confirm(`ลบช่องคะแนน "${it.name}"?\nคะแนนที่กรอกไว้ในช่องนี้จะถูกลบไปด้วย`)) return;
+
+      const { data, error } = await supabaseClient.rpc('delete_grade_item', { p_id: it.id });
+      if (error) { dataHelpers.toast('❌ ลบไม่สำเร็จ: ' + error.message, 'error'); return; }
+      if (!data || data.success === false || data.error) { dataHelpers.toast('❌ ' + ((data && data.error) || 'ลบไม่สำเร็จ'), 'error'); return; }
+
+      Object.keys(dirty).forEach(k => { if (k.split('|')[0] === it.id) delete dirty[k]; });
+      dataHelpers.toast('ลบช่องคะแนนแล้ว', 'success');
+      await loadGradebook(true);
+    }
+
+    // ---------- ส่งเกรดเข้าระบบ (เส้นทางเดียวกับหน้าบันทึกเกรด → ปพ.5/6 ใช้ได้ต่อ) ----------
+    async function sendGrades() {
+      if (!ctx || !items.length) { dataHelpers.toast('ยังไม่มีช่องคะแนน — เพิ่มและกรอกคะแนนก่อน', 'warning'); return; }
+
+      const payload = [];
+      students.forEach(stu => {
+        const total = computeTotal(stu.id);
+        if (total === null) return;  // ไม่มีคะแนนเลย — ข้าม
+        const g = gradeFor(total);
+        payload.push({
+          student_id: stu.id,
+          subject_code: ctx.subjectCode,
+          subject_name: ctx.subjectName,
+          academic_year: ctx.year,
+          term: ctx.term,
+          score_midterm: null,
+          score_final: null,
+          score_assignment: null,
+          score_total: Number(total.toFixed(2)),
+          grade_label: g.label,
+          grade_value: g.value,
+          comments: null,
+          credit_hours: ctx.credits || null,
+          published: false
+        });
+      });
+
+      if (!payload.length) { dataHelpers.toast('ยังไม่มีคะแนนของนักเรียนคนไหนเลย — กรอกคะแนนก่อนส่งเกรด', 'warning'); return; }
+      if (!confirm('บันทึกคะแนนรวม+เกรดของทั้งห้องเข้าระบบเกรด (ใช้ออก ปพ.5/สมุดพก)?')) return;
+
+      const btn = document.getElementById('publishBtn');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '⏳ กำลังส่งเกรด...';
+      try {
+        const { data, error } = await supabaseClient.rpc('bulk_upsert_grades', { p_rows: payload });
+        if (error) throw new Error(error.message);
+        if (!data || !data.success) throw new Error((data && data.error) || 'ส่งเกรดไม่สำเร็จ');
+        dataHelpers.toast(`✅ ส่งเกรด ${data.saved ?? payload.length} คนเข้าระบบแล้ว — ดูได้ในหน้า บันทึกเกรด`, 'success');
+      } catch (e) {
+        dataHelpers.toast('❌ ส่งเกรดไม่สำเร็จ: ' + (e && e.message ? e.message : e), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    }
+
+    function fmtNum(n) {
+      const v = Number(n);
+      if (isNaN(v)) return String(n ?? '');
+      return (Math.round(v * 100) / 100).toString();
+    }
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    init().catch(e => {
+      const m = document.getElementById('loadingMsg');
+      if (m) m.textContent = '⚠️ เกิดข้อผิดพลาดในการโหลด: ' + (e && e.message ? e.message : e);
+    });
+  </script>
+</body>
+</html>

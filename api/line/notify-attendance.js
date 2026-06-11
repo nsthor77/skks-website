@@ -125,7 +125,7 @@ module.exports = async (req, res) => {
     const timeStr = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
     const statusTextMap = {
       present: '✅ มาเรียนเรียบร้อย',
-      absent:  '❌ ขาดเรียน',
+      absent:  '❗ ขาดเรียน',
       late:    '⏰ มาสาย',
       excused: '📝 ขาด (มีใบลา)',
       leave:   '🏠 ลา',
@@ -133,13 +133,19 @@ module.exports = async (req, res) => {
     };
     const statusText = statusTextMap[status] || status;
 
-    const message = lineSettings.default_template
-      ? lineSettings.default_template
-          .replace('{student_name}', studentName)
-          .replace('{action}', statusText)
-          .replace('{time}', timeStr)
-          .replace('{classroom}', student.classroom || '')
-      : `🎓 ${school.name_th || school.name_en || 'PanyaSchoolKit'}\n\n${studentName} (ห้อง ${student.classroom || '—'})\n${statusText}\nเวลา ${timeStr}`;
+    let message;
+    if (lineSettings.default_template) {
+      message = lineSettings.default_template
+        .replace('{student_name}', studentName)
+        .replace('{action}', statusText)
+        .replace('{time}', timeStr)
+        .replace('{classroom}', student.classroom || '');
+    } else if (status === 'absent') {
+      // Dedicated safety message for absences (no custom template set)
+      message = `🎓 ${school.name_th || school.name_en || 'PanyaSchoolKit'}\n\n❗ แจ้งเตือน: ${studentName} (ห้อง ${student.classroom || '—'}) ไม่มาโรงเรียนวันนี้ (ขาดเรียน)\nหากบุตรหลานของท่านออกจากบ้านมาแล้ว หรือมีข้อสงสัย กรุณาติดต่อครูประจำชั้นทันที`;
+    } else {
+      message = `🎓 ${school.name_th || school.name_en || 'PanyaSchoolKit'}\n\n${studentName} (ห้อง ${student.classroom || '—'})\n${statusText}\nเวลา ${timeStr}`;
+    }
 
     // ---- Send via LINE Messaging API ----
     const lineResp = await fetch('https://api.line.me/v2/bot/message/push', {

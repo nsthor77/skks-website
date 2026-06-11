@@ -24,6 +24,19 @@
     .admin-topbar .admin-logo h1 { display: none; }
     .card, .stat-card { border-color: var(--pk-border) !important; box-shadow: none !important; }
     .admin-container h1, .admin-container h2, .admin-container h3 { color: var(--pk-ink); }
+    /* 📍 วันนี้ — mini-stat tiles */
+    .today-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .today-tile { display: block; text-decoration: none; color: inherit; background: #fff; border: 1px solid var(--pk-border, #E5E7EB); border-radius: 10px; padding: 14px 16px; transition: border-color .15s, transform .15s; }
+    .today-tile:hover { border-color: var(--brand, #1B5E3F); transform: translateY(-1px); }
+    .today-tile .tt-label { font-size: 12px; color: #6B7280; }
+    .today-tile .tt-value { font-size: 22px; font-weight: 800; color: var(--pk-ink, #1F2937); margin-top: 4px; }
+    .today-tile .tt-sub { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+    .today-tile.tt-red { border-color: #FECACA; background: #FEF2F2; }
+    .today-tile.tt-red .tt-value { color: #DC2626; }
+    .today-tile.tt-amber { border-color: #FDE68A; background: #FFFBEB; }
+    .today-tile.tt-amber .tt-value { color: #B45309; }
+    .today-note { margin-top: 12px; font-size: 12.5px; color: #6B7280; line-height: 1.6; }
+    .today-note strong { color: #DC2626; }
   </style>
 </head>
 <body>
@@ -94,7 +107,17 @@
           </span>
         </div>
       </div>
-      
+
+      <!-- 📍 วันนี้ — สรุปวันนี้ (ซ่อนอัตโนมัติถ้า RPC ใช้ไม่ได้/ไม่มีสิทธิ์) -->
+      <div class="card" id="todayCard" style="display:none; margin-bottom:20px;">
+        <div class="card-header">
+          <h3 id="todayTitle">📍 วันนี้</h3>
+        </div>
+        <div class="today-tiles" id="todayTiles"></div>
+        <div class="today-note" id="todayAbsentLine" style="display:none;"></div>
+        <div class="today-note" id="todayUncheckedLine" style="display:none;"></div>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card blue">
           <div class="label" data-i18n="stat.students">Total Students</div>
@@ -303,6 +326,7 @@
       document.getElementById('loadingMsg').style.display = 'none';
       document.getElementById('content').style.display = 'block';
       
+      loadTodaySummary(); // 📍 วันนี้ — โหลดขนานกัน, พังเงียบๆ ได้ (section ถูกซ่อนไว้)
       loadStats();
       loadRecentApplications();
       
@@ -373,6 +397,65 @@
       `;
     }
     
+    // ===== 📍 วันนี้ — สรุปปฏิบัติการรายวัน =====
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function loadTodaySummary() {
+      try {
+        const { data: s, error } = await supabaseClient.rpc('get_today_summary');
+        if (error || !s || s.error) return; // RPC ยังไม่มี/ไม่มีสิทธิ์ → ซ่อนส่วนนี้ไว้
+
+        const total = Number(s.total_active || 0);
+        const present = Number(s.present || 0);
+        const absent = Number(s.absent || 0);
+        const pct = total > 0 ? Math.round(present / total * 100) : 0;
+        const unchecked = Number(s.unchecked_count || 0);
+        const uncheckedRooms = Array.isArray(s.unchecked_classrooms) ? s.unchecked_classrooms : [];
+        const money = Number(s.money_today || 0);
+        const slips = Number(s.slips_pending || 0);
+        const hw = Number(s.homework_ungraded || 0);
+
+        document.getElementById('todayTitle').textContent = '📍 วันนี้ · ' +
+          new Date().toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        const tiles = [
+          { href: 'attendance.html', label: '✅ มาเรียน', value: present + '/' + total, sub: pct + '%', cls: '' },
+          { href: 'attendance.html', label: '❗ ขาดเรียน', value: String(absent), sub: 'คน', cls: absent > 0 ? 'tt-red' : '' },
+          { href: 'attendance.html', label: '🏫 ห้องที่ยังไม่เช็คชื่อ', value: String(unchecked), sub: 'ห้อง', cls: unchecked > 0 ? 'tt-amber' : '', tip: uncheckedRooms.join(', ') },
+          { href: 'payments.html', label: '💰 เงินเข้าวันนี้', value: '฿' + money.toLocaleString('th-TH'), sub: 'บาท', cls: '' },
+          { href: 'payment-approvals.html', label: '🧾 สลิปรอตรวจ', value: String(slips), sub: 'รายการ', cls: slips > 0 ? 'tt-amber' : '' },
+          { href: 'homework.html', label: '📚 การบ้านรอตรวจ', value: String(hw), sub: 'งาน', cls: '' }
+        ];
+        document.getElementById('todayTiles').innerHTML = tiles.map(tl =>
+          '<a class="today-tile ' + tl.cls + '" href="' + tl.href + '"' + (tl.tip ? ' title="' + esc(tl.tip) + '"' : '') + '>' +
+            '<div class="tt-label">' + esc(tl.label) + '</div>' +
+            '<div class="tt-value">' + esc(tl.value) + '</div>' +
+            '<div class="tt-sub">' + esc(tl.sub) + '</div>' +
+          '</a>'
+        ).join('');
+
+        if (absent > 0 && Array.isArray(s.absent_names) && s.absent_names.length > 0) {
+          const names = s.absent_names.map(a => esc(a.name || '') + ' (' + esc(a.classroom || '—') + ')').join(', ');
+          const el = document.getElementById('todayAbsentLine');
+          el.innerHTML = '<strong>❗ ขาดวันนี้:</strong> ' + names + (absent > s.absent_names.length ? ' …' : '');
+          el.style.display = '';
+        }
+        if (unchecked > 0 && uncheckedRooms.length > 0) {
+          const el = document.getElementById('todayUncheckedLine');
+          el.innerHTML = '🏫 ยังไม่เช็คชื่อ: ' + uncheckedRooms.map(r => esc(r)).join(', ');
+          el.style.display = '';
+        }
+
+        document.getElementById('todayCard').style.display = '';
+      } catch (e) {
+        // เงียบไว้ — ส่วน "วันนี้" ถูกซ่อน ไม่กระทบส่วนอื่นของหน้า
+      }
+    }
+
     setLang(getLang());
     loadDashboard();
   </script>

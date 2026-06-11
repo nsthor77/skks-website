@@ -173,6 +173,7 @@
     <div class="quick-actions">
       <button class="quick-btn success" onclick="markAllAs('present')" data-i18n="attendance.markAllPresent">✓ Mark all Present</button>
       <button class="quick-btn" onclick="markAllAs('absent')" data-i18n="attendance.markAllAbsent">✗ Mark all Absent</button>
+      <button class="quick-btn" id="notifyAbsentBtn" onclick="notifyAbsent()" style="background:var(--pk-warning-bg);color:var(--pk-warning);border-color:var(--pk-warning-bg);font-weight:600;">📲 แจ้งขาดเรียนถึงผู้ปกครอง</button>
     </div>
 
     <div class="card">
@@ -332,13 +333,44 @@
     async function sendLineNotification(attendanceId, studentId, status) {
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) return;
-        await fetch('/api/line/notify-attendance', {
+        if (!session) return { success: false, error: 'no_session' };
+        const res = await fetch('/api/line/notify-attendance', {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain', 'Authorization': 'Bearer ' + session.access_token },
           body: JSON.stringify({ attendance_id: attendanceId, student_id: studentId, status })
         });
-      } catch (e) { /* fail silently for now */ }
+        const json = await res.json().catch(() => null);
+        return json || { success: res.ok };
+      } catch (e) { return { success: false, error: e.message }; }
+    }
+
+    async function notifyAbsent() {
+      const absentRows = rows.filter(r => r.status === 'absent');
+      if (!absentRows.length) return toast('วันนี้ไม่มีนักเรียนขาดเรียนในห้องนี้ 🎉', 'info');
+      if (!confirm(`ส่งแจ้งเตือน LINE ถึงผู้ปกครองของนักเรียนที่ขาดเรียน ${absentRows.length} คน?`)) return;
+
+      const btn = document.getElementById('notifyAbsentBtn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      let sent = 0, skipped = 0, failed = 0, i = 0;
+      for (const r of absentRows) {
+        i++;
+        btn.textContent = `กำลังส่ง ${i}/${absentRows.length}…`;
+        if (!r.attendance_id) { skipped++; continue; }
+        try {
+          const resp = await sendLineNotification(r.attendance_id, r.student_id, 'absent');
+          if (resp && resp.success) sent++;
+          else if (resp && resp.skipped) skipped++;
+          else failed++;
+        } catch (e) { failed++; }
+      }
+      btn.disabled = false;
+      btn.textContent = originalText;
+      let msg = `✅ ส่งแจ้งเตือนแล้ว ${sent}/${absentRows.length} คน`;
+      if (skipped) msg += ` · ข้าม ${skipped}`;
+      if (failed) msg += ` · ล้มเหลว ${failed}`;
+      toast(msg, failed ? 'error' : 'success');
+      loadAttendance(); // refresh LINE status badges
     }
 
     async function markAllAs(status) {

@@ -134,6 +134,22 @@
     + '#pk-sb::-webkit-scrollbar{width:8px;}#pk-sb::-webkit-scrollbar-thumb{background:#D8DEE9;border-radius:8px;}'
     + '#pk-sb .pk-sb-brand{display:flex;align-items:center;gap:10px;padding:16px 18px 14px;border-bottom:1px solid #EEF0F5;position:sticky;top:0;background:#fff;z-index:1;}'
     + '#pk-sb .pk-sb-brand img{height:26px;width:auto;}'
+    + '#pk-sb .pk-sb-search{position:relative;padding:10px 12px 4px;position:sticky;top:58px;background:#fff;z-index:1;border-bottom:1px solid #EEF0F5;}'
+    + '#pk-sb .pk-sb-search input{width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid #E1E7F5;border-radius:9px;'
+    + "font-family:inherit;font-size:13px;background:#F7F9FC;color:#15213F;}"
+    + '#pk-sb .pk-sb-search input:focus{outline:none;border-color:#93B4F5;background:#fff;}'
+    + '#pk-sb .pk-sb-search-results{position:absolute;left:12px;right:12px;top:calc(100% + 2px);background:#fff;'
+    + 'border:1px solid #E1E7F5;border-radius:10px;box-shadow:0 12px 30px -8px rgba(15,26,54,.25);max-height:340px;overflow-y:auto;display:none;z-index:950;}'
+    + '#pk-sb .pk-sb-search-results.show{display:block;}'
+    + '#pk-sb .pk-sr-item{display:block;padding:9px 12px;text-decoration:none;border-bottom:1px solid #F3F6FC;}'
+    + '#pk-sb .pk-sr-item:last-child{border-bottom:none;}'
+    + '#pk-sb .pk-sr-item:hover{background:#F3F6FC;}'
+    + '#pk-sb .pk-sr-title{font-size:13.5px;font-weight:600;color:#15213F;}'
+    + '#pk-sb .pk-sr-sub{font-size:11.5px;color:#8A93A6;margin-top:1px;}'
+    + '#pk-sb .pk-sr-badge{display:inline-block;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;margin-left:6px;vertical-align:middle;}'
+    + '#pk-sb .pk-sr-badge.student{background:#DBE5FF;color:#1E40AF;}'
+    + '#pk-sb .pk-sr-badge.teacher{background:#D1FAE5;color:#065F46;}'
+    + '#pk-sb .pk-sr-empty{padding:14px 12px;font-size:12.5px;color:#9AA3B5;text-align:center;}'
     + '#pk-sb .pk-sb-nav{padding:10px 12px 28px;flex:1;}'
     + '#pk-sb .pk-sb-group{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;cursor:pointer;'
     + "font-family:inherit;text-align:left;padding:11px 12px;margin-top:4px;border-radius:9px;color:#15213F;font-size:14.5px;font-weight:700;}"
@@ -323,9 +339,14 @@
     sb = document.createElement('aside');
     sb.id = 'pk-sb';
     sb.innerHTML = '<div class="pk-sb-brand"><img src="' + logo + '" alt="Panya School Kit" '
-      + 'onerror="this.style.display=\'none\'" /></div><nav class="pk-sb-nav"></nav>';
+      + 'onerror="this.style.display=\'none\'" /></div>'
+      + (isStudent ? '' : '<div class="pk-sb-search"><input type="text" id="pk-sb-search-input" placeholder="'
+          + (langOf() === 'en' ? 'Search students / teachers…' : 'ค้นหานักเรียน/ครู…') + '" autocomplete="off" />'
+          + '<div class="pk-sb-search-results" id="pk-sb-search-results"></div></div>')
+      + '<nav class="pk-sb-nav"></nav>';
     document.body.appendChild(sb);
     nav = sb.querySelector('.pk-sb-nav');
+    if (!isStudent) initGlobalSearch();
 
     // accordion: click a category header to expand/collapse its sub-links
     nav.addEventListener('click', function (e) {
@@ -365,6 +386,51 @@
       if (lk) { e.preventDefault(); e.stopPropagation(); showUpgrade(lk.getAttribute('data-need'), false); }
     });
     loadPlan();
+  }
+
+  // ---- Global search: find a student/teacher fast from any page ------------
+  function initGlobalSearch() {
+    var input = document.getElementById('pk-sb-search-input');
+    var results = document.getElementById('pk-sb-search-results');
+    if (!input || !results) return;
+    var timer = null, seq = 0;
+    var basePath = (location.pathname.indexOf('/pages/') > -1) ? '' : 'pages/';
+
+    function close() { results.classList.remove('show'); results.innerHTML = ''; }
+    function renderEmpty(msg) {
+      results.innerHTML = '<div class="pk-sr-empty">' + esc(msg) + '</div>';
+      results.classList.add('show');
+    }
+    function renderResults(rows) {
+      if (!rows || !rows.length) { renderEmpty(langOf() === 'en' ? 'No matches' : 'ไม่พบผลลัพธ์'); return; }
+      results.innerHTML = rows.map(function (r) {
+        var badgeCls = r.type === 'teacher' ? 'teacher' : 'student';
+        var badgeTxt = r.type === 'teacher' ? (langOf() === 'en' ? 'Teacher' : 'ครู') : (langOf() === 'en' ? 'Student' : 'นักเรียน');
+        return '<a class="pk-sr-item" href="' + basePath + esc(r.href) + '">'
+          + '<span class="pk-sr-title">' + esc(r.title) + '<span class="pk-sr-badge ' + badgeCls + '">' + badgeTxt + '</span></span>'
+          + (r.subtitle ? '<div class="pk-sr-sub">' + esc(r.subtitle) + '</div>' : '')
+          + '</a>';
+      }).join('');
+      results.classList.add('show');
+    }
+
+    input.addEventListener('input', function () {
+      var q = input.value.trim();
+      clearTimeout(timer);
+      if (q.length < 2) { close(); return; }
+      timer = setTimeout(function () {
+        var mySeq = ++seq;
+        if (typeof supabaseClient === 'undefined' || !supabaseClient.rpc) return;
+        supabaseClient.rpc('global_search', { p_query: q }).then(function (res) {
+          if (mySeq !== seq) return; // stale response
+          renderResults((res && res.data) || []);
+        }).catch(function () { if (mySeq === seq) close(); });
+      }, 250);
+    });
+    input.addEventListener('focus', function () { if (results.innerHTML) results.classList.add('show'); });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.pk-sb-search')) close();
+    });
   }
 
   // ---- Tenant branding: show the SCHOOL's own name + logo (not hardcoded) ----

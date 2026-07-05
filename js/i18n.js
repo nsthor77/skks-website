@@ -90,6 +90,7 @@
       addStudent: { en: '➕ Add Student', th: '➕ เพิ่มนักเรียน' },
       importCsv: { en: '📥 Import CSV', th: '📥 นำเข้า CSV' },
       exportCsv: { en: '📤 Export CSV', th: '📤 Export CSV' },
+      printList: { en: '🖨️ Print List', th: '🖨️ พิมพ์รายชื่อ' },
       configFields: { en: '⚙️ Configure Fields', th: '⚙️ ตั้งค่าฟิลด์' },
       searchPlaceholder: { en: '🔍 Search by name / ID / nickname', th: '🔍 ค้นหาชื่อ / รหัสนักเรียน / ชื่อเล่น' },
       filterStatus: { en: 'All statuses', th: 'ทุกสถานะ' },

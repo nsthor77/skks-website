@@ -298,8 +298,76 @@
 
           ${renderCustomDataCard(s.custom_data || {}, customFieldDefs)}
         </div>
+
+        <div class="grid-2" id="s360" style="margin-top:16px;"></div>
       `;
+
+      load360(id);
     });
+
+    // ============ Student 360°: attendance / behavior / grades / homework ============
+    async function load360(studentId) {
+      const wrap = document.getElementById('s360');
+      if (!wrap) return;
+      let d = null;
+      try {
+        const res = await supabaseClient.rpc('get_student_360', { p_student_id: studentId });
+        d = res.data;
+      } catch (e) { return; }
+      if (!d || d.error) return;   // RPC not deployed yet or no permission → skip silently
+
+      const attStatusTh = { present:'มา', late:'สาย', absent:'ขาด', leave:'ลา', sick:'ป่วย',
+                            excused:'ลา', event:'กิจกรรม', half_day_am:'ครึ่งวัน', half_day_pm:'ครึ่งวัน' };
+      const attColor = s2 => s2 === 'absent' ? '#B91C1C' : (s2 === 'late' ? '#B45309' : (s2 === 'leave' || s2 === 'sick' || s2 === 'excused') ? '#6D28D9' : '#065F46');
+      const attBg    = s2 => s2 === 'absent' ? '#FEE2E2' : (s2 === 'late' ? '#FEF3C7' : (s2 === 'leave' || s2 === 'sick' || s2 === 'excused') ? '#EDE9FE' : '#D1FAE5');
+      const dShort = x => new Date(x).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+
+      const att = d.attendance || {};
+      const attChips = (att.recent || []).map(r =>
+        `<span style="display:inline-block;margin:2px;padding:3px 8px;border-radius:7px;font-size:11.5px;font-weight:600;background:${attBg(r.status)};color:${attColor(r.status)};">${dShort(r.date)} ${attStatusTh[r.status] || r.status}</span>`
+      ).join('') || '<span class="val muted">ยังไม่มีข้อมูล</span>';
+
+      const beh = d.behavior || {};
+      const behScore = Number(beh.score ?? 100);
+      const behColor = behScore >= 90 ? '#065F46' : behScore >= 70 ? '#B45309' : '#B91C1C';
+      const behRows = (beh.recent || []).map(r =>
+        `<div class="field"><div class="lbl">${dShort(r.date)}</div><div class="val"><b style="color:${r.delta >= 0 ? '#065F46' : '#B91C1C'};">${r.delta >= 0 ? '+' : ''}${r.delta}</b> ${esc(r.reason || r.category || '')}</div></div>`
+      ).join('') || '<div class="field"><div class="val muted" style="grid-column:span 2;">ไม่มีบันทึกพฤติกรรม</div></div>';
+
+      const grades = d.grades || [];
+      const gradeRows = grades.map(g =>
+        `<div class="field"><div class="lbl">${esc(g.subject_name || g.subject_code || '')}</div>
+         <div class="val">${g.score_total != null ? g.score_total + ' คะแนน' : ''} ${g.grade_label ? '· เกรด <b>' + esc(g.grade_label) + '</b>' : ''} <span style="color:#7B8497;font-size:12px;">(${esc(g.term || '')}/${esc(g.academic_year || '')})</span></div></div>`
+      ).join('') || '<div class="field"><div class="val muted" style="grid-column:span 2;">ยังไม่มีผลการเรียน</div></div>';
+
+      const hw = d.homework || {};
+
+      wrap.innerHTML = `
+        <div class="card">
+          <h3>การมาเรียน (30 วันล่าสุด)</h3>
+          <div style="display:flex;gap:18px;margin-bottom:10px;">
+            <div><div style="font-size:22px;font-weight:700;color:#065F46;">${att.present ?? 0}</div><div style="font-size:12px;color:#7B8497;">มาเรียน</div></div>
+            <div><div style="font-size:22px;font-weight:700;color:#B91C1C;">${att.absent ?? 0}</div><div style="font-size:12px;color:#7B8497;">ขาด</div></div>
+            <div><div style="font-size:22px;font-weight:700;color:#6D28D9;">${att.leave ?? 0}</div><div style="font-size:12px;color:#7B8497;">ลา</div></div>
+          </div>
+          <div>${attChips}</div>
+        </div>
+        <div class="card">
+          <h3>คะแนนพฤติกรรม</h3>
+          <div style="font-size:30px;font-weight:800;color:${behColor};margin-bottom:8px;">${behScore} <span style="font-size:13px;font-weight:500;color:#7B8497;">/ 100</span></div>
+          ${behRows}
+        </div>
+        <div class="card">
+          <h3>ผลการเรียนล่าสุด</h3>
+          ${gradeRows}
+        </div>
+        <div class="card">
+          <h3>การบ้าน</h3>
+          <div class="field"><div class="lbl">ส่งแล้วรอตรวจ</div><div class="val">${hw.submitted ?? 0} งาน</div></div>
+          <div class="field"><div class="lbl">ตรวจแล้ว</div><div class="val">${hw.graded ?? 0} งาน</div></div>
+        </div>
+      `;
+    }
 
     // Sprint 10.5: render custom_data using field definitions
     function renderCustomDataCard(customData, defs) {

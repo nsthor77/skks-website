@@ -156,6 +156,10 @@
       </select>
       <label data-i18n="attendance.grade">Grade:</label>
       <input type="text" id="gradeInput" placeholder="e.g. Grade 3" style="width:120px;" />
+      <label id="periodLabel" style="display:none;">คาบ:</label>
+      <select id="periodSelect" style="display:none;">
+        <option value="">เช็คชื่อรายวัน (ปกติ)</option>
+      </select>
       <button class="btn btn-primary" onclick="loadAttendance()" data-i18n="attendance.refresh">🔄 Refresh</button>
     </div>
 
@@ -174,6 +178,7 @@
       <button class="quick-btn success" onclick="markAllAs('present')" data-i18n="attendance.markAllPresent">✓ Mark all Present</button>
       <button class="quick-btn" onclick="markAllAs('absent')" data-i18n="attendance.markAllAbsent">✗ Mark all Absent</button>
       <button class="quick-btn" id="notifyAbsentBtn" onclick="notifyAbsent()" style="background:var(--pk-warning-bg);color:var(--pk-warning);border-color:var(--pk-warning-bg);font-weight:600;">📲 แจ้งขาดเรียนถึงผู้ปกครอง</button>
+      <span id="periodNote" style="display:none;align-self:center;font-size:12.5px;color:var(--pk-ash);">แจ้งเตือน LINE ใช้กับเช็คชื่อรายวันเท่านั้น</span>
     </div>
 
     <div class="card">
@@ -206,6 +211,7 @@
       document.getElementById('dateInput').valueAsDate = new Date();
       bindFilters();
       await loadClassrooms();
+      await loadPeriods();
       await loadAttendance();
     });
     document.addEventListener('langchange', () => { render(); loadStats(); });
@@ -217,6 +223,39 @@
       document.getElementById('dateInput').addEventListener('change', loadAttendance);
       document.getElementById('classroomSelect').addEventListener('change', loadAttendance);
       document.getElementById('gradeInput').addEventListener('input', debounce(loadAttendance, 400));
+      document.getElementById('periodSelect').addEventListener('change', () => { updatePeriodUI(); loadAttendance(); });
+    }
+
+    // ── Per-period check (เช็คชื่อรายคาบ) ─────────────────────────────────
+    // null = daily/homeroom check (default, canonical for LINE parent alerts)
+    function currentPeriod() {
+      const v = document.getElementById('periodSelect').value;
+      return v === '' ? null : parseInt(v, 10);
+    }
+
+    async function loadPeriods() {
+      try {
+        const { data, error } = await supabaseClient.rpc('get_class_periods');
+        if (error || !Array.isArray(data) || !data.length) return; // no periods → feature stays invisible (daily only)
+        const sel = document.getElementById('periodSelect');
+        data.forEach(p => {
+          if (p.period_number === null || p.period_number === undefined) return;
+          const opt = document.createElement('option');
+          opt.value = p.period_number;
+          const time = (p.start_time && p.end_time) ? ` (${String(p.start_time).slice(0,5)}-${String(p.end_time).slice(0,5)})` : '';
+          opt.textContent = `คาบ ${p.period_number}` + (p.label ? ` — ${p.label}` : '') + time;
+          sel.appendChild(opt);
+        });
+        document.getElementById('periodLabel').style.display = '';
+        sel.style.display = '';
+      } catch (e) { /* keep daily-only */ }
+    }
+
+    function updatePeriodUI() {
+      const isPeriod = currentPeriod() !== null;
+      // LINE parent alerts are daily-only — hide the notify button for period checks
+      document.getElementById('notifyAbsentBtn').style.display = isPeriod ? 'none' : '';
+      document.getElementById('periodNote').style.display = isPeriod ? '' : 'none';
     }
 
     async function loadClassrooms() {
@@ -242,7 +281,7 @@
       document.getElementById('studentList').innerHTML = '<div class="empty-state">⏳ ' + t('common.loading') + '</div>';
 
       const { data, error } = await supabaseClient.rpc('get_attendance_for_date', {
-        p_date: date, p_classroom: classroom || null, p_grade: grade || null
+        p_date: date, p_classroom: classroom || null, p_grade: grade || null, p_period: currentPeriod()
       });
       if (error) return toast(t('attendance.loadFailed') + ': ' + error.message, 'error');
       if (data?.error) return toast(data.error, 'error');
@@ -254,6 +293,23 @@
     async function loadStats() {
       const date = document.getElementById('dateInput').value;
       const classroom = document.getElementById('classroomSelect').value;
+
+      // Per-period view: server stats are daily-only by design — compute from loaded rows instead
+      if (currentPeriod() !== null) {
+        const count = st => rows.filter(r => r.status === st).length;
+        const present = rows.filter(r => ['present','half_day_am','half_day_pm'].includes(r.status)).length;
+        const marked = present + count('absent') + count('late') + count('excused') + count('leave') + count('sick');
+        document.getElementById('statTotal').textContent    = rows.length.toLocaleString();
+        document.getElementById('statPresent').textContent  = present.toLocaleString();
+        document.getElementById('statAbsent').textContent   = count('absent').toLocaleString();
+        document.getElementById('statLate').textContent     = count('late').toLocaleString();
+        document.getElementById('statExcused').textContent  = count('excused').toLocaleString();
+        document.getElementById('statLeave').textContent    = count('leave').toLocaleString();
+        document.getElementById('statSick').textContent     = count('sick').toLocaleString();
+        document.getElementById('statUnmarked').textContent = (rows.length - marked).toLocaleString();
+        return;
+      }
+
       const { data } = await supabaseClient.rpc('get_attendance_stats', { p_date: date, p_classroom: classroom || null });
       if (!data || data.error) return;
       document.getElementById('statTotal').textContent    = (data.total ?? 0).toLocaleString();
@@ -313,8 +369,9 @@
 
     async function setStatus(studentId, status) {
       const date = document.getElementById('dateInput').value;
+      const period = currentPeriod();
       const { data, error } = await supabaseClient.rpc('mark_attendance', {
-        p_student_id: studentId, p_date: date, p_status: status, p_method: 'manual'
+        p_student_id: studentId, p_date: date, p_status: status, p_method: 'manual', p_period: period
       });
       if (error || !data?.success) return toast(t('attendance.markFailed'), 'error');
       toast(t('attendance.markedAs') + ': ' + t('attendance.status' + status.charAt(0).toUpperCase() + status.slice(1)), 'success');
@@ -327,7 +384,10 @@
       loadStats();
 
       // Trigger LINE notification (best effort, fire-and-forget)
-      sendLineNotification(data.id, studentId, status).catch(e => console.warn('LINE notify failed:', e));
+      // Daily check only — per-period marks never trigger parent LINE alerts
+      if (period === null) {
+        sendLineNotification(data.id, studentId, status).catch(e => console.warn('LINE notify failed:', e));
+      }
     }
 
     async function sendLineNotification(attendanceId, studentId, status) {
@@ -345,6 +405,7 @@
     }
 
     async function notifyAbsent() {
+      if (currentPeriod() !== null) return toast('แจ้งเตือน LINE ใช้กับเช็คชื่อรายวันเท่านั้น', 'info');
       const absentRows = rows.filter(r => r.status === 'absent');
       if (!absentRows.length) return toast('วันนี้ไม่มีนักเรียนขาดเรียนในห้องนี้ 🎉', 'info');
       if (!confirm(`ส่งแจ้งเตือน LINE ถึงผู้ปกครองของนักเรียนที่ขาดเรียน ${absentRows.length} คน?`)) return;
@@ -376,7 +437,7 @@
     async function markAllAs(status) {
       const date = document.getElementById('dateInput').value;
       if (!confirm(t('attendance.confirmMarkAll').replace('{status}', t('attendance.status' + status.charAt(0).toUpperCase() + status.slice(1))))) return;
-      const payload = rows.filter(r => r.status !== status).map(r => ({ student_id: r.student_id, date, status, method: 'manual' }));
+      const payload = rows.filter(r => r.status !== status).map(r => ({ student_id: r.student_id, date, status, method: 'manual', period_number: currentPeriod() }));
       if (!payload.length) return toast(t('attendance.allAlreadySet'), 'info');
       const { data, error } = await supabaseClient.rpc('bulk_mark_attendance', { p_rows: payload });
       if (error) return toast(t('attendance.markFailed'), 'error');
@@ -398,7 +459,7 @@
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `attendance-${date}${classroom ? '-' + classroom : ''}.csv`;
+      a.href = url; a.download = `attendance-${date}${classroom ? '-' + classroom : ''}${currentPeriod() !== null ? '-p' + currentPeriod() : ''}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     }

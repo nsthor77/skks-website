@@ -160,6 +160,52 @@ async function findStudent(supabase, schoolId, studentNumber) {
   return (data && data[0]) || null;
 }
 
+// Principal (ผอ.) self-linking: verify the code against
+// schools.line_settings->>'principal_link_code', then append this LINE userId
+// into line_settings.principal_line_user_ids (deduped, max 5).
+// Replies only (FREE — no quota cost). Never throws (caller catches anyway).
+async function handlePrincipalLink(supabase, schoolId, token, ev, userId, code) {
+  const { data: school } = await supabase
+    .from('schools')
+    .select('line_settings')
+    .eq('id', schoolId)
+    .single();
+
+  const settings = (school && school.line_settings) || {};
+  const expected = String(settings.principal_link_code || '').trim().toUpperCase();
+
+  if (!expected || expected !== code) {
+    await replyText(token, ev.replyToken, 'รหัสเชื่อมต่อไม่ถูกต้อง');
+    return;
+  }
+
+  const ids = Array.isArray(settings.principal_line_user_ids)
+    ? settings.principal_line_user_ids.filter(Boolean)
+    : [];
+
+  if (!ids.includes(userId)) {
+    if (ids.length >= 5) {
+      await replyText(token, ev.replyToken,
+        'มีผู้บริหารเชื่อมต่อครบ 5 บัญชีแล้วค่ะ กรุณาติดต่อเจ้าของโรงเรียน');
+      return;
+    }
+    ids.push(userId);
+    const newSettings = Object.assign({}, settings, { principal_line_user_ids: ids });
+    const { error: upErr } = await supabase
+      .from('schools')
+      .update({ line_settings: newSettings })
+      .eq('id', schoolId);
+    if (upErr) {
+      console.error('[line/webhook] principal link error:', upErr.message);
+      await replyText(token, ev.replyToken, 'ขออภัยค่ะ ระบบขัดข้อง กรุณาลองใหม่อีกครั้ง');
+      return;
+    }
+  }
+
+  await replyText(token, ev.replyToken,
+    '✅ เชื่อมบัญชีผู้บริหารสำเร็จ ระบบจะส่งรายงานสรุปให้ทาง LINE นี้');
+}
+
 async function handleEvent(supabase, schoolId, token, ev) {
   // ---- new friend → welcome + how to link ----
   if (ev.type === 'follow' && ev.replyToken) {
@@ -173,6 +219,16 @@ async function handleEvent(supabase, schoolId, token, ev) {
   if (!userId) return;
 
   const text = String(ev.message.text || '').trim();
+
+  // "ผอ <CODE>" / "ADMIN <CODE>" → link this LINE account as a principal
+  // (ผู้บริหาร) who receives the monthly summary report. The code comes from
+  // ensure_principal_link_code() shown on pages/monthly-report.html.
+  // MUST run before the generic "<number> <birthdate>" parent-link matcher.
+  const principalMatch = text.match(/^(?:ผอ|ADMIN)[\s-]*([A-Z0-9]{6})$/i);
+  if (principalMatch) {
+    await handlePrincipalLink(supabase, schoolId, token, ev, userId, principalMatch[1].toUpperCase());
+    return;
+  }
 
   // "ยกเลิก <student_number>" → unlink this LINE account from that student
   const unlinkMatch = text.match(/^ยกเลิก\s+(\S+)$/);

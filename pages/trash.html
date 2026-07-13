@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ถังขยะ — PanyaSchoolKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --pk-blue-900: #1E3A8A;
+      --pk-blue-800: #1E40AF;
+      --pk-blue-700: #1D4ED8;
+      --pk-blue-600: #2563EB;
+      --pk-blue-500: #3B82F6;
+      --pk-blue-200: #BFD0FB;
+      --pk-blue-100: #DBE5FF;
+      --pk-blue-50:  #EEF3FF;
+      --pk-gold-500: #D4A574;
+      --pk-canvas:   #EBF0FA;
+      --pk-paper:    #FFFFFF;
+      --pk-ink:      #0F1A36;
+      --pk-ink-soft: #1F2A4E;
+      --pk-ash:      #4B5670;
+      --pk-mist:     #7B8497;
+      --pk-border:   #D8DEE9;
+      --pk-border-em:#A8B2C4;
+      --pk-success:  #065F46;
+      --pk-success-bg: #D1FAE5;
+      --pk-warning:  #92400E;
+      --pk-warning-bg: #FEF3C7;
+      --pk-danger:   #991B1B;
+      --pk-danger-bg: #FEE2E2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      background: var(--pk-canvas);
+      color: var(--pk-ink);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* Topbar */
+    .topbar {
+      background: var(--pk-paper);
+      border-bottom: 1px solid var(--pk-border);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .brand-link { display: flex; align-items: center; text-decoration: none; }
+    .brand-link img { height: 26px; width: auto; }
+    .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--pk-ash);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: all .15s;
+    }
+    .nav-links a:hover { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+    .nav-links a.active { background: var(--pk-blue-100); color: var(--pk-blue-800); font-weight: 600; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .user-info { font-size: 13px; color: var(--pk-ash); }
+    .btn-out {
+      padding: 7px 14px; border-radius: 8px;
+      background: transparent; border: 1px solid var(--pk-border);
+      color: var(--pk-ash); font-size: 13px; cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-out:hover { background: var(--pk-canvas); color: var(--pk-ink); }
+
+    /* Container */
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    /* Page Header */
+    .page-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 18px;
+    }
+    .page-title h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-title p { color: var(--pk-ash); font-size: 14px; }
+    .page-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      padding: 10px 16px; border-radius: 10px;
+      font-family: inherit; font-size: 13.5px; font-weight: 600;
+      cursor: pointer; border: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: all .15s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--pk-blue-800); color: var(--pk-paper);
+      box-shadow: 0 2px 6px rgba(30,64,175,0.2);
+    }
+    .btn-primary:hover { background: var(--pk-blue-900); }
+    .btn-secondary {
+      background: var(--pk-paper); color: var(--pk-ink-soft);
+      border: 1px solid var(--pk-border-em);
+    }
+    .btn-secondary:hover { background: var(--pk-canvas); }
+    .btn-danger { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .btn-danger:hover { background: #FECACA; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    /* Info banner */
+    .info-banner {
+      background: var(--pk-blue-50);
+      border: 1px solid var(--pk-blue-100);
+      color: var(--pk-ink-soft);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13.5px;
+      margin-bottom: 16px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .info-banner strong { color: var(--pk-blue-800); }
+
+    /* Table */
+    .card {
+      background: var(--pk-paper);
+      border: 1px solid var(--pk-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    thead { background: var(--pk-canvas); }
+    th {
+      text-align: left; padding: 11px 14px;
+      font-weight: 600; font-size: 11px;
+      color: var(--pk-ash); text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--pk-border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 11px 14px; border-bottom: 1px solid #F0F2F7;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFBFC; }
+    .stu-number { font-family: 'Inter', monospace; font-weight: 600; color: var(--pk-blue-700); }
+    .stu-name { font-weight: 600; color: var(--pk-ink); }
+    .stu-nick { color: var(--pk-mist); font-size: 12px; font-weight: 400; }
+    .days-left { font-weight: 600; }
+    .days-left.urgent { color: var(--pk-danger); }
+    .action-cell { display: flex; gap: 6px; justify-content: flex-end; }
+
+    /* Empty / Loading */
+    .empty-state, .loading-state {
+      padding: 60px 20px; text-align: center;
+      color: var(--pk-ash); font-size: 14px;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state h4 { font-size: 17px; font-weight: 600; color: var(--pk-ink); margin-bottom: 6px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 18px; border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 9999; font-size: 14px; font-weight: 500;
+      display: none;
+    }
+    .toast.show { display: block; animation: slideIn 0.2s; }
+    .toast.success { background: var(--pk-success-bg); color: var(--pk-success); }
+    .toast.error { background: var(--pk-danger-bg); color: var(--pk-danger); }
+    .toast.info { background: var(--pk-blue-50); color: var(--pk-blue-800); }
+    @keyframes slideIn {
+      from { transform: translateX(20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .topbar { padding: 12px 16px; }
+      .nav-links { gap: 2px; }
+      .nav-links a { padding: 5px 10px; font-size: 12.5px; }
+      .container { padding: 16px; }
+      .page-header { flex-direction: column; align-items: stretch; }
+    }
+    @media (max-width: 540px) {
+      .nav-links { display: none; }
+      th, td { padding: 8px 10px; }
+    }
+
+    /* iOS prevent zoom */
+    @media (max-width: 768px) {
+      input, select, textarea { font-size: 16px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html" class="brand-link">
+        <img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" />
+      </a>
+      <nav class="nav-links">
+        <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+        <a href="students.html" data-i18n="nav.students">Students</a>
+        <a href="teachers.html" data-i18n="nav.teachers">Teachers</a>
+        <a href="applications.html" data-i18n="nav.applications">Applications</a>
+        <a href="attendance.html" data-i18n="nav.attendance">Attendance</a>
+        <a href="finance.html" class="owner-only" style="display:none" data-i18n="nav.finance">Finance</a>
+        <a href="billing.html" class="owner-only" style="display:none" data-i18n="nav.billing">Billing</a>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <span class="user-info" id="userInfo">...</span>
+      <button class="btn-out" onclick="signOut()">ออกจากระบบ</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-title">
+        <h1>🗑️ ถังขยะ</h1>
+        <p>รายการนักเรียนที่ถูกลบ — กู้คืนได้ภายใน 30 วัน</p>
+      </div>
+      <div class="page-actions">
+        <a href="students.html" class="btn btn-secondary">← กลับไปหน้านักเรียน</a>
+      </div>
+    </div>
+
+    <!-- Info banner -->
+    <div class="info-banner">
+      <span>ℹ️</span>
+      <span>นักเรียนที่ถูกลบจะพักไว้ที่นี่ <strong>30 วัน</strong> ก่อนถูกลบถาวรอัตโนมัติ — กด "กู้คืน" เพื่อนำกลับเข้าระบบได้ทุกเมื่อภายในช่วงเวลานี้</span>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>รหัส</th>
+              <th>ชื่อ-นามสกุล</th>
+              <th>ห้อง</th>
+              <th>ลบเมื่อ</th>
+              <th>เหลือเวลา</th>
+              <th>ลบโดย</th>
+              <th style="text-align:right;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="7"><div class="loading-state">⏳ กำลังโหลด...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+
+  <script>
+    let currentProfile = null;
+    let isOwner = false;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+      currentProfile = profile;
+      isOwner = ['owner', 'developer'].includes(profile.role);
+
+      if (isOwner) {
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
+      }
+      document.getElementById('userInfo').textContent = profile.email || ((profile.first_name || '') + ' ' + (profile.last_name || '')).trim();
+
+      loadTrash();
+    });
+
+    async function loadTrash() {
+      document.getElementById('tbody').innerHTML = '<tr><td colspan="7"><div class="loading-state">⏳ กำลังโหลด...</div></td></tr>';
+
+      const { data, error } = await supabaseClient.rpc('get_trash');
+      if (error) {
+        toast('โหลดข้อมูลไม่สำเร็จ: ' + error.message, 'error');
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="7"><div class="empty-state">โหลดไม่ได้</div></td></tr>';
+        return;
+      }
+      if (data && data.success === false) {
+        toast(data.error || 'โหลดข้อมูลไม่สำเร็จ', 'error');
+        document.getElementById('tbody').innerHTML = `<tr><td colspan="7"><div class="empty-state">${esc(data.error || 'โหลดไม่ได้')}</div></td></tr>`;
+        return;
+      }
+
+      render(data?.rows || []);
+    }
+
+    function render(rows) {
+      const tbody = document.getElementById('tbody');
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+          <div class="icon">🗑️</div>
+          <h4>ถังขยะว่าง</h4>
+          <p>รายการที่ลบจะเก็บไว้ 30 วัน</p>
+        </div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(r => {
+        const deletedDate = r.deleted_at
+          ? new Date(r.deleted_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })
+          : '—';
+        const daysLeft = Number(r.days_left ?? 0);
+        const urgent = daysLeft <= 7 ? ' urgent' : '';
+        const room = [r.grade, r.classroom].filter(Boolean).join(' · ') || '—';
+        const purgeBtn = isOwner
+          ? `<button class="btn btn-sm btn-danger" onclick="purgeStudent('${r.id}', ${JSON.stringify(r.student_number || '').replace(/"/g, '&quot;')})" title="ลบถาวร">ลบถาวร</button>`
+          : '';
+        return `<tr>
+          <td><span class="stu-number">${esc(r.student_number || '—')}</span></td>
+          <td><span class="stu-name">${esc(r.name || '—')}</span></td>
+          <td>${esc(room)}</td>
+          <td>${esc(deletedDate)}</td>
+          <td><span class="days-left${urgent}">${daysLeft} วัน</span></td>
+          <td>${esc(r.deleted_by_name || '—')}</td>
+          <td class="action-cell">
+            <button class="btn btn-sm btn-secondary" onclick="restoreStudent('${r.id}', ${JSON.stringify(r.student_number || '').replace(/"/g, '&quot;')})" title="กู้คืน">↩️ กู้คืน</button>
+            ${purgeBtn}
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function restoreStudent(id, num) {
+      const { data, error } = await supabaseClient.rpc('restore_student', { p_id: id });
+      if (error) return toast('กู้คืนไม่สำเร็จ: ' + error.message, 'error');
+      if (data && data.success === false) return toast(data.error || 'กู้คืนไม่สำเร็จ', 'error');
+      toast(`กู้คืน "${num}" เรียบร้อยแล้ว`, 'success');
+      loadTrash();
+    }
+
+    async function purgeStudent(id, num) {
+      if (!confirm(`ลบ "${num}" ถาวร?\nข้อมูลนักเรียนและข้อมูลที่เกี่ยวข้องจะหายไปทั้งหมด`)) return;
+      if (!confirm('ลบถาวร ไม่สามารถกู้คืนได้ พิมพ์ยืนยันด้วย OK')) return;
+      const { data, error } = await supabaseClient.rpc('purge_student', { p_id: id });
+      if (error) return toast('ลบถาวรไม่สำเร็จ: ' + error.message, 'error');
+      if (data && data.success === false) return toast(data.error || 'ลบถาวรไม่สำเร็จ', 'error');
+      toast('ลบถาวรเรียบร้อยแล้ว', 'success');
+      loadTrash();
+    }
+
+    // ============ Helpers ============
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function toast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      t.className = 'toast show ' + type;
+      t.textContent = msg;
+      setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+
+    async function signOut() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '../login.html';
+    }
+  </script>
+</body>
+</html>

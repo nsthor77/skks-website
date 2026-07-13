@@ -56,7 +56,8 @@
       { href: 'schedule-admin.html',  tier: 'admin',   en: 'Schedule',   th: 'ตารางเรียน' },
       { href: 'teacher-schedule.html',tier: 'teacher', en: 'My Schedule',th: 'ตารางสอนของฉัน' },
       { href: 'library.html',         tier: 'teacher', en: 'Library',    th: 'ห้องสมุด' },
-      { href: 'reports.html',         tier: 'admin',   en: 'Reports',    th: 'รายงาน' }
+      { href: 'reports.html',         tier: 'admin',   en: 'Reports',    th: 'รายงาน' },
+      { href: 'monthly-report.html',  tier: 'admin',   en: 'Monthly Report', th: 'รายงานรายเดือน' }
     ]},
     { label: { en: 'Finance', th: 'การเงิน' }, items: [
       { href: 'payments.html',          tier: 'owner', en: 'Payments',  th: 'การชำระเงิน' },
@@ -91,7 +92,8 @@
       { href: 'website-manager.html',  tier: 'admin', en: 'Website',          th: 'จัดการเว็บไซต์' },
       { href: 'school-settings.html',  tier: 'admin', en: 'School',           th: 'โรงเรียน' },
       { href: 'brand-setup.html',      tier: 'admin', en: 'Branding',         th: 'แบรนด์/โลโก้' },
-      { href: 'data-export.html',      tier: 'owner', en: 'Export Data',      th: 'ส่งออกข้อมูล' }
+      { href: 'data-export.html',      tier: 'owner', en: 'Export Data',      th: 'ส่งออกข้อมูล' },
+      { href: 'trash.html',            tier: 'admin', en: 'Trash',            th: 'ถังขยะ' }
     ]}
   ];
 
@@ -217,7 +219,7 @@
     'schedule-admin.html': 'pro', 'my-schedule.html': 'pro', 'teacher-schedule.html': 'pro', 'exam-schedule.html': 'pro',
     'behavior.html': 'pro', 'care-hub.html': 'pro', 'sdq.html': 'pro', 'home-visit.html': 'pro', 'popor-docs.html': 'pro',
     'consent-admin.html': 'pro', 'my-consent.html': 'pro', 'surveys-admin.html': 'pro', 'my-surveys.html': 'pro', 'messages.html': 'pro',
-    'website-manager.html': 'pro', 'brand-setup.html': 'pro',
+    'website-manager.html': 'pro', 'brand-setup.html': 'pro', 'monthly-report.html': 'pro',
     // Premium (฿6,990)
     'scholarships.html': 'premium', 'my-scholarships.html': 'premium', 'budget.html': 'premium', 'poverty.html': 'premium',
     'cafeteria.html': 'premium', 'my-wallet.html': 'premium', 'bus.html': 'premium', 'my-bus.html': 'premium',

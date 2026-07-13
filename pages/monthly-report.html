@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายงานรายเดือน — PanyaSchoolKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/panya-mark.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--pk-blue-800:#1E40AF;--pk-blue-50:#EEF3FF;--pk-canvas:#EBF0FA;--pk-paper:#FFFFFF;--pk-ink:#0F1A36;--pk-ink-soft:#1F2A4E;--pk-ash:#4B5670;--pk-border:#D8DEE9;--pk-border-em:#A8B2C4;--pk-success:#065F46;--pk-success-bg:#D1FAE5;--pk-danger:#991B1B;--pk-danger-bg:#FEE2E2;}
+    *{box-sizing:border-box;margin:0;padding:0;} body{font-family:'IBM Plex Sans Thai','Inter',sans-serif;background:var(--pk-canvas);color:var(--pk-ink);min-height:100vh;}
+    .topbar{background:var(--pk-paper);border-bottom:1px solid var(--pk-border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;} .topbar-left{display:flex;align-items:center;gap:16px;} .topbar img{height:26px;} .back-link{color:var(--pk-ash);text-decoration:none;font-size:13.5px;}
+    .container{max-width:980px;margin:0 auto;padding:24px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:16px;}
+    .page-title h1{font-size:23px;font-weight:700;} .page-title p{color:var(--pk-ash);font-size:13.5px;margin-top:4px;}
+    .btn{padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:none;} .btn-primary{background:var(--pk-blue-800);color:#fff;} .btn-secondary{background:var(--pk-paper);color:var(--pk-ink-soft);border:1px solid var(--pk-border-em);} .btn-danger{background:var(--pk-danger-bg);color:var(--pk-danger);} .btn-sm{padding:6px 10px;font-size:12px;} .btn:disabled{opacity:.55;cursor:default;}
+    .card{background:var(--pk-paper);border:1px solid var(--pk-border);border-radius:12px;padding:18px 20px;margin-bottom:16px;}
+    .card h3{font-size:15.5px;font-weight:700;margin-bottom:12px;}
+    .controls{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
+    .controls .field label{display:block;font-size:12px;color:var(--pk-ash);font-weight:600;margin-bottom:4px;}
+    .controls select{padding:9px 12px;border:1px solid var(--pk-border);border-radius:8px;font-family:inherit;font-size:14px;background:#fff;min-width:120px;}
+    .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+    .tile{background:#fff;border:1px solid var(--pk-border);border-radius:10px;padding:14px 16px;}
+    .tile .t-label{font-size:12px;color:var(--pk-ash);}
+    .tile .t-value{font-size:22px;font-weight:800;color:var(--pk-ink);margin-top:4px;}
+    .tile .t-sub{font-size:11.5px;color:#8A93A6;margin-top:2px;}
+    .tile.t-red{border-color:#FECACA;background:#FEF2F2;} .tile.t-red .t-value{color:#DC2626;}
+    .tile.t-amber{border-color:#FDE68A;background:#FFFBEB;} .tile.t-amber .t-value{color:#B45309;}
+    .tile.t-green{border-color:#A7F3D0;background:#ECFDF5;} .tile.t-green .t-value{color:var(--pk-success);}
+    table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;}
+    th,td{padding:9px 11px;border-bottom:1px solid #EEF2F7;text-align:left;} th{font-size:11px;color:var(--pk-ash);text-transform:uppercase;background:#F8FAFC;}
+    td.num,th.num{text-align:right;}
+    .empty{text-align:center;color:var(--pk-ash);padding:30px;}
+    .line-status{font-size:13.5px;color:var(--pk-ash);margin-bottom:10px;}
+    .line-steps{font-size:13.5px;color:var(--pk-ink-soft);line-height:1.8;margin-bottom:12px;}
+    .code-box{display:inline-block;font-family:'Inter',monospace;font-size:24px;font-weight:800;letter-spacing:6px;background:var(--pk-blue-50);color:var(--pk-blue-800);border:1px dashed var(--pk-blue-800);border-radius:10px;padding:10px 18px;margin:4px 0 12px;}
+    .line-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .print-header{display:none;}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--pk-ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;z-index:200;} .toast.show{opacity:1;}.toast.success{background:var(--pk-success);}.toast.error{background:var(--pk-danger);}
+    @media(max-width:640px){.container{padding:14px;}.controls select{font-size:16px;}}
+    @media print{
+      .topbar,#controlsCard,#lineCard,.no-print,.toast{display:none !important;}
+      #pk-sb{display:none !important;}
+      body.pk-has-sb{padding-left:0 !important;}
+      body{background:#fff !important;}
+      .card,.tile{border:1px solid #CBD5E1 !important;box-shadow:none !important;break-inside:avoid;}
+      .print-header{display:block;margin-bottom:14px;}
+      .print-header h1{font-size:18px;} .print-header p{font-size:12.5px;color:#4B5670;margin-top:2px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar"><div class="topbar-left"><a href="../index.html"><img src="../images/panya-schoolkit-lockup.png" alt="Panya SchoolKit" /></a><a href="dashboard.html" class="back-link">← แดชบอร์ด</a></div><div></div></div>
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title"><h1>📊 รายงานรายเดือน</h1><p>สรุปภาพรวมโรงเรียนสำหรับผู้บริหาร (ผอ.)</p></div>
+      <button class="btn btn-secondary no-print" onclick="window.print()">🖨️ พิมพ์</button>
+    </div>
+
+    <div class="card" id="controlsCard">
+      <div class="controls">
+        <div class="field"><label>เดือน</label><select id="selMonth"></select></div>
+        <div class="field"><label>ปีการศึกษา (พ.ศ.)</label><select id="selYear"></select></div>
+        <button class="btn btn-primary" id="showBtn" onclick="loadReport()">แสดงรายงาน</button>
+      </div>
+    </div>
+
+    <div class="print-header" id="printHeader"></div>
+
+    <div id="report"><div class="empty">⏳ กำลังโหลดรายงาน...</div></div>
+
+    <div class="card no-print" id="lineCard" style="display:none;">
+      <h3>📲 ส่งรายงานเข้า LINE ผู้บริหาร</h3>
+      <div class="line-status" id="lineStatus"></div>
+      <div class="line-steps" id="lineSteps"></div>
+      <div id="codeWrap" style="display:none;"><div class="code-box" id="codeBox"></div></div>
+      <div class="line-actions">
+        <button class="btn btn-primary" id="sendBtn" onclick="sendLine()">📲 ส่งรายงานเดือนนี้เข้า LINE</button>
+        <button class="btn btn-danger btn-sm" id="unlinkBtn" style="display:none;" onclick="unlinkAll()">ยกเลิกการเชื่อมต่อทั้งหมด</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/role-guard.js"></script>
+  <script>
+    const TH_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+    let isOwner = false;
+    let current = { year: null, month: null };   // เดือน/ปีของรายงานที่แสดงอยู่
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const profile = await roleGuard.requireStaff();
+      if (!profile) return;
+      isOwner = ['owner', 'developer'].includes(profile.role);
+      initSelectors();
+      loadReport();
+      initLineSection();
+    });
+
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function fmt(n){ return Number(n||0).toLocaleString('th-TH'); }
+    function fmtBaht(n){ return '฿' + Number(n||0).toLocaleString('th-TH', { maximumFractionDigits: 2 }); }
+
+    function initSelectors(){
+      const now = new Date();
+      const mSel = document.getElementById('selMonth');
+      mSel.innerHTML = TH_MONTHS.map((name, i) => `<option value="${i+1}">${name}</option>`).join('');
+      mSel.value = String(now.getMonth() + 1);
+
+      const ySel = document.getElementById('selYear');
+      const y = now.getFullYear();
+      const opts = [];
+      for (let yy = y - 2; yy <= y + 2; yy++) opts.push(`<option value="${yy}">${yy + 543}</option>`);
+      ySel.innerHTML = opts.join('');
+      ySel.value = String(y);
+    }
+
+    async function loadReport(){
+      const year = parseInt(document.getElementById('selYear').value, 10);
+      const month = parseInt(document.getElementById('selMonth').value, 10);
+      const box = document.getElementById('report');
+      box.innerHTML = '<div class="empty">⏳ กำลังโหลดรายงาน...</div>';
+
+      const { data: r, error } = await supabaseClient.rpc('get_monthly_report', { p_year: year, p_month: month });
+      if (error || !r || r.error) {
+        const msg = (r && r.error) || (error && error.message) || 'โหลดรายงานไม่สำเร็จ';
+        box.innerHTML = '<div class="card"><div class="empty">😔 ' + esc(msg) + '</div></div>';
+        return;
+      }
+      current = { year, month };
+      render(r);
+    }
+
+    function render(r){
+      const att = r.attendance || {};
+      const money = r.money || {};
+      const stu = r.students || {};
+      const hw = r.homework || {};
+      const beh = r.behavior || {};
+      const monthLabel = TH_MONTHS[(r.month || 1) - 1] + ' ' + ((r.year || 0) + 543);
+
+      document.getElementById('printHeader').innerHTML =
+        '<h1>รายงานประจำเดือน ' + esc(monthLabel) + '</h1>' +
+        '<p>พิมพ์เมื่อ ' + esc(new Date().toLocaleDateString('th-TH', { day:'numeric', month:'long', year:'numeric' })) + '</p>';
+
+      const rate = (att.attendance_rate === null || att.attendance_rate === undefined) ? null : Number(att.attendance_rate);
+      const absent = Number(att.absent || 0);
+      const unpaidCount = Number(money.unpaid_count || 0);
+      const behCount = Number(beh.negative_records || 0);
+
+      const tiles = [
+        { label: '👥 นักเรียนทั้งหมด', value: fmt(stu.total_active) + ' คน', sub: '+' + fmt(stu.new_this_month) + ' ใหม่เดือนนี้', cls: '' },
+        { label: '✅ มาเรียนเฉลี่ย', value: rate === null ? '—' : rate + '%', sub: 'จากการเช็คชื่อ ' + fmt(att.checked) + ' ครั้ง', cls: rate !== null && rate >= 90 ? 't-green' : '' },
+        { label: '🏫 วันที่มีเช็คชื่อ', value: fmt(att.school_days) + ' วัน', sub: 'ในเดือนนี้', cls: '' },
+        { label: '❌ ขาดเรียนรวม', value: fmt(absent) + ' ครั้ง', sub: 'สาย ' + fmt(att.late) + ' · ลา ' + fmt(att.leave), cls: absent > 0 ? 't-red' : '' },
+        { label: '💰 รับชำระเดือนนี้', value: fmtBaht(money.paid_total), sub: 'ยอดชำระสำเร็จ', cls: '' },
+        { label: '📄 ค้างชำระ', value: fmtBaht(money.unpaid_total), sub: fmt(unpaidCount) + ' รายการ (ยอดปัจจุบัน)', cls: unpaidCount > 0 ? 't-amber' : '' },
+        { label: '📚 การบ้าน', value: fmt(hw.assigned) + ' ชิ้น', sub: 'ตรวจแล้ว ' + fmt(hw.graded), cls: '' },
+        { label: '⚠️ พฤติกรรมหักคะแนน', value: fmt(behCount) + ' ครั้ง', sub: 'รวม -' + fmt(beh.minus_points) + ' คะแนน', cls: behCount > 0 ? 't-amber' : '' }
+      ];
+
+      let html = '<div class="card"><h3>ภาพรวมเดือน ' + esc(monthLabel) + '</h3><div class="tiles">' +
+        tiles.map(t =>
+          '<div class="tile ' + t.cls + '">' +
+            '<div class="t-label">' + esc(t.label) + '</div>' +
+            '<div class="t-value">' + esc(t.value) + '</div>' +
+            '<div class="t-sub">' + esc(t.sub) + '</div>' +
+          '</div>').join('') +
+        '</div></div>';
+
+      const top = Array.isArray(r.top_absent) ? r.top_absent : [];
+      html += '<div class="card"><h3>นักเรียนขาดเรียนมากที่สุด (Top 5)</h3>';
+      if (!top.length) {
+        html += '<div class="empty">ไม่มีนักเรียนขาดเรียนในเดือนนี้ 🎉</div>';
+      } else {
+        html += '<table><thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th class="num">ขาด (ครั้ง)</th></tr></thead><tbody>' +
+          top.map((s, i) =>
+            '<tr><td>' + (i + 1) + '</td><td><b>' + esc(s.name || '—') + '</b></td><td>' + esc(s.classroom || '—') + '</td><td class="num">' + fmt(s.absent_count) + '</td></tr>'
+          ).join('') + '</tbody></table>';
+      }
+      html += '</div>';
+
+      document.getElementById('report').innerHTML = html;
+    }
+
+    // ===== LINE section =====
+    async function initLineSection(){
+      const card = document.getElementById('lineCard');
+      card.style.display = '';
+      const status = document.getElementById('lineStatus');
+      const steps = document.getElementById('lineSteps');
+
+      if (!isOwner) {
+        status.textContent = 'ปุ่มด้านล่างจะส่งรายงานเดือนที่แสดงอยู่ไปยัง LINE ของผู้บริหารที่เชื่อมต่อไว้แล้ว';
+        steps.innerHTML = 'วิธีเชื่อมต่อผู้บริหารเพิ่ม: ให้ ผอ./ผู้บริหาร แอด LINE OA ของโรงเรียน แล้วพิมพ์ <b>ผอ ตามด้วยรหัสเชื่อม</b> (ขอรหัสได้จากเจ้าของโรงเรียนในหน้านี้)';
+        return;
+      }
+
+      try {
+        const { data: r, error } = await supabaseClient.rpc('ensure_principal_link_code');
+        if (error || !r || !r.success) {
+          status.textContent = (r && r.error) || 'โหลดรหัสเชื่อมไม่สำเร็จ';
+          return;
+        }
+        const n = Number(r.linked_count || 0);
+        status.innerHTML = n > 0
+          ? '✅ ผู้บริหารเชื่อมต่อแล้ว <b>' + fmt(n) + '</b> บัญชี (สูงสุด 5)'
+          : 'ยังไม่มีผู้บริหารเชื่อมต่อ — ทำตามขั้นตอนด้านล่าง';
+        steps.innerHTML =
+          '1) ให้ ผอ./ผู้บริหาร แอด LINE OA ของโรงเรียนเป็นเพื่อน<br>' +
+          '2) พิมพ์ในแชท: <b>ผอ ' + esc(r.code || '') + '</b><br>' +
+          '3) ระบบจะตอบยืนยัน จากนั้นกดปุ่มส่งรายงานได้เลย';
+        document.getElementById('codeBox').textContent = r.code || '';
+        document.getElementById('codeWrap').style.display = '';
+        if (n > 0) document.getElementById('unlinkBtn').style.display = '';
+      } catch (e) {
+        status.textContent = 'โหลดรหัสเชื่อมไม่สำเร็จ';
+      }
+    }
+
+    async function sendLine(){
+      if (!current.year || !current.month) { toast('กรุณาแสดงรายงานก่อน', 'error'); return; }
+      const btn = document.getElementById('sendBtn');
+      btn.disabled = true; const old = btn.textContent; btn.textContent = '⏳ กำลังส่ง...';
+      try {
+        const session = (await supabaseClient.auth.getSession()).data.session;
+        if (!session) { toast('กรุณาเข้าสู่ระบบใหม่', 'error'); return; }
+        const res = await fetch('/api/line/monthly-report', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({ year: current.year, month: current.month })
+        });
+        const j = await res.json().catch(() => ({}));
+        if (j && j.success) {
+          toast('✅ ส่งรายงานให้ผู้บริหารแล้ว ' + fmt(j.sent) + ' บัญชี', 'success');
+        } else {
+          toast((j && j.error) || 'ส่งไม่สำเร็จ กรุณาลองใหม่', 'error');
+        }
+      } catch (e) {
+        toast('ส่งไม่สำเร็จ กรุณาลองใหม่', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = old;
+      }
+    }
+
+    async function unlinkAll(){
+      if (!confirm('ยกเลิกการเชื่อมต่อ LINE ผู้บริหารทั้งหมด?')) return;
+      const { data: r, error } = await supabaseClient.rpc('unlink_principals');
+      if (error || !r || !r.success) { toast((r && r.error) || 'ยกเลิกไม่สำเร็จ', 'error'); return; }
+      toast('ยกเลิกการเชื่อมต่อแล้ว', 'success');
+      initLineSection();
+    }
+
+    let toastTimer = null;
+    function toast(msg, type){ const el = document.getElementById('toast'); el.textContent = msg; el.className = 'toast show ' + (type || ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.className = 'toast', 3000); }
+  </script>
+</body>
+</html>
